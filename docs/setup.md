@@ -7,13 +7,19 @@
 
 ## Install Dependencies
 
-From the project root, install the required npm packages:
+From the project root, install the npm packages listed in `package.json`:
 
 ```bash
 npm install
 ```
 
-This installs the packages in `package.json`, including `next`, `react`, and `react-dom`.
+This installs all project dependencies and dev dependencies from `package.json`, including `next`, `react`, `react-dom`, and the TypeScript typings.
+
+You still need to set up these manually:
+
+- `.env.local` with `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and `JWT_SECRET`
+- the Supabase `users` table in your database
+- any files in `public/` such as the logos used by the UI
 
 ## Start the Web App
 
@@ -69,3 +75,4 @@ create table users (
 Notes:
 - The implementation uses a custom auth flow backed by Supabase Postgres. It does not use Supabase Auth/magic links.
 - Keep the service role key secret and use server-side code only.
+- If you change dependencies in `package.json`, run `npm install` again to update `node_modules` and `package-lock.json`.
