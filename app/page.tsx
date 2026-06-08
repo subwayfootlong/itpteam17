@@ -4,9 +4,10 @@ import React, { useState, useEffect } from 'react';
 import SplashScreen from '@/components/SplashScreen';
 import WelcomeScreen from '@/components/WelcomeScreen';
 import LoginScreen from '@/components/LoginScreen';
+import RegisterScreen from '@/components/RegisterScreen';
 
 export default function Home() {
-  const [currentScreen, setCurrentScreen] = useState<'splash' | 'welcome' | 'login'>('splash');
+  const [currentScreen, setCurrentScreen] = useState<'splash' | 'welcome' | 'login' | 'register'>('splash');
 
   useEffect(() => {
     // Phase 1: Splash Screen timer automatically forwards to Welcome page after 3s
@@ -23,8 +24,14 @@ export default function Home() {
   };
 
   const handleLoginSuccess = () => {
+    window.alert('Login successful');
     console.log("User successfully validated. Authenticating and routing to Dashboard panel...");
     // Future step: router.push('/dashboard')
+  };
+
+  const handleRegisterSuccess = () => {
+    window.alert('Account created');
+    console.log('Account created successfully.');
   };
 
   return (
@@ -38,10 +45,14 @@ export default function Home() {
       {currentScreen === 'login' && (
         <LoginScreen 
           onLoginSuccess={handleLoginSuccess}
-          onCreateAccountClick={() => console.log("Routing to signup wizard...")}
+          onCreateAccountClick={() => setCurrentScreen('register')}
           onForgotPasswordClick={() => console.log("Routing to password recovery interface...")}
           onContactSupportClick={() => console.log("Opening communication ticket modal...")}
         />
+      )}
+
+      {currentScreen === 'register' && (
+        <RegisterScreen onRegisterSuccess={handleRegisterSuccess} onBackToLogin={() => setCurrentScreen('login')} />
       )}
     </main>
   );

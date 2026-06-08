@@ -26,6 +26,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onGetStarted }) => {
               src="/primarylogo.png" // Updated to your new file name
               alt="Pergas Primary Logo"
               fill
+              sizes="320px"
               priority
             />
           </div>

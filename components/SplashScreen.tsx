@@ -41,6 +41,7 @@ const SplashScreen = () => {
             alt="Pergas Secondary Logo"
             width={128}
             height={144}
+            sizes="128px"
             priority
           />
           {/* Ensure this text is a single line, centered, and matches the logo width */}

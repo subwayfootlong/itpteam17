@@ -29,7 +29,25 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (onLoginSuccess) onLoginSuccess();
+        (async () => {
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                if (res.ok) {
+                    if (onLoginSuccess) onLoginSuccess();
+                } else {
+                    const body = await res.json();
+                    alert(body?.error || 'Login failed');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Login error');
+            }
+        })();
     };
 
     return (
@@ -49,6 +67,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
                             src="/primarylogo.png"
                             alt="Pergas Primary Corporate Logo"
                             fill
+                            sizes="320px"
                             priority
                         />
                     </div>
