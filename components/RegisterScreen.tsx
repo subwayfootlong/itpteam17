@@ -2,6 +2,10 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import Input from '@/components/ui/Input';
+import Button from '@/components/ui/Button';
+import { useToast } from '@/components/ui/Toast';
+import { postJson } from '@/lib/api';
 
 interface RegisterScreenProps {
   onRegisterSuccess?: () => void;
@@ -15,37 +19,22 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegisterSuccess, onBa
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
+  const toast = useToast();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      alert('Passwords do not match');
+      toast.push({ type: 'error', message: 'Passwords do not match' });
       return;
     }
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fullName,
-          email,
-          password,
-        }),
-      });
-
-      const payload = await response.json();
-
-      if (!response.ok) {
-        alert(payload?.error || 'Registration failed');
-        return;
-      }
-
+      await postJson('/api/auth/register', { fullName, email, password });
+      toast.push({ type: 'success', message: 'Account created' });
       if (onRegisterSuccess) onRegisterSuccess();
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert('Registration error');
+      toast.push({ type: 'error', message: error?.message || 'Registration error' });
     }
   };
 
@@ -76,65 +65,47 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegisterSuccess, onBa
         {/* Form */}
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-5">
           {/* Full Name */}
-          <div className="w-full flex flex-col gap-1.5">
-            <label className="text-gray-900 text-sm font-semibold tracking-tight">Full Name</label>
-            <div className="w-full rounded-xl bg-slate-50 border border-stone-300 focus-within:border-[#53A63E] transition-all">
-              <input
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Enter your full name"
-                className="w-full h-12 px-4 bg-transparent text-gray-900 text-sm outline-none"
-                required
-              />
-            </div>
-          </div>
+          <Input
+            label="Full Name"
+            type="text"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            placeholder="Enter your full name"
+            required
+          />
 
           {/* Email */}
-          <div className="w-full flex flex-col gap-1.5">
-            <label className="text-gray-900 text-sm font-semibold tracking-tight">Email Address</label>
-            <div className="w-full rounded-xl bg-slate-50 border border-stone-300 focus-within:border-[#53A63E] transition-all">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="email@example.com"
-                className="w-full h-12 px-4 bg-transparent text-gray-900 text-sm outline-none"
-                required
-              />
-            </div>
-          </div>
+          <Input
+            label="Email Address"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="email@example.com"
+            required
+          />
 
           {/* Password Fields (Shared Logic) */}
           {[
-            { label: 'Password', val: password, set: setPassword },
-            { label: 'Confirm Password', val: confirmPassword, set: setConfirmPassword }
+            { label: 'Password', val: password, set: setPassword, placeholder: 'Create a password' },
+            { label: 'Confirm Password', val: confirmPassword, set: setConfirmPassword, placeholder: 'Repeat your password' }
           ].map((field, idx) => (
-            <div key={idx} className="w-full flex flex-col gap-1.5">
-              <label className="text-gray-900 text-sm font-semibold tracking-tight">{field.label}</label>
-              <div className="relative w-full rounded-xl bg-slate-50 border border-stone-300 focus-within:border-[#53A63E] transition-all">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={field.val}
-                  onChange={(e) => field.set(e.target.value)}
-                  placeholder={idx === 0 ? "Create a password" : "Repeat your password"}
-                  className="w-full h-12 px-4 pr-12 bg-transparent text-gray-900 text-sm outline-none"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-500"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                </button>
-              </div>
-            </div>
+            <Input
+              key={idx}
+              label={field.label}
+              type={showPassword ? 'text' : 'password'}
+              value={field.val}
+              onChange={(e) => field.set(e.target.value)}
+              placeholder={field.placeholder}
+              showPasswordToggle
+              isPasswordVisible={showPassword}
+              onTogglePassword={() => setShowPassword(!showPassword)}
+              required
+            />
           ))}
 
-          <button type="submit" className="w-full h-12 mt-4 bg-[#53A63E] text-white font-semibold rounded-xl hover:bg-opacity-95 transition-all">
+          <Button type="submit" className="mt-4" variant="primary">
             Create Account
-          </button>
+          </Button>
         </form>
 
         {/* Footer */}

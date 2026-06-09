@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Button from '@/components/ui/Button';
 
 interface WelcomeScreenProps {
   onGetStarted?: () => void;
@@ -49,12 +50,8 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onGetStarted }) => {
       <div className="w-full max-w-xs flex flex-col justify-end items-center pb-6 mt-auto relative z-10">
 
         {/* Interactive "Get Started" Primary Button */}
-        <button
-          onClick={onGetStarted}
-          className="w-full h-12 bg-[#53A63E] hover:bg-opacity-95 text-white font-semibold rounded-xl shadow-md flex justify-center items-center gap-2 transition-all active:scale-[0.99]"
-        >
+        <Button onClick={onGetStarted} variant="primary">
           <span>Get Started</span>
-          {/* Arrow SVG Icon matching Figma design spec */}
           <svg
             className="w-4 h-4 text-white"
             fill="none"
@@ -64,7 +61,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onGetStarted }) => {
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
           </svg>
-        </button>
+        </Button>
 
         {/* Footer Institutional Labeling */}
         <div className="pt-8 flex flex-col justify-start items-center w-full">
