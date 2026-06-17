@@ -67,10 +67,10 @@ h1, h2, h3, h4, h5, h6, .font-butler {
 
 /* ─── Admin-specific overrides ───────────────────────────────────────── */
 :root {
-  --sidebar-bg: #174311;
+  --sidebar-bg: #1c3829;
   --sidebar-text: rgba(255, 255, 255, 0.82);
   --sidebar-avatar-bg: #e8f5e3;
-  --sidebar-avatar-text: #174311;
+  --sidebar-avatar-text: #1c3829;
 }
 
 /* Page background — very subtle floral tint */
