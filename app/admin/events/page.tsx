@@ -2,6 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { FilterPills } from '@/components/admin/ui/FilterPills';
+import { ActionLink } from '@/components/admin/ui/Button';
+import StatCard from '@/components/admin/ui/StatCard';
+import { Badge } from '@/components/admin/ui/Badge';
+import {
+  TableWrapper,
+  TableHead,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableCell,
+} from '@/components/admin/ui/Table';
 
 interface Event {
   id: string;
@@ -16,11 +28,6 @@ interface Event {
   created_at: string;
 }
 
-const STATUS_STYLE: Record<string, string> = {
-  published: 'bg-green-100 text-green-700',
-  draft: 'bg-amber-100 text-amber-700',
-  archived: 'bg-gray-100 text-gray-500',
-};
 
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -68,169 +75,154 @@ export default function EventsPage() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 w-full pb-12">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Event Management</h2>
-          <p className="text-gray-500 text-sm mt-0.5">
+          <h2 className="text-[22px] font-bold font-butler"  style={{ color: '#1a2e1a' }}>
+            Event Management
+          </h2>
+          <p className="text-[13px] mt-0.5 font-helvetica"  style={{ color: '#939498' }}>
             Create, publish, and manage Pergas programmes and seminars
           </p>
         </div>
-        <Link
-          href="/admin/events/new"
-          className="flex items-center gap-2 px-4 py-2 bg-[#3FAE2A] hover:bg-[#35941f] text-white text-sm font-semibold rounded-lg transition-colors"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
+        <ActionLink href="/admin/events/new" icon={true}>
           Create New Event
-        </Link>
+        </ActionLink>
       </div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-3">
         {[
-          { label: 'Total Events', value: stats.total },
-          { label: 'Published', value: stats.published, color: 'text-green-600' },
-          { label: 'Drafts', value: stats.draft, color: 'text-amber-600' },
-          { label: 'Upcoming', value: stats.upcoming, color: 'text-blue-600' },
+          { label: 'Total Events', value: stats.total, accent: '#1a2e1a' },
+          { label: 'Published', value: stats.published, accent: '#3FAE2A' },
+          { label: 'Drafts', value: stats.draft, accent: '#FFB547' },
+          { label: 'Upcoming', value: stats.upcoming, accent: '#3BB0C9' },
         ].map((s) => (
-          <div key={s.label} className="bg-white rounded-xl border border-gray-200 p-4">
-            <div className="text-gray-500 text-xs uppercase tracking-wider mb-1">{s.label}</div>
-            <div className={`text-2xl font-bold ${s.color ?? 'text-gray-800'}`}>{s.value}</div>
-          </div>
+          <StatCard key={s.label} label={s.label} value={s.value} accent={s.accent} />
         ))}
       </div>
 
       {/* Filter bar */}
-      <div className="flex items-center gap-3">
-        {['all', 'published', 'draft', 'archived'].map((s) => (
-          <button
-            key={s}
-            onClick={() => setStatusFilter(s)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium capitalize transition-all ${
-              statusFilter === s
-                ? 'bg-[#3FAE2A] text-white'
-                : 'bg-white border border-gray-300 text-gray-600 hover:border-[#3FAE2A]'
-            }`}
-          >
-            {s === 'all' ? 'All Events' : s}
-          </button>
-        ))}
-      </div>
+      <FilterPills 
+        options={['all', 'published', 'draft', 'archived']} 
+        activeValue={statusFilter} 
+        onChange={setStatusFilter} 
+      />
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-100 bg-gray-50">
-                <th className="text-left px-5 py-3 text-gray-500 font-medium text-xs uppercase tracking-wider w-8" />
-                <th className="text-left px-5 py-3 text-gray-500 font-medium text-xs uppercase tracking-wider">Event</th>
-                <th className="text-left px-5 py-3 text-gray-500 font-medium text-xs uppercase tracking-wider">Date & Time</th>
-                <th className="text-left px-5 py-3 text-gray-500 font-medium text-xs uppercase tracking-wider">Venue</th>
-                <th className="text-left px-5 py-3 text-gray-500 font-medium text-xs uppercase tracking-wider">Category</th>
-                <th className="text-left px-5 py-3 text-gray-500 font-medium text-xs uppercase tracking-wider">Status</th>
-                <th className="text-right px-5 py-3 text-gray-500 font-medium text-xs uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {loading ? (
-                [...Array(4)].map((_, i) => (
-                  <tr key={i}>
-                    {[...Array(7)].map((_, j) => (
-                      <td key={j} className="px-5 py-4">
-                        <div className="h-3 bg-gray-100 rounded animate-pulse" />
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              ) : events.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center">
-                    <div className="text-gray-400 mb-2">No events found</div>
-                    <Link href="/admin/events/new" className="text-[#3FAE2A] text-sm hover:underline">
-                      Create your first event →
-                    </Link>
-                  </td>
-                </tr>
-              ) : (
-                events.map((ev) => (
-                  <tr key={ev.id} className="hover:bg-gray-50 transition-colors">
-                    {/* Color dot by status */}
-                    <td className="pl-5">
-                      <div className={`w-2 h-2 rounded-full ${ev.status === 'published' ? 'bg-green-500' : ev.status === 'draft' ? 'bg-amber-400' : 'bg-gray-300'}`} />
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="font-medium text-gray-800">{ev.title}</div>
-                      {ev.external_rsvp_url && (
-                        <div className="text-xs text-[#3FAE2A] mt-0.5">External RSVP linked</div>
-                      )}
-                    </td>
-                    <td className="px-5 py-3.5 text-gray-500 text-xs">
-                      <div>{new Date(ev.event_date).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
-                      {ev.start_time && <div className="mt-0.5">{ev.start_time}</div>}
-                    </td>
-                    <td className="px-5 py-3.5 text-gray-500 text-xs max-w-[160px] truncate">
-                      {ev.venue ?? '—'}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className="px-2 py-0.5 rounded text-xs bg-blue-50 text-blue-700">
-                        {ev.category}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className={`px-2 py-0.5 rounded text-xs font-medium capitalize ${STATUS_STYLE[ev.status]}`}>
-                        {ev.status}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center justify-end gap-2">
-                        {/* Quick publish/unpublish toggle */}
-                        {ev.status === 'draft' && (
-                          <button
-                            onClick={() => handleStatusChange(ev.id, 'published')}
-                            className="text-xs text-green-600 hover:underline font-medium"
-                          >
-                            Publish
-                          </button>
-                        )}
-                        {ev.status === 'published' && (
-                          <button
-                            onClick={() => handleStatusChange(ev.id, 'archived')}
-                            className="text-xs text-amber-600 hover:underline font-medium"
-                          >
-                            Archive
-                          </button>
-                        )}
-                        <Link
-                          href={`/admin/events/${ev.id}/edit`}
-                          className="text-xs text-[#3FAE2A] hover:underline font-medium"
-                        >
-                          Edit
-                        </Link>
+      <TableWrapper>
+        <TableHead>
+          <TableHeader className="w-8" />
+          <TableHeader>Event</TableHeader>
+          <TableHeader>Date & Time</TableHeader>
+          <TableHeader>Venue</TableHeader>
+          <TableHeader>Category</TableHeader>
+          <TableHeader>Status</TableHeader>
+          <TableHeader className="text-right">Actions</TableHeader>
+        </TableHead>
+        <TableBody>
+          {loading ? (
+            [...Array(4)].map((_, rowIndex) => (
+              <TableRow key={rowIndex}>
+                {[...Array(7)].map((_, cellIndex) => (
+                  <TableCell key={cellIndex}>
+                    <div className="h-3 bg-gray-100 rounded animate-pulse" />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : events.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={7} className="py-12 text-center text-gray-500">
+                <div className="mb-2">No events found</div>
+                <Link href="/admin/events/new" className="text-[#3FAE2A] font-medium hover:underline">
+                  Create your first event →
+                </Link>
+              </TableCell>
+            </TableRow>
+          ) : (
+            events.map((ev) => {
+              const statusConfig =
+                ev.status === 'published'
+                  ? { colorClass: 'bg-[#e8f5e3] text-[#27500A]', dotColor: 'bg-[#3FAE2A]' }
+                  : ev.status === 'draft'
+                    ? { colorClass: 'bg-[#fff4de] text-[#9a6800]', dotColor: 'bg-[#FFB547]' }
+                    : { colorClass: 'bg-gray-100 text-gray-600', dotColor: 'bg-gray-400' };
+
+              return (
+                <TableRow key={ev.id}>
+                  <TableCell className="w-8">
+                    <div className={`w-2 h-2 rounded-full ${statusConfig.dotColor}`} />
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-bold text-gray-800">{ev.title}</div>
+                    {ev.external_rsvp_url && (
+                      <div className="text-[11px] text-[#3FAE2A] mt-0.5 font-medium">External RSVP linked</div>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-gray-600">
+                    <div className="font-medium">{new Date(ev.event_date).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                    {ev.start_time && <div className="text-[11px] mt-0.5">{ev.start_time}</div>}
+                  </TableCell>
+                  <TableCell className="text-gray-600 max-w-[160px] truncate">
+                    {ev.venue ?? '—'}
+                  </TableCell>
+                  <TableCell>
+                    <Badge colorClass="bg-[#e3f6fb] text-[#1a7a8f]">
+                      {ev.category}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge colorClass={statusConfig.colorClass} dotColor={statusConfig.dotColor}>
+                      {ev.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center justify-end gap-3">
+                      {ev.status === 'draft' && (
                         <button
-                          onClick={() => handleDelete(ev.id)}
-                          disabled={deleting === ev.id}
-                          className="text-xs text-red-500 hover:underline font-medium disabled:opacity-40"
+                          onClick={() => handleStatusChange(ev.id, 'published')}
+                          className="text-[12px] text-[#3FAE2A] hover:text-[#27500A] font-bold transition-colors"
                         >
-                          {deleting === ev.id ? '…' : 'Delete'}
+                          PUBLISH
                         </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-        {!loading && (
-          <div className="px-5 py-3 border-t border-gray-100 text-xs text-gray-400">
-            {events.length} event{events.length !== 1 ? 's' : ''}
-          </div>
-        )}
-      </div>
+                      )}
+                      {ev.status === 'published' && (
+                        <button
+                          onClick={() => handleStatusChange(ev.id, 'draft')}
+                          className="text-[12px] text-amber-600 hover:text-amber-800 font-bold transition-colors"
+                        >
+                          UNPUBLISH
+                        </button>
+                      )}
+                      <Link
+                        href={`/admin/events/${ev.id}/edit`}
+                        className="text-gray-400 hover:text-[#3BB0C9] transition-colors"
+                        title="Edit"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(ev.id)}
+                        disabled={deleting === ev.id}
+                        className="text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50"
+                        title="Delete"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })
+          )}
+        </TableBody>
+      </TableWrapper>
     </div>
   );
 }

@@ -1,7 +1,19 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { ActionLink } from '@/components/admin/ui/Button';
+import { useToast } from '@/components/admin/Toast';
+import { FilterPills } from '@/components/admin/ui/FilterPills';
+import StatCard from '@/components/admin/ui/StatCard';
+import {
+  TableWrapper,
+  TableHead,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableCell,
+} from '@/components/admin/ui/Table';
 
 interface Announcement {
   id: string;
@@ -12,197 +24,233 @@ interface Announcement {
   updated_at: string;
 }
 
-const STATUS_STYLE: Record<string, string> = {
-  published: 'bg-green-100 text-green-700',
-  draft: 'bg-amber-100 text-amber-700',
-  archived: 'bg-gray-100 text-gray-500',
+const STATUS_STYLE: Record<string, { bg: string; color: string; dot: string }> = {
+  published: { bg: '#e8f5e3', color: '#27500A', dot: '#3FAE2A' },
+  draft:     { bg: '#fff4de', color: '#9a6800', dot: '#FFB547' },
+  archived:  { bg: '#f0f0f0', color: '#585859', dot: '#939498' },
 };
 
+const CATEGORY_STYLE: Record<string, { bg: string; color: string }> = {
+  'General':          { bg: '#f0f0f0', color: '#585859' },
+  'Volunteer':        { bg: '#e8f5e3', color: '#27500A' },
+  'Workshop':         { bg: '#e3f6fb', color: '#1a7a8f' },
+  'AGM':              { bg: '#e0f4f2', color: '#0d5e54' },
+  'Community Service':{ bg: '#fff4de', color: '#9a6800' },
+  'Religious':        { bg: '#e8f5e3', color: '#27500A' },
+  'Administrative':   { bg: '#f0f0f0', color: '#585859' },
+};
+
+const FONT = "'Helvetica Neue', -apple-system, sans-serif";
+
 export default function AnnouncementsPage() {
+  const { toast } = useToast();
   const [items, setItems] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
-  const [deleting, setDeleting] = useState<string | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
 
-  const fetchItems = () => {
-    setLoading(true);
-    const params = new URLSearchParams();
-    if (statusFilter !== 'all') params.set('status', statusFilter);
-    fetch(`/api/admin/announcements?${params}`)
-      .then((r) => r.json())
-      .then((d) => setItems(d.announcements ?? []))
-      .catch(console.error)
-      .finally(() => setLoading(false));
+  useEffect(() => {
+    let active = true;
+    const fetchAnnouncements = async () => {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (statusFilter !== 'all') params.set('status', statusFilter);
+      try {
+        const r = await fetch(`/api/admin/announcements?${params}`);
+        const d = await r.json();
+        if (active) setItems(d.announcements ?? []);
+      } catch {
+        if (active) toast.error('Failed to load announcements.');
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    fetchAnnouncements();
+    return () => { active = false; };
+  }, [statusFilter, toast]);
+
+  const handleStatusChange = async (id: string, newStatus: "draft" | "published" | "archived", label: string) => {
+    setBusy(id);
+    try {
+      const res = await fetch(`/api/admin/announcements/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (res.ok) {
+        toast.success(`Announcement ${label}.`);
+        setItems((prev) => prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item)));
+      } else {
+        toast.error('Action failed. Please try again.');
+      }
+    } catch {
+      toast.error('Network error.');
+    } finally {
+      setBusy(null);
+    }
   };
 
-  useEffect(() => { fetchItems(); }, [statusFilter]); // eslint-disable-line
-
-  const handleStatusChange = async (id: string, status: string) => {
-    await fetch(`/api/admin/announcements/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-    });
-    fetchItems();
+  const handleDelete = async (id: string, title: string) => {
+    if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+    setBusy(id);
+    try {
+      const res = await fetch(`/api/admin/announcements/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        toast.success('Announcement deleted.');
+        setItems((prev) => prev.filter((item) => item.id !== id));
+      } else {
+        toast.error('Failed to delete.');
+      }
+    } catch {
+      toast.error('Network error.');
+    } finally {
+      setBusy(null);
+    }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Delete this announcement? This cannot be undone.')) return;
-    setDeleting(id);
-    await fetch(`/api/admin/announcements/${id}`, { method: 'DELETE' });
-    setDeleting(null);
-    fetchItems();
+  const stats = {
+    total:     items.length,
+    published: items.filter((i) => i.status === 'published').length,
+    draft:     items.filter((i) => i.status === 'draft').length,
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 w-full">
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Announcements</h2>
-          <p className="text-gray-500 text-sm mt-0.5">
+          <h2 className="text-[22px] font-bold" style={{ color: '#1a2e1a', fontFamily: "'Playfair Display', Georgia, serif" }}>
+            Announcements
+          </h2>
+          <p className="text-[13px] mt-0.5" style={{ color: '#939498', fontFamily: FONT }}>
             Manage official Pergas announcements shown in the member feed
           </p>
         </div>
-        <Link
-          href="/admin/announcements/new"
-          className="flex items-center gap-2 px-4 py-2 bg-[#3FAE2A] hover:bg-[#35941f] text-white text-sm font-semibold rounded-lg transition-colors"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
+        <ActionLink href="/admin/announcements/new" icon={true}>
           New Announcement
-        </Link>
+        </ActionLink>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-3">
         {[
-          { label: 'Total', value: items.length },
-          { label: 'Published', value: items.filter((i) => i.status === 'published').length, color: 'text-green-600' },
-          { label: 'Drafts', value: items.filter((i) => i.status === 'draft').length, color: 'text-amber-600' },
+          { label: 'Total',      value: stats.total,     accent: '#1a2e1a' },
+          { label: 'Published',  value: stats.published, accent: '#3FAE2A' },
+          { label: 'Drafts',     value: stats.draft,     accent: '#FFB547' },
         ].map((s) => (
-          <div key={s.label} className="bg-white rounded-xl border border-gray-200 p-4">
-            <div className="text-gray-500 text-xs uppercase tracking-wider mb-1">{s.label}</div>
-            <div className={`text-2xl font-bold ${s.color ?? 'text-gray-800'}`}>{s.value}</div>
-          </div>
+          <StatCard key={s.label} label={s.label} value={s.value} accent={s.accent} />
         ))}
       </div>
 
-      {/* Filter */}
-      <div className="flex items-center gap-3">
-        {['all', 'published', 'draft', 'archived'].map((s) => (
-          <button
-            key={s}
-            onClick={() => setStatusFilter(s)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium capitalize transition-all ${
-              statusFilter === s
-                ? 'bg-[#3FAE2A] text-white'
-                : 'bg-white border border-gray-300 text-gray-600 hover:border-[#3FAE2A]'
-            }`}
-          >
-            {s === 'all' ? 'All' : s}
-          </button>
-        ))}
-      </div>
+      {/* Filter bar */}
+      <FilterPills 
+        options={['all', 'published', 'draft', 'archived']} 
+        activeValue={statusFilter} 
+        onChange={setStatusFilter} 
+      />
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-100 bg-gray-50">
-              <th className="text-left px-5 py-3 text-gray-500 font-medium text-xs uppercase tracking-wider">Title</th>
-              <th className="text-left px-5 py-3 text-gray-500 font-medium text-xs uppercase tracking-wider">Category</th>
-              <th className="text-left px-5 py-3 text-gray-500 font-medium text-xs uppercase tracking-wider">Status</th>
-              <th className="text-left px-5 py-3 text-gray-500 font-medium text-xs uppercase tracking-wider">Last Updated</th>
-              <th className="text-right px-5 py-3 text-gray-500 font-medium text-xs uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {loading ? (
-              [...Array(4)].map((_, i) => (
-                <tr key={i}>
-                  {[...Array(5)].map((_, j) => (
-                    <td key={j} className="px-5 py-4">
-                      <div className="h-3 bg-gray-100 rounded animate-pulse" />
-                    </td>
-                  ))}
-                </tr>
-              ))
-            ) : items.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-5 py-12 text-center">
-                  <div className="text-gray-400 mb-2">No announcements yet</div>
-                  <Link href="/admin/announcements/new" className="text-[#3FAE2A] text-sm hover:underline">
-                    Post your first announcement →
-                  </Link>
-                </td>
-              </tr>
-            ) : (
-              items.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-5 py-3.5">
-                    <div className="font-medium text-gray-800">{item.title}</div>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span className="px-2 py-0.5 rounded text-xs bg-blue-50 text-blue-700">
+      <TableWrapper>
+        <TableHead>
+          {['Title', 'Category', 'Status', 'Last Updated', 'Actions'].map((header) => (
+            <TableHeader
+              key={header}
+              className={header === 'Actions' ? 'text-right' : ''}
+            >
+              {header}
+            </TableHeader>
+          ))}
+        </TableHead>
+        <TableBody>
+          {loading ? (
+            [...Array(4)].map((_, rowIndex) => (
+              <TableRow key={rowIndex}>
+                {[...Array(5)].map((_, cellIndex) => (
+                  <TableCell key={cellIndex}>
+                    <div className="h-3 bg-gray-100 rounded animate-pulse" />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : items.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={5} className="py-14 text-center">
+                <div className="text-[13px] mb-2" style={{ color: '#939498' }}>No announcements yet</div>
+                <Link href="/admin/announcements/new" className="text-[13px] font-medium hover:underline" style={{ color: '#3FAE2A' }}>
+                  Post your first announcement →
+                </Link>
+              </TableCell>
+            </TableRow>
+          ) : (
+            items.map((item) => {
+              const ss = STATUS_STYLE[item.status];
+              const cs = CATEGORY_STYLE[item.category] ?? { bg: '#f0f0f0', color: '#585859' };
+              const isBusy = busy === item.id;
+              return (
+                <TableRow key={item.id} className={isBusy ? 'opacity-60' : ''}>
+                  <TableCell>
+                    <div className="text-[13px] font-medium" style={{ color: '#1a2e1a' }}>{item.title}</div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="inline-block px-2 py-0.5 rounded text-[11px] font-medium"
+                      style={{ background: cs.bg, color: cs.color }}>
                       {item.category}
                     </span>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium capitalize ${STATUS_STYLE[item.status]}`}>
+                  </TableCell>
+                  <TableCell>
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium capitalize"
+                      style={{ background: ss.bg, color: ss.color }}>
+                      <span className="w-1.5 h-1.5 rounded-full" style={{ background: ss.dot }} />
                       {item.status}
                     </span>
-                  </td>
-                  <td className="px-5 py-3.5 text-gray-500 text-xs">
-                    {new Date(item.updated_at).toLocaleDateString('en-SG', {
-                      day: 'numeric', month: 'short', year: 'numeric',
-                    })}
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <div className="flex items-center justify-end gap-2">
+                  </TableCell>
+                  <TableCell className="text-[12px]" style={{ color: '#585859' }}>
+                    {new Date(item.updated_at).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center justify-end gap-3">
                       {item.status === 'draft' && (
-                        <button
-                          onClick={() => handleStatusChange(item.id, 'published')}
-                          className="text-xs text-green-600 hover:underline font-medium"
-                        >
+                        <button disabled={isBusy}
+                          onClick={() => handleStatusChange(item.id, 'published', 'published')}
+                          className="text-[12px] font-medium hover:underline disabled:opacity-40"
+                          style={{ color: '#3FAE2A' }}>
                           Publish
                         </button>
                       )}
                       {item.status === 'published' && (
-                        <button
-                          onClick={() => handleStatusChange(item.id, 'archived')}
-                          className="text-xs text-amber-600 hover:underline font-medium"
-                        >
+                        <button disabled={isBusy}
+                          onClick={() => handleStatusChange(item.id, 'archived', 'archived')}
+                          className="text-[12px] font-medium hover:underline disabled:opacity-40"
+                          style={{ color: '#FFB547' }}>
                           Archive
                         </button>
                       )}
-                      <Link
-                        href={`/admin/announcements/${item.id}/edit`}
-                        className="text-xs text-[#3FAE2A] hover:underline font-medium"
-                      >
+                      {item.status === 'archived' && (
+                        <button disabled={isBusy}
+                          onClick={() => handleStatusChange(item.id, 'published', 're-published')}
+                          className="text-[12px] font-medium hover:underline disabled:opacity-40"
+                          style={{ color: '#3BB0C9' }}>
+                          Restore
+                        </button>
+                      )}
+                      <Link href={`/admin/announcements/${item.id}/edit`}
+                        className="text-[12px] font-medium hover:underline" style={{ color: '#3FAE2A' }}>
                         Edit
                       </Link>
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        disabled={deleting === item.id}
-                        className="text-xs text-red-500 hover:underline font-medium disabled:opacity-40"
-                      >
-                        {deleting === item.id ? '…' : 'Delete'}
+                      <button disabled={isBusy} onClick={() => handleDelete(item.id, item.title)}
+                        className="text-[12px] font-medium hover:underline disabled:opacity-40"
+                        style={{ color: '#C51A4A' }}>
+                        {isBusy ? '…' : 'Delete'}
                       </button>
                     </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-        {!loading && (
-          <div className="px-5 py-3 border-t border-gray-100 text-xs text-gray-400">
-            {items.length} announcement{items.length !== 1 ? 's' : ''}
-          </div>
-        )}
-      </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })
+          )}
+        </TableBody>
+      </TableWrapper>
     </div>
   );
 }
