@@ -1,11 +1,5 @@
-import BenefitsDirectory from "./components/benefits-directory";
-import { membershipBenefits, partners } from "./data/partners";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <BenefitsDirectory
-      partners={partners}
-      membershipBenefits={membershipBenefits}
-    />
-  );
+  redirect("/benefit");
 }

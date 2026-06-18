@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import type {
   MembershipBenefit,
@@ -338,18 +339,22 @@ export default function BenefitsDirectory({
         <div className="header-inner">
           <BrandMark />
           <nav className="desktop-nav" aria-label="Primary navigation">
-            <a href="#">Home</a>
+            <Link href="/benefit">Home</Link>
             <a href="#">Events</a>
-            <a className="is-active" href="#" aria-current="page">
+            <Link className="is-active" href="/benefit" aria-current="page">
               Benefits
-            </a>
-            <a href="#">Community</a>
+            </Link>
+            <Link href="/announcements">Community</Link>
           </nav>
           <div className="member-actions">
-            <button className="notification-button" aria-label="Notifications">
+            <Link
+              className="notification-button"
+              href="/notifications"
+              aria-label="Notifications"
+            >
               <Icon name="bell" size={21} />
               <span />
-            </button>
+            </Link>
             <button className="member-profile">
               <span className="avatar">AK</span>
               <span className="member-copy">
@@ -564,22 +569,22 @@ export default function BenefitsDirectory({
       </footer>
 
       <nav className="mobile-nav" aria-label="Mobile navigation">
-        <a href="#">
+        <Link href="/benefit">
           <Icon name="home" size={21} />
           Home
-        </a>
+        </Link>
         <a href="#">
           <Icon name="calendar" size={21} />
           Events
         </a>
-        <a className="is-active" href="#" aria-current="page">
+        <Link className="is-active" href="/benefit" aria-current="page">
           <Icon name="card" size={21} />
           Benefits
-        </a>
-        <a href="#">
+        </Link>
+        <Link href="/announcements">
           <Icon name="user" size={21} />
-          Profile
-        </a>
+          Community
+        </Link>
       </nav>
 
       {selected && (
