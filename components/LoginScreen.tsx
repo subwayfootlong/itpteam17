@@ -6,6 +6,7 @@ import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
 import { postJson } from '@/lib/api';
+import { getErrorMessage } from '@/lib/errors';
 
 interface LoginScreenProps {
     onLoginSuccess?: () => void;
@@ -39,9 +40,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
             await postJson('/api/auth/login', { email, password });
             toast.push({ type: 'success', message: 'Login successful' });
             if (onLoginSuccess) onLoginSuccess();
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error(err);
-            toast.push({ type: 'error', message: err?.message || 'Login error' });
+            toast.push({ type: 'error', message: getErrorMessage(err, 'Login error') });
         }
     };
 

@@ -1,17 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Spinner from '@/components/ui/Spinner';
 
 const SplashScreen = () => {
-  // Use a state to ensure the spinner starts animating after the client mounts
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
   // Use shared Spinner component
 
   return (
@@ -41,9 +33,7 @@ const SplashScreen = () => {
         </div>
 
         {/* Animated Loading Spinner */}
-        <div className={isClient ? '' : 'opacity-0'}>
-          <Spinner size="md" />
-        </div>
+        <Spinner size="md" />
       </div>
 
       {/* 3. Bottom Footer Text */}

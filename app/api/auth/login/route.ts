@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { verifyPassword, createAccessToken } from '@/lib/auth';
+import { getErrorMessage } from '@/lib/errors';
 
 export async function POST(req: Request) {
   try {
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
     const res = NextResponse.json({ ok: true });
     res.cookies.set('token', token, { httpOnly: true, path: '/', maxAge: 60 * 60 * 24 * 7 });
     return res;
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || String(err) }, { status: 500 });
+  } catch (err: unknown) {
+    return NextResponse.json({ error: getErrorMessage(err, 'Login failed') }, { status: 500 });
   }
 }

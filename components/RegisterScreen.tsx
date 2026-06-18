@@ -6,6 +6,7 @@ import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
 import { postJson } from '@/lib/api';
+import { getErrorMessage } from '@/lib/errors';
 
 interface RegisterScreenProps {
   onRegisterSuccess?: () => void;
@@ -32,9 +33,9 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegisterSuccess, onBa
       await postJson('/api/auth/register', { fullName, email, password });
       toast.push({ type: 'success', message: 'Account created' });
       if (onRegisterSuccess) onRegisterSuccess();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      toast.push({ type: 'error', message: error?.message || 'Registration error' });
+      toast.push({ type: 'error', message: getErrorMessage(error, 'Registration error') });
     }
   };
 
