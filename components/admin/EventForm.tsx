@@ -42,7 +42,43 @@ export default function EventForm({ initialData, eventId }: EventFormProps) {
   const router = useRouter();
   const [form, setForm] = useState<EventFormData>({ ...EMPTY, ...initialData });
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("File is too large. Maximum size is 5MB.");
+      return;
+    }
+
+    setUploading(true);
+    setError('');
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const d = await res.json();
+        throw new Error(d.error || 'Failed to upload image');
+      }
+
+      const { url } = await res.json();
+      set('image_url', url);
+    } catch (err: any) {
+      setError(err.message || 'Image upload failed.');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const set = (field: keyof EventFormData, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -79,6 +115,18 @@ export default function EventForm({ initialData, eventId }: EventFormProps) {
       setSaving(false);
     }
   };
+
+  // Date & Time constraints (enforce only on creation to allow editing past events)
+  const isCreating = !eventId;
+  const now = new Date();
+  const todayStr = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+  
+  const getMinTime = () => {
+    if (!isCreating || form.event_date !== todayStr) return undefined;
+    const future = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour buffer
+    return `${String(future.getHours()).padStart(2, '0')}:${String(future.getMinutes()).padStart(2, '0')}`;
+  };
+  const minStartTime = getMinTime();
 
   return (
     <form onSubmit={handleSubmit} className="max-w-4xl space-y-6 pb-12">
@@ -134,6 +182,7 @@ export default function EventForm({ initialData, eventId }: EventFormProps) {
               <input
                 required
                 type="date"
+                min={isCreating ? todayStr : undefined}
                 value={form.event_date}
                 onChange={(e) => set('event_date', e.target.value)}
                 className="h-11 px-4 rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-800 outline-none transition-all focus:bg-white focus:border-[#3FAE2A] focus:ring-4 focus:ring-[#3FAE2A]/10"
@@ -143,6 +192,7 @@ export default function EventForm({ initialData, eventId }: EventFormProps) {
               <label className="text-sm font-semibold text-gray-700">Start Time</label>
               <input
                 type="time"
+                min={minStartTime}
                 value={form.start_time}
                 onChange={(e) => set('start_time', e.target.value)}
                 className="h-11 px-4 rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-800 outline-none transition-all focus:bg-white focus:border-[#3FAE2A] focus:ring-4 focus:ring-[#3FAE2A]/10"
@@ -152,6 +202,7 @@ export default function EventForm({ initialData, eventId }: EventFormProps) {
               <label className="text-sm font-semibold text-gray-700">End Time</label>
               <input
                 type="time"
+                min={form.start_time || minStartTime}
                 value={form.end_time}
                 onChange={(e) => set('end_time', e.target.value)}
                 className="h-11 px-4 rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-800 outline-none transition-all focus:bg-white focus:border-[#3FAE2A] focus:ring-4 focus:ring-[#3FAE2A]/10"
@@ -250,13 +301,32 @@ export default function EventForm({ initialData, eventId }: EventFormProps) {
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
               </div>
               <input
-                type="url"
-                value={form.image_url}
-                onChange={(e) => set('image_url', e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                className="h-11 pl-10 pr-4 w-full rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-800 placeholder-gray-400 outline-none transition-all focus:bg-white focus:border-[#3FAE2A] focus:ring-4 focus:ring-[#3FAE2A]/10"
+                type="file"
+                accept="image/jpeg, image/png, image/webp"
+                onChange={handleImageUpload}
+                disabled={uploading}
+                className="h-11 pl-10 pr-4 pt-2.5 w-full rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-800 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:bg-[#3FAE2A] file:text-white file:text-xs file:font-semibold file:cursor-pointer file:shadow-sm cursor-pointer hover:file:bg-[#35941f] outline-none transition-all focus:bg-white focus:border-[#3FAE2A] focus:ring-4 focus:ring-[#3FAE2A]/10 disabled:opacity-50"
               />
             </div>
+            {uploading && <div className="text-sm text-[#3FAE2A] mt-1 font-medium">Uploading image...</div>}
+            {form.image_url && (
+              <div className="mt-3 rounded-xl overflow-hidden border border-gray-200 max-w-sm bg-gray-50">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img 
+                  src={form.image_url} 
+                  alt="Banner preview" 
+                  className="w-full h-auto object-cover" 
+                  referrerPolicy="no-referrer" 
+                  loading="lazy"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                  onLoad={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'block';
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -271,7 +341,7 @@ export default function EventForm({ initialData, eventId }: EventFormProps) {
           </button>
           <button
             type="submit"
-            disabled={saving}
+            disabled={saving || uploading}
             className="px-8 py-2.5 bg-[#3FAE2A] hover:bg-[#35941f] shadow-md shadow-[#3FAE2A]/20 disabled:opacity-70 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all"
           >
             {saving ? 'Processing...' : eventId ? 'Save Changes' : 'Create Event'}

@@ -30,7 +30,43 @@ export default function AnnouncementForm({ initialData, announcementId }: Announ
   const router = useRouter();
   const [form, setForm] = useState<AnnouncementFormData>({ ...EMPTY, ...initialData });
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("File is too large. Maximum size is 5MB.");
+      return;
+    }
+
+    setUploading(true);
+    setError('');
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const d = await res.json();
+        throw new Error(d.error || 'Failed to upload image');
+      }
+
+      const { url } = await res.json();
+      set('image_url', url);
+    } catch (err: any) {
+      setError(err.message || 'Image upload failed.');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const set = (field: keyof AnnouncementFormData, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -149,13 +185,32 @@ export default function AnnouncementForm({ initialData, announcementId }: Announ
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
               </div>
               <input
-                type="url"
-                value={form.image_url}
-                onChange={(e) => set('image_url', e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                className="h-11 pl-10 pr-4 w-full rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-800 placeholder-gray-400 outline-none transition-all focus:bg-white focus:border-[#3FAE2A] focus:ring-4 focus:ring-[#3FAE2A]/10"
+                type="file"
+                accept="image/jpeg, image/png, image/webp"
+                onChange={handleImageUpload}
+                disabled={uploading}
+                className="h-11 pl-10 pr-4 pt-2.5 w-full rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-800 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:bg-[#3FAE2A] file:text-white file:text-xs file:font-semibold file:cursor-pointer file:shadow-sm cursor-pointer hover:file:bg-[#35941f] outline-none transition-all focus:bg-white focus:border-[#3FAE2A] focus:ring-4 focus:ring-[#3FAE2A]/10 disabled:opacity-50"
               />
             </div>
+            {uploading && <div className="text-sm text-[#3FAE2A] mt-1 font-medium">Uploading image...</div>}
+            {form.image_url && (
+              <div className="mt-3 rounded-xl overflow-hidden border border-gray-200 max-w-sm bg-gray-50">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img 
+                  src={form.image_url} 
+                  alt="Cover preview" 
+                  className="w-full h-auto object-cover" 
+                  referrerPolicy="no-referrer" 
+                  loading="lazy"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                  onLoad={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'block';
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -170,7 +225,7 @@ export default function AnnouncementForm({ initialData, announcementId }: Announ
           </button>
           <button
             type="submit"
-            disabled={saving}
+            disabled={saving || uploading}
             className="px-8 py-2.5 bg-[#3FAE2A] hover:bg-[#35941f] shadow-md shadow-[#3FAE2A]/20 disabled:opacity-70 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all"
           >
             {saving ? 'Processing...' : announcementId ? 'Save Changes' : 'Post Announcement'}
