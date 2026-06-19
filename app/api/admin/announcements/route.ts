@@ -12,13 +12,16 @@ export async function GET(req: Request) {
 
   let query = supabaseAdmin
     .from('announcements')
-    .select('id, title, category, status, created_at, updated_at')
+    .select('id, title, category, status, created_at, updated_at, image_url')
     .order('created_at', { ascending: false });
 
   if (status) query = query.eq('status', status);
 
   const { data, error } = await query;
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error('Announcements GET Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
   return NextResponse.json({ announcements: data ?? [] });
 }
 
@@ -26,7 +29,19 @@ export async function POST(req: Request) {
   // const admin = await getVerifiedAdmin();
   // if (!admin) return unauthorizedResponse();
 
-  const body = await req.json();
+  let body;
+  try {
+    body = await req.json();
+  } catch (err) {
+    return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+  }
+
+  if (!body.title || typeof body.title !== 'string') {
+    return NextResponse.json({ error: 'Title is required and must be a string' }, { status: 400 });
+  }
+  if (!body.content || typeof body.content !== 'string') {
+    return NextResponse.json({ error: 'Content is required and must be a string' }, { status: 400 });
+  }
 
   const { data, error } = await supabaseAdmin
     .from('announcements')
@@ -41,6 +56,9 @@ export async function POST(req: Request) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error('Announcements POST Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
   return NextResponse.json({ announcement: data }, { status: 201 });
 }

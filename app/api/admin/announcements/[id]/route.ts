@@ -13,11 +13,14 @@ export async function GET(
   const { id } = await params;
   const { data, error } = await supabaseAdmin
     .from('announcements')
-    .select('*')
+    .select('*, announcement_comments(count)')
     .eq('id', id)
     .maybeSingle();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error('Announcements GET by ID Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
   if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json({ announcement: data });
 }
@@ -30,7 +33,12 @@ export async function PATCH(
   // if (!admin) return unauthorizedResponse();
 
   const { id } = await params;
-  const body = await req.json();
+  let body;
+  try {
+    body = await req.json();
+  } catch (err) {
+    return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+  }
 
   const allowed = ['title', 'content', 'category', 'image_url', 'status'];
   const updates: Record<string, unknown> = {};
@@ -45,7 +53,10 @@ export async function PATCH(
     .select()
     .maybeSingle();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error('Announcements PATCH Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
   return NextResponse.json({ announcement: data });
 }
 
@@ -58,6 +69,9 @@ export async function DELETE(
 
   const { id } = await params;
   const { error } = await supabaseAdmin.from('announcements').delete().eq('id', id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error('Announcements DELETE Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
   return NextResponse.json({ ok: true });
 }
