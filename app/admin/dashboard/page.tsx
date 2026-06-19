@@ -10,12 +10,26 @@ interface Stats {
   publishedAnnouncements: number;
   activePerks: number;
   expiredMembers: number;
+  trends?: {
+    totalMembers: string;
+    activeMembers: string;
+    upcomingEvents: string;
+    publishedAnnouncements: string;
+  };
+  sparklines?: {
+    totalMembers: string;
+    activeMembers: string;
+    upcomingEvents: string;
+    publishedAnnouncements: string;
+  };
+  insight?: string;
 }
 
 interface Activity {
   id: string;
   message: string;
-  timestamp: string;
+  timeAgo: string;
+  author: string;
   type: 'member' | 'event' | 'announcement' | 'system';
 }
 
@@ -119,7 +133,6 @@ const STAT_CONFIGS = [
     key: 'totalMembers' as keyof Stats,
     label: 'Total Members',
     subKey: null as null,
-    change: '+8%',
     isPos: true,
     iconBg: 'bg-[#e8f5e3]',
     iconText: 'text-[#27500A]',
@@ -133,8 +146,7 @@ const STAT_CONFIGS = [
   {
     key: 'activeMembers' as keyof Stats,
     label: 'Active Members',
-    subKey: 'expiredMembers' as keyof Stats,
-    change: '+3%',
+    subKey: null as null,
     isPos: true,
     iconBg: 'bg-[#e0f4f1]',
     iconText: 'text-[#1E9888]',
@@ -149,7 +161,6 @@ const STAT_CONFIGS = [
     key: 'upcomingEvents' as keyof Stats,
     label: 'Upcoming Events',
     subKey: null,
-    change: '+2',
     isPos: true,
     iconBg: 'bg-[#e3f6fb]',
     iconText: 'text-[#1a7a8f]',
@@ -164,7 +175,6 @@ const STAT_CONFIGS = [
     key: 'publishedAnnouncements' as keyof Stats,
     label: 'Live Announcements',
     subKey: null,
-    change: '+1',
     isPos: true,
     iconBg: 'bg-[#fff4de]',
     iconText: 'text-[#9a6800]',
@@ -186,7 +196,7 @@ export default function AdminDashboard() {
   const today = new Date().toLocaleDateString('en-SG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
   useEffect(() => {
-    fetch('/api/admin/stats')
+    fetch('/api/admin/dashboard', { cache: 'no-store' })
       .then((r) => r.json())
       .then((data) => {
         setStats(data.stats);
@@ -279,7 +289,7 @@ export default function AdminDashboard() {
                         ? <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                         : <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6" /></svg>
                       }
-                      {cfg.change}
+                      {stats?.trends?.[cfg.key as keyof typeof stats.trends] ?? '+0'}
                     </div>
                   </div>
                   {/* Value — Helvetica Neue */}
@@ -301,7 +311,7 @@ export default function AdminDashboard() {
                       aria-hidden="true"
                     >
                       <polyline
-                        points={spark.path.replace(/[ML]/g, '').trim().split(' L ').join(' ').replace('M', '')}
+                        points={(stats?.sparklines?.[cfg.key as keyof typeof stats.sparklines] ?? spark.path).replace(/[ML]/g, '').trim().split(' L ').join(' ').replace('M', '')}
                         fill="none"
                         stroke={spark.color}
                         strokeWidth="1.5"
@@ -390,10 +400,14 @@ export default function AdminDashboard() {
                     >
                       {s.icon}
                     </div>
-                    <div className="font-helvetica min-w-0">
-                      <p className="text-[13px] font-bold leading-tight text-[#1a2e1a] truncate">{a.message}</p>
-                      <p className="text-[11px] mt-1 font-medium text-[#939498]">{new Date(a.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</p>
-                    </div>
+                      <div className="font-helvetica min-w-0">
+                        <p className="text-[13px] font-bold leading-tight text-[#1a2e1a] truncate">{a.message}</p>
+                        <p className="text-[11px] mt-1 font-medium text-[#939498] flex items-center gap-1.5">
+                          <span>{a.timeAgo}</span>
+                          <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                          <span>{a.author}</span>
+                        </p>
+                      </div>
                   </div>
                 );
               })
@@ -455,7 +469,7 @@ export default function AdminDashboard() {
         <div className="flex-1 font-helvetica min-w-0">
           <h4 className="text-[13px] font-bold text-[#1c3829] mb-0.5">Administrative Insight</h4>
           <p className="text-[12px] text-[#2c5230] leading-relaxed">
-            Announcement engagement is up +24%. Event registrations slightly dipped. Align announcement timing with event launches to capitalise on traffic spikes.
+            {stats?.insight ?? 'Loading insights...'}
           </p>
         </div>
         <Link
