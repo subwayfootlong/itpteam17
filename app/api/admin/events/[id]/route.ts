@@ -17,7 +17,10 @@ export async function GET(
     .eq('id', id)
     .maybeSingle();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error('Events GET by ID Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
   if (!data) return NextResponse.json({ error: 'Event not found' }, { status: 404 });
   return NextResponse.json({ event: data });
 }
@@ -30,7 +33,12 @@ export async function PATCH(
   // if (!admin) return unauthorizedResponse();
 
   const { id } = await params;
-  const body = await req.json();
+  let body;
+  try {
+    body = await req.json();
+  } catch (err) {
+    return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+  }
 
   const allowed = [
     'title', 'description', 'event_date', 'start_time', 'end_time',
@@ -48,7 +56,10 @@ export async function PATCH(
     .select()
     .maybeSingle();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error('Events PATCH Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
   return NextResponse.json({ event: data });
 }
 
@@ -61,6 +72,9 @@ export async function DELETE(
 
   const { id } = await params;
   const { error } = await supabaseAdmin.from('events').delete().eq('id', id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error('Events DELETE Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
   return NextResponse.json({ ok: true });
 }

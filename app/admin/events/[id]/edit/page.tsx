@@ -4,10 +4,11 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import EventForm, { EventFormData } from '@/components/admin/EventForm';
+import RegisteredUsersCard from '@/components/admin/RegisteredUsersCard';
 
 export default function EditEventPage() {
   const { id } = useParams<{ id: string }>();
-  const [initialData, setInitialData] = useState<Partial<EventFormData> | null>(null);
+  const [initialData, setInitialData] = useState<Partial<EventFormData> & { capacity_num?: number | null, spots_available?: number | null } | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
@@ -29,6 +30,8 @@ export default function EditEventPage() {
           external_rsvp_url: ev.external_rsvp_url ?? '',
           image_url: ev.image_url ?? '',
           status: ev.status ?? 'draft',
+          capacity_num: ev.capacity,
+          spots_available: ev.spots_available,
         });
       })
       .catch(() => setNotFound(true))
@@ -53,7 +56,7 @@ export default function EditEventPage() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 pb-12">
       <nav className="text-sm text-gray-400">
         <Link href="/admin/events" className="hover:text-[#3FAE2A]">Events</Link>
         <span className="mx-2">›</span>
@@ -63,7 +66,21 @@ export default function EditEventPage() {
         <h2 className="text-2xl font-bold text-gray-800">Edit Event</h2>
         <p className="text-gray-500 text-sm mt-0.5">Update event details. Changes save immediately.</p>
       </div>
-      {initialData && <EventForm initialData={initialData} eventId={id} />}
+      
+      <div className="flex flex-col xl:flex-row gap-6 items-start">
+        <div className="w-full xl:flex-1">
+          {initialData && <EventForm initialData={initialData} eventId={id} />}
+        </div>
+        <div className="w-full xl:w-[400px] shrink-0 xl:sticky xl:top-6">
+          {initialData && (
+            <RegisteredUsersCard 
+              eventId={id} 
+              capacity={initialData.capacity_num ?? null} 
+              spotsAvailable={initialData.spots_available ?? null} 
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 }

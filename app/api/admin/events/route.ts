@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 // import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: Request) {
   // AUTH: uncomment when ready
   // const admin = await getVerifiedAdmin();
@@ -13,13 +15,16 @@ export async function GET(req: Request) {
 
   let query = supabaseAdmin
     .from('events')
-    .select('id, title, event_date, start_time, end_time, venue, category, capacity, status, external_rsvp_url, created_at')
+    .select('id, title, event_date, start_time, end_time, venue, category, capacity, spots_available, status, external_rsvp_url, created_at, image_url')
     .order('event_date', { ascending: false });
 
   if (status) query = query.eq('status', status);
 
   const { data, error } = await query;
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error('Events GET Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
   return NextResponse.json({ events: data ?? [] });
 }
 
@@ -28,7 +33,19 @@ export async function POST(req: Request) {
   // const admin = await getVerifiedAdmin();
   // if (!admin) return unauthorizedResponse();
 
-  const body = await req.json();
+  let body;
+  try {
+    body = await req.json();
+  } catch (err) {
+    return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+  }
+
+  if (!body.title || typeof body.title !== 'string') {
+    return NextResponse.json({ error: 'Title is required and must be a string' }, { status: 400 });
+  }
+  if (!body.event_date || typeof body.event_date !== 'string') {
+    return NextResponse.json({ error: 'Event date is required' }, { status: 400 });
+  }
 
   const { data, error } = await supabaseAdmin
     .from('events')
@@ -49,6 +66,9 @@ export async function POST(req: Request) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error('Events POST Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
   return NextResponse.json({ event: data }, { status: 201 });
 }
