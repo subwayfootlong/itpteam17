@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type {
@@ -13,18 +12,35 @@ type PreferenceKey = "renewal" | "event" | "system";
 
 const filters: Filter[] = ["All", "Unread", "Renewal", "Event", "System"];
 
+const preferenceCopy: {
+  key: PreferenceKey;
+  title: string;
+  description: string;
+}[] = [
+  {
+    key: "renewal",
+    title: "Renewal reminders",
+    description: "Membership expiry and renewal deadlines",
+  },
+  {
+    key: "event",
+    title: "Event updates",
+    description: "Registration windows and event reminders",
+  },
+  {
+    key: "system",
+    title: "System notices",
+    description: "Comments, account and platform updates",
+  },
+];
+
 function Icon({ name, size = 20 }: { name: string; size?: number }) {
   const paths: Record<string, React.ReactNode> = {
+    arrow: <path d="m9 18 6-6-6-6" />,
     bell: (
       <>
         <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
         <path d="M10 21h4" />
-      </>
-    ),
-    home: (
-      <>
-        <path d="m3 11 9-8 9 8" />
-        <path d="M5 10v11h14V10M9 21v-7h6v7" />
       </>
     ),
     calendar: (
@@ -39,10 +55,28 @@ function Icon({ name, size = 20 }: { name: string; size?: number }) {
         <path d="M2 10h20M6 15h4" />
       </>
     ),
+    check: <path d="m20 6-11 11-5-5" />,
+    clock: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v5l3 3" />
+      </>
+    ),
+    close: (
+      <>
+        <path d="M18 6 6 18M6 6l12 12" />
+      </>
+    ),
+    home: (
+      <>
+        <path d="m3 11 9-8 9 8" />
+        <path d="M5 10v11h14V10M9 21v-7h6v7" />
+      </>
+    ),
     message: (
       <>
         <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z" />
-        <path d="M8 9h8M8 13h5" />
+        <path d="M8 9h8" />
       </>
     ),
     refresh: (
@@ -52,17 +86,21 @@ function Icon({ name, size = 20 }: { name: string; size?: number }) {
         <path d="M18 2v4h4M6 22v-4H2" />
       </>
     ),
-    check: <path d="m20 6-11 11-5-5" />,
-    clock: (
+    search: (
       <>
-        <circle cx="12" cy="12" r="9" />
-        <path d="M12 7v5l3 3" />
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-4-4" />
       </>
     ),
     shield: (
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
     ),
-    arrow: <path d="m9 18 6-6-6-6" />,
+    user: (
+      <>
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 21a8 8 0 0 1 16 0" />
+      </>
+    ),
   };
 
   return (
@@ -82,87 +120,6 @@ function Icon({ name, size = 20 }: { name: string; size?: number }) {
   );
 }
 
-function BrandMark() {
-  return (
-    <div className="brand">
-      <Image
-        className="brand-logo brand-logo--primary"
-        src="/pergas-assets/pergas-logo-primary.png"
-        width={250}
-        height={50}
-        alt="Pergas - Singapore Islamic Scholars and Religious Teachers Association"
-        priority
-      />
-      <Image
-        className="brand-logo brand-logo--secondary"
-        src="/pergas-assets/pergas-logo-secondary.png"
-        width={50}
-        height={50}
-        alt="Pergas"
-        priority
-      />
-      <span>Member Portal</span>
-    </div>
-  );
-}
-
-function Header({ unreadCount }: { unreadCount: number }) {
-  return (
-    <header className="site-header">
-      <div className="header-inner">
-        <BrandMark />
-        <nav className="desktop-nav" aria-label="Primary navigation">
-          <Link href="/benefit">Home</Link>
-          <a href="#">Events</a>
-          <Link href="/benefit">Benefits</Link>
-          <Link href="/announcements">Community</Link>
-        </nav>
-        <div className="member-actions">
-          <Link
-            className="notification-button is-active"
-            href="/notifications"
-            aria-label={`${unreadCount} unread notifications`}
-            aria-current="page"
-          >
-            <Icon name="bell" size={21} />
-            {unreadCount > 0 && <span />}
-          </Link>
-          <button className="member-profile">
-            <span className="avatar">AK</span>
-            <span className="member-copy">
-              <strong>Ahmad Khalid</strong>
-              <small>Active member</small>
-            </span>
-          </button>
-        </div>
-      </div>
-    </header>
-  );
-}
-
-function MobileNav() {
-  return (
-    <nav className="mobile-nav" aria-label="Mobile navigation">
-      <Link href="/benefit">
-        <Icon name="home" size={21} />
-        Home
-      </Link>
-      <a href="#">
-        <Icon name="calendar" size={21} />
-        Events
-      </a>
-      <Link href="/benefit">
-        <Icon name="card" size={21} />
-        Benefits
-      </Link>
-      <Link href="/announcements">
-        <Icon name="message" size={21} />
-        Community
-      </Link>
-    </nav>
-  );
-}
-
 function nextNotification(id: number): SystemNotification {
   return {
     id,
@@ -178,6 +135,63 @@ function nextNotification(id: number): SystemNotification {
   };
 }
 
+function NotificationHeader({ unreadCount }: { unreadCount: number }) {
+  return (
+    <header className="notifications-mobile-header">
+      <div>
+        <span className="notifications-member-avatar">AK</span>
+        <h1>Pergas</h1>
+      </div>
+      <Link
+        className="notifications-bell-button"
+        href="/notifications"
+        aria-label={`${unreadCount} unread notifications`}
+        aria-current="page"
+      >
+        <Icon name="bell" size={22} />
+        {unreadCount > 0 && <span />}
+      </Link>
+    </header>
+  );
+}
+
+function BottomNav() {
+  return (
+    <nav className="notifications-bottom-nav" aria-label="Mobile navigation">
+      <Link href="/benefit">
+        <Icon name="home" size={22} />
+        Home
+      </Link>
+      <a href="#">
+        <Icon name="calendar" size={22} />
+        Events
+      </a>
+      <Link href="/benefit">
+        <Icon name="card" size={22} />
+        Benefits
+      </Link>
+      <Link href="/announcements">
+        <Icon name="message" size={22} />
+        Community
+      </Link>
+      <a className="is-active" href="#" aria-current="page">
+        <Icon name="user" size={22} />
+        Profile
+      </a>
+    </nav>
+  );
+}
+
+function NotificationIcon({ type }: { type: NotificationType }) {
+  const icon = type === "Renewal" ? "clock" : type === "System" ? "shield" : "bell";
+
+  return (
+    <span className={`notifications-type-icon is-${type.toLowerCase()}`}>
+      <Icon name={icon} size={20} />
+    </span>
+  );
+}
+
 export default function NotificationsCenter({
   initialNotifications,
 }: {
@@ -185,6 +199,7 @@ export default function NotificationsCenter({
 }) {
   const [notifications, setNotifications] = useState(initialNotifications);
   const [filter, setFilter] = useState<Filter>("All");
+  const [query, setQuery] = useState("");
   const [toast, setToast] = useState("");
   const [preferences, setPreferences] = useState<Record<PreferenceKey, boolean>>({
     renewal: true,
@@ -195,16 +210,35 @@ export default function NotificationsCenter({
   const unreadCount = notifications.filter((item) => !item.isRead).length;
 
   const filteredNotifications = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
     return notifications.filter((notification) => {
-      if (filter === "All") return true;
-      if (filter === "Unread") return !notification.isRead;
-      return notification.type === filter;
+      const matchesFilter =
+        filter === "All" ||
+        (filter === "Unread" && !notification.isRead) ||
+        notification.type === filter;
+      const matchesQuery =
+        !normalizedQuery ||
+        [
+          notification.title,
+          notification.message,
+          notification.type,
+          notification.priority,
+        ].some((value) => value.toLowerCase().includes(normalizedQuery));
+
+      return matchesFilter && matchesQuery;
     });
-  }, [filter, notifications]);
+  }, [filter, notifications, query]);
 
   const markAllRead = () => {
     setNotifications((current) =>
       current.map((notification) => ({ ...notification, isRead: true })),
+    );
+  };
+
+  const clearRead = () => {
+    setNotifications((current) =>
+      current.filter((notification) => !notification.isRead),
     );
   };
 
@@ -233,145 +267,124 @@ export default function NotificationsCenter({
   };
 
   return (
-    <div className="portal-shell notifications-page">
-      <Header unreadCount={unreadCount} />
-      <main>
-        <section className="notifications-hero">
-          <Image
-            className="hero-floral"
-            src="/pergas-assets/pergas-floral.png"
-            width={476}
-            height={473}
-            alt=""
-            aria-hidden="true"
-          />
-          <div className="page-container notifications-hero__content">
-            <div>
-              <span className="eyebrow">UC-07 NOTIFICATION ENGINE</span>
-              <h1>Automated renewal and event alerts</h1>
-              <p>
-                Receive timely system notifications for membership renewals,
-                event reminders and important member updates.
-              </p>
-            </div>
-            <div className="notification-summary-card">
-              <Icon name="bell" size={28} />
-              <span>{unreadCount}</span>
-              <p>
-                unread alerts
-                <small>{notifications.length} total notifications</small>
-              </p>
-            </div>
+    <div className="notifications-mobile-shell">
+      <NotificationHeader unreadCount={unreadCount} />
+
+      <main className="notifications-mobile-main">
+        <section className="notifications-title-row">
+          <div>
+            <h2>Notifications</h2>
+            <p>{unreadCount} unread updates</p>
+          </div>
+          <div>
+            <button type="button" onClick={markAllRead} disabled={unreadCount === 0}>
+              Mark All Read
+            </button>
+            <button type="button" onClick={clearRead}>
+              Clear Read
+            </button>
           </div>
         </section>
 
-        <section className="page-container notifications-workspace">
-          <aside className="notification-preferences">
-            <span className="section-label">PUSH SETTINGS</span>
-            <h2>Alert preferences</h2>
-            <p>
-              Configure which automated alerts the member should receive from
-              the Notification Engine.
-            </p>
-
-            <div className="preference-list">
-              <button
-                className={preferences.renewal ? "is-enabled" : ""}
-                onClick={() => togglePreference("renewal")}
-              >
-                <span>
-                  <strong>Renewal reminders</strong>
-                  <small>Membership expiry and renewal deadlines</small>
-                </span>
-                <i>{preferences.renewal ? "On" : "Off"}</i>
-              </button>
-              <button
-                className={preferences.event ? "is-enabled" : ""}
-                onClick={() => togglePreference("event")}
-              >
-                <span>
-                  <strong>Event updates</strong>
-                  <small>Registration windows and event reminders</small>
-                </span>
-                <i>{preferences.event ? "On" : "Off"}</i>
-              </button>
-              <button
-                className={preferences.system ? "is-enabled" : ""}
-                onClick={() => togglePreference("system")}
-              >
-                <span>
-                  <strong>System notices</strong>
-                  <small>Comments, account and platform updates</small>
-                </span>
-                <i>{preferences.system ? "On" : "Off"}</i>
-              </button>
-            </div>
-
-            <button className="test-alert-button" onClick={sendTestAlert}>
-              Send test event alert
-              <Icon name="refresh" size={15} />
+        <label className="notifications-search">
+          <span className="sr-only">Search notifications</span>
+          <Icon name="search" size={22} />
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search notifications..."
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => setQuery("")}
+              aria-label="Clear search"
+            >
+              <Icon name="close" size={17} />
             </button>
+          )}
+        </label>
 
-            <div className="engine-note">
-              <Icon name="shield" size={17} />
-              Prototype note: alerts are simulated locally. In production this
-              connects to a backend notification service and browser push
-              subscriptions.
-            </div>
-          </aside>
+        <div className="notifications-filter-tabs" aria-label="Notification filters">
+          {filters.map((item) => (
+            <button
+              key={item}
+              className={filter === item ? "is-active" : ""}
+              type="button"
+              onClick={() => setFilter(item)}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
 
-          <div className="notification-center-panel">
-            <div className="notification-toolbar">
-              <div>
-                <span className="section-label">MEMBER INBOX</span>
-                <h2>System notifications</h2>
-              </div>
-              <button onClick={markAllRead} disabled={unreadCount === 0}>
-                Mark all as read
+        <section className="notifications-summary-card">
+          <div>
+            <span>{unreadCount}</span>
+            <strong>new unread updates</strong>
+          </div>
+          <button type="button" onClick={sendTestAlert}>
+            Test Alert
+            <Icon name="refresh" size={15} />
+          </button>
+        </section>
+
+        <section className="notifications-preferences-card">
+          <div className="notifications-section-heading">
+            <span>Push Settings</span>
+            <strong>Alert preferences</strong>
+          </div>
+          <div className="notifications-preference-list">
+            {preferenceCopy.map((preference) => (
+              <button
+                key={preference.key}
+                className={preferences[preference.key] ? "is-enabled" : ""}
+                type="button"
+                onClick={() => togglePreference(preference.key)}
+              >
+                <span>
+                  <strong>{preference.title}</strong>
+                  <small>{preference.description}</small>
+                </span>
+                <i>{preferences[preference.key] ? "On" : "Off"}</i>
               </button>
-            </div>
+            ))}
+          </div>
+        </section>
 
-            <div className="category-tabs notification-tabs">
-              {filters.map((item) => (
-                <button
-                  key={item}
-                  className={filter === item ? "is-active" : ""}
-                  onClick={() => setFilter(item)}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
+        <section className="notifications-list-section">
+          <div className="notifications-section-heading">
+            <span>Member Inbox</span>
+            <strong>{filteredNotifications.length} alerts shown</strong>
+          </div>
 
-            <div className="notification-list">
+          {filteredNotifications.length > 0 ? (
+            <div className="notifications-mobile-list">
               {filteredNotifications.map((notification) => (
                 <article
-                  className={`notification-card ${
+                  className={`notifications-mobile-card ${
                     notification.isRead ? "" : "is-unread"
                   }`}
                   key={notification.id}
                 >
-                  <span
-                    className={`notification-icon notification-icon--${notification.type.toLowerCase()}`}
-                  >
-                    <Icon
-                      name={notification.type === "Renewal" ? "clock" : "bell"}
-                      size={18}
-                    />
-                  </span>
+                  <NotificationIcon type={notification.type} />
                   <div>
-                    <div className="notification-card__header">
+                    <header>
                       <span>{notification.type}</span>
                       <small>{notification.timestamp}</small>
-                    </div>
+                    </header>
                     <h3>{notification.title}</h3>
                     <p>{notification.message}</p>
-                    <div className="notification-card__actions">
+                    <div className="notifications-card-actions">
                       <a href={notification.actionHref}>
                         {notification.actionLabel}
                         <Icon name="arrow" size={14} />
                       </a>
-                      <button onClick={() => toggleRead(notification.id)}>
+                      <button
+                        type="button"
+                        onClick={() => toggleRead(notification.id)}
+                      >
                         <Icon name="check" size={14} />
                         {notification.isRead ? "Mark unread" : "Mark read"}
                       </button>
@@ -380,18 +393,26 @@ export default function NotificationsCenter({
                 </article>
               ))}
             </div>
-          </div>
+          ) : (
+            <div className="notifications-empty-state">
+              <Icon name="bell" size={30} />
+              <h3>No notifications found</h3>
+              <p>Try another filter or send a test alert.</p>
+            </div>
+          )}
         </section>
       </main>
 
       {toast && (
-        <div className="notification-toast" role="status">
+        <div className="notifications-mobile-toast" role="status">
           {toast}
-          <button onClick={() => setToast("")}>Dismiss</button>
+          <button type="button" onClick={() => setToast("")}>
+            Dismiss
+          </button>
         </div>
       )}
 
-      <MobileNav />
+      <BottomNav />
     </div>
   );
 }
