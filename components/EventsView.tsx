@@ -38,14 +38,8 @@ function getDateLabel(dateKey: string) {
 }
 
 function formatTime(startTime: string | null, endTime: string | null) {
-  if (!startTime && !endTime) {
-    return "Time to be confirmed";
-  }
-
-  if (startTime && endTime) {
-    return `${startTime} - ${endTime}`;
-  }
-
+  if (!startTime && !endTime) return "Time to be confirmed";
+  if (startTime && endTime) return `${startTime} - ${endTime}`;
   return startTime || endTime;
 }
 
@@ -60,42 +54,25 @@ function buildCalendarDays(currentMonth: Date) {
   const daysInMonth = lastDayOfMonth.getDate();
   const previousMonthLastDate = new Date(year, month, 0).getDate();
 
-  const days: {
-    day: number;
-    dateKey: string;
-    isCurrentMonth: boolean;
-  }[] = [];
+  const days: { day: number; dateKey: string; isCurrentMonth: boolean }[] = [];
 
   for (let i = startDay - 1; i >= 0; i--) {
     const day = previousMonthLastDate - i;
     const date = new Date(year, month - 1, day);
 
-    days.push({
-      day,
-      dateKey: toDateKey(date),
-      isCurrentMonth: false,
-    });
+    days.push({ day, dateKey: toDateKey(date), isCurrentMonth: false });
   }
 
   for (let day = 1; day <= daysInMonth; day++) {
     const date = new Date(year, month, day);
-
-    days.push({
-      day,
-      dateKey: toDateKey(date),
-      isCurrentMonth: true,
-    });
+    days.push({ day, dateKey: toDateKey(date), isCurrentMonth: true });
   }
 
   while (days.length % 7 !== 0) {
     const nextDay = days.length - (startDay + daysInMonth) + 1;
     const date = new Date(year, month + 1, nextDay);
 
-    days.push({
-      day: nextDay,
-      dateKey: toDateKey(date),
-      isCurrentMonth: false,
-    });
+    days.push({ day: nextDay, dateKey: toDateKey(date), isCurrentMonth: false });
   }
 
   return days;
@@ -107,36 +84,29 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
   const [currentMonth, setCurrentMonth] = useState(
     new Date(today.getFullYear(), today.getMonth(), 1)
   );
-
   const [selectedDate, setSelectedDate] = useState(getTodayDateKey());
 
-  const calendarDays = useMemo(
-    () => buildCalendarDays(currentMonth),
-    [currentMonth]
+  const calendarDays = useMemo(() => buildCalendarDays(currentMonth), [currentMonth]);
+
+  const eventDates = useMemo(
+    () =>
+      new Set(
+        events.filter((event) => event.event_date).map((event) => event.event_date as string)
+      ),
+    [events]
   );
 
-  const eventDates = useMemo(() => {
-    return new Set(
-      events
-        .filter((event) => event.event_date)
-        .map((event) => event.event_date as string)
-    );
-  }, [events]);
-
-  const selectedDateEvents = useMemo(() => {
-    return events.filter((event) => event.event_date === selectedDate);
-  }, [events, selectedDate]);
+  const selectedDateEvents = useMemo(
+    () => events.filter((event) => event.event_date === selectedDate),
+    [events, selectedDate]
+  );
 
   function goToPreviousMonth() {
-    setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)
-    );
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
   }
 
   function goToNextMonth() {
-    setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1)
-    );
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
   }
 
   return (
@@ -148,32 +118,30 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
           {/* Calendar Card */}
           <div className="rounded-2xl border border-gray-200 bg-[#FFFFFF] p-6 shadow-sm">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-[#151C27]">
-                {getMonthTitle(currentMonth)}
-              </h2>
+              <h2 className="text-2xl font-bold text-[#151C27]">{getMonthTitle(currentMonth)}</h2>
 
               <div className="flex gap-5 text-[#151C27]">
-                <button
-                  type="button"
-                  aria-label="Previous month"
-                  onClick={goToPreviousMonth}
-                >
+                <button type="button" aria-label="Previous month" onClick={goToPreviousMonth}>
                   <ChevronLeft size={26} />
                 </button>
 
-                <button
-                  type="button"
-                  aria-label="Next month"
-                  onClick={goToNextMonth}
-                >
+                <button type="button" aria-label="Next month" onClick={goToNextMonth}>
                   <ChevronRight size={26} />
                 </button>
               </div>
             </div>
 
             <div className="mt-6 grid grid-cols-7 text-center text-[#5F5E5E]">
-              {["S", "M", "T", "W", "T", "F", "S"].map((day) => (
-                <p key={day}>{day}</p>
+              {[
+                "S",
+                "M",
+                "T",
+                "W",
+                "T",
+                "F",
+                "S",
+              ].map((day, index) => (
+                <p key={`${day}-${index}`}>{day}</p>
               ))}
             </div>
 
@@ -194,20 +162,14 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
                         isSelected
                           ? "flex h-10 w-10 items-center justify-center rounded-full bg-[#0F6E00] font-bold text-white"
                           : date.isCurrentMonth
-                            ? "flex h-10 w-10 items-center justify-center text-[#151C27]"
-                            : "flex h-10 w-10 items-center justify-center text-gray-300"
+                          ? "flex h-10 w-10 items-center justify-center text-[#151C27]"
+                          : "flex h-10 w-10 items-center justify-center text-gray-300"
                       }
                     >
                       {date.day}
                     </span>
 
-                    <span
-                      className={
-                        hasEvent && !isSelected
-                          ? "mt-1 h-1 w-1 rounded-full bg-[#0F6E00]"
-                          : "mt-1 h-1 w-1"
-                      }
-                    />
+                    <span className={hasEvent && !isSelected ? "mt-1 h-1 w-1 rounded-full bg-[#0F6E00]" : "mt-1 h-1 w-1"} />
                   </button>
                 );
               })}
@@ -223,14 +185,11 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
 
           {/* Upcoming Text */}
           <div className="mt-6 border-l-4 border-[#0F6E00] pl-4">
-            <p className="text-[#151C27]">
-              Upcoming on {getDateLabel(selectedDate)}
-            </p>
+            <p className="text-[#151C27]">Upcoming on {getDateLabel(selectedDate)}</p>
 
             <p className="text-[#151C27]">
               {selectedDateEvents.length}{" "}
-              {selectedDateEvents.length === 1 ? "session" : "sessions"}{" "}
-              scheduled
+              {selectedDateEvents.length === 1 ? "session" : "sessions"} scheduled
             </p>
           </div>
 
@@ -242,16 +201,10 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
               </div>
             ) : (
               selectedDateEvents.map((event) => {
-                const isFull =
-                  event.spots_available !== null && event.spots_available <= 0;
-
+                const isFull = event.spots_available !== null && event.spots_available <= 0;
                 const hasRsvpLink = Boolean(event.external_rsvp_url?.trim());
 
-                const buttonLabel = isFull
-                  ? "Full"
-                  : hasRsvpLink
-                    ? "Register"
-                    : "Unavailable";
+                const buttonLabel = isFull ? "Full" : hasRsvpLink ? "Register" : "Unavailable";
 
                 return (
                   <article
@@ -260,46 +213,26 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
                   >
                     <div className="relative h-48 bg-gray-200">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={event.image_url || "/event-placeholder.jpg"}
-                        alt={event.title}
-                        className="h-full w-full object-cover"
-                      />
+                      <img src={event.image_url || "/event-placeholder.jpg"} alt={event.title} className="h-full w-full object-cover" />
 
                       {event.category && (
-                        <span className="absolute right-4 top-4 rounded-full bg-[#0F6E00] px-4 py-1 text-sm text-white">
-                          {event.category}
-                        </span>
+                        <span className="absolute right-4 top-4 rounded-full bg-[#0F6E00] px-4 py-1 text-sm text-white">{event.category}</span>
                       )}
                     </div>
 
                     <div className="p-6">
-                      <h3 className="text-2xl font-bold leading-snug text-[#151C27]">
-                        {event.title}
-                      </h3>
+                      <h3 className="text-2xl font-bold leading-snug text-[#151C27]">{event.title}</h3>
 
-                      {event.description && (
-                        <p className="mt-2 text-sm text-[#5F5E5E]">
-                          {event.description}
-                        </p>
-                      )}
+                      {event.description && <p className="mt-2 text-sm text-[#5F5E5E]">{event.description}</p>}
 
                       <div className="mt-4 space-y-3 text-[#151C27]">
                         <p className="flex items-center gap-2">
-                          <Clock
-                            size={18}
-                            strokeWidth={2.2}
-                            className="text-[#5F5E5E]"
-                          />
+                          <Clock size={18} strokeWidth={2.2} className="text-[#5F5E5E]" />
                           {formatTime(event.start_time, event.end_time)}
                         </p>
 
                         <p className="flex items-center gap-2">
-                          <MapPin
-                            size={18}
-                            strokeWidth={2.2}
-                            className="text-[#5F5E5E]"
-                          />
+                          <MapPin size={18} strokeWidth={2.2} className="text-[#5F5E5E]" />
                           {event.venue || "Venue to be confirmed"}
                         </p>
                       </div>
@@ -314,11 +247,7 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
                           {buttonLabel}
                         </a>
                       ) : (
-                        <button
-                          type="button"
-                          disabled
-                          className="mt-6 w-full rounded-xl border border-[#5F5E5E] py-4 font-semibold text-[#151C27]"
-                        >
+                        <button type="button" disabled className="mt-6 w-full rounded-xl border border-[#5F5E5E] py-4 font-semibold text-[#151C27]">
                           {buttonLabel}
                         </button>
                       )}
