@@ -513,13 +513,13 @@ export default function ProfileView({ member }: { member: MemberProfile }) {
 
           {/* Settings and Logout */}
           <div className="mt-7 grid grid-cols-2 gap-4">
-            <button
-              type="button"
+            <Link
+              href="/member/settings"
               className="flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-[#EEF1FF] py-4 text-[#151C27]"
             >
               <Settings size={18} />
               Settings
-            </button>
+            </Link>
 
             <button type="button" onClick={handleLogout} className="flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-white py-4 text-red-600">
               <LogOut size={18} />
