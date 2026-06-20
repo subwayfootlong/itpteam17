@@ -1,0 +1,94 @@
+/*
+ * pergas-admin.css
+ * Pergas Brand Identity & Style Guide compliance layer for the admin portal.
+ * Import this ONCE in app/admin/layout.tsx  →  import '@/styles/pergas-admin.css'
+ *
+ * Brand references:
+ *   Primary:   Pantone 361C  →  #3FAE2A  (R63 G174 B42)
+ *   Teal:      Pantone 7473C →  #1E9888  (R30 G152 B138)
+ *   Amber:     Pantone 1365C →  #FFB547  (R255 G181 B71)
+ *   Crimson:   Pantone 7636C →  #C51A4A  (R197 G26 B74)
+ *   Sky Blue:  Pantone 631C  →  #3BB0C9  (R59 G176 B201)
+ *   Black:     #000000
+ *   White:     #FFFFFF
+ *   80% Black: #585859
+ *   50% Black: #939498
+ *
+ * Typefaces (brand spec):
+ *   Headlines / Titles:         Butler  →  fallback: Playfair Display (Google Fonts)
+ *   Body / Sub-headings:        Minion Pro → fallback: Georgia / Lora
+ *   Headers, Footers, UI:       Helvetica Neue → system -apple-system stack
+ *   Arabic:                     Traditional Arabic → system Arabic stack
+ */
+
+/* ─── Google Fonts imports (closest web-safe alternatives to Butler & Minion Pro) ─── */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-pergas-green:        #3FAE2A;
+  --color-pergas-green-dark:   #2d8a1f;
+  --color-pergas-green-light:  #e8f5e3;
+  --color-pergas-teal:         #1E9888;
+  --color-pergas-amber:        #FFB547;
+  --color-pergas-amber-dark:   #9a6800;
+  --color-pergas-amber-light:  #fff4de;
+  --color-pergas-crimson:      #C51A4A;
+  --color-pergas-blue:         #3BB0C9;
+  --color-pergas-80:           #585859;
+  --color-pergas-50:           #939498;
+  
+  --font-butler: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-minion: 'Lora', Georgia, serif;
+  --font-helvetica: 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-arabic: 'Traditional Arabic', 'Scheherazade New', 'Noto Naskh Arabic', serif;
+}
+
+body {
+  font-family: var(--font-helvetica);
+}
+
+h1, h2, h3, h4, h5, h6, .font-butler {
+  font-family: var(--font-butler);
+}
+
+/* ─── Pergas divider line style (from design element guidelines) ──────── */
+.pergas-rule {
+  border: none;
+  border-top: 2px solid var(--pergas-green);
+  margin: 0 0 4px;
+}
+.pergas-rule-thin {
+  border: none;
+  border-top: 1px solid rgba(63, 174, 42, 0.3);
+  margin: 0;
+}
+
+/* ─── Admin-specific overrides ───────────────────────────────────────── */
+:root {
+  --sidebar-bg: #1c3829;
+  --sidebar-text: rgba(255, 255, 255, 0.82);
+  --sidebar-avatar-bg: #e8f5e3;
+  --sidebar-avatar-text: #1c3829;
+}
+
+/* Page background — very subtle floral tint */
+.admin-page-bg {
+  background-color: #f4f7f4;
+}
+
+/* Section header typography — use Butler (Playfair) */
+.admin-section-title {
+  font-family: var(--font-butler);
+  font-weight: 600;
+  color: #1a2e1a;
+  letter-spacing: -0.01em;
+}
+
+/* Card stat number — Helvetica Neue bold */
+.admin-stat-number {
+  font-family: var(--font-helvetica);
+  font-weight: 700;
+  color: var(--pergas-green);
+}
