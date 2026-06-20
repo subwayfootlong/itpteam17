@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import SplashScreen from '@/components/SplashScreen';
 import WelcomeScreen from '@/components/WelcomeScreen';
 import LoginScreen from '@/components/LoginScreen';
@@ -9,16 +9,22 @@ import RegisterScreen from '@/components/RegisterScreen';
 
 export default function Home() {
   const router = useRouter();
-  const [currentScreen, setCurrentScreen] = useState<'splash' | 'welcome' | 'login' | 'register'>('splash');
+  const searchParams = useSearchParams();
+  const initialScreen = searchParams.get('screen') === 'login' ? 'login' : 'splash';
+  const [currentScreen, setCurrentScreen] = useState<'splash' | 'welcome' | 'login' | 'register'>(initialScreen);
 
   useEffect(() => {
+    if (searchParams.get('screen') === 'login') {
+      return;
+    }
+
     // Phase 1: Splash Screen timer automatically forwards to Welcome page after 3s
     const timer = setTimeout(() => {
       setCurrentScreen('welcome');
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [searchParams]);
 
   // Action handlers
   const handleGetStarted = () => {

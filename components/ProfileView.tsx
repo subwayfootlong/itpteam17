@@ -5,6 +5,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import MemberTopBar from "@/components/MemberTopBar";
 import MemberBottomNav from "@/components/MemberBottomNav";
 import type { MemberProfile } from "@/app/member/profile/page";
+import { useRouter } from "next/navigation";
 import {
   BadgeCheck,
   BookOpen,
@@ -266,8 +267,24 @@ function formatTier(tier: string | null) {
 }
 
 export default function ProfileView({ member }: { member: MemberProfile }) {
+  const router = useRouter();
   const tier = member.membership_tier || "ordinary";
   const benefits = benefitsByTier[tier] || benefitsByTier.ordinary;
+
+  async function handleLogout() {
+    const confirmed = window.confirm("Are you sure you want to log out?");
+
+    if (!confirmed) {
+      return;
+    }
+
+    await fetch("/api/auth/logout", {
+      method: "POST",
+    });
+
+    router.push("/?screen=login");
+    router.refresh();
+  }
 
   const qrValue = JSON.stringify({
     memberId: member.member_id,
@@ -504,10 +521,7 @@ export default function ProfileView({ member }: { member: MemberProfile }) {
               Settings
             </button>
 
-            <button
-              type="button"
-              className="flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-white py-4 text-red-600"
-            >
+            <button type="button" onClick={handleLogout} className="flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-white py-4 text-red-600">
               <LogOut size={18} />
               Log Out
             </button>
