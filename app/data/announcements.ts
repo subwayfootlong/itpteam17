@@ -7,7 +7,7 @@ export type AnnouncementCategory =
 export type CommentStatus = "approved" | "pending" | "flagged";
 
 export type CommunityComment = {
-  id: number;
+  id: string;
   author: string;
   role: string;
   body: string;
@@ -16,7 +16,7 @@ export type CommunityComment = {
 };
 
 export type Announcement = {
-  id: number;
+  id: string;
   title: string;
   category: AnnouncementCategory;
   date: string;
@@ -30,7 +30,7 @@ export type Announcement = {
 
 export const announcements: Announcement[] = [
   {
-    id: 1,
+    id: "1",
     title: "Membership renewal reminder for active members",
     category: "Membership",
     date: "18 Jun 2026",
@@ -43,7 +43,7 @@ export const announcements: Announcement[] = [
     commentsEnabled: true,
     comments: [
       {
-        id: 101,
+        id: "101",
         author: "Nur Aisyah",
         role: "Associate Member",
         body: "Thank you for the reminder. It would help if renewal alerts also appear on the dashboard.",
@@ -51,7 +51,7 @@ export const announcements: Announcement[] = [
         status: "approved",
       },
       {
-        id: 102,
+        id: "102",
         author: "Ahmad Khalid",
         role: "Ordinary Member",
         body: "Clear and useful. I checked mine through the profile page.",
@@ -61,7 +61,7 @@ export const announcements: Announcement[] = [
     ],
   },
   {
-    id: 2,
+    id: "2",
     title: "Registration opens for community learning circle",
     category: "Events",
     date: "17 Jun 2026",
@@ -73,7 +73,7 @@ export const announcements: Announcement[] = [
     commentsEnabled: true,
     comments: [
       {
-        id: 201,
+        id: "201",
         author: "Siti Mariam",
         role: "Student Member",
         body: "Will this session be recorded for those who cannot attend in person?",
@@ -83,7 +83,7 @@ export const announcements: Announcement[] = [
     ],
   },
   {
-    id: 3,
+    id: "3",
     title: "Community guidelines for respectful discussion",
     category: "Community",
     date: "15 Jun 2026",
@@ -96,7 +96,7 @@ export const announcements: Announcement[] = [
     commentsEnabled: true,
     comments: [
       {
-        id: 301,
+        id: "301",
         author: "Faris Hamdan",
         role: "Ordinary Member",
         body: "Appreciate having a clear standard for discussions. This makes the space more useful.",
@@ -106,7 +106,7 @@ export const announcements: Announcement[] = [
     ],
   },
   {
-    id: 4,
+    id: "4",
     title: "Quarterly Ar-Risalah magazine delivery update",
     category: "Official",
     date: "12 Jun 2026",

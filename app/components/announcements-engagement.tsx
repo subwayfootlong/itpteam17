@@ -3,33 +3,25 @@
 import Link from "next/link";
 import { FormEvent, useMemo, useState } from "react";
 import type { Announcement, CommunityComment } from "../data/announcements";
+import type {
+  DiscussionGroup,
+  DiscussionGroupId,
+  DiscussionThread,
+} from "@/lib/uc6Community";
 
 type CommunityTab = "announcements" | "discussions";
-type DiscussionGroupId = "general" | "spiritual";
-type ThreadStatus = "approved" | "pending" | "flagged";
-
-type DiscussionThread = {
-  id: number;
-  groupId: DiscussionGroupId;
-  author: string;
-  postedAt: string;
-  title: string;
-  body: string;
-  votes: number;
-  comments: CommunityComment[];
-  hasImage?: boolean;
-  status: ThreadStatus;
-};
 
 const flaggedWords = ["spam", "scam", "hate", "offensive"];
 
-const groups: {
-  id: DiscussionGroupId;
-  title: string;
-  posts: number;
-  icon: string;
-  tone: "green" | "gold";
-}[] = [
+type CommentResponse = {
+  comment: CommunityComment;
+};
+
+type ThreadResponse = {
+  thread: DiscussionThread;
+};
+
+const fallbackGroups: DiscussionGroup[] = [
   {
     id: "general",
     title: "General Community",
@@ -46,9 +38,9 @@ const groups: {
   },
 ];
 
-const initialThreads: DiscussionThread[] = [
+const fallbackThreads: DiscussionThread[] = [
   {
-    id: 1,
+    id: "1",
     groupId: "general",
     author: "Brother Ahmad",
     postedAt: "2h ago",
@@ -59,7 +51,7 @@ const initialThreads: DiscussionThread[] = [
     status: "approved",
     comments: [
       {
-        id: 101,
+        id: "101",
         author: "Sister Sarah",
         role: "Active Member",
         body: "The topic looks useful. I hope the recording is shared after the session.",
@@ -67,7 +59,7 @@ const initialThreads: DiscussionThread[] = [
         status: "approved",
       },
       {
-        id: 102,
+        id: "102",
         author: "Ustaz Ridzuan",
         role: "Moderator",
         body: "We will update the thread once the programme team confirms post-event resources.",
@@ -77,7 +69,7 @@ const initialThreads: DiscussionThread[] = [
     ],
   },
   {
-    id: 2,
+    id: "2",
     groupId: "general",
     author: "Sister Sarah",
     postedAt: "5h ago",
@@ -89,7 +81,7 @@ const initialThreads: DiscussionThread[] = [
     status: "approved",
     comments: [
       {
-        id: 201,
+        id: "201",
         author: "Ahmad Khalid",
         role: "Active Member",
         body: "It looks welcoming. Thank you for sharing this.",
@@ -99,7 +91,7 @@ const initialThreads: DiscussionThread[] = [
     ],
   },
   {
-    id: 3,
+    id: "3",
     groupId: "general",
     author: "Ustaz Ridzuan",
     postedAt: "1d ago",
@@ -110,7 +102,7 @@ const initialThreads: DiscussionThread[] = [
     status: "approved",
     comments: [
       {
-        id: 301,
+        id: "301",
         author: "Nur Aisyah",
         role: "Associate Member",
         body: "The digital card is easy to find. The benefits page is also clearer now.",
@@ -120,7 +112,7 @@ const initialThreads: DiscussionThread[] = [
     ],
   },
   {
-    id: 4,
+    id: "4",
     groupId: "spiritual",
     author: "Sister Mariam",
     postedAt: "4h ago",
@@ -256,7 +248,7 @@ function isFlagged(body: string) {
 
 function makePendingComment(body: string, sequence: number): CommunityComment {
   return {
-    id: Date.now() + sequence,
+    id: `local-comment-${Date.now()}-${sequence}`,
     author: "Ahmad Khalid",
     role: "Active Member",
     body,
@@ -270,7 +262,7 @@ function makePendingThread(
   body: string,
 ): DiscussionThread {
   return {
-    id: Date.now(),
+    id: `local-thread-${Date.now()}`,
     groupId,
     author: "Ahmad Khalid",
     postedAt: "Just now",
@@ -280,6 +272,25 @@ function makePendingThread(
     status: isFlagged(body) ? "flagged" : "pending",
     comments: [],
   };
+}
+
+async function postJson<T>(url: string, payload: unknown): Promise<T> {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(
+      typeof data.error === "string" ? data.error : "Request failed",
+    );
+  }
+
+  return data as T;
 }
 
 function MobileHeader({
@@ -384,7 +395,7 @@ function AnnouncementHeroCard({
   onOpen,
 }: {
   announcement: Announcement;
-  onOpen: (announcementId: number) => void;
+  onOpen: (announcementId: string) => void;
 }) {
   return (
     <article className="announcement-feature-card">
@@ -412,7 +423,7 @@ function AnnouncementList({
   onOpen,
 }: {
   announcements: Announcement[];
-  onOpen: (announcementId: number) => void;
+  onOpen: (announcementId: string) => void;
 }) {
   const [featured, ...rest] = announcements;
 
@@ -450,7 +461,7 @@ function AnnouncementDetail({
 }: {
   announcement: Announcement;
   localComments: CommunityComment[];
-  onComment: (announcementId: number, body: string) => void;
+  onComment: (announcementId: string, body: string) => Promise<void>;
 }) {
   const [draft, setDraft] = useState("");
   const comments = [...announcement.comments, ...localComments];
@@ -461,10 +472,10 @@ function AnnouncementDetail({
     (comment) => comment.status !== "approved",
   );
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!draft.trim()) return;
-    onComment(announcement.id, draft.trim());
+    await onComment(announcement.id, draft.trim());
     setDraft("");
   };
 
@@ -554,10 +565,12 @@ function AnnouncementDetail({
 }
 
 function DiscussionGroups({
+  groups,
   onOpenGroup,
   moderatorNotice,
   onContactModerator,
 }: {
+  groups: DiscussionGroup[];
   onOpenGroup: (groupId: DiscussionGroupId) => void;
   moderatorNotice: boolean;
   onContactModerator: () => void;
@@ -615,7 +628,7 @@ function ThreadCard({
   isExpanded: boolean;
   localComments: CommunityComment[];
   onToggle: () => void;
-  onComment: (threadId: number, body: string) => void;
+  onComment: (threadId: string, body: string) => Promise<void>;
 }) {
   const [draft, setDraft] = useState("");
   const comments = [...thread.comments, ...localComments];
@@ -626,10 +639,10 @@ function ThreadCard({
     (comment) => comment.status !== "approved",
   );
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!draft.trim()) return;
-    onComment(thread.id, draft.trim());
+    await onComment(thread.id, draft.trim());
     setDraft("");
   };
 
@@ -726,6 +739,7 @@ function ThreadCard({
 
 function DiscussionFeed({
   groupId,
+  groups,
   threads,
   localComments,
   expandedThreadId,
@@ -734,21 +748,22 @@ function DiscussionFeed({
   onPost,
 }: {
   groupId: DiscussionGroupId;
+  groups: DiscussionGroup[];
   threads: DiscussionThread[];
-  localComments: Record<number, CommunityComment[]>;
-  expandedThreadId: number | null;
-  onExpandThread: (threadId: number) => void;
-  onComment: (threadId: number, body: string) => void;
-  onPost: (groupId: DiscussionGroupId, body: string) => void;
+  localComments: Record<string, CommunityComment[]>;
+  expandedThreadId: string | null;
+  onExpandThread: (threadId: string) => void;
+  onComment: (threadId: string, body: string) => Promise<void>;
+  onPost: (groupId: DiscussionGroupId, body: string) => Promise<void>;
 }) {
   const [postDraft, setPostDraft] = useState("");
   const group = groups.find((item) => item.id === groupId) ?? groups[0];
   const visibleThreads = threads.filter((thread) => thread.groupId === groupId);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!postDraft.trim()) return;
-    onPost(groupId, postDraft.trim());
+    await onPost(groupId, postDraft.trim());
     setPostDraft("");
   };
 
@@ -793,23 +808,29 @@ function DiscussionFeed({
 
 export default function AnnouncementsEngagement({
   announcements,
+  groups = fallbackGroups,
+  threads: initialThreads = fallbackThreads,
 }: {
   announcements: Announcement[];
+  groups?: DiscussionGroup[];
+  threads?: DiscussionThread[];
 }) {
   const [activeTab, setActiveTab] = useState<CommunityTab>("announcements");
   const [selectedAnnouncementId, setSelectedAnnouncementId] = useState<
-    number | null
+    string | null
   >(null);
   const [selectedGroupId, setSelectedGroupId] =
     useState<DiscussionGroupId | null>(null);
   const [threads, setThreads] = useState(initialThreads);
-  const [expandedThreadId, setExpandedThreadId] = useState<number | null>(1);
+  const [expandedThreadId, setExpandedThreadId] = useState<string | null>(
+    initialThreads[0]?.id ?? null,
+  );
   const [moderatorNotice, setModeratorNotice] = useState(false);
   const [announcementComments, setAnnouncementComments] = useState<
-    Record<number, CommunityComment[]>
+    Record<string, CommunityComment[]>
   >({});
   const [threadComments, setThreadComments] = useState<
-    Record<number, CommunityComment[]>
+    Record<string, CommunityComment[]>
   >({});
 
   const selectedAnnouncement = useMemo(
@@ -844,31 +865,75 @@ export default function AnnouncementsEngagement({
     setSelectedGroupId(null);
   };
 
-  const handleAnnouncementComment = (announcementId: number, body: string) => {
+  const handleAnnouncementComment = async (
+    announcementId: string,
+    body: string,
+  ) => {
+    let comment = makePendingComment(
+      body,
+      (announcementComments[announcementId] ?? []).length + 1,
+    );
+
+    try {
+      const response = await postJson<CommentResponse>(
+        "/api/community/announcement-comments",
+        { announcementId, body },
+      );
+      comment = response.comment;
+    } catch (error) {
+      console.warn("Saved UC6 announcement comment locally:", error);
+    }
+
     setAnnouncementComments((current) => ({
       ...current,
       [announcementId]: [
         ...(current[announcementId] ?? []),
-        makePendingComment(body, (current[announcementId] ?? []).length + 1),
+        comment,
       ],
     }));
   };
 
-  const handleThreadComment = (threadId: number, body: string) => {
+  const handleThreadComment = async (threadId: string, body: string) => {
+    let comment = makePendingComment(
+      body,
+      (threadComments[threadId] ?? []).length + 1,
+    );
+
+    try {
+      const response = await postJson<CommentResponse>(
+        "/api/community/thread-comments",
+        { threadId, body },
+      );
+      comment = response.comment;
+    } catch (error) {
+      console.warn("Saved UC6 thread comment locally:", error);
+    }
+
     setThreadComments((current) => ({
       ...current,
       [threadId]: [
         ...(current[threadId] ?? []),
-        makePendingComment(body, (current[threadId] ?? []).length + 1),
+        comment,
       ],
     }));
     setExpandedThreadId(threadId);
   };
 
-  const handlePost = (groupId: DiscussionGroupId, body: string) => {
-    const pendingThread = makePendingThread(groupId, body);
-    setThreads((current) => [pendingThread, ...current]);
-    setExpandedThreadId(pendingThread.id);
+  const handlePost = async (groupId: DiscussionGroupId, body: string) => {
+    let thread = makePendingThread(groupId, body);
+
+    try {
+      const response = await postJson<ThreadResponse>(
+        "/api/community/threads",
+        { groupId, body },
+      );
+      thread = response.thread;
+    } catch (error) {
+      console.warn("Saved UC6 discussion thread locally:", error);
+    }
+
+    setThreads((current) => [thread, ...current]);
+    setExpandedThreadId(thread.id);
   };
 
   return (
@@ -888,6 +953,7 @@ export default function AnnouncementsEngagement({
         ) : selectedGroupId ? (
           <DiscussionFeed
             groupId={selectedGroupId}
+            groups={groups}
             threads={threads}
             localComments={threadComments}
             expandedThreadId={expandedThreadId}
@@ -906,6 +972,7 @@ export default function AnnouncementsEngagement({
           />
         ) : (
           <DiscussionGroups
+            groups={groups}
             onOpenGroup={setSelectedGroupId}
             moderatorNotice={moderatorNotice}
             onContactModerator={() => setModeratorNotice(true)}
