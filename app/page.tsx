@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import SplashScreen from '@/components/SplashScreen';
 import WelcomeScreen from '@/components/WelcomeScreen';
 import LoginScreen from '@/components/LoginScreen';
 import RegisterScreen from '@/components/RegisterScreen';
 
 export default function Home() {
+  const router = useRouter();
   const [currentScreen, setCurrentScreen] = useState<'splash' | 'welcome' | 'login' | 'register'>('splash');
 
   useEffect(() => {
@@ -24,14 +26,13 @@ export default function Home() {
   };
 
   const handleLoginSuccess = () => {
-    window.alert('Login successful');
-    console.log("User successfully validated. Authenticating and routing to Dashboard panel...");
-    // Future step: router.push('/dashboard')
+    router.replace('/benefit');
+    router.refresh();
   };
 
   const handleRegisterSuccess = () => {
-    window.alert('Account created');
-    console.log('Account created successfully.');
+    router.replace('/benefit');
+    router.refresh();
   };
 
   return (

@@ -13,7 +13,7 @@ export async function verifyPassword(password: string, hash: string) {
   return bcrypt.compare(password, hash);
 }
 
-export function createAccessToken(payload: Record<string, any>) {
+export function createAccessToken(payload: Record<string, unknown>) {
   return jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: '7d' });
 }
 
