@@ -33,16 +33,16 @@ export async function POST(req: Request) {
     if (announcementId.startsWith("admin:")) {
       const adminAnnouncementId = announcementId.replace(/^admin:/, "");
       const { data, error } = await supabaseAdmin
-        .from("uc6_admin_announcement_comments")
+        .from("announcement_comments")
         .insert({
           announcement_id: adminAnnouncementId,
           user_id: user.id,
           author_name: user.fullName,
           author_role: "Active Member",
-          body: trimmedBody,
+          content: trimmedBody,
           status: moderationStatus(trimmedBody),
         })
-        .select("id, body, status, created_at, author_name, author_role")
+        .select("id, body:content, status, created_at, author_name, author_role")
         .single<CommentRow>();
 
       if (error) {

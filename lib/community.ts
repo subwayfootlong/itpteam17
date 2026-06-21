@@ -242,8 +242,8 @@ export async function getCommunityData(
       .eq("status", "published")
       .order("updated_at", { ascending: false }),
     supabaseAdmin
-      .from("uc6_admin_announcement_comments")
-      .select("id, announcement_id, user_id, body, status, created_at, author_name, author_role")
+      .from("announcement_comments")
+      .select("id, announcement_id, user_id, body:content, status, created_at, author_name, author_role")
       .order("created_at", { ascending: true }),
     supabaseAdmin
       .from("uc6_announcements")

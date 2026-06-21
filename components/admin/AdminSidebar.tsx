@@ -50,6 +50,16 @@ const NAV_ITEMS = [
       </svg>
     ),
   },
+  {
+    label: 'Comment Moderation',
+    href: '/admin/comment-moderation',
+    icon: (
+      <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3h5.25M21 12a8.25 8.25 0 01-8.25 8.25H7.5L3 21l.75-4.5A8.25 8.25 0 1121 12z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="m15.75 14.25 1.5 1.5 3-3" />
+      </svg>
+    ),
+  },
 ];
 
 interface AdminSidebarProps {

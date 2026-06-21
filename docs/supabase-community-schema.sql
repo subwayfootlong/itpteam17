@@ -28,17 +28,6 @@ create table if not exists public.uc6_announcement_comments (
   created_at timestamptz not null default now()
 );
 
-create table if not exists public.uc6_admin_announcement_comments (
-  id uuid primary key default gen_random_uuid(),
-  announcement_id text not null,
-  user_id uuid references public.users(id) on delete set null,
-  author_name text,
-  author_role text not null default 'Active Member',
-  body text not null,
-  status text not null default 'pending' check (status in ('approved', 'pending', 'flagged')),
-  created_at timestamptz not null default now()
-);
-
 create table if not exists public.uc6_discussion_groups (
   id uuid primary key default gen_random_uuid(),
   title text not null,
@@ -76,9 +65,6 @@ create index if not exists uc6_announcements_status_published_idx
 
 create index if not exists uc6_announcement_comments_announcement_idx
   on public.uc6_announcement_comments(announcement_id, created_at);
-
-create index if not exists uc6_admin_announcement_comments_announcement_idx
-  on public.uc6_admin_announcement_comments(announcement_id, created_at);
 
 create index if not exists uc6_discussion_groups_sort_idx
   on public.uc6_discussion_groups(sort_order);
