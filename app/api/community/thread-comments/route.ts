@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/currentUser";
 import { getErrorMessage } from "@/lib/errors";
 import { supabaseAdmin } from "@/lib/supabaseServer";
-import { moderationStatus } from "@/lib/uc6Community";
+import { moderationStatus } from "@/lib/community";
 
 type CommentRow = {
   id: string;
@@ -55,6 +55,7 @@ export async function POST(req: Request) {
         body: data.body,
         postedAt: "Just now",
         status: data.status,
+        isOwn: true,
       },
     });
   } catch (err: unknown) {

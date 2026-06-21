@@ -13,6 +13,7 @@ export type CommunityComment = {
   body: string;
   postedAt: string;
   status: CommentStatus;
+  isOwn?: boolean;
 };
 
 export type Announcement = {
@@ -23,6 +24,7 @@ export type Announcement = {
   readTime: string;
   summary: string;
   body: string;
+  imageUrl?: string;
   pinned?: boolean;
   commentsEnabled: boolean;
   comments: CommunityComment[];

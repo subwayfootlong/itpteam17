@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/currentUser";
 import { getErrorMessage } from "@/lib/errors";
 import { supabaseAdmin } from "@/lib/supabaseServer";
-import { moderationStatus } from "@/lib/uc6Community";
+import { moderationStatus } from "@/lib/community";
 
 type ThreadRow = {
   id: string;

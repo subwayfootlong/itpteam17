@@ -3,7 +3,7 @@ export type PartnerCategory = "Books & Learning" | "Lifestyle";
 export type SingaporeRegion = "Central" | "East" | "North" | "West";
 
 export type Partner = {
-  id: number;
+  id: string;
   name: string;
   initials: string;
   category: PartnerCategory;
@@ -67,7 +67,7 @@ export const membershipBenefits: MembershipBenefit[] = [
 
 export const partners: Partner[] = [
   {
-    id: 1,
+    id: "1",
     name: "Muslimedia Distributors",
     initials: "MD",
     category: "Books & Learning",
@@ -83,7 +83,7 @@ export const partners: Partner[] = [
     featured: true,
   },
   {
-    id: 2,
+    id: "2",
     name: "Swing Suroor Store",
     initials: "SS",
     category: "Lifestyle",
@@ -100,7 +100,7 @@ export const partners: Partner[] = [
     mapPosition: { x: 55, y: 52 },
   },
   {
-    id: 3,
+    id: "3",
     name: "Barakah Bites Cafe",
     initials: "BB",
     category: "Lifestyle",
@@ -116,7 +116,7 @@ export const partners: Partner[] = [
     mapPosition: { x: 72, y: 55 },
   },
   {
-    id: 4,
+    id: "4",
     name: "IlmWorks Learning Studio",
     initials: "IW",
     category: "Books & Learning",
@@ -133,7 +133,7 @@ export const partners: Partner[] = [
     mapPosition: { x: 51, y: 45 },
   },
   {
-    id: 5,
+    id: "5",
     name: "Sakinah Wellness",
     initials: "SW",
     category: "Lifestyle",
@@ -149,7 +149,7 @@ export const partners: Partner[] = [
     mapPosition: { x: 47, y: 24 },
   },
   {
-    id: 6,
+    id: "6",
     name: "Nusa Reads",
     initials: "NR",
     category: "Books & Learning",
@@ -165,7 +165,7 @@ export const partners: Partner[] = [
     mapPosition: { x: 26, y: 54 },
   },
   {
-    id: 7,
+    id: "7",
     name: "Amanah Family Pharmacy",
     initials: "AF",
     category: "Lifestyle",

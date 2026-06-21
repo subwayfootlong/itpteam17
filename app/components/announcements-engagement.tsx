@@ -7,7 +7,7 @@ import type {
   DiscussionGroup,
   DiscussionGroupId,
   DiscussionThread,
-} from "@/lib/uc6Community";
+} from "@/lib/community";
 
 type CommunityTab = "announcements" | "discussions";
 
@@ -254,6 +254,7 @@ function makePendingComment(body: string, sequence: number): CommunityComment {
     body,
     postedAt: "Just now",
     status: isFlagged(body) ? "flagged" : "pending",
+    isOwn: true,
   };
 }
 
@@ -291,6 +292,10 @@ async function postJson<T>(url: string, payload: unknown): Promise<T> {
   }
 
   return data as T;
+}
+
+function pluralize(count: number, singular: string, plural = `${singular}s`) {
+  return `${count} ${count === 1 ? singular : plural}`;
 }
 
 function MobileHeader({
@@ -399,13 +404,16 @@ function AnnouncementHeroCard({
 }) {
   return (
     <article className="announcement-feature-card">
-      <div className="announcement-feature-card__image">
-        <span>Featured</span>
-      </div>
+      {announcement.imageUrl && (
+        <div className="announcement-feature-card__image">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={announcement.imageUrl} alt={announcement.title} />
+        </div>
+      )}
       <div className="announcement-feature-card__body">
         <p className="official-line">
           <Icon name="verified" size={17} />
-          Official Admin <span>2 hours ago</span>
+          Official Admin <span>{announcement.date}</span>
         </p>
         <h2>{announcement.title}</h2>
         <p>{announcement.body}</p>
@@ -471,6 +479,9 @@ function AnnouncementDetail({
   const reviewComments = comments.filter(
     (comment) => comment.status !== "approved",
   );
+  const hasDistinctSummary =
+    announcement.summary.trim().toLowerCase() !==
+    announcement.body.trim().toLowerCase();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -482,56 +493,72 @@ function AnnouncementDetail({
   return (
     <section className="community-screen">
       <article className="announcement-detail-card">
-        <div className="announcement-detail-card__image" />
+        {announcement.imageUrl && (
+          <div className="announcement-detail-card__image">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={announcement.imageUrl} alt={announcement.title} />
+          </div>
+        )}
         <p className="official-line">
           <Icon name="verified" size={17} />
           Official Admin <span>{announcement.date}</span>
         </p>
         <h2>{announcement.title}</h2>
-        <p className="announcement-detail-card__summary">
-          {announcement.summary}
+        {hasDistinctSummary && (
+          <p className="announcement-detail-card__summary">
+            {announcement.summary}
+          </p>
+        )}
+        <p className="announcement-detail-card__body-copy">
+          {announcement.body}
         </p>
-        <p>{announcement.body}</p>
       </article>
 
       <section className="moderated-comments">
         <div className="moderated-comments__heading">
           <div>
             <span>Moderated thread</span>
-            <h3>{approvedComments.length} approved comments</h3>
+            <h3>{pluralize(approvedComments.length, "approved comment")}</h3>
           </div>
           <Icon name="verified" size={20} />
         </div>
 
-        {approvedComments.map((comment) => (
-          <article className="community-comment" key={comment.id}>
-            <span aria-hidden="true">
-              {comment.author
-                .split(" ")
-                .map((part) => part[0])
-                .join("")
-                .slice(0, 2)}
-            </span>
-            <div>
-              <strong>{comment.author}</strong>
-              <small>
-                {comment.role} - {comment.postedAt}
-              </small>
-              <p>{comment.body}</p>
+        <div className="community-comments-list">
+          {approvedComments.length > 0 ? (
+            approvedComments.map((comment) => (
+              <article className="community-comment" key={comment.id}>
+                <span aria-hidden="true">
+                  {comment.author
+                    .split(" ")
+                    .map((part) => part[0])
+                    .join("")
+                    .slice(0, 2)}
+                </span>
+                <div>
+                  <strong>{comment.author}</strong>
+                  <small>
+                    {comment.role} - {comment.postedAt}
+                  </small>
+                  <p>{comment.body}</p>
+                </div>
+              </article>
+            ))
+          ) : (
+            <div className="community-empty-comments">
+              <strong>No public comments yet</strong>
+              <p>Be the first to send a respectful response for review.</p>
             </div>
-          </article>
-        ))}
+          )}
+        </div>
 
         {reviewComments.length > 0 && (
           <div className="community-review-note" aria-live="polite">
-            <strong>Awaiting moderator review</strong>
-            {reviewComments.map((comment) => (
-              <p key={comment.id}>
-                {comment.status === "flagged"
-                  ? "Your comment has been held for moderator review."
-                  : "Your comment is pending approval."}
-              </p>
-            ))}
+            <strong>{pluralize(reviewComments.length, "comment")} waiting for approval</strong>
+            <p>
+              {reviewComments.some((comment) => comment.status === "flagged")
+                ? "One of your comments needs moderator review before it can appear publicly."
+                : "Your comment has been saved and will appear here after moderator approval."}
+            </p>
           </div>
         )}
 
@@ -548,7 +575,7 @@ function AnnouncementDetail({
             <div>
               <small>{draft.length}/280</small>
               <button type="submit" disabled={!draft.trim()}>
-                Submit for review
+                Submit
                 <Icon name="send" size={16} />
               </button>
             </div>
@@ -881,7 +908,7 @@ export default function AnnouncementsEngagement({
       );
       comment = response.comment;
     } catch (error) {
-      console.warn("Saved UC6 announcement comment locally:", error);
+      console.warn("Saved announcement comment locally:", error);
     }
 
     setAnnouncementComments((current) => ({
@@ -906,7 +933,7 @@ export default function AnnouncementsEngagement({
       );
       comment = response.comment;
     } catch (error) {
-      console.warn("Saved UC6 thread comment locally:", error);
+      console.warn("Saved thread comment locally:", error);
     }
 
     setThreadComments((current) => ({
@@ -929,7 +956,7 @@ export default function AnnouncementsEngagement({
       );
       thread = response.thread;
     } catch (error) {
-      console.warn("Saved UC6 discussion thread locally:", error);
+      console.warn("Saved discussion thread locally:", error);
     }
 
     setThreads((current) => [thread, ...current]);

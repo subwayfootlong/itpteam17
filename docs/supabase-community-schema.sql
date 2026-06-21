@@ -1,4 +1,4 @@
--- UC6: View Announcements & Engage
+-- Community engagement: View Announcements & Engage
 -- Run this in the Supabase SQL editor after your existing users table exists.
 -- If your users.id column is not uuid, change the user_id columns below to match it.
 

@@ -33,6 +33,12 @@ interface Activity {
   type: 'member' | 'event' | 'announcement' | 'system';
 }
 
+type StatMetricKey =
+  | 'totalMembers'
+  | 'activeMembers'
+  | 'upcomingEvents'
+  | 'publishedAnnouncements';
+
 // Brand colour per activity type
 const ACTIVITY_STYLE: Record<string, { bg: string; color: string; icon: React.ReactNode }> = {
   member: {
@@ -120,7 +126,7 @@ const QUICK_ACTIONS = [
 // Sparkline SVG paths — thin single-colour lines hinting at recent trend.
 // The path is a simple polyline normalised to a 60×24 viewBox.
 // Positive trend: generally upward; negative: downward; flat: gentle.
-const SPARKLINES: Record<string, { path: string; color: string }> = {
+const SPARKLINES: Record<StatMetricKey, { path: string; color: string }> = {
   totalMembers:          { path: 'M0,20 L10,18 L20,15 L30,13 L40,10 L50,7 L60,4',    color: '#3FAE2A' },
   activeMembers:         { path: 'M0,18 L10,16 L20,14 L30,12 L40,11 L50,9 L60,6',    color: '#1E9888' },
   upcomingEvents:        { path: 'M0,16 L10,14 L20,16 L30,12 L40,10 L50,8 L60,5',    color: '#3BB0C9' },
@@ -130,7 +136,7 @@ const SPARKLINES: Record<string, { path: string; color: string }> = {
 // Stat card configs — icon, colours, change badge
 const STAT_CONFIGS = [
   {
-    key: 'totalMembers' as keyof Stats,
+    key: 'totalMembers' as StatMetricKey,
     label: 'Total Members',
     subKey: null as null,
     isPos: true,
@@ -144,7 +150,7 @@ const STAT_CONFIGS = [
     ),
   },
   {
-    key: 'activeMembers' as keyof Stats,
+    key: 'activeMembers' as StatMetricKey,
     label: 'Active Members',
     subKey: null as null,
     isPos: true,
@@ -158,7 +164,7 @@ const STAT_CONFIGS = [
     ),
   },
   {
-    key: 'upcomingEvents' as keyof Stats,
+    key: 'upcomingEvents' as StatMetricKey,
     label: 'Upcoming Events',
     subKey: null,
     isPos: true,
@@ -172,7 +178,7 @@ const STAT_CONFIGS = [
     ),
   },
   {
-    key: 'publishedAnnouncements' as keyof Stats,
+    key: 'publishedAnnouncements' as StatMetricKey,
     label: 'Live Announcements',
     subKey: null,
     isPos: true,

@@ -2606,13 +2606,27 @@ a {
 .thread-image-placeholder {
   position: relative;
   min-height: 320px;
+  overflow: hidden;
   background:
     linear-gradient(160deg, rgba(7, 113, 0, 0.24), transparent 58%),
     linear-gradient(90deg, #684d34, #d7b57d 48%, #514236);
 }
 
-.announcement-feature-card__image::before,
-.announcement-detail-card__image::before {
+.announcement-feature-card__image,
+.announcement-detail-card__image {
+  min-height: 0;
+  background: #eff5ec;
+}
+
+.announcement-feature-card__image img,
+.announcement-detail-card__image img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.thread-image-placeholder::before {
   position: absolute;
   right: 28px;
   bottom: 0;
@@ -2624,8 +2638,7 @@ a {
   content: "";
 }
 
-.announcement-feature-card__image::after,
-.announcement-detail-card__image::after {
+.thread-image-placeholder::after {
   position: absolute;
   inset: 42px 34px auto;
   height: 120px;
@@ -2636,19 +2649,6 @@ a {
     0 52px 0 rgba(0, 0, 0, 0.18),
     0 78px 0 rgba(0, 0, 0, 0.18);
   content: "";
-}
-
-.announcement-feature-card__image span {
-  position: absolute;
-  z-index: 1;
-  top: 16px;
-  left: 20px;
-  padding: 8px 16px;
-  border-radius: 999px;
-  background: #ffb547;
-  color: #47310a;
-  font-size: 18px;
-  font-weight: 800;
 }
 
 .announcement-feature-card__body,
@@ -2810,6 +2810,10 @@ a {
   background: #eef9eb;
 }
 
+.announcement-detail-card__body-copy {
+  white-space: pre-line;
+}
+
 .moderated-comments {
   margin-top: 22px;
   padding: 24px;
@@ -2839,12 +2843,23 @@ a {
   font-size: 24px;
 }
 
+.community-comments-list {
+  overflow: hidden;
+  border: 1px solid #edf1ec;
+  border-radius: 14px;
+  background: #fbfdf9;
+}
+
 .community-comment {
   display: grid;
-  padding: 14px 0;
+  padding: 14px;
   grid-template-columns: 42px minmax(0, 1fr);
   gap: 13px;
   border-top: 1px solid #edf1ec;
+}
+
+.community-comment:first-child {
+  border-top: 0;
 }
 
 .community-comment > span {
@@ -2881,12 +2896,31 @@ a {
   line-height: 1.45;
 }
 
+.community-empty-comments {
+  padding: 16px;
+  color: #536057;
+}
+
+.community-empty-comments strong {
+  display: block;
+  color: #253028;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.community-empty-comments p {
+  margin: 5px 0 0;
+  color: #6f7a72;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
 .community-review-note {
   margin-top: 14px;
-  padding: 14px 16px;
-  border: 1px solid #efd7aa;
+  padding: 15px 16px;
+  border: 1px solid #e8cf9e;
   border-radius: 12px;
-  background: #fff7e8;
+  background: linear-gradient(180deg, #fff9ec, #fff4dc);
   color: #795f2e;
 }
 
@@ -2960,6 +2994,14 @@ a {
   padding: 0 16px;
   border-radius: 9px;
   font-size: 13px;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.community-composer button:not(:disabled):hover {
+  background: #075f00;
+  transform: translateY(-1px);
 }
 
 .community-composer button:disabled,
@@ -4195,7 +4237,7 @@ a {
   }
 }
 
-/* Mobile app shell alignment for UC-05 and UC-06 */
+/* Mobile app shell alignment for benefits, community, and notifications */
 .benefits-mobile-shell,
 .community-app-shell,
 .notifications-mobile-shell {
@@ -4893,7 +4935,7 @@ a {
   font-weight: 900;
 }
 
-/* Final mobile-frame lock: keeps UC-05/06/07 bars consistent on desktop. */
+/* Final mobile-frame lock: keeps mobile bars consistent on desktop. */
 .benefits-mobile-shell,
 .community-app-shell,
 .notifications-mobile-shell {
