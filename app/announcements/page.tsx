@@ -20,12 +20,12 @@ export default async function AnnouncementsPage() {
     console.warn("Using UC6 fallback data:", error);
   }
 
-  if (communityData?.announcements.length && communityData.groups.length) {
+  if (communityData?.announcements.length) {
     return (
       <AnnouncementsEngagement
         announcements={communityData.announcements}
-        groups={communityData.groups}
-        threads={communityData.threads}
+        groups={communityData.groups.length ? communityData.groups : undefined}
+        threads={communityData.threads.length ? communityData.threads : undefined}
       />
     );
   }

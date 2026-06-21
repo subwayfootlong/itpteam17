@@ -399,13 +399,16 @@ function AnnouncementHeroCard({
 }) {
   return (
     <article className="announcement-feature-card">
-      <div className="announcement-feature-card__image">
-        <span>Featured</span>
-      </div>
+      {announcement.imageUrl && (
+        <div className="announcement-feature-card__image">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={announcement.imageUrl} alt={announcement.title} />
+        </div>
+      )}
       <div className="announcement-feature-card__body">
         <p className="official-line">
           <Icon name="verified" size={17} />
-          Official Admin <span>2 hours ago</span>
+          Official Admin <span>{announcement.date}</span>
         </p>
         <h2>{announcement.title}</h2>
         <p>{announcement.body}</p>
@@ -482,7 +485,12 @@ function AnnouncementDetail({
   return (
     <section className="community-screen">
       <article className="announcement-detail-card">
-        <div className="announcement-detail-card__image" />
+        {announcement.imageUrl && (
+          <div className="announcement-detail-card__image">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={announcement.imageUrl} alt={announcement.title} />
+          </div>
+        )}
         <p className="official-line">
           <Icon name="verified" size={17} />
           Official Admin <span>{announcement.date}</span>

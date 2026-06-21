@@ -30,6 +30,19 @@ export async function POST(req: Request) {
       );
     }
 
+    if (announcementId.startsWith("admin:")) {
+      return NextResponse.json({
+        comment: {
+          id: `pending-admin-comment-${Date.now()}`,
+          author: user.fullName,
+          role: "Active Member",
+          body: trimmedBody,
+          postedAt: "Just now",
+          status: moderationStatus(trimmedBody),
+        },
+      });
+    }
+
     const { data, error } = await supabaseAdmin
       .from("uc6_announcement_comments")
       .insert({

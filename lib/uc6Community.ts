@@ -48,6 +48,16 @@ type AnnouncementRow = {
   comments_enabled: boolean | null;
 };
 
+type AdminAnnouncementRow = {
+  id: string;
+  title: string;
+  content: string | null;
+  category: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  image_url: string | null;
+};
+
 type CommentRow = {
   id: string;
   announcement_id?: string;
@@ -77,6 +87,29 @@ type ThreadRow = {
   created_at: string | null;
   author_name: string | null;
 };
+
+function mapAdminAnnouncementCategory(
+  category: string | null,
+): AnnouncementCategory {
+  const normalized = (category ?? "").toLowerCase();
+
+  if (normalized.includes("admin")) return "Official";
+  if (
+    normalized.includes("workshop") ||
+    normalized.includes("agm") ||
+    normalized.includes("event")
+  ) {
+    return "Events";
+  }
+  if (normalized.includes("member")) return "Membership";
+
+  return "Community";
+}
+
+function summarizeContent(content: string) {
+  const firstSentence = content.match(/^.{1,150}?(?:\.|\?|!|$)/)?.[0]?.trim();
+  return firstSentence || content.slice(0, 150).trim();
+}
 
 export const flaggedWords = ["spam", "scam", "hate", "offensive"];
 
@@ -141,6 +174,25 @@ function mapAnnouncement(
   };
 }
 
+function mapAdminAnnouncement(row: AdminAnnouncementRow): Announcement {
+  const body = row.content?.trim() || "Announcement details will be updated soon.";
+  const imageUrl = row.image_url?.trim();
+
+  return {
+    id: `admin:${row.id}`,
+    title: row.title,
+    category: mapAdminAnnouncementCategory(row.category),
+    date: formatRelativeDate(row.updated_at || row.created_at),
+    readTime: `${Math.max(1, Math.ceil(body.split(/\s+/).length / 180))} min read`,
+    summary: summarizeContent(body),
+    body,
+    imageUrl: imageUrl || undefined,
+    pinned: false,
+    commentsEnabled: true,
+    comments: [],
+  };
+}
+
 function mapThread(
   row: ThreadRow,
   comments: CommunityComment[],
@@ -161,12 +213,18 @@ function mapThread(
 
 export async function getCommunityData(): Promise<CommunityData> {
   const [
+    adminAnnouncementsResult,
     announcementsResult,
     announcementCommentsResult,
     groupsResult,
     threadsResult,
     threadCommentsResult,
   ] = await Promise.all([
+    supabaseAdmin
+      .from("announcements")
+      .select("id, title, content, category, created_at, updated_at, image_url")
+      .eq("status", "published")
+      .order("updated_at", { ascending: false }),
     supabaseAdmin
       .from("uc6_announcements")
       .select("id, title, category, published_at, read_time, summary, body, pinned, comments_enabled")
@@ -192,17 +250,6 @@ export async function getCommunityData(): Promise<CommunityData> {
       .order("created_at", { ascending: true }),
   ]);
 
-  const firstError =
-    announcementsResult.error ||
-    announcementCommentsResult.error ||
-    groupsResult.error ||
-    threadsResult.error ||
-    threadCommentsResult.error;
-
-  if (firstError) {
-    throw firstError;
-  }
-
   const announcementCommentsById = new Map<string, CommunityComment[]>();
   for (const row of (announcementCommentsResult.data ?? []) as CommentRow[]) {
     if (!row.announcement_id) continue;
@@ -219,26 +266,42 @@ export async function getCommunityData(): Promise<CommunityData> {
     threadCommentsById.set(row.thread_id, comments);
   }
 
-  const threads = ((threadsResult.data ?? []) as ThreadRow[]).map((row) =>
-    mapThread(row, threadCommentsById.get(row.id) ?? []),
-  );
+  const threads = threadsResult.error
+    ? []
+    : ((threadsResult.data ?? []) as ThreadRow[]).map((row) =>
+        mapThread(row, threadCommentsById.get(row.id) ?? []),
+      );
 
   const threadCounts = threads.reduce<Record<string, number>>((acc, thread) => {
     acc[thread.groupId] = (acc[thread.groupId] ?? 0) + 1;
     return acc;
   }, {});
 
+  const adminAnnouncements = adminAnnouncementsResult.error
+    ? []
+    : ((adminAnnouncementsResult.data ?? []) as AdminAnnouncementRow[]).map(
+        mapAdminAnnouncement,
+      );
+
+  const uc6Announcements =
+    announcementsResult.error || announcementCommentsResult.error
+      ? []
+      : ((announcementsResult.data ?? []) as AnnouncementRow[]).map((row) =>
+          mapAnnouncement(row, announcementCommentsById.get(row.id) ?? []),
+        );
+
   return {
-    announcements: ((announcementsResult.data ?? []) as AnnouncementRow[]).map(
-      (row) => mapAnnouncement(row, announcementCommentsById.get(row.id) ?? []),
-    ),
-    groups: ((groupsResult.data ?? []) as GroupRow[]).map((row) => ({
-      id: row.id,
-      title: row.title,
-      posts: threadCounts[row.id] ?? 0,
-      icon: row.icon || "message",
-      tone: row.tone || "green",
-    })),
+    announcements:
+      adminAnnouncements.length > 0 ? adminAnnouncements : uc6Announcements,
+    groups: groupsResult.error
+      ? []
+      : ((groupsResult.data ?? []) as GroupRow[]).map((row) => ({
+          id: row.id,
+          title: row.title,
+          posts: threadCounts[row.id] ?? 0,
+          icon: row.icon || "message",
+          tone: row.tone || "green",
+        })),
     threads,
   };
 }
