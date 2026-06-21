@@ -1,6 +1,6 @@
 import BenefitsDirectory from "../components/benefits-directory";
 import { membershipBenefits, partners } from "../data/partners";
-import { getActiveBenefitPartners } from "@/lib/uc5Benefits";
+import { getActiveBenefitPartners } from "@/lib/benefits";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,7 @@ export default async function BenefitPage() {
       visiblePartners = adminPartners;
     }
   } catch (error) {
-    console.warn("Using UC5 fallback benefit data:", error);
+    console.warn("Using benefit fallback data:", error);
   }
 
   return (

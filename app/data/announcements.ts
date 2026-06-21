@@ -13,6 +13,7 @@ export type CommunityComment = {
   body: string;
   postedAt: string;
   status: CommentStatus;
+  isOwn?: boolean;
 };
 
 export type Announcement = {

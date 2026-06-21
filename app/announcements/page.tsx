@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import AnnouncementsEngagement from "../components/announcements-engagement";
 import { announcements } from "../data/announcements";
-import { getCommunityData } from "@/lib/uc6Community";
+import { getCurrentUser } from "@/lib/currentUser";
+import { getCommunityData } from "@/lib/community";
 
 export const dynamic = "force-dynamic";
 
@@ -13,11 +14,12 @@ export const metadata: Metadata = {
 
 export default async function AnnouncementsPage() {
   let communityData: Awaited<ReturnType<typeof getCommunityData>> | null = null;
+  const currentUser = await getCurrentUser();
 
   try {
-    communityData = await getCommunityData();
+    communityData = await getCommunityData(currentUser?.id);
   } catch (error) {
-    console.warn("Using UC6 fallback data:", error);
+    console.warn("Using community fallback data:", error);
   }
 
   if (communityData?.announcements.length) {

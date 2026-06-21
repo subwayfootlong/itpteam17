@@ -62,11 +62,16 @@ type CommentRow = {
   id: string;
   announcement_id?: string;
   thread_id?: string;
+  user_id?: string | null;
   body: string;
   status: CommentStatus;
   created_at: string | null;
   author_name: string | null;
   author_role: string | null;
+};
+
+type AdminAnnouncementCommentRow = Omit<CommentRow, "announcement_id"> & {
+  announcement_id: string;
 };
 
 type GroupRow = {
@@ -145,7 +150,11 @@ export function formatRelativeDate(value: string | null) {
   });
 }
 
-function mapComment(row: CommentRow): CommunityComment {
+function shouldShowComment(row: CommentRow, currentUserId?: string) {
+  return row.status === "approved" || Boolean(currentUserId && row.user_id === currentUserId);
+}
+
+function mapComment(row: CommentRow, currentUserId?: string): CommunityComment {
   return {
     id: row.id,
     author: row.author_name || "Pergas Member",
@@ -153,6 +162,7 @@ function mapComment(row: CommentRow): CommunityComment {
     body: row.body,
     postedAt: formatRelativeDate(row.created_at),
     status: row.status,
+    isOwn: Boolean(currentUserId && row.user_id === currentUserId),
   };
 }
 
@@ -174,7 +184,10 @@ function mapAnnouncement(
   };
 }
 
-function mapAdminAnnouncement(row: AdminAnnouncementRow): Announcement {
+function mapAdminAnnouncement(
+  row: AdminAnnouncementRow,
+  comments: CommunityComment[],
+): Announcement {
   const body = row.content?.trim() || "Announcement details will be updated soon.";
   const imageUrl = row.image_url?.trim();
 
@@ -189,7 +202,7 @@ function mapAdminAnnouncement(row: AdminAnnouncementRow): Announcement {
     imageUrl: imageUrl || undefined,
     pinned: false,
     commentsEnabled: true,
-    comments: [],
+    comments,
   };
 }
 
@@ -211,9 +224,12 @@ function mapThread(
   };
 }
 
-export async function getCommunityData(): Promise<CommunityData> {
+export async function getCommunityData(
+  currentUserId?: string,
+): Promise<CommunityData> {
   const [
     adminAnnouncementsResult,
+    adminAnnouncementCommentsResult,
     announcementsResult,
     announcementCommentsResult,
     groupsResult,
@@ -226,6 +242,10 @@ export async function getCommunityData(): Promise<CommunityData> {
       .eq("status", "published")
       .order("updated_at", { ascending: false }),
     supabaseAdmin
+      .from("uc6_admin_announcement_comments")
+      .select("id, announcement_id, user_id, body, status, created_at, author_name, author_role")
+      .order("created_at", { ascending: true }),
+    supabaseAdmin
       .from("uc6_announcements")
       .select("id, title, category, published_at, read_time, summary, body, pinned, comments_enabled")
       .eq("status", "published")
@@ -233,7 +253,7 @@ export async function getCommunityData(): Promise<CommunityData> {
       .order("published_at", { ascending: false }),
     supabaseAdmin
       .from("uc6_announcement_comments")
-      .select("id, announcement_id, body, status, created_at, author_name, author_role")
+      .select("id, announcement_id, user_id, body, status, created_at, author_name, author_role")
       .order("created_at", { ascending: true }),
     supabaseAdmin
       .from("uc6_discussion_groups")
@@ -246,23 +266,33 @@ export async function getCommunityData(): Promise<CommunityData> {
       .order("created_at", { ascending: false }),
     supabaseAdmin
       .from("uc6_thread_comments")
-      .select("id, thread_id, body, status, created_at, author_name, author_role")
+      .select("id, thread_id, user_id, body, status, created_at, author_name, author_role")
       .order("created_at", { ascending: true }),
   ]);
 
+  const adminCommentsById = new Map<string, CommunityComment[]>();
+  if (!adminAnnouncementCommentsResult.error) {
+    for (const row of (adminAnnouncementCommentsResult.data ?? []) as AdminAnnouncementCommentRow[]) {
+      if (!row.announcement_id || !shouldShowComment(row, currentUserId)) continue;
+      const comments = adminCommentsById.get(row.announcement_id) ?? [];
+      comments.push(mapComment(row, currentUserId));
+      adminCommentsById.set(row.announcement_id, comments);
+    }
+  }
+
   const announcementCommentsById = new Map<string, CommunityComment[]>();
   for (const row of (announcementCommentsResult.data ?? []) as CommentRow[]) {
-    if (!row.announcement_id) continue;
+    if (!row.announcement_id || !shouldShowComment(row, currentUserId)) continue;
     const comments = announcementCommentsById.get(row.announcement_id) ?? [];
-    comments.push(mapComment(row));
+    comments.push(mapComment(row, currentUserId));
     announcementCommentsById.set(row.announcement_id, comments);
   }
 
   const threadCommentsById = new Map<string, CommunityComment[]>();
   for (const row of (threadCommentsResult.data ?? []) as CommentRow[]) {
-    if (!row.thread_id) continue;
+    if (!row.thread_id || !shouldShowComment(row, currentUserId)) continue;
     const comments = threadCommentsById.get(row.thread_id) ?? [];
-    comments.push(mapComment(row));
+    comments.push(mapComment(row, currentUserId));
     threadCommentsById.set(row.thread_id, comments);
   }
 
@@ -280,10 +310,10 @@ export async function getCommunityData(): Promise<CommunityData> {
   const adminAnnouncements = adminAnnouncementsResult.error
     ? []
     : ((adminAnnouncementsResult.data ?? []) as AdminAnnouncementRow[]).map(
-        mapAdminAnnouncement,
+        (row) => mapAdminAnnouncement(row, adminCommentsById.get(row.id) ?? []),
       );
 
-  const uc6Announcements =
+  const communityAnnouncements =
     announcementsResult.error || announcementCommentsResult.error
       ? []
       : ((announcementsResult.data ?? []) as AnnouncementRow[]).map((row) =>
@@ -292,7 +322,7 @@ export async function getCommunityData(): Promise<CommunityData> {
 
   return {
     announcements:
-      adminAnnouncements.length > 0 ? adminAnnouncements : uc6Announcements,
+      adminAnnouncements.length > 0 ? adminAnnouncements : communityAnnouncements,
     groups: groupsResult.error
       ? []
       : ((groupsResult.data ?? []) as GroupRow[]).map((row) => ({
