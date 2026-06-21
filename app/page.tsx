@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import SplashScreen from "@/components/SplashScreen";
 import WelcomeScreen from "@/components/WelcomeScreen";
@@ -8,16 +8,25 @@ import LoginScreen from "@/components/LoginScreen";
 import RegisterScreen from "@/components/RegisterScreen";
 
 export default function Home() {
+  return (
+    <Suspense fallback={<SplashScreen />}>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
+function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const [currentScreen, setCurrentScreen] = useState<
     "splash" | "welcome" | "login" | "register"
   >("splash");
+  const forcedScreen = searchParams.get("screen");
+  const visibleScreen = forcedScreen === "login" ? "login" : currentScreen;
 
   useEffect(() => {
-    if (searchParams.get("screen") === "login") {
-      setCurrentScreen("login");
+    if (forcedScreen === "login") {
       return;
     }
 
@@ -26,7 +35,7 @@ export default function Home() {
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [searchParams]);
+  }, [forcedScreen]);
 
   const handleGetStarted = () => {
     setCurrentScreen("login");
@@ -43,13 +52,13 @@ export default function Home() {
 
   return (
     <main className="min-h-screen w-full relative bg-white">
-      {currentScreen === "splash" && <SplashScreen />}
+      {visibleScreen === "splash" && <SplashScreen />}
 
-      {currentScreen === "welcome" && (
+      {visibleScreen === "welcome" && (
         <WelcomeScreen onGetStarted={handleGetStarted} />
       )}
 
-      {currentScreen === "login" && (
+      {visibleScreen === "login" && (
         <LoginScreen
           onLoginSuccess={handleLoginSuccess}
           onCreateAccountClick={() => setCurrentScreen("register")}
@@ -62,7 +71,7 @@ export default function Home() {
         />
       )}
 
-      {currentScreen === "register" && (
+      {visibleScreen === "register" && (
         <RegisterScreen
           onRegisterSuccess={handleRegisterSuccess}
           onBackToLogin={() => setCurrentScreen("login")}

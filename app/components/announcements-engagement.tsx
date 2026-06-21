@@ -328,7 +328,7 @@ function MobileHeader({
       </div>
       <Link
         className="community-icon-button"
-        href="/notifications"
+        href="/member/notifications"
         aria-label="Notifications"
       >
         <Icon name={canGoBack ? "search" : "bell"} size={23} />
@@ -371,26 +371,26 @@ function CommunityTabs({
 function BottomNav() {
   return (
     <nav className="community-bottom-nav" aria-label="Mobile navigation">
-      <Link href="/benefit">
+      <Link href="/member">
         <Icon name="home" size={23} />
         Home
       </Link>
-      <a href="#">
+      <Link href="/member/events">
         <Icon name="calendar" size={23} />
         Events
-      </a>
-      <Link href="/benefit">
+      </Link>
+      <Link href="/member/benefit">
         <Icon name="card" size={23} />
         Benefits
       </Link>
-      <Link className="is-active" href="/announcements" aria-current="page">
+      <Link className="is-active" href="/member/community" aria-current="page">
         <Icon name="message" size={23} />
         Community
       </Link>
-      <a href="#">
+      <Link href="/member/profile">
         <Icon name="user" size={23} />
         Profile
-      </a>
+      </Link>
     </nav>
   );
 }

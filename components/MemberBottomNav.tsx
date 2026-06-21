@@ -22,7 +22,7 @@ const navItems = [
   },
   {
     label: "Community",
-    href: "#",
+    href: "/member/community",
     icon: MessageSquare,
   },
   {
