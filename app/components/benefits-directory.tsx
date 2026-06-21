@@ -414,9 +414,11 @@ function BenefitModal({
 export default function BenefitsDirectory({
   partners,
   membershipBenefits,
+  showChrome = true,
 }: {
   partners: Partner[];
   membershipBenefits: MembershipBenefit[];
+  showChrome?: boolean;
 }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<CategoryFilter>("All");
@@ -450,7 +452,7 @@ export default function BenefitsDirectory({
 
   return (
     <div className="benefits-mobile-shell">
-      <BenefitsHeader />
+      {showChrome && <BenefitsHeader />}
 
       <main className="benefits-mobile-main">
         <section className="benefits-intro">
@@ -554,7 +556,7 @@ export default function BenefitsDirectory({
         )}
       </main>
 
-      <BottomNav />
+      {showChrome && <BottomNav />}
 
       {redeemPartner && (
         <BenefitModal

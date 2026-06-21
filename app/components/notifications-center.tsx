@@ -194,8 +194,10 @@ function NotificationIcon({ type }: { type: NotificationType }) {
 
 export default function NotificationsCenter({
   initialNotifications,
+  showChrome = true,
 }: {
   initialNotifications: SystemNotification[];
+  showChrome?: boolean;
 }) {
   const [notifications, setNotifications] = useState(initialNotifications);
   const [filter, setFilter] = useState<Filter>("All");
@@ -268,7 +270,7 @@ export default function NotificationsCenter({
 
   return (
     <div className="notifications-mobile-shell">
-      <NotificationHeader unreadCount={unreadCount} />
+      {showChrome && <NotificationHeader unreadCount={unreadCount} />}
 
       <main className="notifications-mobile-main">
         <section className="notifications-title-row">
@@ -412,7 +414,7 @@ export default function NotificationsCenter({
         </div>
       )}
 
-      <BottomNav />
+      {showChrome && <BottomNav />}
     </div>
   );
 }

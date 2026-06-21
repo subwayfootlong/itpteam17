@@ -1,59 +1,72 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import SplashScreen from '@/components/SplashScreen';
-import WelcomeScreen from '@/components/WelcomeScreen';
-import LoginScreen from '@/components/LoginScreen';
-import RegisterScreen from '@/components/RegisterScreen';
+import React, { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import SplashScreen from "@/components/SplashScreen";
+import WelcomeScreen from "@/components/WelcomeScreen";
+import LoginScreen from "@/components/LoginScreen";
+import RegisterScreen from "@/components/RegisterScreen";
 
 export default function Home() {
   const router = useRouter();
-  const [currentScreen, setCurrentScreen] = useState<'splash' | 'welcome' | 'login' | 'register'>('splash');
+  const searchParams = useSearchParams();
+
+  const [currentScreen, setCurrentScreen] = useState<
+    "splash" | "welcome" | "login" | "register"
+  >("splash");
 
   useEffect(() => {
-    // Phase 1: Splash Screen timer automatically forwards to Welcome page after 3s
+    if (searchParams.get("screen") === "login") {
+      setCurrentScreen("login");
+      return;
+    }
+
     const timer = setTimeout(() => {
-      setCurrentScreen('welcome');
+      setCurrentScreen("welcome");
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [searchParams]);
 
-  // Action handlers
   const handleGetStarted = () => {
-    setCurrentScreen('login');
+    setCurrentScreen("login");
   };
 
   const handleLoginSuccess = () => {
-    router.replace('/benefit');
-    router.refresh();
+    router.push("/member");
   };
 
   const handleRegisterSuccess = () => {
-    router.replace('/benefit');
+    router.push("/member");
     router.refresh();
   };
 
   return (
     <main className="min-h-screen w-full relative bg-white">
-      {currentScreen === 'splash' && <SplashScreen />}
-      
-      {currentScreen === 'welcome' && (
+      {currentScreen === "splash" && <SplashScreen />}
+
+      {currentScreen === "welcome" && (
         <WelcomeScreen onGetStarted={handleGetStarted} />
       )}
-      
-      {currentScreen === 'login' && (
-        <LoginScreen 
+
+      {currentScreen === "login" && (
+        <LoginScreen
           onLoginSuccess={handleLoginSuccess}
-          onCreateAccountClick={() => setCurrentScreen('register')}
-          onForgotPasswordClick={() => console.log("Routing to password recovery interface...")}
-          onContactSupportClick={() => console.log("Opening communication ticket modal...")}
+          onCreateAccountClick={() => setCurrentScreen("register")}
+          onForgotPasswordClick={() =>
+            console.log("Routing to password recovery interface...")
+          }
+          onContactSupportClick={() =>
+            console.log("Opening communication ticket modal...")
+          }
         />
       )}
 
-      {currentScreen === 'register' && (
-        <RegisterScreen onRegisterSuccess={handleRegisterSuccess} onBackToLogin={() => setCurrentScreen('login')} />
+      {currentScreen === "register" && (
+        <RegisterScreen
+          onRegisterSuccess={handleRegisterSuccess}
+          onBackToLogin={() => setCurrentScreen("login")}
+        />
       )}
     </main>
   );
