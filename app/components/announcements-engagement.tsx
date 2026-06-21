@@ -837,10 +837,12 @@ export default function AnnouncementsEngagement({
   announcements,
   groups = fallbackGroups,
   threads: initialThreads = fallbackThreads,
+  showChrome = true,
 }: {
   announcements: Announcement[];
   groups?: DiscussionGroup[];
   threads?: DiscussionThread[];
+  showChrome?: boolean;
 }) {
   const [activeTab, setActiveTab] = useState<CommunityTab>("announcements");
   const [selectedAnnouncementId, setSelectedAnnouncementId] = useState<
@@ -876,6 +878,9 @@ export default function AnnouncementsEngagement({
       : "Pergas";
 
   const canGoBack = Boolean(selectedAnnouncement || selectedGroupId);
+  const shellClassName = showChrome
+    ? "community-app-shell"
+    : "community-app-shell is-member-embedded";
 
   const handleBack = () => {
     if (selectedAnnouncement) {
@@ -964,8 +969,27 @@ export default function AnnouncementsEngagement({
   };
 
   return (
-    <div className="community-app-shell">
-      <MobileHeader title={pageTitle} canGoBack={canGoBack} onBack={handleBack} />
+    <div className={shellClassName}>
+      {showChrome && (
+        <MobileHeader title={pageTitle} canGoBack={canGoBack} onBack={handleBack} />
+      )}
+      {!showChrome && (
+        <div className="community-inline-heading">
+          {canGoBack ? (
+            <button type="button" onClick={handleBack} aria-label="Go back">
+              <Icon name="back" size={22} />
+            </button>
+          ) : (
+            <span aria-hidden="true">
+              <Icon name="message" size={22} />
+            </span>
+          )}
+          <div>
+            <h2>{pageTitle === "Pergas" ? "Community" : pageTitle}</h2>
+            {!canGoBack && <p>Announcements and member discussions</p>}
+          </div>
+        </div>
+      )}
       {!selectedAnnouncement && !selectedGroupId && (
         <CommunityTabs activeTab={activeTab} onSelect={handleSelectTab} />
       )}
@@ -1006,7 +1030,7 @@ export default function AnnouncementsEngagement({
           />
         )}
       </main>
-      <BottomNav />
+      {showChrome && <BottomNav />}
     </div>
   );
 }

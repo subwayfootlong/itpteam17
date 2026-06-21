@@ -5006,3 +5006,153 @@ a {
 .notifications-filter-tabs::-webkit-scrollbar {
   display: none;
 }
+
+.community-app-shell.is-member-embedded {
+  width: 100%;
+  min-height: auto;
+  margin: 0;
+  padding-bottom: 0;
+  overflow: visible;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.community-app-shell.is-member-embedded .community-main {
+  width: 100%;
+  padding-bottom: 0;
+}
+
+.community-inline-heading {
+  display: flex;
+  padding: 24px 20px 0;
+  align-items: center;
+  gap: 12px;
+}
+
+.community-inline-heading > span,
+.community-inline-heading button {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid #dfe7dc;
+  border-radius: 14px;
+  background: #f6f7f6;
+  color: #0f6e00;
+}
+
+.community-inline-heading button {
+  cursor: pointer;
+}
+
+.community-inline-heading h2 {
+  margin: 0;
+  color: #151c27;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.community-inline-heading p {
+  margin: 4px 0 0;
+  color: #5f5e5e;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.community-app-shell.is-member-embedded .community-tabs {
+  position: static;
+  width: auto;
+  margin: 20px 20px 0;
+  padding: 4px;
+  gap: 4px;
+  border: 1px solid #e2e8e1;
+  border-radius: 16px;
+  background: #f6f7f6;
+}
+
+.community-app-shell.is-member-embedded .community-tabs button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 12px;
+  color: #5f5e5e;
+  font-size: 14px;
+  text-align: center;
+}
+
+.community-app-shell.is-member-embedded .community-tabs button.is-active {
+  background: #e8f4e6;
+  color: #0f6e00;
+}
+
+.community-app-shell.is-member-embedded .community-screen {
+  padding: 20px 20px 34px;
+}
+
+.community-app-shell.is-member-embedded .announcement-feature-card,
+.community-app-shell.is-member-embedded .announcement-mini-card,
+.community-app-shell.is-member-embedded .announcement-detail-card,
+.community-app-shell.is-member-embedded .discussion-group-card,
+.community-app-shell.is-member-embedded .moderator-card,
+.community-app-shell.is-member-embedded .discussion-thread-card,
+.community-app-shell.is-member-embedded .share-thoughts,
+.community-app-shell.is-member-embedded .moderated-comments {
+  border-color: #edf1ec;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(21, 28, 39, 0.05);
+}
+
+.community-app-shell.is-member-embedded .announcement-feature-card h2,
+.community-app-shell.is-member-embedded .announcement-detail-card h2,
+.community-app-shell.is-member-embedded .discussion-thread-card h2 {
+  color: #151c27;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1.18;
+}
+
+.community-app-shell.is-member-embedded .official-line {
+  color: #0f6e00;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.community-app-shell.is-member-embedded .announcement-feature-card__body,
+.community-app-shell.is-member-embedded .announcement-mini-card,
+.community-app-shell.is-member-embedded .moderated-comments,
+.community-app-shell.is-member-embedded .moderator-card {
+  padding: 18px;
+}
+
+.community-app-shell.is-member-embedded .announcement-feature-card p,
+.community-app-shell.is-member-embedded .announcement-detail-card p,
+.community-app-shell.is-member-embedded .discussion-thread-card p,
+.community-app-shell.is-member-embedded .moderator-card p,
+.community-app-shell.is-member-embedded .announcement-mini-card p {
+  color: #3f473f;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.community-app-shell.is-member-embedded .announcement-feature-card button,
+.community-app-shell.is-member-embedded .moderator-card button,
+.community-app-shell.is-member-embedded .community-composer button {
+  background: #0f6e00;
+  font-size: 14px;
+}
+
+.community-app-shell.is-member-embedded .announcement-list {
+  margin-top: 18px;
+  gap: 16px;
+}
+
+.community-app-shell.is-member-embedded .floating-compose {
+  right: max(20px, calc((100vw - 448px) / 2 + 20px));
+  bottom: 94px;
+  width: 54px;
+  height: 54px;
+  background: #0f6e00;
+}
