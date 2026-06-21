@@ -300,6 +300,24 @@ function PartnerMap({
       Boolean(partner.mapPosition),
   );
 
+  if (mappedPartners.length === 0) {
+    return (
+      <section className="benefits-map-screen">
+        <div className="benefits-map-canvas">
+          <svg viewBox="0 0 760 350" aria-label="Stylized Singapore partner map">
+            <path d="M86 188c26-15 58-18 81-38 25-22 43-60 82-70 42-11 78 9 114 2 50-9 88-39 139-24 23 7 38 29 62 33 29 5 58-10 84 6 21 13 25 39 12 59-11 17-32 23-46 38-14 16-17 42-35 54-28 18-67 2-98 15-26 11-44 39-74 42-34 4-61-22-94-26-39-5-75 20-114 14-26-4-45-25-70-32-23-7-56-3-68-26-10-19 4-37 25-47Z" />
+            <path d="M687 219c13-4 30 1 35 14 5 12-4 25-17 27-14 2-29-7-28-20 0-9 4-17 10-21ZM34 223c11-7 29-4 35 8 7 13-5 27-20 28-12 1-25-5-27-17-2-8 4-15 12-19Z" />
+          </svg>
+        </div>
+        <div className="benefits-empty-state">
+          <Icon name="map" size={28} />
+          <h2>No map locations</h2>
+          <p>Try another category or search term to show partner pins.</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="benefits-map-screen">
       <div className="benefits-map-canvas">
@@ -427,6 +445,9 @@ export default function BenefitsDirectory({
     });
   }, [category, partners, query]);
 
+  const visibleMapSelected =
+    filteredPartners.find((partner) => partner.id === mapSelected?.id) ?? null;
+
   return (
     <div className="benefits-mobile-shell">
       <BenefitsHeader />
@@ -501,7 +522,7 @@ export default function BenefitsDirectory({
         {view === "map" ? (
           <PartnerMap
             partners={filteredPartners}
-            selected={mapSelected}
+            selected={visibleMapSelected}
             onSelect={setMapSelected}
             onRedeem={setRedeemPartner}
           />
