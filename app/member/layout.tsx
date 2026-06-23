@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { verifyAccessToken } from "@/lib/auth";
+import SessionTimeout from "@/components/SessionTimeout";
 
 export default async function MemberLayout({
   children,
@@ -20,5 +21,10 @@ export default async function MemberLayout({
     redirect("/");
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <SessionTimeout />
+      {children}
+    </>
+  );
 }
