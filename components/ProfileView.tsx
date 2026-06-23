@@ -5,13 +5,13 @@ import { QRCodeCanvas } from "qrcode.react";
 import MemberTopBar from "@/components/MemberTopBar";
 import MemberBottomNav from "@/components/MemberBottomNav";
 import type { MemberProfile } from "@/app/member/profile/page";
+import { formatTierLabel } from "@/lib/membershipTiers";
 import { useRouter } from "next/navigation";
 import {
   BadgeCheck,
   BookOpen,
   CalendarCheck,
   Edit3,
-  Gift,
   Handshake,
   Library,
   LogOut,
@@ -30,6 +30,24 @@ type Benefit = {
 };
 
 const benefitsByTier: Record<string, Benefit[]> = {
+  basic: [
+    {
+      title: "Member Portal",
+      subtitle: "Access to member resources",
+      icon: Library,
+    },
+    {
+      title: "Event Discovery",
+      subtitle: "Browse upcoming Pergas events",
+      icon: CalendarCheck,
+    },
+    {
+      title: "Announcements",
+      subtitle: "Official Pergas updates",
+      icon: BookOpen,
+    },
+  ],
+
   student: [
     {
       title: "Digital Library",
@@ -138,112 +156,6 @@ const benefitsByTier: Record<string, Benefit[]> = {
       icon: Vote,
     },
   ],
-
-  fellow: [
-    {
-      title: "Digital Library",
-      subtitle: "Reference Library",
-      icon: Library,
-    },
-    {
-      title: "Discounts",
-      subtitle: "10% off program fees",
-      icon: Percent,
-    },
-    {
-      title: "Book Purchases",
-      subtitle: "15% off books",
-      icon: BookOpen,
-    },
-    {
-      title: "Friends of Pergas",
-      subtitle: "Partner discounts",
-      icon: Handshake,
-    },
-    {
-      title: "Priority Entry",
-      subtitle: "Early booking",
-      icon: CalendarCheck,
-    },
-    {
-      title: "Exclusives",
-      subtitle: "Members-only programs",
-      icon: Star,
-    },
-    {
-      title: "Magazine Delivery",
-      subtitle: "Ar-Risalah quarterly",
-      icon: Truck,
-    },
-    {
-      title: "Board Eligibility",
-      subtitle: "Run for board member",
-      icon: Users,
-    },
-    {
-      title: "Voting Rights",
-      subtitle: "Member voting privileges",
-      icon: Vote,
-    },
-    {
-      title: "VIP Seats",
-      subtitle: "National events access",
-      icon: Gift,
-    },
-  ],
-
-  professional: [
-    {
-      title: "Digital Library",
-      subtitle: "Reference Library",
-      icon: Library,
-    },
-    {
-      title: "Discounts",
-      subtitle: "10% off program fees",
-      icon: Percent,
-    },
-    {
-      title: "Book Purchases",
-      subtitle: "15% off books",
-      icon: BookOpen,
-    },
-    {
-      title: "Friends of Pergas",
-      subtitle: "Partner discounts",
-      icon: Handshake,
-    },
-    {
-      title: "Priority Entry",
-      subtitle: "Early booking",
-      icon: CalendarCheck,
-    },
-    {
-      title: "Exclusives",
-      subtitle: "Members-only programs",
-      icon: Star,
-    },
-    {
-      title: "Magazine Delivery",
-      subtitle: "Ar-Risalah quarterly",
-      icon: Truck,
-    },
-    {
-      title: "Board Eligibility",
-      subtitle: "Run for board member",
-      icon: Users,
-    },
-    {
-      title: "Voting Rights",
-      subtitle: "Member voting privileges",
-      icon: Vote,
-    },
-    {
-      title: "VIP Seats",
-      subtitle: "National events access",
-      icon: Gift,
-    },
-  ],
 };
 
 function formatDate(date: string | null) {
@@ -258,18 +170,10 @@ function formatDate(date: string | null) {
   });
 }
 
-function formatTier(tier: string | null) {
-  if (!tier) {
-    return "Member";
-  }
-
-  return tier.charAt(0).toUpperCase() + tier.slice(1);
-}
-
 export default function ProfileView({ member }: { member: MemberProfile }) {
   const router = useRouter();
-  const tier = member.membership_tier || "ordinary";
-  const benefits = benefitsByTier[tier] || benefitsByTier.ordinary;
+  const tier = member.membership_tier || "basic";
+  const benefits = benefitsByTier[tier] || benefitsByTier.basic;
 
   async function handleLogout() {
     const confirmed = window.confirm("Are you sure you want to log out?");
@@ -305,7 +209,7 @@ export default function ProfileView({ member }: { member: MemberProfile }) {
             <div className="relative z-10 flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm uppercase tracking-[0.2em]">
-                  {formatTier(member.membership_tier)} Member
+                  {formatTierLabel(member.membership_tier)} Member
                 </p>
 
                 <h2 className="mt-2 text-lg font-medium">

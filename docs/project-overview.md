@@ -16,7 +16,7 @@ The **Pergas Integrated Members Engagement System** is a digital portal designed
 | UC ID | Use Case Name | Primary Actor | Secondary / System Actor | Description / Functional Scope | Associated FRs |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **UC-01** | User Auth & Session Lifecycle | Member / Admin | Pergas Member Database | Secure login, role validation, and session logout. | FR-02, 03, 15, 16, 17, 23 |
-| **UC-02** | Account Sync & Registration | Member | Pergas Member Database | Pre-verified paid members activate profiles. | FR-01 |
+| **UC-02** | Account Registration & Membership | Member | — | Self-registration with default Basic tier; admin manages subscription levels. | FR-01 |
 | **UC-03** | View Profile & Digital E-Card | Member | Partner Merchant | Displays details and renders live validation QR/barcode. | FR-04, 05, 13 |
 | **UC-04** | Browse Events & External RSVP | Member | Zoho Backstage | Calendar/list view with deep-links for registration. | FR-06, 07, 08 |
 | **UC-05** | Discover Partner Benefits | Member | Map Integration Service | Search/filter discounts via list or interactive SG map. | FR-09, 10 |

@@ -332,35 +332,6 @@ export default function AdminDashboard() {
             })}
       </div>
 
-      {/* ── Pending Approvals — full-width attention banner ──────────────── */}
-      <div
-        className="w-full rounded-xl border px-6 py-4 flex items-center justify-between gap-4"
-        style={{ background: '#fff9ec', borderColor: '#FFB547' }}
-      >
-        <div className="flex items-center gap-4 min-w-0">
-          <div className="w-9 h-9 rounded-lg bg-[#FFB547] text-white flex items-center justify-center flex-shrink-0 shadow-sm">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div className="min-w-0 font-helvetica">
-            <span className="text-[13px] font-bold text-[#9a6800] font-butler">Pending Approvals</span>
-            <p className="text-[12px] text-[#b37e00] font-medium mt-0.5">
-              You have <strong>3 registration requests</strong> awaiting review.
-            </p>
-          </div>
-        </div>
-        <Link
-          href="/admin/members?status=pending"
-          className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#FFB547] text-[#1c3829] text-[12px] font-bold rounded-lg shadow-sm hover:brightness-105 transition-all flex-shrink-0 font-helvetica"
-        >
-          Review Now
-          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
-          </svg>
-        </Link>
-      </div>
-
       {/* ── Main content grid: Recent Activity | Quick Actions ───────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 

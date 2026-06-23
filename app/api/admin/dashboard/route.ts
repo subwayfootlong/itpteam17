@@ -62,7 +62,7 @@ function generateSparkline(dataDates: Date[], totalCurrentCount: number): string
 
 export async function GET() {
   const [members, events, announcements, benefits] = await Promise.all([
-    supabaseAdmin.from('users').select('id, full_name, membership_status, created_at').eq('role', 'member'),
+    supabaseAdmin.from('users').select('id, full_name, membership_status, created_at').neq('role', 'admin'),
     supabaseAdmin.from('events').select('id, title, status, event_date, created_at'),
     supabaseAdmin.from('announcements').select('id, title, status, created_at'),
     supabaseAdmin.from('benefits').select('id').eq('is_active', true),

@@ -14,7 +14,7 @@ export async function GET(req: Request) {
   let query = supabaseAdmin
     .from('users')
     .select('id, full_name, email, member_id, membership_tier, membership_status, expiry_date, phone, created_at')
-    .eq('role', 'member')
+    .neq('role', 'admin')
     .order('created_at', { ascending: false });
 
   if (search) {

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { hashPassword, createAccessToken } from '@/lib/auth';
 import { getErrorMessage } from '@/lib/errors';
+import { DEFAULT_TIER } from '@/lib/membershipTiers';
 
 export async function POST(req: Request) {
   try {
@@ -24,12 +25,18 @@ export async function POST(req: Request) {
 
     const password_hash = await hashPassword(password);
 
+    const today = new Date().toISOString().split('T')[0];
+
     const { data, error } = await supabaseAdmin
       .from('users')
       .insert({
         full_name: fullName || null,
         email,
         password_hash,
+        role: 'member',
+        membership_tier: DEFAULT_TIER,
+        membership_status: 'active',
+        member_since: today,
       })
       .select()
       .limit(1)

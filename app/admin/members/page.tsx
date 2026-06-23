@@ -14,6 +14,7 @@ import {
   TableCell,
   useSortState,
 } from '@/components/admin/ui/Table';
+import { MEMBERSHIP_TIERS, TIER_COLORS, formatTierLabel } from '@/lib/membershipTiers';
 
 interface Member {
   id: string;
@@ -26,14 +27,6 @@ interface Member {
   phone: string | null;
   created_at: string;
 }
-
-const TIER_COLORS: Record<string, string> = {
-  ordinary:     'bg-[#e3f6fb] text-[#1a7a8f]',
-  associate:    'bg-purple-50 text-purple-700',
-  fellow:       'bg-[#e8f5e3] text-[#27500A]',
-  professional: 'bg-[#fff4de] text-[#9a6800]',
-  student:      'bg-gray-100 text-gray-600',
-};
 
 const STATUS_CONFIG: Record<string, { colorClass: string; dotColor: string; accent: string }> = {
   active:    { colorClass: 'bg-[#e8f5e3] text-[#27500A]', dotColor: 'bg-[#3FAE2A]', accent: '#3FAE2A' },
@@ -142,7 +135,7 @@ export default function MembersPage() {
           {m.member_id ?? '—'}
         </TableCell>
         <TableCell>
-          <Badge colorClass={tierClass}>{m.membership_tier ?? 'ordinary'}</Badge>
+          <Badge colorClass={tierClass}>{formatTierLabel(m.membership_tier)}</Badge>
         </TableCell>
         <TableCell>
           <Badge colorClass={cfg.colorClass} dotColor={cfg.dotColor}>{m.membership_status}</Badge>
@@ -226,11 +219,9 @@ export default function MembersPage() {
             className="h-10 px-3 min-w-[140px] rounded-lg border border-gray-200 bg-gray-50/50 text-[13px] text-gray-800 outline-none transition-all focus:bg-white focus:border-[#3FAE2A] focus:ring-4 focus:ring-[#3FAE2A]/10 cursor-pointer"
           >
             <option value="all">All Tiers</option>
-            <option value="ordinary">Ordinary</option>
-            <option value="associate">Associate</option>
-            <option value="fellow">Fellow</option>
-            <option value="professional">Professional</option>
-            <option value="student">Student</option>
+            {MEMBERSHIP_TIERS.map((t) => (
+              <option key={t.value} value={t.value}>{t.label}</option>
+            ))}
           </select>
           <select
             value={statusFilter}

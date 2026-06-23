@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { DEFAULT_TIER, MEMBERSHIP_TIERS } from '@/lib/membershipTiers';
 
 interface Member {
   id: string;
@@ -231,17 +232,15 @@ export default function MemberDetailPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2 border-t border-gray-100">
               <div className="flex flex-col gap-2">
-                <label className="text-[13px] font-bold text-gray-700">Membership Tier</label>
+                <label className="text-[13px] font-bold text-gray-700">Subscription Level</label>
                 <select
-                  value={form.membership_tier ?? 'ordinary'}
+                  value={form.membership_tier ?? DEFAULT_TIER}
                   onChange={(e) => setForm({ ...form, membership_tier: e.target.value })}
                   className="h-11 px-4 rounded-xl border border-gray-200 bg-gray-50/50 text-[13px] font-medium text-gray-800 outline-none transition-all focus:bg-white focus:border-[#3FAE2A] focus:ring-4 focus:ring-[#3FAE2A]/10 cursor-pointer appearance-none"
                 >
-                  <option value="ordinary">Ordinary</option>
-                  <option value="associate">Associate</option>
-                  <option value="fellow">Fellow</option>
-                  <option value="professional">Professional</option>
-                  <option value="student">Student</option>
+                  {MEMBERSHIP_TIERS.map((t) => (
+                    <option key={t.value} value={t.value}>{t.label}</option>
+                  ))}
                 </select>
               </div>
               <div className="flex flex-col gap-2">
