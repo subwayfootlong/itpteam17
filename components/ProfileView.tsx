@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import { QRCodeCanvas } from "qrcode.react";
-import MemberTopBar from "@/components/MemberTopBar";
-import MemberBottomNav from "@/components/MemberBottomNav";
 import type { MemberProfile } from "@/app/member/profile/page";
 import { formatTierLabel } from "@/lib/membershipTiers";
 import { formatMemberName } from "@/lib/memberName";
+import { formatMemberDate } from "@/lib/dates";
 import { useRouter } from "next/navigation";
 import {
   BadgeCheck,
@@ -159,18 +158,6 @@ const benefitsByTier: Record<string, Benefit[]> = {
   ],
 };
 
-function formatDate(date: string | null) {
-  if (!date) {
-    return "Not available";
-  }
-
-  return new Date(`${date}T00:00:00`).toLocaleDateString("en-SG", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
-
 export default function ProfileView({ member }: { member: MemberProfile }) {
   const router = useRouter();
   const tier = member.membership_tier || "basic";
@@ -199,11 +186,7 @@ export default function ProfileView({ member }: { member: MemberProfile }) {
   });
 
   return (
-    <main className="flex min-h-screen justify-center bg-gray-100">
-      <section className="min-h-screen w-full max-w-md bg-[#FFFFFF] pb-24">
-        <MemberTopBar />
-
-        <div className="px-5 py-5">
+    <div className="px-5 py-5">
           {/* Digital E-Card */}
           <section className="relative overflow-hidden rounded-2xl bg-[#149100] p-5 text-white shadow-sm">
 
@@ -230,7 +213,7 @@ export default function ProfileView({ member }: { member: MemberProfile }) {
                 </p>
 
                 <p className="mt-4 text-xs uppercase text-white/70">
-                  Valid thru: {formatDate(member.expiry_date)}
+                  Valid thru: {formatMemberDate(member.expiry_date)}
                 </p>
               </div>
 
@@ -303,7 +286,7 @@ export default function ProfileView({ member }: { member: MemberProfile }) {
                       Member Since
                     </p>
                     <p className="mt-1 text-[#151C27]">
-                      {formatDate(member.member_since)}
+                      {formatMemberDate(member.member_since)}
                     </p>
                   </div>
 
@@ -312,7 +295,7 @@ export default function ProfileView({ member }: { member: MemberProfile }) {
                       Renewal Date
                     </p>
                     <p className="mt-1 text-[#151C27]">
-                      {formatDate(member.expiry_date)}
+                      {formatMemberDate(member.expiry_date)}
                     </p>
                   </div>
                 </div>
@@ -449,10 +432,6 @@ export default function ProfileView({ member }: { member: MemberProfile }) {
               Log Out
             </button>
           </div>
-        </div>
-
-        <MemberBottomNav />
-      </section>
-    </main>
+    </div>
   );
 }

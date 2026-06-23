@@ -6,7 +6,9 @@ import type {
   MembershipBenefit,
   Partner,
   PartnerCategory,
-} from "../data/partners";
+} from "@/lib/data/partners";
+import MemberIcon from "@/components/member/MemberIcon";
+import MemberBottomNav from "@/components/MemberBottomNav";
 
 type CategoryFilter = "All" | PartnerCategory;
 type BenefitView = "list" | "map";
@@ -18,157 +20,44 @@ const categoryIcons: Record<PartnerCategory, string> = {
   Lifestyle: "spark",
 };
 
-function Icon({ name, size = 20 }: { name: string; size?: number }) {
-  const paths: Record<string, React.ReactNode> = {
-    arrow: <path d="m9 18 6-6-6-6" />,
-    bell: (
-      <>
-        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
-        <path d="M10 21h4" />
-      </>
-    ),
-    book: (
-      <>
-        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
-      </>
-    ),
-    calendar: (
-      <>
-        <rect x="3" y="5" width="18" height="16" rx="2" />
-        <path d="M16 3v4M8 3v4M3 10h18" />
-      </>
-    ),
-    card: (
-      <>
-        <rect x="2" y="5" width="20" height="14" rx="2" />
-        <path d="M2 10h20M6 15h4" />
-      </>
-    ),
-    close: (
-      <>
-        <path d="M18 6 6 18M6 6l12 12" />
-      </>
-    ),
-    home: (
-      <>
-        <path d="m3 11 9-8 9 8" />
-        <path d="M5 10v11h14V10M9 21v-7h6v7" />
-      </>
-    ),
-    map: (
-      <>
-        <path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3Z" />
-        <path d="M9 3v15M15 6v15" />
-      </>
-    ),
-    message: (
-      <>
-        <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z" />
-        <path d="M8 9h8" />
-      </>
-    ),
-    pin: (
-      <>
-        <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
-        <circle cx="12" cy="10" r="2.5" />
-      </>
-    ),
-    search: (
-      <>
-        <circle cx="11" cy="11" r="7" />
-        <path d="m20 20-4-4" />
-      </>
-    ),
-    share: (
-      <>
-        <circle cx="18" cy="5" r="3" />
-        <circle cx="6" cy="12" r="3" />
-        <circle cx="18" cy="19" r="3" />
-        <path d="m8.6 10.8 6.8-4.6M8.6 13.2l6.8 4.6" />
-      </>
-    ),
-    spark: (
-      <path d="m12 3 1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7ZM19 16l.7 2.3L22 19l-2.3.7L19 22l-.7-2.3L16 19l2.3-.7Z" />
-    ),
-    user: (
-      <>
-        <circle cx="12" cy="8" r="4" />
-        <path d="M4 21a8 8 0 0 1 16 0" />
-      </>
-    ),
-  };
+type MemberSummary = {
+  firstName: string;
+  lastName: string;
+  membershipTierLabel: string;
+  initials: string;
+};
 
-  return (
-    <svg
-      aria-hidden="true"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      {paths[name]}
-    </svg>
-  );
-}
-
-function BenefitsHeader() {
+function BenefitsHeader({ initials }: { initials: string }) {
   return (
     <header className="benefits-mobile-header">
       <div>
-        <span className="benefits-member-avatar">AK</span>
+        <span className="benefits-member-avatar">{initials}</span>
         <h1>Pergas</h1>
       </div>
-      <Link href="/notifications" aria-label="Notifications">
-        <Icon name="bell" size={22} />
+      <Link href="/member/notifications" aria-label="Notifications">
+        <MemberIcon name="bell" size={22} />
       </Link>
     </header>
   );
 }
 
-function BottomNav() {
-  return (
-    <nav className="benefits-bottom-nav" aria-label="Mobile navigation">
-      <Link href="/benefit">
-        <Icon name="home" size={22} />
-        Home
-      </Link>
-      <a href="#">
-        <Icon name="calendar" size={22} />
-        Events
-      </a>
-      <Link className="is-active" href="/benefit" aria-current="page">
-        <Icon name="card" size={22} />
-        Benefits
-      </Link>
-      <Link href="/announcements">
-        <Icon name="message" size={22} />
-        Community
-      </Link>
-      <a href="#">
-        <Icon name="user" size={22} />
-        Profile
-      </a>
-    </nav>
-  );
-}
-
 function MembershipSummary({
   membershipBenefits,
+  member,
 }: {
   membershipBenefits: MembershipBenefit[];
+  member: MemberSummary;
 }) {
   const shownBenefits = membershipBenefits.slice(0, 4);
+  const displayName = [member.firstName, member.lastName]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <section className="benefits-pass-card">
       <div>
-        <span>Associate Member</span>
-        <strong>Ahmad Khalid</strong>
+        <span>{member.membershipTierLabel} Member</span>
+        <strong>{displayName || "Member"}</strong>
         <small>Active privileges available</small>
       </div>
       <p>{membershipBenefits.length}</p>
@@ -262,7 +151,7 @@ function RewardCard({
       <div className="benefit-reward-card__body">
         <div className="benefit-reward-card__meta">
           <span>
-            <Icon name={categoryIcons[partner.category]} size={15} />
+            <MemberIcon name={categoryIcons[partner.category]} size={15} />
             {partner.category}
           </span>
           <small>{partner.distance}</small>
@@ -274,7 +163,7 @@ function RewardCard({
             Claim Reward
           </button>
           <button type="button" aria-label={`Share ${partner.name}`}>
-            <Icon name="share" size={19} />
+            <MemberIcon name="share" size={19} />
           </button>
         </div>
       </div>
@@ -310,7 +199,7 @@ function PartnerMap({
           </svg>
         </div>
         <div className="benefits-empty-state">
-          <Icon name="map" size={28} />
+          <MemberIcon name="map" size={28} />
           <h2>No map locations</h2>
           <p>Try another category or search term to show partner pins.</p>
         </div>
@@ -337,7 +226,7 @@ function PartnerMap({
             onClick={() => onSelect(partner)}
             aria-label={`Open ${partner.name}`}
           >
-            <Icon name="pin" size={18} />
+            <MemberIcon name="pin" size={18} />
           </button>
         ))}
       </div>
@@ -345,9 +234,7 @@ function PartnerMap({
         <strong>{mappedPartners.length} partner locations</strong>
         <p>Online rewards remain available from the rewards list.</p>
       </div>
-      {selected && (
-        <RewardCard partner={selected} onSelect={onRedeem} />
-      )}
+      {selected && <RewardCard partner={selected} onSelect={onRedeem} />}
     </section>
   );
 }
@@ -374,7 +261,7 @@ function BenefitModal({
         aria-labelledby="benefit-title"
       >
         <button type="button" onClick={onClose} aria-label="Close">
-          <Icon name="close" size={20} />
+          <MemberIcon name="close" size={20} />
         </button>
         <PartnerVisual partner={partner} />
         <span className="benefits-sheet-kicker">Pergas Member Reward</span>
@@ -382,7 +269,7 @@ function BenefitModal({
         <h3>{partner.name}</h3>
         <p>{partner.description}</p>
         <div className="benefits-location-box">
-          <Icon name="pin" size={20} />
+          <MemberIcon name="pin" size={20} />
           <span>
             <strong>{partner.region} Singapore</strong>
             {partner.address}
@@ -404,7 +291,7 @@ function BenefitModal({
           rel="noreferrer"
         >
           {partner.mapPosition ? "Get Directions" : "Visit Partner Website"}
-          <Icon name="arrow" size={18} />
+          <MemberIcon name="arrow" size={18} />
         </a>
       </section>
     </div>
@@ -415,10 +302,17 @@ export default function BenefitsDirectory({
   partners,
   membershipBenefits,
   showChrome = true,
+  member = {
+    firstName: "",
+    lastName: "",
+    membershipTierLabel: "Member",
+    initials: "M",
+  },
 }: {
   partners: Partner[];
   membershipBenefits: MembershipBenefit[];
   showChrome?: boolean;
+  member?: MemberSummary;
 }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<CategoryFilter>("All");
@@ -452,7 +346,7 @@ export default function BenefitsDirectory({
 
   return (
     <div className="benefits-mobile-shell">
-      {showChrome && <BenefitsHeader />}
+      {showChrome && <BenefitsHeader initials={member.initials} />}
 
       <main className="benefits-mobile-main">
         <section className="benefits-intro">
@@ -460,11 +354,14 @@ export default function BenefitsDirectory({
           <p>Access rewards, partner discounts, and active member privileges.</p>
         </section>
 
-        <MembershipSummary membershipBenefits={membershipBenefits} />
+        <MembershipSummary
+          membershipBenefits={membershipBenefits}
+          member={member}
+        />
 
         <label className="benefits-search">
           <span className="sr-only">Search benefits</span>
-          <Icon name="search" size={22} />
+          <MemberIcon name="search" size={22} />
           <input
             type="search"
             value={query}
@@ -477,7 +374,7 @@ export default function BenefitsDirectory({
               onClick={() => setQuery("")}
               aria-label="Clear search"
             >
-              <Icon name="close" size={17} />
+              <MemberIcon name="close" size={17} />
             </button>
           )}
         </label>
@@ -540,7 +437,7 @@ export default function BenefitsDirectory({
           </section>
         ) : (
           <section className="benefits-empty-state">
-            <Icon name="search" size={28} />
+            <MemberIcon name="search" size={28} />
             <h2>No benefits found</h2>
             <p>Try another search or show all rewards.</p>
             <button
@@ -556,7 +453,7 @@ export default function BenefitsDirectory({
         )}
       </main>
 
-      {showChrome && <BottomNav />}
+      {showChrome && <MemberBottomNav />}
 
       {redeemPartner && (
         <BenefitModal

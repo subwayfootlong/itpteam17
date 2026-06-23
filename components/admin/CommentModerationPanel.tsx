@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useToast } from "@/components/admin/Toast";
+import { useToast } from "@/components/ui/Toast";
 import { FilterPills } from "@/components/admin/ui/FilterPills";
 import StatCard from "@/components/admin/ui/StatCard";
 import {
@@ -17,6 +17,7 @@ import type {
   ModerationSource,
   ModerationStatus,
 } from "@/lib/commentModeration";
+import { formatDateTime } from "@/lib/dates";
 
 type ModerationAction = "approve" | "reject";
 
@@ -59,18 +60,6 @@ const FILTER_OPTIONS = [
   { label: "Approved", value: "approved" },
   { label: "Rejected", value: "flagged" },
 ];
-
-function formatDate(value: string | null) {
-  if (!value) return "Unknown";
-
-  return new Date(value).toLocaleString("en-SG", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 function statusBadge(status: ModerationStatus) {
   const style = STATUS_STYLE[status];
@@ -213,7 +202,7 @@ export default function CommentModerationPanel({
         </TableCell>
         <TableCell>{statusBadge(comment.status)}</TableCell>
         <TableCell className="text-[12px] text-gray-500">
-          {formatDate(comment.createdAt)}
+          {formatDateTime(comment.createdAt)}
         </TableCell>
         <TableCell>
           <div className="flex items-center justify-end gap-2">

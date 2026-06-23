@@ -1,7 +1,8 @@
-import { cookies } from "next/headers";
+import MemberPageShell from "@/components/member/MemberPageShell";
 import ProfileView from "@/components/ProfileView";
-import { verifyAccessToken } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/currentUser";
 import { supabaseAdmin } from "@/lib/supabaseServer";
+import { notFound } from "next/navigation";
 
 export type MemberProfile = {
   id: string;
@@ -20,23 +21,29 @@ export type MemberProfile = {
   member_since: string | null;
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function ProfilePage() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
-  const payload = verifyAccessToken(token as string) as { sub: string };
-  const userId = payload.sub;
+  const currentUser = await getCurrentUser();
+  if (!currentUser) {
+    notFound();
+  }
 
   const { data: member, error } = await supabaseAdmin
     .from("users")
     .select(
-      "id, first_name, last_name, email, role, member_id, membership_tier, membership_status, expiry_date, phone, organization, designation, arabic_name, member_since"
+      "id, first_name, last_name, email, role, member_id, membership_tier, membership_status, expiry_date, phone, organization, designation, arabic_name, member_since",
     )
-    .eq("id", userId)
+    .eq("id", currentUser.id)
     .single();
 
   if (error || !member) {
-    throw new Error("Unable to load member profile");
+    notFound();
   }
 
-  return <ProfileView member={member as MemberProfile} />;
+  return (
+    <MemberPageShell>
+      <ProfileView member={member as MemberProfile} />
+    </MemberPageShell>
+  );
 }

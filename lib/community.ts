@@ -4,37 +4,24 @@ import type {
   AnnouncementCategory,
   CommentStatus,
   CommunityComment,
-} from "@/app/data/announcements";
+} from "@/lib/data/announcements";
+import type {
+  CommunityData,
+  DiscussionThread,
+  ThreadStatus,
+} from "./communityTypes";
 
-export type DiscussionGroupId = string;
-export type ThreadStatus = "approved" | "pending" | "flagged";
+import { formatRelativeDate } from "./dates";
 
-export type DiscussionGroup = {
-  id: DiscussionGroupId;
-  title: string;
-  posts: number;
-  icon: string;
-  tone: "green" | "gold";
-};
-
-export type DiscussionThread = {
-  id: string;
-  groupId: DiscussionGroupId;
-  author: string;
-  postedAt: string;
-  title: string;
-  body: string;
-  votes: number;
-  comments: CommunityComment[];
-  hasImage?: boolean;
-  status: ThreadStatus;
-};
-
-export type CommunityData = {
-  announcements: Announcement[];
-  groups: DiscussionGroup[];
-  threads: DiscussionThread[];
-};
+export type {
+  CommunityData,
+  DiscussionGroup,
+  DiscussionGroupId,
+  DiscussionThread,
+  ThreadStatus,
+} from "./communityTypes";
+export { flaggedWords, moderationStatus } from "./communityModeration";
+export { formatRelativeDate } from "./dates";
 
 type AnnouncementRow = {
   id: string;
@@ -114,40 +101,6 @@ function mapAdminAnnouncementCategory(
 function summarizeContent(content: string) {
   const firstSentence = content.match(/^.{1,150}?(?:\.|\?|!|$)/)?.[0]?.trim();
   return firstSentence || content.slice(0, 150).trim();
-}
-
-export const flaggedWords = ["spam", "scam", "hate", "offensive"];
-
-export function moderationStatus(body: string): ThreadStatus {
-  const normalized = body.toLowerCase();
-  return flaggedWords.some((word) => normalized.includes(word))
-    ? "flagged"
-    : "pending";
-}
-
-export function formatRelativeDate(value: string | null) {
-  if (!value) return "";
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-
-  const diffMs = Date.now() - date.getTime();
-  const minutes = Math.max(0, Math.round(diffMs / 60000));
-
-  if (minutes < 1) return "Just now";
-  if (minutes < 60) return `${minutes}m ago`;
-
-  const hours = Math.round(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-
-  const days = Math.round(hours / 24);
-  if (days < 7) return `${days}d ago`;
-
-  return date.toLocaleDateString("en-SG", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
 }
 
 function shouldShowComment(row: CommentRow, currentUserId?: string) {

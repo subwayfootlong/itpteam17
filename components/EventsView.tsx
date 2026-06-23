@@ -1,8 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import MemberTopBar from "@/components/MemberTopBar";
-import MemberBottomNav from "@/components/MemberBottomNav";
 import { ChevronLeft, ChevronRight, Clock, MapPin } from "lucide-react";
 import type { EventRow } from "@/app/member/events/page";
 
@@ -110,11 +108,7 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
   }
 
   return (
-    <main className="flex min-h-screen justify-center bg-gray-100">
-      <section className="min-h-screen w-full max-w-md bg-[#FFFFFF] pb-24">
-        <MemberTopBar />
-
-        <div className="px-5 py-5">
+    <div className="px-5 py-5">
           {/* Calendar Card */}
           <div className="rounded-2xl border border-gray-200 bg-[#FFFFFF] p-6 shadow-sm">
             <div className="flex items-center justify-between">
@@ -257,10 +251,6 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
               })
             )}
           </div>
-        </div>
-
-        <MemberBottomNav />
-      </section>
-    </main>
+    </div>
   );
 }

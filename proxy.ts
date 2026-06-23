@@ -8,7 +8,7 @@ import {
   setLastActivityCookie,
 } from "@/lib/session";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
 
   if (!token) {

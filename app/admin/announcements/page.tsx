@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ActionLink } from '@/components/admin/ui/Button';
-import { useToast } from '@/components/admin/Toast';
+import { useToast } from "@/components/ui/Toast";
 import { FilterPills } from '@/components/admin/ui/FilterPills';
 import StatCard from '@/components/admin/ui/StatCard';
 import {

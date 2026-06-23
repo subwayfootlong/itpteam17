@@ -3,7 +3,7 @@ import type {
   Partner,
   PartnerCategory,
   SingaporeRegion,
-} from "@/app/data/partners";
+} from "@/lib/data/partners";
 
 type BenefitRow = {
   id: string | number;

@@ -1,12 +1,14 @@
-import MemberBottomNav from "@/components/MemberBottomNav";
-import MemberTopBar from "@/components/MemberTopBar";
-import BenefitsDirectory from "../../components/benefits-directory";
-import { membershipBenefits, partners } from "../../data/partners";
+import MemberPageShell from "@/components/member/MemberPageShell";
+import BenefitsDirectory from "@/components/member/BenefitsDirectory";
+import { getCurrentUser } from "@/lib/currentUser";
+import { membershipBenefits, partners } from "@/lib/data/partners";
 import { getActiveBenefitPartners } from "@/lib/benefits";
+import { formatTierLabel } from "@/lib/membershipTiers";
 
 export const dynamic = "force-dynamic";
 
 export default async function BenefitPage() {
+  const user = await getCurrentUser();
   let visiblePartners = partners;
 
   try {
@@ -19,18 +21,18 @@ export default async function BenefitPage() {
   }
 
   return (
-    <main className="flex min-h-screen justify-center bg-gray-100">
-      <section className="min-h-screen w-full max-w-md bg-[#FFFFFF] pb-24">
-        <MemberTopBar />
-
-        <BenefitsDirectory
-          partners={visiblePartners}
-          membershipBenefits={membershipBenefits}
-          showChrome={false}
-        />
-
-        <MemberBottomNav />
-      </section>
-    </main>
+    <MemberPageShell>
+      <BenefitsDirectory
+        partners={visiblePartners}
+        membershipBenefits={membershipBenefits}
+        showChrome={false}
+        member={{
+          firstName: user?.firstName ?? "",
+          lastName: user?.lastName ?? "",
+          membershipTierLabel: formatTierLabel(user?.membershipTier),
+          initials: user?.initials ?? "M",
+        }}
+      />
+    </MemberPageShell>
   );
 }

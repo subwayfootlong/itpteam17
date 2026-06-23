@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import MemberBottomNav from "@/components/MemberBottomNav";
-import MemberTopBar from "@/components/MemberTopBar";
-import NotificationsCenter from "../../components/notifications-center";
-import { systemNotifications } from "../../data/system-notifications";
+import MemberPageShell from "@/components/member/MemberPageShell";
+import NotificationsCenter from "@/components/member/NotificationsCenter";
+import { systemNotifications } from "@/lib/data/system-notifications";
 
 export const metadata: Metadata = {
   title: "Notifications | Pergas Member Portal",
@@ -12,17 +11,11 @@ export const metadata: Metadata = {
 
 export default function NotificationsPage() {
   return (
-    <main className="flex min-h-screen justify-center bg-gray-100">
-      <section className="min-h-screen w-full max-w-md bg-[#FFFFFF] pb-24">
-        <MemberTopBar />
-
-        <NotificationsCenter
-          initialNotifications={systemNotifications}
-          showChrome={false}
-        />
-
-        <MemberBottomNav />
-      </section>
-    </main>
+    <MemberPageShell>
+      <NotificationsCenter
+        initialNotifications={systemNotifications}
+        showChrome={false}
+      />
+    </MemberPageShell>
   );
 }

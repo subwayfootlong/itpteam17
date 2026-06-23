@@ -2,27 +2,9 @@ import { NextResponse } from 'next/server';
 // import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { formatMemberName } from '@/lib/memberName';
+import { timeAgo } from '@/lib/dates';
 
 export const dynamic = 'force-dynamic';
-
-function timeAgo(dateInput: string | Date) {
-  const date = new Date(dateInput);
-  const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
-  let interval = Math.floor(seconds / 31536000);
-  if (interval > 1) return interval + ' years ago';
-  interval = Math.floor(seconds / 2592000);
-  if (interval > 1) return interval + ' months ago';
-  interval = Math.floor(seconds / 86400);
-  if (interval > 1) return interval + ' days ago';
-  if (interval === 1) return '1 day ago';
-  interval = Math.floor(seconds / 3600);
-  if (interval > 1) return interval + ' hours ago';
-  if (interval === 1) return '1 hour ago';
-  interval = Math.floor(seconds / 60);
-  if (interval > 1) return interval + ' mins ago';
-  if (interval === 1) return '1 min ago';
-  return 'just now';
-}
 
 function generateSparkline(dataDates: Date[], totalCurrentCount: number): string {
   const counts = [0, 0, 0, 0, 0, 0, 0];

@@ -1,3 +1,4 @@
+import MemberPageShell from "@/components/member/MemberPageShell";
 import EventsView from "@/components/EventsView";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 
@@ -21,15 +22,17 @@ export default async function EventsPage() {
   const { data: events, error } = await supabaseAdmin
     .from("events")
     .select(
-      "id, title, description, event_date, start_time, end_time, venue, image_url, external_rsvp_url, category, capacity, spots_available, status"
+      "id, title, description, event_date, start_time, end_time, venue, image_url, external_rsvp_url, category, capacity, spots_available, status",
     )
     .eq("status", "published")
     .order("event_date", { ascending: true });
 
   return (
-    <EventsView
-      events={(events || []) as EventRow[]}
-      hasError={Boolean(error)}
-    />
+    <MemberPageShell>
+      <EventsView
+        events={(events || []) as EventRow[]}
+        hasError={Boolean(error)}
+      />
+    </MemberPageShell>
   );
 }

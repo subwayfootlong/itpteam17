@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import MemberBottomNav from "@/components/MemberBottomNav";
+import MemberPageShell from "@/components/member/MemberPageShell";
 import {
   ArrowLeft,
   Bell,
@@ -73,9 +73,8 @@ export default function SettingsPage() {
   }
 
   return (
-    <main className="flex min-h-screen justify-center bg-gray-100">
-      <section className="min-h-screen w-full max-w-md bg-[#FFFFFF] pb-24">
-        <div className="px-5 py-6">
+    <MemberPageShell showTopBar={false}>
+      <div className="px-5 py-6">
           {/* Page Header */}
           <header className="flex items-center gap-3">
             <Link href="/member/profile" aria-label="Back to profile">
@@ -258,9 +257,6 @@ export default function SettingsPage() {
             Log Out
           </button>
         </div>
-
-        <MemberBottomNav />
-      </section>
-    </main>
+    </MemberPageShell>
   );
 }

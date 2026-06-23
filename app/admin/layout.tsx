@@ -1,7 +1,7 @@
 import "./pergas-admin.css";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminTopbar from "@/components/admin/AdminTopbar";
-import { ToastProvider } from "@/components/admin/Toast";
+import { ToastProvider } from "@/components/ui/Toast";
 import SessionTimeout from "@/components/SessionTimeout";
 import { getVerifiedAdmin } from "@/lib/adminAuth";
 import { redirect } from "next/navigation";
