@@ -6,6 +6,7 @@ import MemberTopBar from "@/components/MemberTopBar";
 import MemberBottomNav from "@/components/MemberBottomNav";
 import type { MemberProfile } from "@/app/member/profile/page";
 import { formatTierLabel } from "@/lib/membershipTiers";
+import { formatMemberName } from "@/lib/memberName";
 import { useRouter } from "next/navigation";
 import {
   BadgeCheck,
@@ -192,7 +193,7 @@ export default function ProfileView({ member }: { member: MemberProfile }) {
 
   const qrValue = JSON.stringify({
     memberId: member.member_id,
-    name: member.full_name,
+    name: formatMemberName(member, "Member Name"),
     status: member.membership_status,
     tier: member.membership_tier,
   });
@@ -213,7 +214,7 @@ export default function ProfileView({ member }: { member: MemberProfile }) {
                 </p>
 
                 <h2 className="mt-2 text-lg font-medium">
-                  {member.full_name || "Member Name"}
+                  {formatMemberName(member, "Member Name")}
                 </h2>
 
                 {member.arabic_name && (
@@ -258,7 +259,25 @@ export default function ProfileView({ member }: { member: MemberProfile }) {
                     Full Name
                   </p>
                   <p className="mt-1 text-[#151C27]">
-                    {member.full_name || "Not available"}
+                    {formatMemberName(member, "Member Name")}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm font-semibold uppercase text-[#5F5E5E]">
+                    Organization
+                  </p>
+                  <p className="mt-1 text-[#151C27]">
+                    {member.organization || "Not available"}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm font-semibold uppercase text-[#5F5E5E]">
+                    Designation
+                  </p>
+                  <p className="mt-1 text-[#151C27]">
+                    {member.designation || "Not available"}
                   </p>
                 </div>
 

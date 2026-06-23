@@ -15,10 +15,12 @@ import {
   useSortState,
 } from '@/components/admin/ui/Table';
 import { MEMBERSHIP_TIERS, TIER_COLORS, formatTierLabel } from '@/lib/membershipTiers';
+import { formatMemberName, memberNameInitial } from '@/lib/memberName';
 
 interface Member {
   id: string;
-  full_name: string;
+  first_name: string | null;
+  last_name: string | null;
   email: string;
   member_id: string | null;
   membership_tier: string;
@@ -42,7 +44,7 @@ export default function MembersPage() {
   const [tierFilter, setTierFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const { sortState, handleSort, sortData } = useSortState('full_name', 'asc');
+  const { sortState, handleSort, sortData } = useSortState('first_name', 'asc');
 
   useEffect(() => {
     let active = true;
@@ -65,7 +67,7 @@ export default function MembersPage() {
   const handleExportCSV = () => {
     const headers = ['Name', 'Email', 'Member ID', 'Tier', 'Status', 'Expiry Date', 'Joined'];
     const rows = members.map((m) => [
-      m.full_name,
+      formatMemberName(m),
       m.email,
       m.member_id ?? '',
       m.membership_tier,
@@ -92,7 +94,7 @@ export default function MembersPage() {
     return members.filter((m) => {
       const matchSearch =
         !search ||
-        (m.full_name || '').toLowerCase().includes(search.toLowerCase()) ||
+        formatMemberName(m).toLowerCase().includes(search.toLowerCase()) ||
         (m.email || '').toLowerCase().includes(search.toLowerCase()) ||
         (m.member_id || '').toLowerCase().includes(search.toLowerCase());
       const matchTier = tierFilter === 'all' || m.membership_tier === tierFilter;
@@ -104,7 +106,7 @@ export default function MembersPage() {
   const sortedMembers = useMemo(
     () =>
       sortData(filteredMembers, (m, key) => {
-        if (key === 'full_name')         return m.full_name;
+        if (key === 'first_name')        return formatMemberName(m);
         if (key === 'member_id')         return m.member_id ?? '';
         if (key === 'membership_tier')   return m.membership_tier;
         if (key === 'membership_status') return m.membership_status;
@@ -123,10 +125,10 @@ export default function MembersPage() {
         <TableCell>
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-[#e8f5e3] flex items-center justify-center text-[#27500A] text-[10px] font-bold flex-shrink-0">
-              {(m.full_name ?? m.email).charAt(0).toUpperCase()}
+              {memberNameInitial(m)}
             </div>
             <div>
-              <div className="font-bold text-gray-800">{m.full_name ?? '—'}</div>
+              <div className="font-bold text-gray-800">{formatMemberName(m, '—')}</div>
               <div className="text-gray-500 text-[11px] mt-0.5">{m.email}</div>
             </div>
           </div>
@@ -247,7 +249,7 @@ export default function MembersPage() {
         emptyState="No members found matching your criteria."
       >
         <TableHead>
-          <TableHeader sortKey="full_name"         sortState={sortState} onSort={handleSort}>Member</TableHeader>
+          <TableHeader sortKey="first_name"        sortState={sortState} onSort={handleSort}>Member</TableHeader>
           <TableHeader sortKey="member_id"         sortState={sortState} onSort={handleSort}>Member ID</TableHeader>
           <TableHeader sortKey="membership_tier"   sortState={sortState} onSort={handleSort}>Tier</TableHeader>
           <TableHeader sortKey="membership_status" sortState={sortState} onSort={handleSort}>Status</TableHeader>

@@ -6,6 +6,7 @@ import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
 import { postJson } from '@/lib/api';
+import PhoneInputField from '@/components/ui/PhoneInput';
 import { getErrorMessage } from '@/lib/errors';
 
 interface RegisterScreenProps {
@@ -14,8 +15,12 @@ interface RegisterScreenProps {
 }
 
 const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegisterSuccess, onBackToLogin }) => {
-  const [fullName, setFullName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [organization, setOrganization] = useState('');
+  const [designation, setDesignation] = useState('');
+  const [phone, setPhone] = useState<string | undefined>();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -29,8 +34,21 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegisterSuccess, onBa
       return;
     }
 
+    if (!phone) {
+      toast.push({ type: 'error', message: 'Please enter a valid telephone number' });
+      return;
+    }
+
     try {
-      await postJson('/api/auth/register', { fullName, email, password });
+      await postJson('/api/auth/register', {
+        firstName,
+        lastName,
+        email,
+        organization,
+        designation,
+        phone,
+        password,
+      });
       toast.push({ type: 'success', message: 'Account created' });
       if (onRegisterSuccess) onRegisterSuccess();
     } catch (error: unknown) {
@@ -44,8 +62,6 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegisterSuccess, onBa
       <div className="absolute inset-0 pointer-events-none opacity-5 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-lime-900 to-transparent" />
 
       <div className="w-full max-w-md flex flex-col justify-start items-center py-8 relative z-10 my-auto">
-        
-        {/* Header Segment */}
         <div className="w-full flex flex-col justify-start items-center pb-8 text-center">
           <div className="relative mb-4 w-24 h-28">
             <Image
@@ -63,19 +79,26 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegisterSuccess, onBa
           </p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-5">
-          {/* Full Name */}
-          <Input
-            label="Full Name"
-            type="text"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            placeholder="Enter your full name"
-            required
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <Input
+              label="First Name"
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="Enter your first name"
+              required
+            />
+            <Input
+              label="Last Name"
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Enter your last name"
+              required
+            />
+          </div>
 
-          {/* Email */}
           <Input
             label="Email Address"
             type="email"
@@ -85,10 +108,36 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegisterSuccess, onBa
             required
           />
 
-          {/* Password Fields (Shared Logic) */}
+          <Input
+            label="Organization"
+            type="text"
+            value={organization}
+            onChange={(e) => setOrganization(e.target.value)}
+            placeholder="Your organization or institution"
+            required
+          />
+
+          <Input
+            label="Designation"
+            type="text"
+            value={designation}
+            onChange={(e) => setDesignation(e.target.value)}
+            placeholder="Your role or title"
+            required
+          />
+
+          <PhoneInputField
+            label="Telephone No."
+            id="register-telephone"
+            value={phone}
+            onChange={setPhone}
+            defaultCountry="SG"
+            required
+          />
+
           {[
             { label: 'Password', val: password, set: setPassword, placeholder: 'Create a password' },
-            { label: 'Confirm Password', val: confirmPassword, set: setConfirmPassword, placeholder: 'Repeat your password' }
+            { label: 'Confirm Password', val: confirmPassword, set: setConfirmPassword, placeholder: 'Repeat your password' },
           ].map((field, idx) => (
             <Input
               key={idx}
@@ -109,7 +158,6 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegisterSuccess, onBa
           </Button>
         </form>
 
-        {/* Footer */}
         <div className="mt-8 text-center text-sm">
           <span className="text-stone-600">Already have an account? </span>
           <button onClick={onBackToLogin} className="text-[#53A63E] font-semibold hover:underline">Sign in</button>

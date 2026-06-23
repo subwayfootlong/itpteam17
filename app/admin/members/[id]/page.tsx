@@ -4,12 +4,16 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { DEFAULT_TIER, MEMBERSHIP_TIERS } from '@/lib/membershipTiers';
+import { formatMemberName } from '@/lib/memberName';
 
 interface Member {
   id: string;
-  full_name: string;
+  first_name: string | null;
+  last_name: string | null;
   email: string;
   phone: string | null;
+  organization: string | null;
+  designation: string | null;
   arabic_name: string | null;
   member_id: string | null;
   membership_tier: string;
@@ -49,8 +53,11 @@ export default function MemberDetailPage() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          full_name: form.full_name,
+          first_name: form.first_name,
+          last_name: form.last_name,
           phone: form.phone,
+          organization: form.organization,
+          designation: form.designation,
           arabic_name: form.arabic_name,
           member_id: form.member_id,
           membership_tier: form.membership_tier,
@@ -96,7 +103,7 @@ export default function MemberDetailPage() {
       <nav className="text-[13px] text-gray-400 font-medium font-helvetica" >
         <Link href="/admin/members" className="hover:text-[#3FAE2A] transition-colors">Directory</Link>
         <span className="mx-2">›</span>
-        <span className="text-gray-700">{member.full_name ?? member.email}</span>
+        <span className="text-gray-700">{formatMemberName(member)}</span>
       </nav>
 
       {message && (
@@ -133,7 +140,7 @@ export default function MemberDetailPage() {
             <div className="space-y-3 relative z-10">
               <div>
                 <div className="text-[11px] text-white/60 font-semibold uppercase tracking-wider mb-0.5">Member Name</div>
-                <div className="text-[16px] font-bold">{member.full_name ?? '—'}</div>
+                <div className="text-[16px] font-bold">{formatMemberName(member, '—')}</div>
                 {member.arabic_name && <div className="text-white/80 text-[14px] mt-1">{member.arabic_name}</div>}
               </div>
               
@@ -162,6 +169,16 @@ export default function MemberDetailPage() {
             <div className="flex flex-col gap-1 pb-3 border-b border-gray-100">
               <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Phone</span>
               <span className="text-[13px] text-gray-800 font-medium">{member.phone ?? '—'}</span>
+            </div>
+
+            <div className="flex flex-col gap-1 pb-3 border-b border-gray-100">
+              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Organization</span>
+              <span className="text-[13px] text-gray-800 font-medium">{member.organization ?? '—'}</span>
+            </div>
+
+            <div className="flex flex-col gap-1 pb-3 border-b border-gray-100">
+              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Designation</span>
+              <span className="text-[13px] text-gray-800 font-medium">{member.designation ?? '—'}</span>
             </div>
             
             <div className="flex flex-col gap-1 pb-3 border-b border-gray-100">
@@ -192,10 +209,16 @@ export default function MemberDetailPage() {
           <div className="p-8 space-y-6 flex-1 font-helvetica" >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Field
-                label="Full Name"
-                value={form.full_name ?? ''}
-                onChange={(v) => setForm({ ...form, full_name: v })}
-                placeholder="e.g. Ahmad Bin Ali"
+                label="First Name"
+                value={form.first_name ?? ''}
+                onChange={(v) => setForm({ ...form, first_name: v })}
+                placeholder="e.g. Ahmad"
+              />
+              <Field
+                label="Last Name"
+                value={form.last_name ?? ''}
+                onChange={(v) => setForm({ ...form, last_name: v })}
+                placeholder="e.g. Bin Ali"
               />
               <Field
                 label="Arabic Name"
@@ -215,6 +238,18 @@ export default function MemberDetailPage() {
                 value={form.phone ?? ''}
                 onChange={(v) => setForm({ ...form, phone: v })}
                 placeholder="+65 8123 4567"
+              />
+              <Field
+                label="Organization"
+                value={form.organization ?? ''}
+                onChange={(v) => setForm({ ...form, organization: v })}
+                placeholder="Organization or institution"
+              />
+              <Field
+                label="Designation"
+                value={form.designation ?? ''}
+                onChange={(v) => setForm({ ...form, designation: v })}
+                placeholder="Role or title"
               />
               <Field
                 label="Member ID"

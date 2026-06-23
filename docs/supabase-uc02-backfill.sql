@@ -18,3 +18,10 @@ where role is null
 
 alter table public.users
   alter column membership_tier set default 'basic';
+
+-- Ensure DB constraint matches app tier values (basic was missing from legacy constraint)
+alter table public.users drop constraint if exists users_membership_tier_check;
+
+alter table public.users
+  add constraint users_membership_tier_check
+  check (membership_tier in ('basic', 'ordinary', 'associate', 'student'));

@@ -5,7 +5,8 @@ import { supabaseAdmin } from "@/lib/supabaseServer";
 
 export type MemberProfile = {
   id: string;
-  full_name: string | null;
+  first_name: string | null;
+  last_name: string | null;
   email: string;
   role: string;
   member_id: string | null;
@@ -13,6 +14,8 @@ export type MemberProfile = {
   membership_status: string | null;
   expiry_date: string | null;
   phone: string | null;
+  organization: string | null;
+  designation: string | null;
   arabic_name: string | null;
   member_since: string | null;
 };
@@ -26,7 +29,7 @@ export default async function ProfilePage() {
   const { data: member, error } = await supabaseAdmin
     .from("users")
     .select(
-      "id, full_name, email, role, member_id, membership_tier, membership_status, expiry_date, phone, arabic_name, member_since"
+      "id, first_name, last_name, email, role, member_id, membership_tier, membership_status, expiry_date, phone, organization, designation, arabic_name, member_since"
     )
     .eq("id", userId)
     .single();

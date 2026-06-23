@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { verifyAccessToken } from "./auth";
 import { supabaseAdmin } from "./supabaseServer";
+import { formatMemberName } from "./memberName";
 
 type TokenPayload = {
   sub?: string;
@@ -25,7 +26,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
 
     const { data } = await supabaseAdmin
       .from("users")
-      .select("id, email, full_name")
+      .select("id, email, first_name, last_name")
       .eq("id", payload.sub)
       .maybeSingle();
 
@@ -40,7 +41,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     return {
       id: String(data.id),
       email: data.email ?? null,
-      fullName: data.full_name || data.email || "Member",
+      fullName: formatMemberName(data),
     };
   } catch {
     return null;

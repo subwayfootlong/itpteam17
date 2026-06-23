@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 // import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { supabaseAdmin } from '@/lib/supabaseServer';
+import { formatMemberName } from '@/lib/memberName';
 
 export const dynamic = 'force-dynamic';
 
@@ -62,7 +63,7 @@ function generateSparkline(dataDates: Date[], totalCurrentCount: number): string
 
 export async function GET() {
   const [members, events, announcements, benefits] = await Promise.all([
-    supabaseAdmin.from('users').select('id, full_name, membership_status, created_at').neq('role', 'admin'),
+    supabaseAdmin.from('users').select('id, first_name, last_name, email, membership_status, created_at').neq('role', 'admin'),
     supabaseAdmin.from('events').select('id, title, status, event_date, created_at'),
     supabaseAdmin.from('announcements').select('id, title, status, created_at'),
     supabaseAdmin.from('benefits').select('id').eq('is_active', true),
@@ -122,7 +123,7 @@ export async function GET() {
   for (const m of allMembers) {
     activityList.push({
       id: `m_${m.id}`,
-      message: `${m.full_name || 'A user'} registered as a new member`,
+      message: `${formatMemberName(m, 'A user')} registered as a new member`,
       createdAt: new Date(m.created_at),
       type: 'member',
       author: 'User',

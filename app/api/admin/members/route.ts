@@ -13,13 +13,13 @@ export async function GET(req: Request) {
 
   let query = supabaseAdmin
     .from('users')
-    .select('id, full_name, email, member_id, membership_tier, membership_status, expiry_date, phone, created_at')
+    .select('id, first_name, last_name, email, member_id, membership_tier, membership_status, expiry_date, phone, organization, designation, created_at')
     .neq('role', 'admin')
     .order('created_at', { ascending: false });
 
   if (search) {
     query = query.or(
-      `full_name.ilike.%${search}%,email.ilike.%${search}%,member_id.ilike.%${search}%`
+      `first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%,member_id.ilike.%${search}%,organization.ilike.%${search}%`
     );
   }
   if (tier) query = query.eq('membership_tier', tier);
