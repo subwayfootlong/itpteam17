@@ -15,36 +15,40 @@ import AnnouncementList from "./community/AnnouncementList";
 import AnnouncementDetail from "./community/AnnouncementDetail";
 import DiscussionGroups from "./community/DiscussionGroups";
 import DiscussionFeed from "./community/DiscussionFeed";
-import { fallbackGroups, fallbackThreads } from "./community/constants";
-import type { CommentResponse, CommunityTab, ThreadResponse } from "./community/types";
+import type { CommentResponse, CommunityTab } from "./community/types";
 import {
   makePendingComment,
-  makePendingThread,
   postJson,
 } from "./community/utils";
 
 export default function AnnouncementsEngagement({
   announcements,
-  groups = fallbackGroups,
-  threads: initialThreads = fallbackThreads,
+  groups = [],
+  threads: initialThreads = [],
   showChrome = true,
   memberName = "Member",
+  initialTab = "announcements",
+  initialGroupId = null,
 }: {
   announcements: Announcement[];
   groups?: DiscussionGroup[];
   threads?: DiscussionThread[];
   showChrome?: boolean;
   memberName?: string;
+  initialTab?: CommunityTab;
+  initialGroupId?: DiscussionGroupId | null;
 }) {
-  const [activeTab, setActiveTab] = useState<CommunityTab>("announcements");
+  const [activeTab, setActiveTab] = useState<CommunityTab>(initialTab);
   const [selectedAnnouncementId, setSelectedAnnouncementId] = useState<
     string | null
   >(null);
   const [selectedGroupId, setSelectedGroupId] =
-    useState<DiscussionGroupId | null>(null);
-  const [threads, setThreads] = useState(initialThreads);
+    useState<DiscussionGroupId | null>(initialGroupId);
+  const [threads] = useState(initialThreads);
   const [expandedThreadId, setExpandedThreadId] = useState<string | null>(
-    initialThreads[0]?.id ?? null,
+    initialThreads.find((thread) => thread.groupId === initialGroupId)?.id ??
+      initialThreads[0]?.id ??
+      null,
   );
   const [moderatorNotice, setModeratorNotice] = useState(false);
   const [announcementComments, setAnnouncementComments] = useState<
@@ -139,23 +143,6 @@ export default function AnnouncementsEngagement({
     setExpandedThreadId(threadId);
   };
 
-  const handlePost = async (groupId: DiscussionGroupId, body: string) => {
-    let thread = makePendingThread(groupId, body, memberName);
-
-    try {
-      const response = await postJson<ThreadResponse>("/api/community/threads", {
-        groupId,
-        body,
-      });
-      thread = response.thread;
-    } catch (error) {
-      console.warn("Saved discussion thread locally:", error);
-    }
-
-    setThreads((current) => [thread, ...current]);
-    setExpandedThreadId(thread.id);
-  };
-
   return (
     <div className={shellClassName}>
       {showChrome && (
@@ -206,7 +193,6 @@ export default function AnnouncementsEngagement({
               )
             }
             onComment={handleThreadComment}
-            onPost={handlePost}
           />
         ) : activeTab === "announcements" ? (
           <AnnouncementList

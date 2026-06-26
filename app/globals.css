@@ -3066,6 +3066,75 @@ a {
   gap: 22px;
 }
 
+.discussion-feed-hero,
+.community-create-card,
+.community-empty-state {
+  border: 1px solid #dfe7dc;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 10px 28px rgba(23, 63, 20, 0.06);
+}
+
+.discussion-feed-hero {
+  display: flex;
+  padding: 22px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background:
+    linear-gradient(135deg, rgba(232, 245, 227, 0.9), rgba(255, 255, 255, 0.92)),
+    white;
+}
+
+.discussion-feed-hero span,
+.community-create-card__intro span {
+  color: #087100;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.discussion-feed-hero h2,
+.community-create-card__intro h2 {
+  margin: 6px 0 6px;
+  color: #151c27;
+  font-family: "Times New Roman", Georgia, serif;
+  font-size: 24px;
+  line-height: 1.12;
+}
+
+.discussion-feed-hero p,
+.community-create-card__intro p {
+  margin: 0;
+  color: #4d584f;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.discussion-feed-hero a,
+.community-empty-state a,
+.community-create-card > button {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 11px;
+  background: #087100;
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.discussion-feed-hero a {
+  padding: 0 14px;
+}
+
 .discussion-group-card {
   display: grid;
   width: 100%;
@@ -3077,6 +3146,11 @@ a {
   color: #171c26;
   cursor: pointer;
   text-align: left;
+}
+
+.discussion-group-card:hover {
+  border-color: #c3e6b3;
+  background: #fbfdf8;
 }
 
 .discussion-group-card__icon {
@@ -3159,6 +3233,38 @@ a {
   position: relative;
 }
 
+.discussion-feed-hero {
+  margin-bottom: 18px;
+}
+
+.community-empty-state {
+  display: flex;
+  min-height: 210px;
+  padding: 28px 22px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.community-empty-state h2 {
+  margin: 14px 0 6px;
+  color: #151c27;
+  font-family: "Times New Roman", Georgia, serif;
+  font-size: 24px;
+}
+
+.community-empty-state p {
+  margin: 0 0 16px;
+  color: #4d584f;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.community-empty-state a {
+  padding: 0 16px;
+}
+
 .share-thoughts {
   display: grid;
   min-height: 104px;
@@ -3193,7 +3299,7 @@ a {
 
 .discussion-thread-card {
   overflow: hidden;
-  margin-top: 30px;
+  margin-top: 18px;
 }
 
 .discussion-thread-card header {
@@ -3259,38 +3365,86 @@ a {
 }
 
 .discussion-thread-card footer {
-  display: grid;
+  display: flex;
   min-height: 74px;
   padding: 12px 20px;
-  grid-template-columns: auto 1fr auto;
   align-items: center;
+  justify-content: flex-start;
   gap: 12px;
-  background: #eef2ff;
+  background: #f5f8f2;
 }
 
-.discussion-thread-card footer button,
-.vote-pill {
+.discussion-thread-card footer button {
   display: inline-flex;
   min-height: 42px;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border: 0;
-  background: transparent;
+  border: 1px solid #d5e4d0;
+  border-radius: 999px;
+  background: #ffffff;
   color: #35423b;
   cursor: pointer;
-  font-size: 18px;
+  padding: 0 16px;
+  font-size: 15px;
+  font-weight: 800;
 }
 
-.vote-pill {
-  padding: 0 12px;
-  border: 1px solid #aebda9;
-  border-radius: 999px;
-  background: white;
+.discussion-thread-card footer button:hover {
+  border-color: #98ce8d;
+  color: #087100;
 }
 
 .thread-comments {
-  padding: 4px 22px 22px;
+  padding: 18px 22px 22px;
+  background: #ffffff;
+}
+
+.thread-comments .community-comment {
+  display: grid;
+  padding: 12px 0;
+  grid-template-columns: 44px minmax(0, 1fr);
+  align-items: flex-start;
+  gap: 12px;
+  border-top: 1px solid #edf1ec;
+}
+
+.thread-comments .community-comment:first-child {
+  border-top: 0;
+}
+
+.thread-comments .community-comment > span {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e8f5e3;
+  color: #087100;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.thread-comments .community-comment strong {
+  display: block;
+  color: #151c27;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.thread-comments .community-comment small {
+  display: block;
+  margin-top: 2px;
+  color: #6c766f;
+  font-size: 12px;
+}
+
+.thread-comments .community-comment p {
+  margin: 9px 0 0;
+  color: #27332b;
+  font-size: 14px;
+  line-height: 1.45;
 }
 
 .community-composer.compact textarea {
@@ -3308,10 +3462,162 @@ a {
   place-items: center;
   border: 0;
   border-radius: 50%;
+  color: white;
+  text-decoration: none;
   background: #087100;
   color: white;
   cursor: pointer;
   box-shadow: 0 14px 28px rgba(8, 113, 0, 0.24);
+}
+
+.community-create-shell {
+  width: 100%;
+  min-height: 100%;
+  padding: 20px 20px 96px;
+  background: #ffffff;
+}
+
+.community-create-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.community-create-header a {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid #dfe7dc;
+  border-radius: 14px;
+  background: #f6f7f6;
+  color: #0f6e00;
+}
+
+.community-create-header span {
+  display: block;
+  color: #087100;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.community-create-header h1 {
+  margin: 3px 0 0;
+  color: #151c27;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 27px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.community-create-card {
+  padding: 22px;
+}
+
+.community-create-card__intro {
+  margin-bottom: 20px;
+}
+
+.community-create-error {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border: 1px solid #f5b4c6;
+  border-radius: 12px;
+  background: #fff2f5;
+  color: #9f1239;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.community-create-card label {
+  display: block;
+  margin-top: 16px;
+}
+
+.community-create-card label > span {
+  display: block;
+  margin-bottom: 7px;
+  color: #35423b;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.community-create-card input,
+.community-create-card select,
+.community-create-card textarea {
+  width: 100%;
+  border: 1px solid #cbd8c8;
+  border-radius: 12px;
+  outline: 0;
+  background: #fbfcf9;
+  color: #171c26;
+  font-size: 14px;
+}
+
+.community-create-card input,
+.community-create-card select {
+  height: 46px;
+  padding: 0 13px;
+}
+
+.community-create-card textarea {
+  min-height: 190px;
+  padding: 13px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.community-create-card input:focus,
+.community-create-card select:focus,
+.community-create-card textarea:focus {
+  border-color: #31ae22;
+  box-shadow: 0 0 0 3px rgba(49, 174, 34, 0.12);
+}
+
+.community-create-card small {
+  display: block;
+  margin-top: 5px;
+  color: #747f76;
+  font-size: 11px;
+  text-align: right;
+}
+
+.community-create-guidance {
+  display: flex;
+  margin: 18px 0;
+  padding: 13px;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid #dbead6;
+  border-radius: 13px;
+  background: #f6fbf3;
+  color: #087100;
+}
+
+.community-create-guidance p {
+  margin: 0;
+  color: #3d493f;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.community-create-card > button {
+  width: 100%;
+}
+
+.community-create-card > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.community-create-empty {
+  margin-top: 18px;
 }
 
 .community-bottom-nav {
@@ -3440,12 +3746,7 @@ a {
     font-size: 17px;
   }
 
-  .discussion-thread-card footer {
-    grid-template-columns: 1fr 1fr auto;
-  }
-
-  .discussion-thread-card footer button,
-  .vote-pill {
+  .discussion-thread-card footer button {
     font-size: 15px;
   }
 
@@ -4287,10 +4588,9 @@ a {
   }
 }
 
-/* Mobile app shell alignment for benefits, community, and notifications */
+/* Mobile app shell alignment for benefits and community */
 .benefits-mobile-shell,
-.community-app-shell,
-.notifications-mobile-shell {
+.community-app-shell {
   min-height: 100vh;
   padding-bottom: 86px;
   background: #f6f7f6;
@@ -4299,8 +4599,7 @@ a {
 }
 
 .benefits-mobile-header,
-.community-header,
-.notifications-mobile-header {
+.community-header {
   position: sticky;
   z-index: 40;
   top: 0;
@@ -4314,8 +4613,7 @@ a {
   backdrop-filter: blur(12px);
 }
 
-.community-header__identity,
-.notifications-mobile-header > div {
+.community-header__identity {
   display: flex;
   min-width: 0;
   align-items: center;
@@ -4323,8 +4621,7 @@ a {
 }
 
 .benefits-mobile-header h1,
-.community-header h1,
-.notifications-mobile-header h1 {
+.community-header h1 {
   margin: 0;
   color: #087100;
   font-family: Arial, Helvetica, sans-serif;
@@ -4335,8 +4632,7 @@ a {
 }
 
 .community-avatar,
-.benefits-member-avatar,
-.notifications-member-avatar {
+.benefits-member-avatar {
   display: grid;
   width: 34px;
   height: 34px;
@@ -4351,8 +4647,7 @@ a {
 }
 
 .community-icon-button,
-.benefits-mobile-header a,
-.notifications-bell-button {
+.benefits-mobile-header a {
   display: grid;
   width: 38px;
   height: 38px;
@@ -4364,7 +4659,76 @@ a {
 }
 
 .benefits-mobile-main,
-.community-main,
+.community-main {
+  width: min(100%, 390px);
+  margin: 0 auto;
+}
+
+/* Notifications are intentionally separate from benefits/community styling. */
+.notifications-mobile-shell {
+  min-height: 100vh;
+  padding-bottom: 86px;
+  background: #f6f7f6;
+  color: #171c26;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.notifications-mobile-header {
+  position: sticky;
+  z-index: 40;
+  top: 0;
+  display: flex;
+  height: 64px;
+  padding: 0 max(14px, calc((100vw - 390px) / 2 + 14px));
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e2e8e1;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(12px);
+}
+
+.notifications-mobile-header > div {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+}
+
+.notifications-mobile-header h1 {
+  margin: 0;
+  color: #087100;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
+.notifications-member-avatar {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid #d7e6d4;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e9f8e5, #ffffff);
+  color: #087100;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.notifications-bell-button {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: #35423b;
+  cursor: pointer;
+}
+
 .notifications-mobile-main {
   width: min(100%, 390px);
   margin: 0 auto;
@@ -4413,8 +4777,7 @@ a {
 }
 
 .benefits-bottom-nav,
-.community-bottom-nav,
-.notifications-bottom-nav {
+.community-bottom-nav {
   position: fixed;
   z-index: 50;
   right: 0;
@@ -4431,8 +4794,7 @@ a {
 }
 
 .benefits-bottom-nav a,
-.community-bottom-nav a,
-.notifications-bottom-nav a {
+.community-bottom-nav a {
   display: flex;
   min-width: 0;
   height: 56px;
@@ -4449,7 +4811,44 @@ a {
 }
 
 .benefits-bottom-nav a.is-active,
-.community-bottom-nav a.is-active,
+.community-bottom-nav a.is-active {
+  background: #dff8d8;
+  color: #087100;
+  font-weight: 800;
+}
+
+.notifications-bottom-nav {
+  position: fixed;
+  z-index: 50;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: grid;
+  height: 76px;
+  padding: 0 max(8px, calc((100vw - 390px) / 2 + 8px));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border-top: 1px solid #dfe7dc;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 -8px 24px rgba(27, 66, 53, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.notifications-bottom-nav a {
+  display: flex;
+  min-width: 0;
+  height: 56px;
+  margin: auto 1px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 3px;
+  border-radius: 16px;
+  color: #5d625e;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
 .notifications-bottom-nav a.is-active {
   background: #dff8d8;
   color: #087100;
@@ -4987,8 +5386,7 @@ a {
 
 /* Final mobile-frame lock: keeps mobile bars consistent on desktop. */
 .benefits-mobile-shell,
-.community-app-shell,
-.notifications-mobile-shell {
+.community-app-shell {
   width: min(100%, 390px);
   margin: 0 auto;
   overflow-x: hidden;
@@ -4997,22 +5395,19 @@ a {
 }
 
 .benefits-mobile-header,
-.community-header,
-.notifications-mobile-header {
+.community-header {
   width: min(100%, 390px);
   margin: 0 auto;
   padding: 0 14px;
 }
 
 .benefits-mobile-main,
-.community-main,
-.notifications-mobile-main {
+.community-main {
   width: 100%;
 }
 
 .benefits-bottom-nav,
-.community-bottom-nav,
-.notifications-bottom-nav {
+.community-bottom-nav {
   right: auto;
   left: 50%;
   width: min(100%, 390px);
@@ -5021,7 +5416,38 @@ a {
 }
 
 .benefits-bottom-nav a,
-.community-bottom-nav a,
+.community-bottom-nav a {
+  height: 56px;
+  min-width: 0;
+  padding: 0 2px;
+}
+
+.notifications-mobile-shell {
+  width: min(100%, 390px);
+  margin: 0 auto;
+  overflow-x: hidden;
+  background: #f6f7f6;
+  box-shadow: 0 0 0 1px rgba(223, 231, 220, 0.65);
+}
+
+.notifications-mobile-header {
+  width: min(100%, 390px);
+  margin: 0 auto;
+  padding: 0 14px;
+}
+
+.notifications-mobile-main {
+  width: 100%;
+}
+
+.notifications-bottom-nav {
+  right: auto;
+  left: 50%;
+  width: min(100%, 390px);
+  padding: 0 8px;
+  transform: translateX(-50%);
+}
+
 .notifications-bottom-nav a {
   height: 56px;
   min-width: 0;

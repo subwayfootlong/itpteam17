@@ -10,11 +10,15 @@ interface Stats {
   publishedAnnouncements: number;
   activePerks: number;
   expiredMembers: number;
+  discussionPosts: number;
+  pendingCommunityItems: number;
   trends?: {
     totalMembers: string;
     activeMembers: string;
     upcomingEvents: string;
     publishedAnnouncements: string;
+    discussionPosts?: string;
+    pendingCommunityItems?: string;
   };
   sparklines?: {
     totalMembers: string;
@@ -30,14 +34,15 @@ interface Activity {
   message: string;
   timeAgo: string;
   author: string;
-  type: 'member' | 'event' | 'announcement' | 'system';
+  type: 'member' | 'event' | 'announcement' | 'discussion' | 'system';
 }
 
 type StatMetricKey =
   | 'totalMembers'
   | 'activeMembers'
   | 'upcomingEvents'
-  | 'publishedAnnouncements';
+  | 'publishedAnnouncements'
+  | 'pendingCommunityItems';
 
 // Brand colour per activity type
 const ACTIVITY_STYLE: Record<string, { bg: string; color: string; icon: React.ReactNode }> = {
@@ -65,6 +70,15 @@ const ACTIVITY_STYLE: Record<string, { bg: string; color: string; icon: React.Re
     icon: (
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+      </svg>
+    ),
+  },
+  discussion: {
+    bg: '#e8f5e3',
+    color: '#087100',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7.5 8.25h9m-9 3h5.25M21 12a8.25 8.25 0 01-8.25 8.25H7.5L3 21l.75-4.5A8.25 8.25 0 1121 12z" />
       </svg>
     ),
   },
@@ -112,6 +126,16 @@ const QUICK_ACTIONS = [
     ),
   },
   {
+    label: 'Review Community',
+    href: '/admin/comment-moderation',
+    accent: '#087100',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7.5 8.25h9m-9 3h5.25M21 12a8.25 8.25 0 01-8.25 8.25H7.5L3 21l.75-4.5A8.25 8.25 0 1121 12z" />
+      </svg>
+    ),
+  },
+  {
     label: 'Manage Benefits',
     href: '/admin/engagement',
     accent: '#1E9888',
@@ -131,6 +155,7 @@ const SPARKLINES: Record<StatMetricKey, { path: string; color: string }> = {
   activeMembers:         { path: 'M0,18 L10,16 L20,14 L30,12 L40,11 L50,9 L60,6',    color: '#1E9888' },
   upcomingEvents:        { path: 'M0,16 L10,14 L20,16 L30,12 L40,10 L50,8 L60,5',    color: '#3BB0C9' },
   publishedAnnouncements:{ path: 'M0,20 L10,17 L20,15 L30,14 L40,13 L50,11 L60,8',   color: '#FFB547' },
+  pendingCommunityItems: { path: 'M0,14 L10,14 L20,14 L30,14 L40,14 L50,14 L60,14',   color: '#087100' },
 };
 
 // Stat card configs — icon, colours, change badge
@@ -174,6 +199,20 @@ const STAT_CONFIGS = [
     icon: (
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    ),
+  },
+  {
+    key: 'pendingCommunityItems' as StatMetricKey,
+    label: 'Pending Community',
+    subKey: null,
+    isPos: true,
+    iconBg: 'bg-[#e8f5e3]',
+    iconText: 'text-[#087100]',
+    accent: '#087100',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7.5 8.25h9m-9 3h5.25M21 12a8.25 8.25 0 01-8.25 8.25H7.5L3 21l.75-4.5A8.25 8.25 0 1121 12z" />
       </svg>
     ),
   },

@@ -7,12 +7,14 @@ import MemberIcon from "@/components/member/MemberIcon";
 
 export default function ThreadCard({
   thread,
+  groupTitle,
   isExpanded,
   localComments,
   onToggle,
   onComment,
 }: {
   thread: DiscussionThread;
+  groupTitle: string;
   isExpanded: boolean;
   localComments: CommunityComment[];
   onToggle: () => void;
@@ -26,6 +28,14 @@ export default function ThreadCard({
   const reviewComments = comments.filter(
     (comment) => comment.status !== "approved",
   );
+  const authorInitials =
+    thread.author
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "M";
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -37,9 +47,9 @@ export default function ThreadCard({
   return (
     <article className="discussion-thread-card">
       <header>
-        <span className="thread-initials">GC</span>
+        <span className="thread-initials">{authorInitials}</span>
         <div>
-          <strong>General Community</strong>
+          <strong>{groupTitle}</strong>
           <small>{thread.postedAt}</small>
         </div>
         <p>{thread.author}</p>
@@ -54,17 +64,9 @@ export default function ThreadCard({
         </div>
       )}
       <footer>
-        <span className="vote-pill">
-          <MemberIcon name="up" size={22} />
-          {thread.votes}
-          <MemberIcon name="down" size={22} />
-        </span>
         <button type="button" onClick={onToggle}>
           <MemberIcon name="comment" size={22} />
           {comments.length} comments
-        </button>
-        <button type="button" aria-label="Share thread">
-          <MemberIcon name="share" size={21} />
         </button>
       </footer>
 

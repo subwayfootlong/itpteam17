@@ -51,7 +51,7 @@ const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Comment Moderation',
+    label: 'Community Moderation',
     href: '/admin/comment-moderation',
     icon: (
       <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">

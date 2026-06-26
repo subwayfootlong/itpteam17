@@ -5,6 +5,7 @@ export type ModerationStatus = "approved" | "pending" | "flagged";
 export type ModerationSource =
   | "admin-announcement"
   | "community-announcement"
+  | "discussion-post"
   | "discussion-thread";
 
 export type ModerationComment = {
@@ -34,6 +35,16 @@ type CommentRow = {
 type ParentRow = {
   id: string;
   title: string | null;
+};
+
+type ThreadModerationRow = {
+  id: string;
+  group_id: string | null;
+  title: string | null;
+  body: string;
+  status: ModerationStatus;
+  created_at: string | null;
+  author_name: string | null;
 };
 
 function uniqueIds(ids: Array<string | null | undefined>) {
@@ -80,7 +91,7 @@ function mapRow(
 }
 
 export async function getModerationComments(): Promise<ModerationComment[]> {
-  const [adminResult, announcementResult, threadResult] = await Promise.all([
+  const [adminResult, announcementResult, postResult, threadResult] = await Promise.all([
     supabaseAdmin
       .from("announcement_comments")
       .select("id, announcement_id, body:content, status, created_at, author_name, author_role")
@@ -90,7 +101,11 @@ export async function getModerationComments(): Promise<ModerationComment[]> {
       .select("id, announcement_id, body, status, created_at, author_name, author_role")
       .order("created_at", { ascending: false }),
     supabaseAdmin
-      .from("uc6_thread_comments")
+      .from("discussion")
+      .select("id, group_id, title, body, status, created_at, author_name")
+      .order("created_at", { ascending: false }),
+    supabaseAdmin
+      .from("discussion_comments")
       .select("id, thread_id, body, status, created_at, author_name, author_role")
       .order("created_at", { ascending: false }),
   ]);
@@ -101,6 +116,9 @@ export async function getModerationComments(): Promise<ModerationComment[]> {
   const announcementRows = announcementResult.error
     ? []
     : ((announcementResult.data ?? []) as CommentRow[]);
+  const postRows = postResult.error
+    ? []
+    : ((postResult.data ?? []) as ThreadModerationRow[]);
   const threadRows = threadResult.error
     ? []
     : ((threadResult.data ?? []) as CommentRow[]);
@@ -116,7 +134,7 @@ export async function getModerationComments(): Promise<ModerationComment[]> {
         uniqueIds(announcementRows.map((row) => row.announcement_id)),
       ),
       getTitleMap(
-        "uc6_discussion_threads",
+        "discussion",
         uniqueIds(threadRows.map((row) => row.thread_id)),
       ),
     ]);
@@ -142,6 +160,18 @@ export async function getModerationComments(): Promise<ModerationComment[]> {
         announcementTitleMap.get(parentId) || "Community announcement",
       );
     }),
+    ...postRows.map((row) => ({
+      id: row.id,
+      source: "discussion-post" as ModerationSource,
+      sourceLabel: "Discussion post",
+      status: row.status,
+      authorName: row.author_name || "Pergas Member",
+      authorRole: "Active Member",
+      body: row.body,
+      createdAt: row.created_at,
+      parentId: row.group_id || "",
+      parentTitle: row.title || "Discussion post",
+    })),
     ...threadRows.map((row) => {
       const parentId = row.thread_id || "";
       return mapRow(
@@ -164,5 +194,6 @@ export async function getModerationComments(): Promise<ModerationComment[]> {
 export function getModerationTable(source: ModerationSource) {
   if (source === "admin-announcement") return "announcement_comments";
   if (source === "community-announcement") return "uc6_announcement_comments";
-  return "uc6_thread_comments";
+  if (source === "discussion-post") return "discussion";
+  return "discussion_comments";
 }

@@ -18,14 +18,15 @@ export async function loadCommunityPageData(): Promise<CommunityPageProps> {
   try {
     const communityData = await getCommunityData(currentUser?.id);
 
-    if (communityData.announcements.length > 0) {
-      return {
-        memberName,
-        announcements: communityData.announcements,
-        groups: communityData.groups.length ? communityData.groups : undefined,
-        threads: communityData.threads.length ? communityData.threads : undefined,
-      };
-    }
+    return {
+      memberName,
+      announcements:
+        communityData.announcements.length > 0
+          ? communityData.announcements
+          : announcements,
+      groups: communityData.groups,
+      threads: communityData.threads,
+    };
   } catch (error) {
     console.warn("Using community fallback data:", error);
   }
@@ -33,5 +34,7 @@ export async function loadCommunityPageData(): Promise<CommunityPageProps> {
   return {
     memberName,
     announcements,
+    groups: [],
+    threads: [],
   };
 }

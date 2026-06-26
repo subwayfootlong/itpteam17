@@ -11,7 +11,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/announcements':     'Announcements',
   '/admin/announcements/new': 'New Announcement',
   '/admin/engagement':        'Benefit Management',
-  '/admin/comment-moderation':'Comment Moderation',
+  '/admin/comment-moderation':'Community Moderation',
   '/admin/settings':          'Settings',
 };
 

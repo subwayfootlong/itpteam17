@@ -8,6 +8,7 @@ import {
 const SOURCES: ModerationSource[] = [
   "admin-announcement",
   "community-announcement",
+  "discussion-post",
   "discussion-thread",
 ];
 
@@ -63,7 +64,7 @@ export async function PATCH(req: Request) {
   }
 
   if (!data) {
-    return NextResponse.json({ error: "Comment not found" }, { status: 404 });
+    return NextResponse.json({ error: "Moderation item not found" }, { status: 404 });
   }
 
   return NextResponse.json({
