@@ -14,23 +14,31 @@ export default function DiscussionGroups({
 }) {
   return (
     <section className="community-screen discussion-groups">
-      {groups.map((group) => (
-        <button
-          className="discussion-group-card"
-          key={group.id}
-          type="button"
-          onClick={() => onOpenGroup(group.id)}
-        >
-          <span className={`discussion-group-card__icon is-${group.tone}`}>
-            <MemberIcon name={group.icon} size={29} />
-          </span>
-          <span>
-            <strong>{group.title}</strong>
-            <small>{group.posts} posts</small>
-          </span>
-          <MemberIcon name="arrowRight" size={24} />
-        </button>
-      ))}
+      {groups.length > 0 ? (
+        groups.map((group) => (
+          <button
+            className="discussion-group-card"
+            key={group.id}
+            type="button"
+            onClick={() => onOpenGroup(group.id)}
+          >
+            <span className={`discussion-group-card__icon is-${group.tone}`}>
+              <MemberIcon name={group.icon} size={29} />
+            </span>
+            <span>
+              <strong>{group.title}</strong>
+              <small>{group.posts} posts</small>
+            </span>
+            <MemberIcon name="arrowRight" size={24} />
+          </button>
+        ))
+      ) : (
+        <div className="community-empty-state">
+          <MemberIcon name="message" size={30} />
+          <h2>No discussion spaces yet</h2>
+          <p>Ask an admin to create discussion groups before members can post.</p>
+        </div>
+      )}
 
       <article className="moderator-card">
         <span>

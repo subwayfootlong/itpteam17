@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import Link from "next/link";
 import type { CommunityComment } from "@/lib/data/announcements";
 import type {
   DiscussionGroup,
@@ -18,7 +18,6 @@ export default function DiscussionFeed({
   expandedThreadId,
   onExpandThread,
   onComment,
-  onPost,
 }: {
   groupId: DiscussionGroupId;
   groups: DiscussionGroup[];
@@ -27,54 +26,54 @@ export default function DiscussionFeed({
   expandedThreadId: string | null;
   onExpandThread: (threadId: string) => void;
   onComment: (threadId: string, body: string) => Promise<void>;
-  onPost: (groupId: DiscussionGroupId, body: string) => Promise<void>;
 }) {
-  const [postDraft, setPostDraft] = useState("");
   const group = groups.find((item) => item.id === groupId) ?? groups[0];
   const visibleThreads = threads.filter((thread) => thread.groupId === groupId);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!postDraft.trim()) return;
-    await onPost(groupId, postDraft.trim());
-    setPostDraft("");
-  };
-
   return (
     <section className="community-screen discussion-feed">
-      <form className="community-composer" onSubmit={handleSubmit}>
-        <span className="community-avatar" aria-hidden="true">
-          AK
-        </span>
-        <label className="sr-only" htmlFor="community-post">
-          Share your thoughts with the community
-        </label>
-        <textarea
-          id="community-post"
-          value={postDraft}
-          onChange={(event) => setPostDraft(event.target.value)}
-          placeholder={`Share your thoughts with ${group.title.toLowerCase()}...`}
-          maxLength={220}
-        />
-        <button type="submit" disabled={!postDraft.trim()} aria-label="Post">
-          <MemberIcon name={postDraft.trim() ? "send" : "image"} size={23} />
-        </button>
-      </form>
+      <div className="discussion-feed-hero">
+        <div>
+          <span>{group?.title ?? "Discussion"}</span>
+          <h2>Share and learn with the community</h2>
+          <p>Start a respectful post from a focused writing page, then track it here after submission.</p>
+        </div>
+        <Link href={`/member/community/new?groupId=${encodeURIComponent(groupId)}`}>
+          New Post
+          <MemberIcon name="edit" size={18} />
+        </Link>
+      </div>
 
-      {visibleThreads.map((thread) => (
-        <ThreadCard
-          key={thread.id}
-          thread={thread}
-          isExpanded={expandedThreadId === thread.id}
-          localComments={localComments[thread.id] ?? []}
-          onToggle={() => onExpandThread(thread.id)}
-          onComment={onComment}
-        />
-      ))}
+      {visibleThreads.length > 0 ? (
+        visibleThreads.map((thread) => (
+          <ThreadCard
+            key={thread.id}
+            thread={thread}
+            groupTitle={group?.title ?? "Discussion"}
+            isExpanded={expandedThreadId === thread.id}
+            localComments={localComments[thread.id] ?? []}
+            onToggle={() => onExpandThread(thread.id)}
+            onComment={onComment}
+          />
+        ))
+      ) : (
+        <div className="community-empty-state">
+          <MemberIcon name="message" size={30} />
+          <h2>No posts yet</h2>
+          <p>Be the first member to start a discussion in this space.</p>
+          <Link href={`/member/community/new?groupId=${encodeURIComponent(groupId)}`}>
+            Create First Post
+          </Link>
+        </div>
+      )}
 
-      <button className="floating-compose" type="button" aria-label="Compose">
+      <Link
+        className="floating-compose"
+        href={`/member/community/new?groupId=${encodeURIComponent(groupId)}`}
+        aria-label="Compose"
+      >
         <MemberIcon name="edit" size={27} />
-      </button>
+      </Link>
     </section>
   );
 }

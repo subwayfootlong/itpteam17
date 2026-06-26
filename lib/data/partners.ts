@@ -14,6 +14,8 @@ export type Partner = {
   distance: string;
   terms: string;
   website: string;
+  imageUrl?: string;
+  logoUrl?: string;
   featured?: boolean;
   mapPosition?: { x: number; y: number };
 };

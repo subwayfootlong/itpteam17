@@ -10,11 +10,15 @@ interface Stats {
   publishedAnnouncements: number;
   activePerks: number;
   expiredMembers: number;
+  discussionPosts: number;
+  pendingCommunityItems: number;
   trends?: {
     totalMembers: string;
     activeMembers: string;
     upcomingEvents: string;
     publishedAnnouncements: string;
+    discussionPosts?: string;
+    pendingCommunityItems?: string;
   };
   sparklines?: {
     totalMembers: string;
@@ -30,14 +34,15 @@ interface Activity {
   message: string;
   timeAgo: string;
   author: string;
-  type: 'member' | 'event' | 'announcement' | 'system';
+  type: 'member' | 'event' | 'announcement' | 'discussion' | 'system';
 }
 
 type StatMetricKey =
   | 'totalMembers'
   | 'activeMembers'
   | 'upcomingEvents'
-  | 'publishedAnnouncements';
+  | 'publishedAnnouncements'
+  | 'pendingCommunityItems';
 
 // Brand colour per activity type
 const ACTIVITY_STYLE: Record<string, { bg: string; color: string; icon: React.ReactNode }> = {
@@ -65,6 +70,15 @@ const ACTIVITY_STYLE: Record<string, { bg: string; color: string; icon: React.Re
     icon: (
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+      </svg>
+    ),
+  },
+  discussion: {
+    bg: '#e8f5e3',
+    color: '#087100',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7.5 8.25h9m-9 3h5.25M21 12a8.25 8.25 0 01-8.25 8.25H7.5L3 21l.75-4.5A8.25 8.25 0 1121 12z" />
       </svg>
     ),
   },
@@ -112,12 +126,22 @@ const QUICK_ACTIONS = [
     ),
   },
   {
-    label: 'View Engagement',
+    label: 'Review Community',
+    href: '/admin/comment-moderation',
+    accent: '#087100',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7.5 8.25h9m-9 3h5.25M21 12a8.25 8.25 0 01-8.25 8.25H7.5L3 21l.75-4.5A8.25 8.25 0 1121 12z" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Manage Benefits',
     href: '/admin/engagement',
     accent: '#1E9888',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 11.25v8.25A1.5 1.5 0 0119.5 21h-15A1.5 1.5 0 013 19.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V21m0-16.125A2.625 2.625 0 1114.625 7.5H12m0 0h8.25M3.75 7.5H12" />
       </svg>
     ),
   },
@@ -131,6 +155,7 @@ const SPARKLINES: Record<StatMetricKey, { path: string; color: string }> = {
   activeMembers:         { path: 'M0,18 L10,16 L20,14 L30,12 L40,11 L50,9 L60,6',    color: '#1E9888' },
   upcomingEvents:        { path: 'M0,16 L10,14 L20,16 L30,12 L40,10 L50,8 L60,5',    color: '#3BB0C9' },
   publishedAnnouncements:{ path: 'M0,20 L10,17 L20,15 L30,14 L40,13 L50,11 L60,8',   color: '#FFB547' },
+  pendingCommunityItems: { path: 'M0,14 L10,14 L20,14 L30,14 L40,14 L50,14 L60,14',   color: '#087100' },
 };
 
 // Stat card configs — icon, colours, change badge
@@ -174,6 +199,20 @@ const STAT_CONFIGS = [
     icon: (
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    ),
+  },
+  {
+    key: 'pendingCommunityItems' as StatMetricKey,
+    label: 'Pending Community',
+    subKey: null,
+    isPos: true,
+    iconBg: 'bg-[#e8f5e3]',
+    iconText: 'text-[#087100]',
+    accent: '#087100',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7.5 8.25h9m-9 3h5.25M21 12a8.25 8.25 0 01-8.25 8.25H7.5L3 21l.75-4.5A8.25 8.25 0 1121 12z" />
       </svg>
     ),
   },
@@ -454,7 +493,7 @@ export default function AdminDashboard() {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-[12px] font-bold font-helvetica flex-shrink-0 transition-all hover:brightness-105 shadow-sm"
           style={{ background: '#3FAE2A', color: '#fff' }}
         >
-          View Report
+          Manage Benefits
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>

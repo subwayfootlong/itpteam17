@@ -71,6 +71,7 @@ type GroupRow = {
 type ThreadRow = {
   id: string;
   group_id: string;
+  user_id: string | null;
   title: string;
   body: string;
   votes: number | null;
@@ -177,6 +178,10 @@ function mapThread(
   };
 }
 
+function shouldShowThread(row: ThreadRow, currentUserId?: string) {
+  return row.status === "approved" || Boolean(currentUserId && row.user_id === currentUserId);
+}
+
 export async function getCommunityData(
   currentUserId?: string,
 ): Promise<CommunityData> {
@@ -209,16 +214,16 @@ export async function getCommunityData(
       .select("id, announcement_id, user_id, body, status, created_at, author_name, author_role")
       .order("created_at", { ascending: true }),
     supabaseAdmin
-      .from("uc6_discussion_groups")
+      .from("discussion_groups")
       .select("id, title, icon, tone")
       .order("sort_order", { ascending: true }),
     supabaseAdmin
-      .from("uc6_discussion_threads")
-      .select("id, group_id, title, body, votes, status, has_image, created_at, author_name")
+      .from("discussion")
+      .select("id, group_id, user_id, title, body, votes, status, has_image, created_at, author_name")
       .in("status", ["approved", "pending", "flagged"])
       .order("created_at", { ascending: false }),
     supabaseAdmin
-      .from("uc6_thread_comments")
+      .from("discussion_comments")
       .select("id, thread_id, user_id, body, status, created_at, author_name, author_role")
       .order("created_at", { ascending: true }),
   ]);
@@ -251,9 +256,11 @@ export async function getCommunityData(
 
   const threads = threadsResult.error
     ? []
-    : ((threadsResult.data ?? []) as ThreadRow[]).map((row) =>
-        mapThread(row, threadCommentsById.get(row.id) ?? []),
-      );
+    : ((threadsResult.data ?? []) as ThreadRow[])
+        .filter((row) => shouldShowThread(row, currentUserId))
+        .map((row) =>
+          mapThread(row, threadCommentsById.get(row.id) ?? []),
+        );
 
   const threadCounts = threads.reduce<Record<string, number>>((acc, thread) => {
     acc[thread.groupId] = (acc[thread.groupId] ?? 0) + 1;

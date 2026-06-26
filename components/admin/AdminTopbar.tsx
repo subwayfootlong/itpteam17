@@ -10,8 +10,8 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/events/new':        'Create New Event',
   '/admin/announcements':     'Announcements',
   '/admin/announcements/new': 'New Announcement',
-  '/admin/engagement':        'Engagement Tracking',
-  '/admin/comment-moderation':'Comment Moderation',
+  '/admin/engagement':        'Benefit Management',
+  '/admin/comment-moderation':'Community Moderation',
   '/admin/settings':          'Settings',
 };
 

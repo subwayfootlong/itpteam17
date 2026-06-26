@@ -129,10 +129,32 @@ function CategoryTabs({
 function PartnerVisual({ partner }: { partner: Partner }) {
   return (
     <div
-      className={`benefit-partner-visual benefit-partner-visual--${partner.category === "Lifestyle" ? "lifestyle" : "books"}`}
+      className={`benefit-partner-visual benefit-partner-visual--${partner.category === "Lifestyle" ? "lifestyle" : "books"} ${partner.imageUrl ? "has-image" : ""}`}
       aria-hidden="true"
     >
-      <span>{partner.initials}</span>
+      {partner.imageUrl && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          className="benefit-partner-visual__image"
+          src={partner.imageUrl}
+          alt=""
+          loading="lazy"
+          referrerPolicy="no-referrer"
+        />
+      )}
+      <span className={partner.logoUrl ? "has-logo" : ""}>
+        {partner.logoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={partner.logoUrl}
+            alt=""
+            loading="lazy"
+            referrerPolicy="no-referrer"
+          />
+        ) : (
+          partner.initials
+        )}
+      </span>
       {partner.featured && <em>NEW</em>}
     </div>
   );
@@ -343,9 +365,13 @@ export default function BenefitsDirectory({
 
   const visibleMapSelected =
     filteredPartners.find((partner) => partner.id === mapSelected?.id) ?? null;
+  const hasBenefits = partners.length > 0;
+  const shellClassName = showChrome
+    ? "benefits-mobile-shell"
+    : "benefits-mobile-shell is-member-embedded";
 
   return (
-    <div className="benefits-mobile-shell">
+    <div className={shellClassName}>
       {showChrome && <BenefitsHeader initials={member.initials} />}
 
       <main className="benefits-mobile-main">
@@ -359,97 +385,107 @@ export default function BenefitsDirectory({
           member={member}
         />
 
-        <label className="benefits-search">
-          <span className="sr-only">Search benefits</span>
-          <MemberIcon name="search" size={22} />
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search rewards or partners..."
-          />
-          {query && (
-            <button
-              type="button"
-              onClick={() => setQuery("")}
-              aria-label="Clear search"
-            >
-              <MemberIcon name="close" size={17} />
-            </button>
-          )}
-        </label>
-
-        <PartnerMapPreview partners={partners} onOpenMap={() => setView("map")} />
-
-        <div className="benefits-view-toggle" aria-label="Benefit view">
-          <button
-            className={view === "list" ? "is-active" : ""}
-            type="button"
-            onClick={() => setView("list")}
-          >
-            Rewards
-          </button>
-          <button
-            className={view === "map" ? "is-active" : ""}
-            type="button"
-            onClick={() => setView("map")}
-          >
-            Map
-          </button>
-        </div>
-
-        <CategoryTabs selected={category} onSelect={setCategory} />
-
-        <section className="benefits-results-heading" aria-live="polite">
-          <div>
-            <span>Featured Rewards</span>
-            <strong>{filteredPartners.length} available</strong>
-          </div>
-          {category !== "All" || query ? (
-            <button
-              type="button"
-              onClick={() => {
-                setCategory("All");
-                setQuery("");
-              }}
-            >
-              Reset
-            </button>
-          ) : null}
-        </section>
-
-        {view === "map" ? (
-          <PartnerMap
-            partners={filteredPartners}
-            selected={visibleMapSelected}
-            onSelect={setMapSelected}
-            onRedeem={setRedeemPartner}
-          />
-        ) : filteredPartners.length > 0 ? (
-          <section className="benefit-reward-list">
-            {filteredPartners.map((partner) => (
-              <RewardCard
-                key={partner.id}
-                partner={partner}
-                onSelect={setRedeemPartner}
-              />
-            ))}
+        {!hasBenefits ? (
+          <section className="benefits-empty-state benefits-empty-state--primary">
+            <MemberIcon name="spark" size={30} />
+            <h2>Currently there are no benefits</h2>
+            <p>New partner rewards will appear here once they are published by admin.</p>
           </section>
         ) : (
-          <section className="benefits-empty-state">
-            <MemberIcon name="search" size={28} />
-            <h2>No benefits found</h2>
-            <p>Try another search or show all rewards.</p>
-            <button
-              type="button"
-              onClick={() => {
-                setQuery("");
-                setCategory("All");
-              }}
-            >
-              Show All Rewards
-            </button>
-          </section>
+          <>
+            <label className="benefits-search">
+              <span className="sr-only">Search benefits</span>
+              <MemberIcon name="search" size={22} />
+              <input
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search rewards or partners..."
+              />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  aria-label="Clear search"
+                >
+                  <MemberIcon name="close" size={17} />
+                </button>
+              )}
+            </label>
+
+            <PartnerMapPreview partners={partners} onOpenMap={() => setView("map")} />
+
+            <div className="benefits-view-toggle" aria-label="Benefit view">
+              <button
+                className={view === "list" ? "is-active" : ""}
+                type="button"
+                onClick={() => setView("list")}
+              >
+                Rewards
+              </button>
+              <button
+                className={view === "map" ? "is-active" : ""}
+                type="button"
+                onClick={() => setView("map")}
+              >
+                Map
+              </button>
+            </div>
+
+            <CategoryTabs selected={category} onSelect={setCategory} />
+
+            <section className="benefits-results-heading" aria-live="polite">
+              <div>
+                <span>Featured Rewards</span>
+                <strong>{filteredPartners.length} available</strong>
+              </div>
+              {category !== "All" || query ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCategory("All");
+                    setQuery("");
+                  }}
+                >
+                  Reset
+                </button>
+              ) : null}
+            </section>
+
+            {view === "map" ? (
+              <PartnerMap
+                partners={filteredPartners}
+                selected={visibleMapSelected}
+                onSelect={setMapSelected}
+                onRedeem={setRedeemPartner}
+              />
+            ) : filteredPartners.length > 0 ? (
+              <section className="benefit-reward-list">
+                {filteredPartners.map((partner) => (
+                  <RewardCard
+                    key={partner.id}
+                    partner={partner}
+                    onSelect={setRedeemPartner}
+                  />
+                ))}
+              </section>
+            ) : (
+              <section className="benefits-empty-state">
+                <MemberIcon name="search" size={28} />
+                <h2>No matching benefits</h2>
+                <p>Try another search or show all rewards.</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuery("");
+                    setCategory("All");
+                  }}
+                >
+                  Show All Rewards
+                </button>
+              </section>
+            )}
+          </>
         )}
       </main>
 

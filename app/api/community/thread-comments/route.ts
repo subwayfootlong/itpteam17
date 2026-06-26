@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     }
 
     const { data, error } = await supabaseAdmin
-      .from("uc6_thread_comments")
+      .from("discussion_comments")
       .insert({
         thread_id: threadId,
         user_id: user.id,

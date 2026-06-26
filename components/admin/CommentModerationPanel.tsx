@@ -20,6 +20,7 @@ import type {
 import { formatDateTime } from "@/lib/dates";
 
 type ModerationAction = "approve" | "reject";
+type ModerationQueue = "announcements" | "discussions";
 
 const STATUS_STYLE: Record<
   ModerationStatus,
@@ -51,6 +52,7 @@ const STATUS_STYLE: Record<
 const SOURCE_STYLE: Record<ModerationSource, { bg: string; color: string }> = {
   "admin-announcement": { bg: "#e8f5e3", color: "#27500A" },
   "community-announcement": { bg: "#e3f6fb", color: "#1a7a8f" },
+  "discussion-post": { bg: "#f0faf0", color: "#087100" },
   "discussion-thread": { bg: "#fff4de", color: "#9a6800" },
 };
 
@@ -60,6 +62,15 @@ const FILTER_OPTIONS = [
   { label: "Approved", value: "approved" },
   { label: "Rejected", value: "flagged" },
 ];
+
+const QUEUE_OPTIONS = [
+  { label: "Announcements", value: "announcements" },
+  { label: "Discussions", value: "discussions" },
+];
+
+function isDiscussionSource(source: ModerationSource) {
+  return source === "discussion-post" || source === "discussion-thread";
+}
 
 function statusBadge(status: ModerationStatus) {
   const style = STATUS_STYLE[status];
@@ -95,26 +106,37 @@ export default function CommentModerationPanel({
 }) {
   const { toast } = useToast();
   const [comments, setComments] = useState(initialComments);
+  const [queue, setQueue] = useState<ModerationQueue>("discussions");
   const [filter, setFilter] = useState("pending");
   const [busyId, setBusyId] = useState<string | null>(null);
   const { sortState, handleSort, sortData } = useSortState("createdAt", "desc");
 
+  const queueComments = useMemo(
+    () =>
+      comments.filter((comment) =>
+        queue === "discussions"
+          ? isDiscussionSource(comment.source)
+          : !isDiscussionSource(comment.source),
+      ),
+    [comments, queue],
+  );
+
   const stats = useMemo(
     () => ({
-      total: comments.length,
-      pending: comments.filter((comment) => comment.status === "pending").length,
-      approved: comments.filter((comment) => comment.status === "approved").length,
-      rejected: comments.filter((comment) => comment.status === "flagged").length,
+      total: queueComments.length,
+      pending: queueComments.filter((comment) => comment.status === "pending").length,
+      approved: queueComments.filter((comment) => comment.status === "approved").length,
+      rejected: queueComments.filter((comment) => comment.status === "flagged").length,
     }),
-    [comments],
+    [queueComments],
   );
 
   const filteredComments = useMemo(
     () =>
       filter === "all"
-        ? comments
-        : comments.filter((comment) => comment.status === filter),
-    [comments, filter],
+        ? queueComments
+        : queueComments.filter((comment) => comment.status === filter),
+    [queueComments, filter],
   );
 
   const sortedComments = useMemo(
@@ -162,7 +184,7 @@ export default function CommentModerationPanel({
             : item,
         ),
       );
-      toast.success(action === "approve" ? "Comment approved." : "Comment rejected.");
+      toast.success(action === "approve" ? "Item approved." : "Item rejected.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Action failed.");
     } finally {
@@ -239,15 +261,26 @@ export default function CommentModerationPanel({
               fontFamily: "'Playfair Display', Georgia, serif",
             }}
           >
-            Comment Moderation
+            Community Moderation
           </h2>
           <p className="text-[13px] mt-0.5 text-gray-500 font-helvetica">
-            Review member comments before they appear in announcements and discussions.
+            Review member posts and comments before they appear in community spaces.
           </p>
         </div>
         <div className="rounded-xl border border-[#dbead6] bg-[#f6fbf3] px-4 py-2 text-[12px] font-medium text-[#27500A] font-helvetica">
-          Pending comments are hidden from the public feed.
+          Pending items are hidden from the public feed.
         </div>
+      </div>
+
+      <div className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
+        <FilterPills
+          options={QUEUE_OPTIONS}
+          activeValue={queue}
+          onChange={(value) => {
+            setQueue(value as ModerationQueue);
+            setFilter("pending");
+          }}
+        />
       </div>
 
       <div className="grid grid-cols-4 gap-3">
@@ -271,17 +304,17 @@ export default function CommentModerationPanel({
         emptyState={
           <div>
             <div className="text-[13px] mb-1 text-gray-500">
-              No comments in this queue.
+              No {queue === "discussions" ? "discussion" : "announcement"} items in this queue.
             </div>
             <div className="text-[12px] text-gray-400">
-              New member comments will appear here after submission.
+              New member {queue === "discussions" ? "posts and comments" : "announcement comments"} will appear here after submission.
             </div>
           </div>
         }
       >
         <TableHead>
           <TableHeader sortKey="parentTitle" sortState={sortState} onSort={handleSort}>
-            Comment
+            {queue === "discussions" ? "Discussion Item" : "Announcement Item"}
           </TableHeader>
           <TableHeader sortKey="authorName" sortState={sortState} onSort={handleSort}>
             Member

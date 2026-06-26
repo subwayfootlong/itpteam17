@@ -13,6 +13,8 @@ type BenefitRow = {
   discount_amount: string | number | null;
   address: string | null;
   description: string | null;
+  image_url: string | null;
+  logo_url: string | null;
   logo_initials: string | null;
   is_active: boolean | null;
   created_at: string | null;
@@ -127,6 +129,8 @@ function mapBenefit(row: BenefitRow, index: number): Partner {
       row.discount_description?.trim() ||
       "Present an active Pergas membership when redeeming. Merchant terms and availability may apply.",
     website: `https://www.google.com/search?q=${encodeURIComponent(name)}`,
+    imageUrl: row.image_url?.trim() || undefined,
+    logoUrl: row.logo_url?.trim() || undefined,
     featured: index < 2,
     mapPosition: hasPhysicalAddress
       ? hashToMapPosition(`${name}:${address}`)
@@ -138,7 +142,7 @@ export async function getActiveBenefitPartners(): Promise<Partner[]> {
   const { data, error } = await supabaseAdmin
     .from("benefits")
     .select(
-      "id, merchant_name, category, discount_description, discount_amount, address, description, logo_initials, is_active, created_at",
+      "id, merchant_name, category, discount_description, discount_amount, address, description, image_url, logo_url, logo_initials, is_active, created_at",
     )
     .eq("is_active", true)
     .order("merchant_name", { ascending: true });

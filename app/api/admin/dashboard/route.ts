@@ -44,11 +44,13 @@ function generateSparkline(dataDates: Date[], totalCurrentCount: number): string
 }
 
 export async function GET() {
-  const [members, events, announcements, benefits] = await Promise.all([
+  const [members, events, announcements, benefits, discussionPosts, discussionComments] = await Promise.all([
     supabaseAdmin.from('users').select('id, first_name, last_name, email, membership_status, created_at').neq('role', 'admin'),
     supabaseAdmin.from('events').select('id, title, status, event_date, created_at'),
     supabaseAdmin.from('announcements').select('id, title, status, created_at'),
     supabaseAdmin.from('benefits').select('id').eq('is_active', true),
+    supabaseAdmin.from('discussion').select('id, title, status, created_at, author_name'),
+    supabaseAdmin.from('discussion_comments').select('id, body, status, created_at, author_name'),
   ]);
 
   const allMembers = members.data ?? [];
@@ -61,6 +63,11 @@ export async function GET() {
   const upcomingEvents = (events.data ?? []).filter((e) => e.event_date >= todayStr).length;
   const publishedAnnouncementsList = (announcements.data ?? []).filter(a => a.status === 'published');
   const publishedAnnouncements = publishedAnnouncementsList.length;
+  const allDiscussionPosts = discussionPosts.data ?? [];
+  const allDiscussionComments = discussionComments.data ?? [];
+  const pendingCommunityItems =
+    allDiscussionPosts.filter((item) => item.status === 'pending').length +
+    allDiscussionComments.filter((item) => item.status === 'pending').length;
 
   // Calculate simple real trends (last 30 days vs prior)
   const thirtyDaysAgo = new Date();
@@ -68,6 +75,7 @@ export async function GET() {
   const newMembersCount = allMembers.filter(m => new Date(m.created_at) >= thirtyDaysAgo).length;
   const newEventsCount = (events.data ?? []).filter(e => new Date(e.created_at) >= thirtyDaysAgo).length;
   const newAnnouncementsCount = (announcements.data ?? []).filter(a => new Date(a.created_at) >= thirtyDaysAgo).length;
+  const newDiscussionCount = allDiscussionPosts.filter(p => new Date(p.created_at) >= thirtyDaysAgo).length;
 
   // Generate Real Sparklines
   const sparklines = {
@@ -92,6 +100,9 @@ export async function GET() {
   }
   if (expiredMembers > 0) {
     insights.push(`You have ${expiredMembers} expired members. Reach out to them via email to renew their memberships and retain your base.`);
+  }
+  if (pendingCommunityItems > 0) {
+    insights.push(`${pendingCommunityItems} community moderation item${pendingCommunityItems === 1 ? ' is' : 's are'} waiting for review.`);
   }
 
   let selectedInsight = "Your dashboard is looking good. Keep monitoring engagement metrics to ensure steady community growth.";
@@ -129,6 +140,15 @@ export async function GET() {
       author: 'Admin Team',
     });
   }
+  for (const post of allDiscussionPosts) {
+    activityList.push({
+      id: `d_${post.id}`,
+      message: `Discussion post "${post.title}" was submitted`,
+      createdAt: new Date(post.created_at),
+      type: 'discussion',
+      author: post.author_name || 'Member',
+    });
+  }
 
   activityList.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   const recentActivity = activityList.slice(0, 5).map(act => ({
@@ -147,11 +167,15 @@ export async function GET() {
       upcomingEvents,
       publishedAnnouncements,
       activePerks: (benefits.data ?? []).length,
+      discussionPosts: allDiscussionPosts.length,
+      pendingCommunityItems,
       trends: {
         totalMembers: `+${newMembersCount}`,
         activeMembers: `+${newMembersCount}`,
         upcomingEvents: `+${newEventsCount}`,
         publishedAnnouncements: `+${newAnnouncementsCount}`,
+        discussionPosts: `+${newDiscussionCount}`,
+        pendingCommunityItems: `${pendingCommunityItems}`,
       },
       sparklines,
       insight: selectedInsight

@@ -1,7 +1,16 @@
 import { NextResponse } from 'next/server';
 // AUTH: uncomment when ready
 // import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
+import { ADMIN_BENEFIT_SELECT } from '@/lib/adminBenefits';
 import { supabaseAdmin } from '@/lib/supabaseServer';
+
+function cleanPatchValue(value: unknown) {
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed === '' ? null : trimmed;
+  }
+  return value;
+}
 
 export async function GET(
   _req: Request,
@@ -12,7 +21,7 @@ export async function GET(
 
   const { id } = await params;
   const { data, error } = await supabaseAdmin
-    .from('benefits').select('*').eq('id', id).maybeSingle();
+    .from('benefits').select(ADMIN_BENEFIT_SELECT).eq('id', id).maybeSingle();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -27,18 +36,28 @@ export async function PATCH(
   // if (!admin) return unauthorizedResponse();
 
   const { id } = await params;
-  const body = await req.json();
+  let body: Record<string, unknown>;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
 
-  const allowed = ['merchant_name', 'category', 'discount_description', 'discount_amount', 'address', 'description', 'logo_initials', 'is_active'];
+  const allowed = ['merchant_name', 'category', 'discount_description', 'discount_amount', 'address', 'description', 'image_url', 'logo_url', 'logo_initials', 'is_active'];
   const updates: Record<string, unknown> = {};
   for (const key of allowed) {
-    if (key in body) updates[key] = body[key] === '' ? null : body[key];
+    if (key in body) updates[key] = cleanPatchValue(body[key]);
+  }
+
+  if (Object.keys(updates).length === 0) {
+    return NextResponse.json({ error: 'No benefit fields provided.' }, { status: 400 });
   }
 
   const { data, error } = await supabaseAdmin
-    .from('benefits').update(updates).eq('id', id).select().maybeSingle();
+    .from('benefits').update(updates).eq('id', id).select(ADMIN_BENEFIT_SELECT).maybeSingle();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json({ benefit: data });
 }
 

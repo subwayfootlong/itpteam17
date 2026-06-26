@@ -7,6 +7,7 @@ import { moderationStatus } from "@/lib/community";
 type ThreadRow = {
   id: string;
   group_id: string;
+  user_id: string | null;
   title: string;
   body: string;
   votes: number | null;
@@ -20,6 +21,11 @@ function makeTitle(body: string) {
   return body.length > 54 ? `${body.slice(0, 54)}...` : body;
 }
 
+function cleanTitle(title: unknown, body: string) {
+  const trimmedTitle = typeof title === "string" ? title.trim() : "";
+  return trimmedTitle || makeTitle(body);
+}
+
 export async function POST(req: Request) {
   try {
     const user = await getCurrentUser();
@@ -27,8 +33,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Please log in first" }, { status: 401 });
     }
 
-    const { groupId, body } = await req.json();
+    const { groupId, title, body } = await req.json();
     const trimmedBody = typeof body === "string" ? body.trim() : "";
+    const threadTitle = cleanTitle(title, trimmedBody);
 
     if (typeof groupId !== "string" || !trimmedBody) {
       return NextResponse.json(
@@ -38,18 +45,18 @@ export async function POST(req: Request) {
     }
 
     const { data, error } = await supabaseAdmin
-      .from("uc6_discussion_threads")
+      .from("discussion")
       .insert({
         group_id: groupId,
         user_id: user.id,
         author_name: user.fullName,
-        title: makeTitle(trimmedBody),
+        title: threadTitle,
         body: trimmedBody,
         votes: 0,
         has_image: false,
         status: moderationStatus(trimmedBody),
       })
-      .select("id, group_id, title, body, votes, status, has_image, created_at, author_name")
+      .select("id, group_id, user_id, title, body, votes, status, has_image, created_at, author_name")
       .single<ThreadRow>();
 
     if (error) {
