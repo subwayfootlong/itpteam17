@@ -366,9 +366,12 @@ export default function BenefitsDirectory({
   const visibleMapSelected =
     filteredPartners.find((partner) => partner.id === mapSelected?.id) ?? null;
   const hasBenefits = partners.length > 0;
+  const shellClassName = showChrome
+    ? "benefits-mobile-shell"
+    : "benefits-mobile-shell is-member-embedded";
 
   return (
-    <div className="benefits-mobile-shell">
+    <div className={shellClassName}>
       {showChrome && <BenefitsHeader initials={member.initials} />}
 
       <main className="benefits-mobile-main">

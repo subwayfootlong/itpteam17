@@ -5493,6 +5493,21 @@ a {
   box-shadow: none;
 }
 
+.benefits-mobile-shell.is-member-embedded {
+  width: 100%;
+  min-height: auto;
+  margin: 0;
+  padding-bottom: 0;
+  overflow: visible;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.benefits-mobile-shell.is-member-embedded .benefits-mobile-main {
+  width: 100%;
+  background: #ffffff;
+}
+
 .community-app-shell.is-member-embedded .community-main {
   width: 100%;
   padding-bottom: 0;
