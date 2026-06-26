@@ -112,12 +112,12 @@ const QUICK_ACTIONS = [
     ),
   },
   {
-    label: 'View Engagement',
+    label: 'Manage Benefits',
     href: '/admin/engagement',
     accent: '#1E9888',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 11.25v8.25A1.5 1.5 0 0119.5 21h-15A1.5 1.5 0 013 19.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V21m0-16.125A2.625 2.625 0 1114.625 7.5H12m0 0h8.25M3.75 7.5H12" />
       </svg>
     ),
   },
@@ -454,7 +454,7 @@ export default function AdminDashboard() {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-[12px] font-bold font-helvetica flex-shrink-0 transition-all hover:brightness-105 shadow-sm"
           style={{ background: '#3FAE2A', color: '#fff' }}
         >
-          View Report
+          Manage Benefits
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>

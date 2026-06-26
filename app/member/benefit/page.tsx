@@ -1,7 +1,7 @@
 import MemberPageShell from "@/components/member/MemberPageShell";
 import BenefitsDirectory from "@/components/member/BenefitsDirectory";
 import { getCurrentUser } from "@/lib/currentUser";
-import { membershipBenefits, partners } from "@/lib/data/partners";
+import { membershipBenefits, type Partner } from "@/lib/data/partners";
 import { getActiveBenefitPartners } from "@/lib/benefits";
 import { formatTierLabel } from "@/lib/membershipTiers";
 
@@ -9,15 +9,12 @@ export const dynamic = "force-dynamic";
 
 export default async function BenefitPage() {
   const user = await getCurrentUser();
-  let visiblePartners = partners;
+  let visiblePartners: Partner[] = [];
 
   try {
-    const adminPartners = await getActiveBenefitPartners();
-    if (adminPartners.length > 0) {
-      visiblePartners = adminPartners;
-    }
+    visiblePartners = await getActiveBenefitPartners();
   } catch (error) {
-    console.warn("Using benefit fallback data:", error);
+    console.warn("Unable to load benefit data:", error);
   }
 
   return (
