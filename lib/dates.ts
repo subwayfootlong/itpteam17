@@ -45,6 +45,55 @@ export function formatRelativeDate(value: string | null): string {
   });
 }
 
+export type ExpiryUrgency = "none" | "warning" | "critical" | "expired";
+
+export function getExpiryInfo(expiryDate: string | null | undefined): {
+  formatted: string;
+  daysLeft: number | null;
+  urgency: ExpiryUrgency;
+  relativeLabel: string;
+} {
+  if (!expiryDate) {
+    return { formatted: "—", daysLeft: null, urgency: "none", relativeLabel: "" };
+  }
+
+  const expiry = new Date(`${expiryDate}T00:00:00`);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const daysLeft = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+  const formatted = expiry.toLocaleDateString("en-SG", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+  if (daysLeft < 0) {
+    const daysAgo = Math.abs(daysLeft);
+    return {
+      formatted,
+      daysLeft,
+      urgency: "expired",
+      relativeLabel: `expired ${daysAgo}d ago`,
+    };
+  }
+  if (daysLeft === 0) {
+    return { formatted, daysLeft, urgency: "critical", relativeLabel: "expires today" };
+  }
+  if (daysLeft <= 7) {
+    return {
+      formatted,
+      daysLeft,
+      urgency: "critical",
+      relativeLabel: `in ${daysLeft} day${daysLeft === 1 ? "" : "s"}`,
+    };
+  }
+  if (daysLeft <= 30) {
+    return { formatted, daysLeft, urgency: "warning", relativeLabel: `in ${daysLeft} days` };
+  }
+  return { formatted, daysLeft, urgency: "none", relativeLabel: `in ${daysLeft} days` };
+}
+
 export function timeAgo(dateInput: string | Date): string {
   const date = new Date(dateInput);
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);

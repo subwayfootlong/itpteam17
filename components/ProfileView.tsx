@@ -17,6 +17,7 @@ import {
   LogOut,
   Percent,
   Settings,
+  ShieldCheck,
   Star,
   Truck,
   Users,
@@ -432,6 +433,16 @@ export default function ProfileView({ member }: { member: MemberProfile }) {
               Log Out
             </button>
           </div>
+
+          {member.role === "admin" ? (
+            <Link
+              href="/admin"
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-[#0F6E00] bg-[#0F6E00] py-4 font-medium text-white"
+            >
+              <ShieldCheck size={18} />
+              Admin Portal
+            </Link>
+          ) : null}
     </div>
   );
 }

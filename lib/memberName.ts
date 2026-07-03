@@ -1,7 +1,10 @@
+import { formatSalutationLabel } from "./memberProfileOptions";
+
 export type MemberNameFields = {
   first_name?: string | null;
   last_name?: string | null;
   email?: string | null;
+  salutation?: string | null;
 };
 
 export function formatMemberName(
@@ -16,6 +19,16 @@ export function formatMemberName(
   if (name) return name;
   if (member.email?.trim()) return member.email.trim();
   return fallback;
+}
+
+export function formatMemberDisplayName(
+  member: MemberNameFields,
+  fallback = "Member"
+): string {
+  const name = formatMemberName(member, fallback);
+  const salutation = formatSalutationLabel(member.salutation);
+  if (salutation && name !== fallback) return `${salutation} ${name}`;
+  return name;
 }
 
 export function memberNameInitial(member: MemberNameFields): string {

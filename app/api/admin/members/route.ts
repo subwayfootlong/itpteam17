@@ -13,7 +13,7 @@ export async function GET(req: Request) {
 
   let query = supabaseAdmin
     .from('users')
-    .select('id, first_name, last_name, email, member_id, membership_tier, membership_status, expiry_date, phone, organization, designation, created_at')
+    .select('id, first_name, last_name, salutation, email, member_id, membership_tier, membership_status, expiry_date, phone, organization, designation, ars_status, member_since, created_at')
     .neq('role', 'admin')
     .order('created_at', { ascending: false });
 
