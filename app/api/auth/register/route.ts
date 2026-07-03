@@ -5,13 +5,16 @@ import { getErrorMessage } from '@/lib/errors';
 import { setLastActivityCookie } from '@/lib/session';
 import { DEFAULT_TIER } from '@/lib/membershipTiers';
 import { formatStoredPhone, isAcceptablePhoneNumber, getPhoneValidationMessage } from '@/lib/phone';
+import { isValidArsStatus, isValidSalutation } from '@/lib/memberProfileOptions';
 
 type RegistrationPayload = {
+  salutation?: string;
   firstName?: string;
   lastName?: string;
   email?: string;
   organization?: string;
   designation?: string;
+  arsStatus?: string;
   phone?: string;
   password?: string;
 };
@@ -19,11 +22,13 @@ type RegistrationPayload = {
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as RegistrationPayload;
+    const salutation = body.salutation?.trim() ?? '';
     const firstName = body.firstName?.trim() ?? '';
     const lastName = body.lastName?.trim() ?? '';
     const email = body.email?.trim() ?? '';
     const organization = body.organization?.trim() ?? '';
     const designation = body.designation?.trim() ?? '';
+    const arsStatus = body.arsStatus?.trim() ?? '';
     const phoneInput = body.phone?.trim() ?? '';
     const password = body.password ?? '';
 
@@ -32,10 +37,12 @@ export async function POST(req: Request) {
     }
 
     const missingFields: string[] = [];
+    if (!salutation) missingFields.push('salutation');
     if (!firstName) missingFields.push('first name');
     if (!lastName) missingFields.push('last name');
     if (!organization) missingFields.push('organization');
     if (!designation) missingFields.push('designation');
+    if (!arsStatus) missingFields.push('ARS status');
     if (!phoneInput) missingFields.push('telephone number');
 
     if (missingFields.length > 0) {
@@ -43,6 +50,14 @@ export async function POST(req: Request) {
         { error: `Missing required fields: ${missingFields.join(', ')}` },
         { status: 400 }
       );
+    }
+
+    if (!isValidSalutation(salutation)) {
+      return NextResponse.json({ error: 'Invalid salutation' }, { status: 400 });
+    }
+
+    if (!isValidArsStatus(arsStatus)) {
+      return NextResponse.json({ error: 'Invalid ARS status' }, { status: 400 });
     }
 
     if (!isAcceptablePhoneNumber(phoneInput)) {
@@ -77,11 +92,13 @@ export async function POST(req: Request) {
     const { data, error } = await supabaseAdmin
       .from('users')
       .insert({
+        salutation,
         first_name: firstName,
         last_name: lastName,
         email,
         organization,
         designation,
+        ars_status: arsStatus,
         phone,
         password_hash,
         role: 'member',

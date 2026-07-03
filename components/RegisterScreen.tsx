@@ -3,11 +3,13 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Input from '@/components/ui/Input';
+import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
 import { postJson } from '@/lib/api';
 import PhoneInputField from '@/components/ui/PhoneInput';
 import { getErrorMessage } from '@/lib/errors';
+import { ARS_STATUSES, SALUTATIONS } from '@/lib/memberProfileOptions';
 
 interface RegisterScreenProps {
   onRegisterSuccess?: () => void;
@@ -15,11 +17,13 @@ interface RegisterScreenProps {
 }
 
 const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegisterSuccess, onBackToLogin }) => {
+  const [salutation, setSalutation] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [organization, setOrganization] = useState('');
   const [designation, setDesignation] = useState('');
+  const [arsStatus, setArsStatus] = useState('no');
   const [phone, setPhone] = useState<string | undefined>();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -41,11 +45,13 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegisterSuccess, onBa
 
     try {
       await postJson('/api/auth/register', {
+        salutation,
         firstName,
         lastName,
         email,
         organization,
         designation,
+        arsStatus,
         phone,
         password,
       });
@@ -80,6 +86,15 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegisterSuccess, onBa
         </div>
 
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-5">
+          <Select
+            label="Salutation"
+            value={salutation}
+            onChange={(e) => setSalutation(e.target.value)}
+            options={SALUTATIONS}
+            placeholder="Select salutation"
+            required
+          />
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <Input
               label="First Name"
@@ -123,6 +138,14 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegisterSuccess, onBa
             value={designation}
             onChange={(e) => setDesignation(e.target.value)}
             placeholder="Your role or title"
+            required
+          />
+
+          <Select
+            label="Asatizah Recognition Scheme (ARS) Status"
+            value={arsStatus}
+            onChange={(e) => setArsStatus(e.target.value)}
+            options={ARS_STATUSES}
             required
           />
 
