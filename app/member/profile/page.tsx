@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 
 export type MemberProfile = {
   id: string;
+  salutation: string | null;
   first_name: string | null;
   last_name: string | null;
   email: string;
@@ -32,7 +33,7 @@ export default async function ProfilePage() {
   const { data: member, error } = await supabaseAdmin
     .from("users")
     .select(
-      "id, first_name, last_name, email, role, member_id, membership_tier, membership_status, expiry_date, phone, organization, designation, arabic_name, member_since",
+      "id, salutation, first_name, last_name, email, role, member_id, membership_tier, membership_status, expiry_date, phone, organization, designation, arabic_name, member_since",
     )
     .eq("id", currentUser.id)
     .single();

@@ -300,13 +300,13 @@ export default function ProfileView({ member }: { member: MemberProfile }) {
                   </div>
                 </div>
 
-                <button
-                  type="button"
+                <Link
+                  href="/member/profile/edit"
                   className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#9B6500] py-3 font-medium text-[#9B6500]"
                 >
                   <Edit3 size={18} />
                   Edit Profile
-                </button>
+                </Link>
               </div>
             </div>
           </section>
