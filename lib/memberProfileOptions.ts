@@ -12,6 +12,11 @@ export const ARS_STATUSES = [
   { value: 'expired', label: 'Expired' },
 ] as const;
 
+export const ARS_CERTIFIED_STATUSES = [
+  { value: 'pending', label: 'Pending' },
+  { value: 'active', label: 'Active' },
+] as const;
+
 export type Salutation = (typeof SALUTATIONS)[number]['value'];
 export type ArsStatus = (typeof ARS_STATUSES)[number]['value'];
 

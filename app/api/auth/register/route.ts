@@ -11,6 +11,7 @@ type RegistrationPayload = {
   salutation?: string;
   firstName?: string;
   lastName?: string;
+  arabicName?: string;
   email?: string;
   organization?: string;
   designation?: string;
@@ -25,6 +26,7 @@ export async function POST(req: Request) {
     const salutation = body.salutation?.trim() ?? '';
     const firstName = body.firstName?.trim() ?? '';
     const lastName = body.lastName?.trim() ?? '';
+    const arabicName = body.arabicName?.trim() ?? '';
     const email = body.email?.trim() ?? '';
     const organization = body.organization?.trim() ?? '';
     const designation = body.designation?.trim() ?? '';
@@ -39,7 +41,6 @@ export async function POST(req: Request) {
     const missingFields: string[] = [];
     if (!salutation) missingFields.push('salutation');
     if (!firstName) missingFields.push('first name');
-    if (!lastName) missingFields.push('last name');
     if (!organization) missingFields.push('organization');
     if (!designation) missingFields.push('designation');
     if (!arsStatus) missingFields.push('ARS status');
@@ -94,7 +95,8 @@ export async function POST(req: Request) {
       .insert({
         salutation,
         first_name: firstName,
-        last_name: lastName,
+        last_name: lastName || null,
+        arabic_name: arabicName || null,
         email,
         organization,
         designation,
