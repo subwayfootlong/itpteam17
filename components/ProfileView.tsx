@@ -237,14 +237,43 @@ export default function ProfileView({ member }: { member: MemberProfile }) {
             </h2>
 
             <div className="mt-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-              <div className="space-y-5">
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>
                   <p className="text-sm font-semibold uppercase text-[#5F5E5E]">
-                    Full Name
+                    Salutation
                   </p>
                   <p className="mt-1 text-[#151C27]">
-                    {formatMemberName(member, "Member Name")}
+                    {member.salutation || "Not available"}
                   </p>
+                </div>
+
+                <div>
+                  <p className="text-sm font-semibold uppercase text-[#5F5E5E]">
+                    Arabic Name
+                  </p>
+                  <p className="mt-1 text-[#151C27]">
+                    {member.arabic_name || "Not available"}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-5 sm:col-span-2">
+                  <div>
+                    <p className="text-sm font-semibold uppercase text-[#5F5E5E]">
+                      First Name
+                    </p>
+                    <p className="mt-1 text-[#151C27]">
+                      {member.first_name || "Not available"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-semibold uppercase text-[#5F5E5E]">
+                      Last Name
+                    </p>
+                    <p className="mt-1 text-[#151C27]">
+                      {member.last_name || "Not available"}
+                    </p>
+                  </div>
                 </div>
 
                 <div>
@@ -280,8 +309,9 @@ export default function ProfileView({ member }: { member: MemberProfile }) {
                     {member.phone || "Not available"}
                   </p>
                 </div>
+              </div>
 
-                <div className="grid grid-cols-2 border-t border-gray-200 pt-4">
+              <div className="mt-5 grid grid-cols-2 border-t border-gray-200 pt-4">
                   <div>
                     <p className="text-sm font-semibold uppercase text-[#5F5E5E]">
                       Member Since
@@ -299,16 +329,15 @@ export default function ProfileView({ member }: { member: MemberProfile }) {
                       {formatMemberDate(member.expiry_date)}
                     </p>
                   </div>
-                </div>
-
-                <Link
-                  href="/member/profile/edit"
-                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#9B6500] py-3 font-medium text-[#9B6500]"
-                >
-                  <Edit3 size={18} />
-                  Edit Profile
-                </Link>
               </div>
+
+              <Link
+                href="/member/profile/edit"
+                className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-[#9B6500] py-3 font-medium text-[#9B6500]"
+              >
+                <Edit3 size={18} />
+                Edit Profile
+              </Link>
             </div>
           </section>
 
