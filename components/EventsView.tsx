@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Clock, MapPin } from "lucide-react";
 import type { EventRow } from "@/app/member/events/page";
 
@@ -118,6 +119,29 @@ function buildCalendarDays(currentMonth: Date) {
 
 export default function EventsView({ events, hasError }: EventsViewProps) {
   const today = new Date();
+  const router = useRouter();
+  const [registeringId, setRegisteringId] = useState<string | null>(null);
+
+  const handleInAppRegister = async (eventId: string) => {
+    setRegisteringId(eventId);
+    try {
+      const res = await fetch('/api/events/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventId }),
+      });
+      if (res.ok) {
+        router.refresh();
+      } else {
+        const d = await res.json();
+        alert(d.error || 'Failed to register');
+      }
+    } catch {
+      alert('Network error. Please try again.');
+    } finally {
+      setRegisteringId(null);
+    }
+  };
 
   const [currentMonth, setCurrentMonth] = useState(
     new Date(today.getFullYear(), today.getMonth(), 1)
@@ -286,22 +310,51 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
                     </p>
                   </div>
 
-                  {!isFull && hasRsvpLink ? (
+                  {hasRsvpLink ? (
                     <a
                       href={event.external_rsvp_url!.trim()}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-auto block rounded-xl bg-[#0F6E00] py-4 text-center font-semibold text-white"
+                      className="mt-auto block rounded-xl bg-[#0F6E00] hover:bg-[#0c5900] py-4 text-center font-semibold text-white transition-colors"
                     >
-                      {buttonLabel}
+                      Register (External)
                     </a>
-                  ) : (
+                  ) : event.isRegistered ? (
                     <button
                       type="button"
                       disabled
-                      className="mt-auto w-full rounded-xl border border-[#5F5E5E] py-4 font-semibold text-[#151C27]"
+                      className="mt-auto w-full rounded-xl bg-green-50 border border-green-200 py-4 font-semibold text-green-700 flex items-center justify-center gap-1.5"
                     >
-                      {buttonLabel}
+                      <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      </svg>
+                      Registered
+                    </button>
+                  ) : event.isRejected ? (
+                    <button
+                      type="button"
+                      disabled={registeringId === event.id}
+                      onClick={() => handleInAppRegister(event.id)}
+                      className="mt-auto w-full rounded-xl bg-[#0F6E00] hover:bg-[#0c5900] py-4 font-semibold text-white transition-colors"
+                    >
+                      {registeringId === event.id ? 'Processing...' : 'Reapply'}
+                    </button>
+                  ) : isFull ? (
+                    <button
+                      type="button"
+                      disabled
+                      className="mt-auto w-full rounded-xl border border-gray-300 bg-gray-50 py-4 font-semibold text-gray-400"
+                    >
+                      Full
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={registeringId === event.id}
+                      onClick={() => handleInAppRegister(event.id)}
+                      className="mt-auto w-full rounded-xl bg-[#0F6E00] hover:bg-[#0c5900] py-4 font-semibold text-white transition-colors"
+                    >
+                      {registeringId === event.id ? 'Processing...' : 'Register'}
                     </button>
                   )}
                 </div>

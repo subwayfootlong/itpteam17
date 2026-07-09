@@ -6,6 +6,7 @@ import type { EventRow } from "@/app/member/events/page";
 import { getCurrentUser } from "@/lib/currentUser";
 import { formatMemberDate } from "@/lib/dates";
 import { supabaseAdmin } from "@/lib/supabaseServer";
+import EventRsvpSection from "@/components/member/EventRsvpSection";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +43,14 @@ export default async function EventDetailsPage({
 
   const eventRecord = event as EventRow;
 
+  // Fetch current user's registration for this event
+  const { data: registration } = await supabaseAdmin
+    .from("event_registrations")
+    .select("id, status, rejection_message")
+    .eq("event_id", id)
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+
   // Track event details view in database
   await supabaseAdmin.from("analytics_events").insert({
     user_id: currentUser.id,
@@ -51,9 +60,7 @@ export default async function EventDetailsPage({
     metadata: { title: eventRecord.title, category: eventRecord.category || "General" }
   });
 
-  const hasRsvpLink = Boolean(eventRecord.external_rsvp_url?.trim());
   const isFull = eventRecord.spots_available !== null && eventRecord.spots_available <= 0;
-  const registerLabel = isFull ? "Full" : hasRsvpLink ? "Register" : "Unavailable";
 
   return (
     <MemberPageShell showTopBar={false}>
@@ -155,24 +162,12 @@ export default async function EventDetailsPage({
               </div>
             </div>
 
-            {!isFull && hasRsvpLink ? (
-              <a
-                href={`/api/events/rsvp?eventId=${eventRecord.id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block rounded-2xl bg-[#0F6E00] px-5 py-4 text-center text-base font-semibold text-white"
-              >
-                {registerLabel}
-              </a>
-            ) : (
-              <button
-                type="button"
-                disabled
-                className="w-full rounded-2xl border border-[#5F5E5E] px-5 py-4 text-base font-semibold text-[#151C27]"
-              >
-                {registerLabel}
-              </button>
-            )}
+            <EventRsvpSection
+              eventId={eventRecord.id}
+              initialRegistration={registration}
+              externalRsvpUrl={eventRecord.external_rsvp_url}
+              isFull={isFull}
+            />
           </div>
         </article>
       </div>
