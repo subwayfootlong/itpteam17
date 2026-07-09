@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import type { Announcement, CommunityComment } from "@/lib/data/announcements";
 import type {
   DiscussionGroup,
@@ -39,9 +39,24 @@ export default function AnnouncementsEngagement({
   initialGroupId?: DiscussionGroupId | null;
 }) {
   const [activeTab, setActiveTab] = useState<CommunityTab>(initialTab);
-  const [selectedAnnouncementId, setSelectedAnnouncementId] = useState<
+  const [selectedAnnouncementId, setSelectedAnnouncementIdState] = useState<
     string | null
   >(null);
+
+  const setSelectedAnnouncementId = useCallback((id: string | null) => {
+    setSelectedAnnouncementIdState(id);
+    if (id) {
+      fetch("/api/analytics/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventType: "announcement_view",
+          targetId: id,
+          category: "announcement",
+        }),
+      }).catch((err) => console.warn("Failed tracking announcement view", err));
+    }
+  }, []);
   const [selectedGroupId, setSelectedGroupId] =
     useState<DiscussionGroupId | null>(initialGroupId);
   const [threads] = useState(initialThreads);
