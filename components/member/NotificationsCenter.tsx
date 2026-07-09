@@ -1,18 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type {
   NotificationType,
   SystemNotification,
 } from "@/lib/data/system-notifications";
+import type { NotificationPreferences } from "@/lib/notifications";
 import MemberIcon from "@/components/member/MemberIcon";
 import MemberBottomNav from "@/components/MemberBottomNav";
 
 type Filter = "All" | "Unread" | NotificationType;
-type PreferenceKey = "renewal" | "event" | "system";
+type PreferenceKey = "benefit" | "announcement" | "event";
 
-const filters: Filter[] = ["All", "Unread", "Renewal", "Event", "System"];
+const filters: Filter[] = [
+  "All",
+  "Unread",
+  "Benefit",
+  "Announcement",
+  "Event",
+  "System",
+];
 
 const preferenceCopy: {
   key: PreferenceKey;
@@ -20,36 +28,21 @@ const preferenceCopy: {
   description: string;
 }[] = [
   {
-    key: "renewal",
-    title: "Renewal reminders",
-    description: "Membership expiry and renewal deadlines",
+    key: "benefit",
+    title: "Benefit updates",
+    description: "New and updated member rewards",
+  },
+  {
+    key: "announcement",
+    title: "Announcements",
+    description: "Official Pergas updates",
   },
   {
     key: "event",
     title: "Event updates",
     description: "Registration windows and event reminders",
   },
-  {
-    key: "system",
-    title: "System notices",
-    description: "Comments, account and platform updates",
-  },
 ];
-
-function nextNotification(id: number): SystemNotification {
-  return {
-    id,
-    type: "Event",
-    priority: "Medium",
-    title: "Test event reminder received",
-    message:
-      "This test alert simulates the Notification Engine sending an automated event update to the member.",
-    timestamp: "Just now",
-    actionLabel: "View event",
-    actionHref: "#event",
-    isRead: false,
-  };
-}
 
 function NotificationHeader({ unreadCount }: { unreadCount: number }) {
   return (
@@ -73,7 +66,15 @@ function NotificationHeader({ unreadCount }: { unreadCount: number }) {
 
 function NotificationIcon({ type }: { type: NotificationType }) {
   const icon =
-    type === "Renewal" ? "clock" : type === "System" ? "shield" : "bell";
+    type === "Benefit"
+      ? "card"
+      : type === "Announcement"
+        ? "verified"
+        : type === "Event"
+          ? "calendar"
+          : type === "Renewal"
+            ? "clock"
+            : "shield";
 
   return (
     <span className={`notifications-type-icon is-${type.toLowerCase()}`}>
@@ -84,22 +85,30 @@ function NotificationIcon({ type }: { type: NotificationType }) {
 
 export default function NotificationsCenter({
   initialNotifications,
+  initialPreferences,
   showChrome = true,
 }: {
   initialNotifications: SystemNotification[];
+  initialPreferences: NotificationPreferences;
   showChrome?: boolean;
 }) {
   const [notifications, setNotifications] = useState(initialNotifications);
   const [filter, setFilter] = useState<Filter>("All");
   const [query, setQuery] = useState("");
   const [toast, setToast] = useState("");
-  const [preferences, setPreferences] = useState<Record<PreferenceKey, boolean>>({
-    renewal: true,
-    event: true,
-    system: true,
-  });
+  const [preferences, setPreferences] =
+    useState<NotificationPreferences>(initialPreferences);
 
   const unreadCount = notifications.filter((item) => !item.isRead).length;
+  const readCount = notifications.length - unreadCount;
+
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent("notifications:unread-count", {
+        detail: { unreadCount },
+      }),
+    );
+  }, [unreadCount]);
 
   const filteredNotifications = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -122,40 +131,110 @@ export default function NotificationsCenter({
     });
   }, [filter, notifications, query]);
 
-  const markAllRead = () => {
+  const markAllRead = async () => {
+    const previous = notifications;
     setNotifications((current) =>
       current.map((notification) => ({ ...notification, isRead: true })),
     );
+
+    try {
+      const response = await fetch("/api/member/notifications", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "mark-all-read" }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Unable to mark notifications as read.");
+      }
+    } catch (error) {
+      setNotifications(previous);
+      setToast(error instanceof Error ? error.message : "Action failed.");
+    }
   };
 
-  const clearRead = () => {
+  const clearRead = async () => {
+    const previous = notifications;
     setNotifications((current) =>
       current.filter((notification) => !notification.isRead),
     );
+
+    try {
+      const response = await fetch("/api/member/notifications", {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Unable to clear read notifications.");
+      }
+    } catch (error) {
+      setNotifications(previous);
+      setToast(error instanceof Error ? error.message : "Action failed.");
+    }
   };
 
-  const toggleRead = (id: number) => {
+  const toggleRead = async (id: string) => {
+    const notification = notifications.find((item) => item.id === id);
+    if (!notification) return;
+
+    const nextReadState = !notification.isRead;
+    const previous = notifications;
+
     setNotifications((current) =>
       current.map((notification) =>
         notification.id === id
-          ? { ...notification, isRead: !notification.isRead }
+          ? { ...notification, isRead: nextReadState }
           : notification,
       ),
     );
-  };
 
-  const togglePreference = (key: PreferenceKey) => {
-    setPreferences((current) => ({ ...current, [key]: !current[key] }));
-  };
+    try {
+      const response = await fetch("/api/member/notifications", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, isRead: nextReadState }),
+      });
 
-  const sendTestAlert = () => {
-    if (!preferences.event) {
-      setToast("Event alerts are turned off. Enable them to receive updates.");
-      return;
+      if (!response.ok) {
+        throw new Error("Unable to update notification.");
+      }
+    } catch (error) {
+      setNotifications(previous);
+      setToast(error instanceof Error ? error.message : "Action failed.");
     }
+  };
 
-    setNotifications((current) => [nextNotification(Date.now()), ...current]);
-    setToast("Test event update delivered to your notification inbox.");
+  const togglePreference = async (key: PreferenceKey) => {
+    const copy = preferenceCopy.find((item) => item.key === key);
+    const previous = preferences;
+    const nextValue = !preferences[key];
+    const next = { ...preferences, [key]: nextValue };
+
+    setPreferences(next);
+
+    try {
+      const response = await fetch("/api/member/notification-preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [key]: nextValue }),
+      });
+      const result = (await response.json().catch(() => ({}))) as {
+        preferences?: NotificationPreferences;
+        error?: string;
+      };
+
+      if (!response.ok || !result.preferences) {
+        throw new Error(result.error ?? "Unable to save alert preference.");
+      }
+
+      setPreferences(result.preferences);
+      setToast(
+        `${copy?.title ?? "Alert preference"} ${nextValue ? "enabled" : "disabled"}.`,
+      );
+    } catch (error) {
+      setPreferences(previous);
+      setToast(error instanceof Error ? error.message : "Action failed.");
+    }
   };
 
   return (
@@ -168,12 +247,12 @@ export default function NotificationsCenter({
             <h2>Notifications</h2>
             <p>{unreadCount} unread updates</p>
           </div>
-          <div>
+          <div className="notifications-actions-row">
             <button type="button" onClick={markAllRead} disabled={unreadCount === 0}>
               Mark All Read
             </button>
-            <button type="button" onClick={clearRead}>
-              Clear Read
+            <button type="button" onClick={clearRead} disabled={readCount === 0}>
+              Delete Read
             </button>
           </div>
         </section>
@@ -214,12 +293,9 @@ export default function NotificationsCenter({
         <section className="notifications-summary-card">
           <div>
             <span>{unreadCount}</span>
-            <strong>new unread updates</strong>
+            <strong>Unread updates</strong>
           </div>
-          <button type="button" onClick={sendTestAlert}>
-            Test Alert
-            <MemberIcon name="refresh" size={15} />
-          </button>
+          <p>New benefits, announcements, and event updates from Pergas admins.</p>
         </section>
 
         <section className="notifications-preferences-card">
@@ -289,7 +365,7 @@ export default function NotificationsCenter({
             <div className="notifications-empty-state">
               <MemberIcon name="bell" size={30} />
               <h3>No notifications found</h3>
-              <p>Try another filter or send a test alert.</p>
+              <p>New benefits, announcements, and event updates will appear here.</p>
             </div>
           )}
         </section>

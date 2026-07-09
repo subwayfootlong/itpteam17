@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 // AUTH: uncomment when ready
 // import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { ADMIN_BENEFIT_SELECT } from '@/lib/adminBenefits';
+import { notifyBenefitAvailable } from '@/lib/notifications';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 
 function cleanPatchValue(value: unknown) {
@@ -53,11 +54,25 @@ export async function PATCH(
     return NextResponse.json({ error: 'No benefit fields provided.' }, { status: 400 });
   }
 
+  const { data: existing } = await supabaseAdmin
+    .from('benefits')
+    .select('is_active')
+    .eq('id', id)
+    .maybeSingle<{ is_active: boolean | null }>();
+
   const { data, error } = await supabaseAdmin
     .from('benefits').update(updates).eq('id', id).select(ADMIN_BENEFIT_SELECT).maybeSingle();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  if (data.is_active && !existing?.is_active) {
+    await notifyBenefitAvailable({
+      id: String(data.id),
+      merchantName: data.merchant_name,
+      offer: data.discount_description,
+    });
+  }
+
   return NextResponse.json({ benefit: data });
 }
 

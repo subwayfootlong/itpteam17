@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 // AUTH: uncomment these two lines when you add JWT auth
 // import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
+import { notifyEventPublished } from '@/lib/notifications';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 
 export const dynamic = 'force-dynamic';
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
   let body;
   try {
     body = await req.json();
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
   }
 
@@ -70,5 +71,13 @@ export async function POST(req: Request) {
     console.error('Events POST Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+  if (data?.status === 'published') {
+    await notifyEventPublished({
+      id: String(data.id),
+      title: data.title,
+      eventDate: data.event_date,
+    });
+  }
+
   return NextResponse.json({ event: data }, { status: 201 });
 }

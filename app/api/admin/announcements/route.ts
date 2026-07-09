@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 // AUTH: uncomment when ready
 // import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
+import { notifyAnnouncementPublished } from '@/lib/notifications';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 
 export async function GET(req: Request) {
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
   let body;
   try {
     body = await req.json();
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
   }
 
@@ -60,5 +61,12 @@ export async function POST(req: Request) {
     console.error('Announcements POST Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+  if (data?.status === 'published') {
+    await notifyAnnouncementPublished({
+      id: String(data.id),
+      title: data.title,
+    });
+  }
+
   return NextResponse.json({ announcement: data }, { status: 201 });
 }

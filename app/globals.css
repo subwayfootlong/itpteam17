@@ -4953,11 +4953,11 @@ a {
   position: absolute;
   top: 8px;
   right: 8px;
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border: 2px solid white;
   border-radius: 50%;
-  background: #31ae22;
+  background: #d92d20;
 }
 
 .notifications-mobile-main {
@@ -4993,9 +4993,17 @@ a {
   gap: 7px;
 }
 
+.notifications-title-row .notifications-actions-row {
+  flex: 0 0 auto;
+  align-items: flex-end;
+}
+
 .notifications-title-row button {
-  border: 0;
-  background: transparent;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid #dbead6;
+  border-radius: 999px;
+  background: #ffffff;
   color: #087100;
   cursor: pointer;
   font-size: 12px;
@@ -5006,6 +5014,7 @@ a {
 .notifications-title-row button:disabled {
   color: #a6afa8;
   cursor: not-allowed;
+  background: #f5f7f4;
 }
 
 .notifications-search {
@@ -5052,16 +5061,24 @@ a {
 .notifications-filter-tabs {
   display: flex;
   margin-top: 18px;
-  padding: 5px;
-  gap: 4px;
+  padding: 4px;
+  gap: 6px;
   overflow-x: auto;
-  border-radius: 999px;
-  background: #e8eddf;
+  overscroll-behavior-inline: contain;
+  border: 1px solid #dfe7dc;
+  border-radius: 18px;
+  background: #f6f8f4;
+  scrollbar-color: #8ecf82 transparent;
+  scrollbar-width: thin;
+  scroll-padding-inline: 4px;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
 }
 
 .notifications-filter-tabs button {
-  min-height: 38px;
-  padding: 0 14px;
+  min-height: 36px;
+  padding: 0 13px;
+  flex: 0 0 auto;
   border: 0;
   border-radius: 999px;
   background: transparent;
@@ -5069,6 +5086,7 @@ a {
   cursor: pointer;
   font-size: 13px;
   font-weight: 800;
+  scroll-snap-align: start;
   white-space: nowrap;
 }
 
@@ -5088,31 +5106,42 @@ a {
 }
 
 .notifications-summary-card {
-  display: flex;
+  display: grid;
   margin-top: 18px;
   padding: 18px;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  gap: 14px;
   background: linear-gradient(135deg, #eff9ec, white);
 }
 
 .notifications-summary-card span {
   display: inline-grid;
-  width: 34px;
-  height: 34px;
-  margin-right: 9px;
+  width: 48px;
+  height: 48px;
   place-items: center;
   border-radius: 50%;
   background: #31ae22;
   color: white;
+  font-size: 20px;
   font-weight: 900;
 }
 
 .notifications-summary-card strong {
+  display: block;
+  margin-top: 8px;
   color: #31ae22;
-  font-size: 15px;
+  font-size: 13px;
+  line-height: 1.25;
   text-transform: uppercase;
+}
+
+.notifications-summary-card p {
+  margin: 0;
+  color: #4d584f;
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: left;
 }
 
 .notifications-summary-card button {
@@ -5257,6 +5286,16 @@ a {
 .notifications-type-icon.is-event {
   background: #fff0d6;
   color: #9b6908;
+}
+
+.notifications-type-icon.is-benefit {
+  background: #e8f5e3;
+  color: #087100;
+}
+
+.notifications-type-icon.is-announcement {
+  background: #edf7ff;
+  color: #196a8f;
 }
 
 .notifications-type-icon.is-system {
@@ -5455,19 +5494,15 @@ a {
 }
 
 .notifications-filter-tabs {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  overflow: hidden;
+  display: flex;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .notifications-filter-tabs button {
-  min-width: 0;
-  padding: 0 6px;
+  min-width: max-content;
+  padding: 0 13px;
   font-size: 12px;
-}
-
-.notifications-filter-tabs button:last-child {
-  font-size: 11px;
 }
 
 .benefits-filter-tabs,
@@ -5478,9 +5513,21 @@ a {
 
 .benefits-filter-tabs::-webkit-scrollbar,
 .benefits-view-toggle::-webkit-scrollbar,
-.community-tabs::-webkit-scrollbar,
-.notifications-filter-tabs::-webkit-scrollbar {
+.community-tabs::-webkit-scrollbar {
   display: none;
+}
+
+.notifications-filter-tabs::-webkit-scrollbar {
+  height: 5px;
+}
+
+.notifications-filter-tabs::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.notifications-filter-tabs::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #8ecf82;
 }
 
 .community-app-shell.is-member-embedded {
