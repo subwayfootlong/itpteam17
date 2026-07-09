@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type {
   NotificationType,
   SystemNotification,
@@ -98,6 +98,7 @@ export default function NotificationsCenter({
   const [toast, setToast] = useState("");
   const [preferences, setPreferences] =
     useState<NotificationPreferences>(initialPreferences);
+  const filterScrollerRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifications.filter((item) => !item.isRead).length;
   const readCount = notifications.length - unreadCount;
@@ -237,6 +238,13 @@ export default function NotificationsCenter({
     }
   };
 
+  const scrollFilters = (direction: "left" | "right") => {
+    filterScrollerRef.current?.scrollBy({
+      left: direction === "left" ? -150 : 150,
+      behavior: "smooth",
+    });
+  };
+
   return (
     <div className="notifications-mobile-shell">
       {showChrome && <NotificationHeader unreadCount={unreadCount} />}
@@ -277,17 +285,39 @@ export default function NotificationsCenter({
           )}
         </label>
 
-        <div className="notifications-filter-tabs" aria-label="Notification filters">
-          {filters.map((item) => (
-            <button
-              key={item}
-              className={filter === item ? "is-active" : ""}
-              type="button"
-              onClick={() => setFilter(item)}
-            >
-              {item}
-            </button>
-          ))}
+        <div className="notifications-filter-shell">
+          <button
+            className="notifications-filter-control"
+            type="button"
+            onClick={() => scrollFilters("left")}
+            aria-label="Scroll notification filters left"
+          >
+            <MemberIcon name="back" size={17} />
+          </button>
+          <div
+            className="notifications-filter-tabs"
+            ref={filterScrollerRef}
+            aria-label="Notification filters"
+          >
+            {filters.map((item) => (
+              <button
+                key={item}
+                className={filter === item ? "is-active" : ""}
+                type="button"
+                onClick={() => setFilter(item)}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+          <button
+            className="notifications-filter-control"
+            type="button"
+            onClick={() => scrollFilters("right")}
+            aria-label="Scroll notification filters right"
+          >
+            <MemberIcon name="arrow" size={17} />
+          </button>
         </div>
 
         <section className="notifications-summary-card">
