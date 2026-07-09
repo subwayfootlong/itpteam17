@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 // Shared progress bar function
 function RegistrationBar({ capacity, spotsAvailable }: { capacity: number | null; spotsAvailable: number | null }) {
@@ -35,6 +36,7 @@ export default function RegisteredUsersCard({ eventId, capacity, spotsAvailable 
   const [users, setUsers] = useState<UserRegistration[]>([]);
   const [loading, setLoading] = useState(true);
   const [userToRemove, setUserToRemove] = useState<string | null>(null);
+  const [rejectionMessage, setRejectionMessage] = useState('');
 
   useEffect(() => {
     fetch(`/api/admin/events/${eventId}/registrations`)
@@ -52,18 +54,20 @@ export default function RegisteredUsersCard({ eventId, capacity, spotsAvailable 
 
   const handleRemove = async (registrationId: string) => {
     try {
-      const res = await fetch(`/api/admin/events/${eventId}/registrations?registrationId=${registrationId}`, {
+      const messageParam = encodeURIComponent(rejectionMessage.trim() || 'Registration cancelled by administrator.');
+      const res = await fetch(`/api/admin/events/${eventId}/registrations?registrationId=${registrationId}&rejectionMessage=${messageParam}`, {
         method: 'DELETE',
       });
       if (res.ok) {
         setUsers(users.filter(u => u.id !== registrationId));
       } else {
-        console.error('Failed to delete registration');
+        console.error('Failed to reject registration');
       }
     } catch (err) {
       console.error(err);
     } finally {
       setUserToRemove(null);
+      setRejectionMessage('');
     }
   };
 
@@ -111,10 +115,10 @@ export default function RegisteredUsersCard({ eventId, capacity, spotsAvailable 
           ) : (
             filteredUsers.map(u => (
               <div key={u.id} className="flex items-center justify-between p-3 rounded-xl border border-gray-100 hover:border-[#3FAE2A]/30 hover:bg-[#e8f5e3]/30 transition-all group">
-                <div className="flex flex-col min-w-0 pr-4">
+                <Link href={`/admin/members/${u.user_id}`} className="flex-1 min-w-0 flex flex-col hover:text-[#3FAE2A] transition-colors pr-2">
                   <span className="text-sm font-bold text-gray-800 truncate">{u.name}</span>
                   <span className="text-[11px] text-gray-500 truncate">{u.email}</span>
-                </div>
+                </Link>
                 <button 
                   onClick={() => setUserToRemove(u.id)}
                   className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
@@ -130,12 +134,24 @@ export default function RegisteredUsersCard({ eventId, capacity, spotsAvailable 
 
       {userToRemove && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in zoom-in-95 duration-200 font-helvetica">
-            <h4 className="text-lg font-bold text-gray-800 font-butler mb-2">Remove Registration</h4>
-            <p className="text-sm text-gray-600 mb-6">Are you sure you want to remove this user from the event? This action cannot be undone.</p>
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in-95 duration-200 font-helvetica">
+            <h4 className="text-lg font-bold text-gray-800 font-butler mb-2">Reject Registration</h4>
+            <p className="text-sm text-gray-600 mb-4">Please provide a reason/message for rejecting this registration. The user will see this message in their portal.</p>
+            
+            <textarea
+              value={rejectionMessage}
+              onChange={(e) => setRejectionMessage(e.target.value)}
+              placeholder="e.g. This event requires active Associate or Ordinary membership status."
+              rows={3}
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-all resize-none mb-6"
+            />
+
             <div className="flex justify-end gap-3">
               <button 
-                onClick={() => setUserToRemove(null)}
+                onClick={() => {
+                  setUserToRemove(null);
+                  setRejectionMessage('');
+                }}
                 className="px-4 py-2 text-sm font-semibold text-gray-600 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl transition-all"
               >
                 Cancel
@@ -144,7 +160,7 @@ export default function RegisteredUsersCard({ eventId, capacity, spotsAvailable 
                 onClick={() => handleRemove(userToRemove)}
                 className="px-4 py-2 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-all shadow-md shadow-red-600/20"
               >
-                Remove
+                Reject Registration
               </button>
             </div>
           </div>
