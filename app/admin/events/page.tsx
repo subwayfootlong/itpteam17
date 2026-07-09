@@ -242,7 +242,16 @@ export default function EventsPage() {
 
         {/* Registrations progress bar */}
         <TableCell>
-          <RegistrationBar capacity={ev.capacity} spotsAvailable={ev.spots_available} />
+          {ev.external_rsvp_url ? (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold bg-[#e3f6fb] text-[#1a7a8f] border border-[#3BB0C9]/20 font-helvetica uppercase tracking-wide">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+              </svg>
+              External
+            </span>
+          ) : (
+            <RegistrationBar capacity={ev.capacity} spotsAvailable={ev.spots_available} />
+          )}
         </TableCell>
 
         {/* Category */}

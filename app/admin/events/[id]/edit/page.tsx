@@ -77,6 +77,7 @@ export default function EditEventPage() {
               eventId={id} 
               capacity={initialData.capacity_num ?? null} 
               spotsAvailable={initialData.spots_available ?? null} 
+              externalRsvpUrl={initialData.external_rsvp_url ?? null}
             />
           )}
         </div>
