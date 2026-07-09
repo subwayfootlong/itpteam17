@@ -31,7 +31,17 @@ interface UserRegistration {
   date: string;
 }
 
-export default function RegisteredUsersCard({ eventId, capacity, spotsAvailable }: { eventId: string, capacity: number | null, spotsAvailable: number | null }) {
+export default function RegisteredUsersCard({ 
+  eventId, 
+  capacity, 
+  spotsAvailable,
+  externalRsvpUrl 
+}: { 
+  eventId: string, 
+  capacity: number | null, 
+  spotsAvailable: number | null,
+  externalRsvpUrl?: string | null 
+}) {
   const [searchTerm, setSearchTerm] = useState('');
   const [users, setUsers] = useState<UserRegistration[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,6 +83,29 @@ export default function RegisteredUsersCard({ eventId, capacity, spotsAvailable 
 
   // Dynamically calculate spots available based on our local users list so the UI updates instantly
   const dynamicSpotsAvailable = capacity ? capacity - users.length : spotsAvailable;
+
+  const isExternal = Boolean(externalRsvpUrl?.trim());
+
+  if (isExternal) {
+    return (
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col p-6 font-helvetica">
+        <h3 className="text-lg font-bold text-gray-800 font-butler">Registrations</h3>
+        <p className="text-xs text-gray-500 mt-1 mb-4 leading-normal font-helvetica">Attendee roster is managed externally.</p>
+        
+        <div className="rounded-xl border border-[#3BB0C9]/20 bg-[#e3f6fb] p-4 text-xs text-[#1a7a8f] leading-relaxed flex gap-2.5">
+          <svg className="w-5 h-5 shrink-0 text-[#1a7a8f] mt-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 111.063.852l-.708 2.836a.75.75 0 001.063.852l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+          </svg>
+          <div>
+            <span className="font-bold">Managed via Zoho Backstage</span>
+            <p className="mt-1 text-[#1a7a8f]/90 font-medium">
+              This event is configured with an external registration URL. Spot availability, ticketing, and student/active roster collections are handled outside of this portal.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col h-full max-h-[600px]">
