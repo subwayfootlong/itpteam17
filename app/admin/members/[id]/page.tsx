@@ -56,12 +56,16 @@ function DetailRow({ label, value }: { label: string; value: React.ReactNode }) 
 export default function MemberViewPage() {
   const { id } = useParams<{ id: string }>();
   const [member, setMember] = useState<Member | null>(null);
+  const [registrations, setRegistrations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch(`/api/admin/members/${id}`)
       .then((r) => r.json())
-      .then((d) => setMember(d.member))
+      .then((d) => {
+        setMember(d.member);
+        setRegistrations(d.registrations ?? []);
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [id]);
@@ -219,6 +223,51 @@ export default function MemberViewPage() {
                 })}
               />
             </div>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] p-6 font-helvetica">
+            <h3 className="font-bold text-gray-900 text-[15px] mb-4 font-butler">Event History</h3>
+            {registrations.length === 0 ? (
+              <div className="text-sm text-gray-400 py-2">No event registrations found.</div>
+            ) : (
+              <div className="space-y-4">
+                {registrations.map((reg) => {
+                  const event = Array.isArray(reg.events) ? reg.events[0] : reg.events;
+                  if (!event) return null;
+
+                  const dateLabel = event.event_date
+                    ? new Date(event.event_date).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric' })
+                    : 'TBD';
+
+                  const isRejected = reg.status === 'rejected';
+
+                  return (
+                    <div key={reg.id} className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-gray-50 last:border-0 last:pb-0 gap-2">
+                      <div className="min-w-0">
+                        <span className="text-[13px] font-bold text-gray-800 line-clamp-1">{event.title}</span>
+                        <div className="flex items-center gap-3 text-[11px] text-gray-400 mt-0.5">
+                          <span>{dateLabel}</span>
+                          {event.venue && <span>• {event.venue}</span>}
+                        </div>
+                        {isRejected && reg.rejection_message && (
+                          <div className="text-[11px] text-red-500 italic mt-1">
+                            Reason: &ldquo;{reg.rejection_message}&rdquo;
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wide ${isRejected ? 'bg-red-50 text-red-700 border border-red-100' : 'bg-green-50 text-green-700 border border-green-100'}`}>
+                          {reg.status}
+                        </span>
+                        <span className="text-[10px] text-gray-400">
+                          {new Date(reg.registered_at).toLocaleDateString('en-SG', { day: 'numeric', month: 'short' })}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </div>

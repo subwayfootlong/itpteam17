@@ -1,6 +1,7 @@
 import MemberPageShell from "@/components/member/MemberPageShell";
 import EventsView from "@/components/EventsView";
 import { supabaseAdmin } from "@/lib/supabaseServer";
+import { getCurrentUser } from "@/lib/currentUser";
 
 export type EventRow = {
   id: string;
@@ -16,9 +17,13 @@ export type EventRow = {
   capacity: number | null;
   spots_available: number | null;
   status: string | null;
+  isRegistered?: boolean;
+  isRejected?: boolean;
 };
 
 export default async function EventsPage() {
+  const currentUser = await getCurrentUser();
+
   const { data: events, error } = await supabaseAdmin
     .from("events")
     .select(
@@ -27,10 +32,34 @@ export default async function EventsPage() {
     .eq("status", "published")
     .order("event_date", { ascending: true });
 
+  const { data: userRegs } = currentUser
+    ? await supabaseAdmin
+        .from("event_registrations")
+        .select("event_id, status")
+        .eq("user_id", currentUser.id)
+    : { data: [] };
+
+  const registeredEventIds = new Set(
+    (userRegs ?? [])
+      .filter((r) => r.status === "registered")
+      .map((r) => r.event_id)
+  );
+  const rejectedEventIds = new Set(
+    (userRegs ?? [])
+      .filter((r) => r.status === "rejected")
+      .map((r) => r.event_id)
+  );
+
+  const eventsWithRegStatus = (events || []).map((e: any) => ({
+    ...e,
+    isRegistered: registeredEventIds.has(e.id),
+    isRejected: rejectedEventIds.has(e.id),
+  }));
+
   return (
     <MemberPageShell>
       <EventsView
-        events={(events || []) as EventRow[]}
+        events={eventsWithRegStatus as EventRow[]}
         hasError={Boolean(error)}
       />
     </MemberPageShell>

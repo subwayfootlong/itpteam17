@@ -21,6 +21,7 @@ export async function GET(
       )
     `)
     .eq('event_id', id)
+    .eq('status', 'registered')
     .order('registered_at', { ascending: false });
 
   if (error) {
@@ -50,14 +51,35 @@ export async function DELETE(
   const { id } = await params;
   const url = new URL(req.url);
   const registrationId = url.searchParams.get('registrationId');
+  const rejectionMessage = url.searchParams.get('rejectionMessage') || 'Registration cancelled by administrator.';
 
   if (!registrationId) {
     return NextResponse.json({ error: 'registrationId is required' }, { status: 400 });
   }
 
+  // Fetch registration details to get user_id for analytics cleanup
+  const { data: regDetails } = await supabaseAdmin
+    .from('event_registrations')
+    .select('user_id')
+    .eq('id', registrationId)
+    .maybeSingle();
+
+  if (regDetails?.user_id) {
+    // Delete the corresponding analytics RSVP click event so it doesn't double count if they reapply
+    await supabaseAdmin
+      .from('analytics_events')
+      .delete()
+      .eq('user_id', regDetails.user_id)
+      .eq('target_id', id)
+      .eq('event_type', 'event_rsvp_click');
+  }
+
   const { error } = await supabaseAdmin
     .from('event_registrations')
-    .delete()
+    .update({
+      status: 'rejected',
+      rejection_message: rejectionMessage,
+    })
     .eq('id', registrationId)
     .eq('event_id', id);
 
