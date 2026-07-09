@@ -41,6 +41,16 @@ export default async function EventDetailsPage({
   }
 
   const eventRecord = event as EventRow;
+
+  // Track event details view in database
+  await supabaseAdmin.from("analytics_events").insert({
+    user_id: currentUser.id,
+    event_type: "event_view",
+    target_id: eventRecord.id,
+    category: "event",
+    metadata: { title: eventRecord.title, category: eventRecord.category || "General" }
+  });
+
   const hasRsvpLink = Boolean(eventRecord.external_rsvp_url?.trim());
   const isFull = eventRecord.spots_available !== null && eventRecord.spots_available <= 0;
   const registerLabel = isFull ? "Full" : hasRsvpLink ? "Register" : "Unavailable";
@@ -147,7 +157,7 @@ export default async function EventDetailsPage({
 
             {!isFull && hasRsvpLink ? (
               <a
-                href={eventRecord.external_rsvp_url!.trim()}
+                href={`/api/events/rsvp?eventId=${eventRecord.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block rounded-2xl bg-[#0F6E00] px-5 py-4 text-center text-base font-semibold text-white"

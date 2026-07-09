@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import type {
   MembershipBenefit,
   Partner,
@@ -340,7 +340,23 @@ export default function BenefitsDirectory({
   const [category, setCategory] = useState<CategoryFilter>("All");
   const [view, setView] = useState<BenefitView>("list");
   const [mapSelected, setMapSelected] = useState<Partner | null>(null);
-  const [redeemPartner, setRedeemPartner] = useState<Partner | null>(null);
+  const [redeemPartner, setRedeemPartnerState] = useState<Partner | null>(null);
+
+  const setRedeemPartner = useCallback((partner: Partner | null) => {
+    setRedeemPartnerState(partner);
+    if (partner) {
+      fetch("/api/analytics/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventType: "benefit_view",
+          targetId: partner.id,
+          category: "benefit",
+          metadata: { name: partner.name, offer: partner.offer },
+        }),
+      }).catch((err) => console.warn("Failed tracking benefit view", err));
+    }
+  }, []);
 
   const filteredPartners = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
