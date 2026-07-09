@@ -49,6 +49,23 @@ export async function PATCH(
     if (key in body) updates[key] = body[key] === '' ? null : body[key];
   }
 
+  if ('capacity' in updates) {
+    const newCapacity = updates.capacity !== null ? Number(updates.capacity) : null;
+    if (newCapacity !== null) {
+      const { count, error: countError } = await supabaseAdmin
+        .from('event_registrations')
+        .select('*', { count: 'exact', head: true })
+        .eq('event_id', id)
+        .eq('status', 'registered');
+
+      if (!countError) {
+        updates.spots_available = Math.max(0, newCapacity - (count ?? 0));
+      }
+    } else {
+      updates.spots_available = null;
+    }
+  }
+
   const { data, error } = await supabaseAdmin
     .from('events')
     .update(updates)

@@ -58,6 +58,7 @@ export async function POST(req: Request) {
       venue: body.venue || null,
       category: body.category ?? 'General',
       capacity: body.capacity ?? null,
+      spots_available: body.capacity ?? null,
       external_rsvp_url: body.external_rsvp_url || null,
       image_url: body.image_url || null,
       status: body.status ?? 'draft',
