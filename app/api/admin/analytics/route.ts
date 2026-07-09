@@ -53,19 +53,27 @@ export async function GET(req: Request) {
 
   const allLogs = logs ?? [];
 
-  // 2. Fetch events, benefits, and announcements details to resolve names
-  const [eventsResult, benefitsResult, announcementsResult] = await Promise.all([
-    supabaseAdmin.from('events').select('id, title, category, event_date'),
+  // 2. Fetch events, benefits, announcements details to resolve names, and event registrations
+  const [eventsResult, benefitsResult, announcementsResult, registrationsResult] = await Promise.all([
+    supabaseAdmin.from('events').select('id, title, category, event_date, external_rsvp_url'),
     supabaseAdmin.from('benefits').select('id, merchant_name, discount_description'),
-    supabaseAdmin.from('announcements').select('id, title, content')
+    supabaseAdmin.from('announcements').select('id, title, content'),
+    supabaseAdmin.from('event_registrations').select('event_id').eq('status', 'registered')
   ]);
 
   // Log any DB lookup errors for diagnostics (non-fatal)
   if (eventsResult.error) console.error('[Analytics] events lookup error:', eventsResult.error.message);
   if (benefitsResult.error) console.error('[Analytics] benefits lookup error:', benefitsResult.error.message);
   if (announcementsResult.error) console.error('[Analytics] announcements lookup error:', announcementsResult.error.message);
+  if (registrationsResult.error) console.error('[Analytics] registrations lookup error:', registrationsResult.error.message);
 
   const eventsMap = new Map((eventsResult.data ?? []).map(e => [e.id, e]));
+
+  const regCountMap = new Map<string, number>();
+  (registrationsResult.data ?? []).forEach((r: any) => {
+    const eid = String(r.event_id);
+    regCountMap.set(eid, (regCountMap.get(eid) ?? 0) + 1);
+  });
 
   const benefitsMap = new Map<string, { merchant_name: string; discount_description: string }>();
   mockPartners.forEach(b => {
@@ -141,12 +149,14 @@ export async function GET(req: Request) {
 
   const formattedEventRankings = Object.entries(eventMetrics).map(([id, stats]) => {
     const event = eventsMap.get(id);
+    const isExternal = Boolean(event?.external_rsvp_url?.trim());
     return {
       id,
       title: event?.title ?? 'Unknown Event',
       category: event?.category ?? 'General',
       views: stats.views,
       rsvps: stats.rsvps,
+      confirmedRegistrations: isExternal ? null : (regCountMap.get(id) ?? 0),
       conversionRate: stats.views > 0 ? ((stats.rsvps / stats.views) * 100).toFixed(1) : '0.0'
     };
   }).sort((a, b) => b.views - a.views);
