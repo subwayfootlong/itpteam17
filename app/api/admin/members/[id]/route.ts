@@ -46,7 +46,24 @@ export async function GET(
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (!data) return NextResponse.json({ error: 'Member not found' }, { status: 404 });
 
-  return NextResponse.json({ member: data });
+  const { data: registrations } = await supabaseAdmin
+    .from('event_registrations')
+    .select(`
+      id,
+      registered_at,
+      status,
+      rejection_message,
+      event_id,
+      events (
+        title,
+        venue,
+        event_date
+      )
+    `)
+    .eq('user_id', id)
+    .order('registered_at', { ascending: false });
+
+  return NextResponse.json({ member: data, registrations: registrations ?? [] });
 }
 
 export async function PATCH(

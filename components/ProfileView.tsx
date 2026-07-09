@@ -159,7 +159,7 @@ const benefitsByTier: Record<string, Benefit[]> = {
   ],
 };
 
-export default function ProfileView({ member }: { member: MemberProfile }) {
+export default function ProfileView({ member, registrations = [] }: { member: MemberProfile, registrations?: any[] }) {
   const router = useRouter();
   const tier = member.membership_tier || "basic";
   const benefits = benefitsByTier[tier] || benefitsByTier.basic;
@@ -387,63 +387,59 @@ export default function ProfileView({ member }: { member: MemberProfile }) {
               Participation History
             </h2>
 
-            <div className="mt-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-              <div className="relative space-y-8 border-l-2 border-gray-200 pl-8">
-                <div className="relative">
-                  <span className="absolute -left-[42px] top-1 h-4 w-4 rounded-full bg-[#0F6E00]" />
-                  <p className="font-medium text-[#151C27]">
-                    Annual Scholars Symposium 2024
-                  </p>
-                  <p className="text-sm text-[#5F5E5E]">
-                    Grand Ballroom, Fairmont Singapore
-                  </p>
-                  <span className="mt-2 inline-block rounded-full bg-[#2EAE23] px-4 py-2 text-xs font-semibold text-white">
-                    Attended
-                  </span>
-                  <p className="mt-3 text-sm font-medium text-[#5F5E5E]">
-                    March 15, 2024
-                  </p>
+            <div className="mt-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm font-helvetica">
+              {registrations.length === 0 ? (
+                <div className="text-center py-8 text-gray-400 text-sm">
+                  You have not registered for any events yet.
                 </div>
+              ) : (
+                <div className="relative space-y-8 border-l-2 border-gray-200 pl-8">
+                  {registrations.map((reg) => {
+                    const event = Array.isArray(reg.events) ? reg.events[0] : reg.events;
+                    if (!event) return null;
 
-                <div className="relative">
-                  <span className="absolute -left-[42px] top-1 h-4 w-4 rounded-full bg-[#2EAE23]" />
-                  <p className="font-medium text-[#151C27]">
-                    Community Leadership Workshop
-                  </p>
-                  <p className="text-sm text-[#5F5E5E]">
-                    Pergas Center, Level 4
-                  </p>
-                  <span className="mt-2 inline-block rounded-full bg-[#2EAE23] px-4 py-2 text-xs font-semibold text-white">
-                    Attended
-                  </span>
-                  <p className="mt-3 text-sm font-medium text-[#5F5E5E]">
-                    January 20, 2024
-                  </p>
+                    const dateLabel = event.event_date
+                      ? new Date(event.event_date).toLocaleDateString('en-SG', { day: 'numeric', month: 'long', year: 'numeric' })
+                      : 'Date to be confirmed';
+
+                    const isRejected = reg.status === 'rejected';
+
+                    return (
+                      <div key={reg.id} className="relative">
+                        <span className={`absolute -left-[42px] top-1.5 h-4 w-4 rounded-full border-2 border-white shadow-sm ${isRejected ? 'bg-red-500' : 'bg-[#0F6E00]'}`} />
+                        <p className="font-bold text-[#151C27] text-base leading-tight">
+                          {event.title}
+                        </p>
+                        <p className="text-sm text-[#5F5E5E] mt-1 font-medium flex items-center gap-1">
+                          <svg className="w-3.5 h-3.5 shrink-0 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          {event.venue || 'Venue to be confirmed'}
+                        </p>
+                        
+                        <div className="flex flex-wrap items-center gap-2 mt-2.5">
+                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${isRejected ? 'bg-red-50 text-red-700 border border-red-100' : 'bg-green-50 text-green-700 border border-green-100'}`}>
+                            {isRejected ? 'Rejected' : 'Registered'}
+                          </span>
+                          <span className="text-xs text-[#5F5E5E] font-medium">
+                            on {new Date(reg.registered_at).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </span>
+                        </div>
+
+                        {isRejected && reg.rejection_message && (
+                          <div className="mt-2.5 p-3 bg-red-50/50 rounded-xl border border-red-100/50 text-xs text-red-800 leading-normal max-w-md">
+                            <span className="font-bold">Reason:</span> &ldquo;{reg.rejection_message}&rdquo;
+                          </div>
+                        )}
+                        <p className="mt-2 text-xs text-gray-400 font-normal">
+                          Scheduled: {dateLabel}
+                        </p>
+                      </div>
+                    );
+                  })}
                 </div>
-
-                <div className="relative">
-                  <span className="absolute -left-[42px] top-1 h-4 w-4 rounded-full bg-[#9B6500]" />
-                  <p className="font-medium text-[#151C27]">
-                    Regional Humanitarian Fundraiser
-                  </p>
-                  <p className="text-sm text-[#5F5E5E]">
-                    Digital Event Zoom
-                  </p>
-                  <span className="mt-2 inline-block rounded-full bg-orange-300 px-4 py-2 text-xs font-semibold text-[#7A4B00]">
-                    Volunteer
-                  </span>
-                  <p className="mt-3 text-sm font-medium text-[#5F5E5E]">
-                    December 05, 2023
-                  </p>
-                </div>
-              </div>
-
-              <Link
-                href="#"
-                className="mt-8 block text-[#0F6E00]"
-              >
-                View Full Attendance History →
-              </Link>
+              )}
             </div>
           </section>
 

@@ -42,9 +42,31 @@ export default async function ProfilePage() {
     notFound();
   }
 
+  // Fetch user's event registration history
+  const { data: registrations } = await supabaseAdmin
+    .from("event_registrations")
+    .select(`
+      id,
+      registered_at,
+      status,
+      rejection_message,
+      event_id,
+      events (
+        id,
+        title,
+        venue,
+        event_date
+      )
+    `)
+    .eq("user_id", currentUser.id)
+    .order("registered_at", { ascending: false });
+
   return (
     <MemberPageShell>
-      <ProfileView member={member as MemberProfile} />
+      <ProfileView 
+        member={member as MemberProfile} 
+        registrations={registrations || []} 
+      />
     </MemberPageShell>
   );
 }
