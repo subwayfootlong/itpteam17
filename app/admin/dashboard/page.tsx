@@ -174,20 +174,20 @@ const STAT_CONFIGS = [
       </svg>
     ),
   },
-  {
-    key: 'activeMembers' as StatMetricKey,
-    label: 'Active Members',
-    subKey: null as null,
-    isPos: true,
-    iconBg: 'bg-[#e0f4f1]',
-    iconText: 'text-[#1E9888]',
-    accent: '#1E9888',
-    icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-  },
+  // {
+  //   key: 'activeMembers' as StatMetricKey,
+  //   label: 'Active Members',
+  //   subKey: null as null,
+  //   isPos: true,
+  //   iconBg: 'bg-[#e0f4f1]',
+  //   iconText: 'text-[#1E9888]',
+  //   accent: '#1E9888',
+  //   icon: (
+  //     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  //       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  //     </svg>
+  //   ),
+  // },
   {
     key: 'upcomingEvents' as StatMetricKey,
     label: 'Upcoming Events',

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 // AUTH: uncomment when ready
 // import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { ADMIN_BENEFIT_SELECT } from '@/lib/adminBenefits';
+import { notifyBenefitAvailable } from '@/lib/notifications';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 
 function cleanText(value: unknown) {
@@ -71,5 +72,13 @@ export async function POST(req: Request) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (data?.is_active) {
+    await notifyBenefitAvailable({
+      id: String(data.id),
+      merchantName: data.merchant_name,
+      offer: data.discount_description,
+    });
+  }
+
   return NextResponse.json({ benefit: data }, { status: 201 });
 }

@@ -80,18 +80,6 @@ function mapRegion(address: string | null): SingaporeRegion | "Online" {
   return "Central";
 }
 
-function hashToMapPosition(seed: string): { x: number; y: number } {
-  let hash = 0;
-  for (let index = 0; index < seed.length; index += 1) {
-    hash = (hash * 31 + seed.charCodeAt(index)) >>> 0;
-  }
-
-  return {
-    x: 22 + (hash % 62),
-    y: 24 + ((hash >> 8) % 42),
-  };
-}
-
 function buildOffer(row: BenefitRow) {
   const description = row.discount_description?.trim();
   const amount =
@@ -111,7 +99,6 @@ function mapBenefit(row: BenefitRow, index: number): Partner {
   const address = row.address?.trim() || "Online or merchant-confirmed redemption";
   const region = mapRegion(row.address);
   const category = mapCategory(row.category);
-  const hasPhysicalAddress = Boolean(row.address?.trim());
 
   return {
     id: String(row.id),
@@ -132,9 +119,7 @@ function mapBenefit(row: BenefitRow, index: number): Partner {
     imageUrl: row.image_url?.trim() || undefined,
     logoUrl: row.logo_url?.trim() || undefined,
     featured: index < 2,
-    mapPosition: hasPhysicalAddress
-      ? hashToMapPosition(`${name}:${address}`)
-      : undefined,
+    mapPosition: undefined,
   };
 }
 

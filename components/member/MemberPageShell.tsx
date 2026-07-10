@@ -13,7 +13,7 @@ export default function MemberPageShell({
   showBottomNav = true,
 }: MemberPageShellProps) {
   return (
-    <main className="flex min-h-screen justify-center bg-gray-100">
+    <main className="flex min-h-screen justify-center bg-white">
       <section className="min-h-screen w-full max-w-md bg-[#FFFFFF] pb-24">
         {showTopBar && <MemberTopBar />}
         {children}

@@ -24,6 +24,7 @@ interface AnalyticsData {
     category: string;
     views: number;
     rsvps: number;
+    confirmedRegistrations: number | null;
     conversionRate: string;
   }[];
   benefitRankings: {
@@ -107,8 +108,12 @@ export default function AdminAnalyticsPage() {
 
     // Section 3: Event Rankings
     lines.push('SECTION: Event Performance Rankings');
-    lines.push(row(['Rank', 'Event Title', 'Category', 'Views', 'RSVPs', 'Conversion Rate (%)']));
-    data.eventRankings.forEach((e, i) => lines.push(row([i + 1, e.title, e.category, e.views, e.rsvps, e.conversionRate])));
+    lines.push(row(['Rank', 'Event Title', 'Category', 'Views', 'RSVP Clicks/Registrations', 'Confirmed Roster (In-App)', 'Conversion Rate (%)']));
+    data.eventRankings.forEach((e, i) => lines.push(row([
+      i + 1, e.title, e.category, e.views, e.rsvps,
+      e.confirmedRegistrations === null ? 'N/A (External)' : e.confirmedRegistrations,
+      e.conversionRate
+    ])));
     lines.push('');
 
     // Section 4: Announcement Rankings
@@ -458,7 +463,7 @@ export default function AdminAnalyticsPage() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[12px] font-semibold text-gray-500 font-helvetica uppercase tracking-wider">
-                    RSVP Conversions
+                    RSVP Conversions / Clicks
                   </span>
                   <div className="w-7 h-7 rounded-full bg-[#e0f4f1] text-[#1E9888] flex items-center justify-center">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -470,8 +475,8 @@ export default function AdminAnalyticsPage() {
                   {data.kpi.conversionRate}%
                 </div>
               </div>
-              <div className="text-[11px] mt-1.5 text-gray-400 font-helvetica leading-normal border-t border-gray-50 pt-2">
-                {data.kpi.totalRsvps} RSVP actions logged
+              <div className="text-[11px] mt-1.5 text-gray-400 font-helvetica leading-normal border-t border-gray-50 pt-2" title="Includes redirects to Zoho Backstage and confirmed in-app registrations">
+                {data.kpi.totalRsvps} RSVP actions &amp; redirects logged
               </div>
             </div>
 
@@ -723,8 +728,18 @@ export default function AdminAnalyticsPage() {
         {/* Left: Event Standings */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
           <div className="px-5 py-4 border-b border-[rgba(63,174,42,0.1)]">
-            <h3 className="font-bold text-[16px] font-butler text-[#1a2e1a]">
+            <h3 className="font-bold text-[16px] font-butler text-[#1a2e1a] flex items-center gap-1.5">
               Event Performance Rankings
+              <span className="group relative inline-block cursor-pointer">
+                <svg className="w-3.5 h-3.5 text-gray-400 hover:text-[#1c3829] transition-colors" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 111.063.852l-.708 2.836a.75.75 0 001.063.852l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                </svg>
+                <span className="pointer-events-none absolute top-full left-0 mt-1.5 w-64 bg-[#1c3829] text-white text-[11px] font-normal leading-relaxed rounded-xl p-3 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 text-left normal-case border border-white/10 font-helvetica">
+                  <span className="font-bold block text-[#FFB547] mb-1">Metrics Explanation:</span>
+                  <strong className="text-white">RSVP Clicks:</strong> Total intent actions. Includes redirects to Zoho for external events, and initial in-app sign-ups for internal events.
+                  <span className="mt-1.5 block"><strong className="text-white">RSVP (Actual):</strong> Confirmed roster counts. Tracks actual registered members in this portal (displays N/A for external Zoho events).</span>
+                </span>
+              </span>
             </h3>
             <p className="text-[12px] text-gray-400 font-helvetica mt-0.5">
               Ranked by views and RSVP conversions (maximum 10)
@@ -743,12 +758,13 @@ export default function AdminAnalyticsPage() {
                 <p className="text-[13px] font-medium text-gray-400 font-helvetica">No event engagement recorded</p>
               </div>
             ) : (
-              <table className="w-full text-left border-collapse text-[13px] font-helvetica">
+               <table className="w-full text-left border-collapse text-[13px] font-helvetica">
                 <thead>
                   <tr className="bg-gray-50/50 text-[#585859] font-bold border-b border-gray-100">
                     <th className="py-3 px-4">Event Title</th>
                     <th className="py-3 px-2 text-center">Views</th>
-                    <th className="py-3 px-2 text-center">RSVPs</th>
+                    <th className="py-3 px-2 text-center">RSVP Clicks</th>
+                    <th className="py-3 px-2 text-center">RSVP (Actual)</th>
                     <th className="py-3 px-4 text-right">Conversion</th>
                   </tr>
                 </thead>
@@ -765,6 +781,13 @@ export default function AdminAnalyticsPage() {
                         </td>
                         <td className="py-3 px-2 text-center text-gray-600 font-semibold">{evt.views}</td>
                         <td className="py-3 px-2 text-center text-gray-600 font-semibold">{evt.rsvps}</td>
+                        <td className="py-3 px-2 text-center text-gray-600 font-semibold">
+                          {evt.confirmedRegistrations === null ? (
+                            <span className="text-[10.5px] text-gray-400 font-normal italic">N/A (External)</span>
+                          ) : (
+                            <span className="text-gray-700 font-bold">{evt.confirmedRegistrations}</span>
+                          )}
+                        </td>
                         <td className="py-3 px-4">
                           <div className="flex items-center justify-end gap-2">
                             <span className="font-bold text-[12px] text-[#1E9888]">{evt.conversionRate}%</span>
