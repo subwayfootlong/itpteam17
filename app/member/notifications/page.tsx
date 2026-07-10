@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import MemberPageShell from "@/components/member/MemberPageShell";
 import NotificationsCenter from "@/components/member/NotificationsCenter";
-import { systemNotifications } from "@/lib/data/system-notifications";
+import { getCurrentUser } from "@/lib/currentUser";
+import {
+  defaultNotificationPreferences,
+  getMemberNotifications,
+  getNotificationPreferences,
+} from "@/lib/notifications";
 
 export const metadata: Metadata = {
   title: "Notifications | Pergas Member Portal",
@@ -9,11 +14,18 @@ export const metadata: Metadata = {
     "Receive automated Pergas renewal reminders and event update alerts.",
 };
 
-export default function NotificationsPage() {
+export default async function NotificationsPage() {
+  const user = await getCurrentUser();
+  const notifications = user ? await getMemberNotifications(user.id) : [];
+  const preferences = user
+    ? await getNotificationPreferences(user.id)
+    : defaultNotificationPreferences;
+
   return (
     <MemberPageShell>
       <NotificationsCenter
-        initialNotifications={systemNotifications}
+        initialNotifications={notifications}
+        initialPreferences={preferences}
         showChrome={false}
       />
     </MemberPageShell>

@@ -20,6 +20,32 @@ const categoryIcons: Record<PartnerCategory, string> = {
   Lifestyle: "spark",
 };
 
+function hasPhysicalLocation(partner: Partner) {
+  const address = partner.address.trim().toLowerCase();
+  return (
+    partner.region !== "Online" &&
+    Boolean(address) &&
+    !address.includes("online") &&
+    !address.includes("merchant-confirmed")
+  );
+}
+
+function googleMapsQuery(partner: Partner) {
+  return `${partner.name}, ${partner.address}, Singapore`;
+}
+
+function googleMapsEmbedUrl(partner: Partner) {
+  return `https://www.google.com/maps?q=${encodeURIComponent(
+    googleMapsQuery(partner),
+  )}&output=embed`;
+}
+
+function googleMapsSearchUrl(partner: Partner) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    googleMapsQuery(partner),
+  )}`;
+}
+
 type MemberSummary = {
   firstName: string;
   lastName: string;
@@ -77,7 +103,8 @@ function PartnerMapPreview({
   partners: Partner[];
   onOpenMap: () => void;
 }) {
-  const mappedPartners = partners.filter((partner) => partner.mapPosition);
+  const mappedPartners = partners.filter(hasPhysicalLocation);
+  const previewPartner = mappedPartners[0];
 
   return (
     <section className="benefits-map-preview">
@@ -85,16 +112,22 @@ function PartnerMapPreview({
         <span>Partners Near You</span>
         <strong>{mappedPartners.length} nearby locations</strong>
       </div>
-      <div className="benefits-mini-map" aria-hidden="true">
-        {mappedPartners.map((partner) => (
-          <i
-            key={partner.id}
-            style={{
-              left: `${partner.mapPosition?.x ?? 50}%`,
-              top: `${partner.mapPosition?.y ?? 50}%`,
-            }}
+      <div
+        className={`benefits-mini-map ${
+          previewPartner ? "benefits-mini-map--google" : "benefits-mini-map--empty"
+        }`}
+      >
+        {previewPartner ? (
+          <iframe
+            className="benefits-google-map-frame"
+            title={`${previewPartner.name} map preview`}
+            src={googleMapsEmbedUrl(previewPartner)}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
           />
-        ))}
+        ) : (
+          <p>No partner address yet</p>
+        )}
       </div>
       <button type="button" onClick={onOpenMap}>
         View Partner Map
@@ -204,26 +237,19 @@ function PartnerMap({
   onSelect: (partner: Partner) => void;
   onRedeem: (partner: Partner) => void;
 }) {
-  const mappedPartners = partners.filter(
-    (
-      partner,
-    ): partner is Partner & { mapPosition: { x: number; y: number } } =>
-      Boolean(partner.mapPosition),
-  );
+  const mappedPartners = partners.filter(hasPhysicalLocation);
+  const activePartner =
+    mappedPartners.find((partner) => partner.id === selected?.id) ??
+    mappedPartners[0] ??
+    null;
 
   if (mappedPartners.length === 0) {
     return (
       <section className="benefits-map-screen">
-        <div className="benefits-map-canvas">
-          <svg viewBox="0 0 760 350" aria-label="Stylized Singapore partner map">
-            <path d="M86 188c26-15 58-18 81-38 25-22 43-60 82-70 42-11 78 9 114 2 50-9 88-39 139-24 23 7 38 29 62 33 29 5 58-10 84 6 21 13 25 39 12 59-11 17-32 23-46 38-14 16-17 42-35 54-28 18-67 2-98 15-26 11-44 39-74 42-34 4-61-22-94-26-39-5-75 20-114 14-26-4-45-25-70-32-23-7-56-3-68-26-10-19 4-37 25-47Z" />
-            <path d="M687 219c13-4 30 1 35 14 5 12-4 25-17 27-14 2-29-7-28-20 0-9 4-17 10-21ZM34 223c11-7 29-4 35 8 7 13-5 27-20 28-12 1-25-5-27-17-2-8 4-15 12-19Z" />
-          </svg>
-        </div>
         <div className="benefits-empty-state">
           <MemberIcon name="map" size={28} />
           <h2>No map locations</h2>
-          <p>Try another category or search term to show partner pins.</p>
+          <p>Benefits with admin-entered physical addresses will appear here.</p>
         </div>
       </section>
     );
@@ -231,32 +257,51 @@ function PartnerMap({
 
   return (
     <section className="benefits-map-screen">
-      <div className="benefits-map-canvas">
-        <svg viewBox="0 0 760 350" aria-label="Stylized Singapore partner map">
-          <path d="M86 188c26-15 58-18 81-38 25-22 43-60 82-70 42-11 78 9 114 2 50-9 88-39 139-24 23 7 38 29 62 33 29 5 58-10 84 6 21 13 25 39 12 59-11 17-32 23-46 38-14 16-17 42-35 54-28 18-67 2-98 15-26 11-44 39-74 42-34 4-61-22-94-26-39-5-75 20-114 14-26-4-45-25-70-32-23-7-56-3-68-26-10-19 4-37 25-47Z" />
-          <path d="M687 219c13-4 30 1 35 14 5 12-4 25-17 27-14 2-29-7-28-20 0-9 4-17 10-21ZM34 223c11-7 29-4 35 8 7 13-5 27-20 28-12 1-25-5-27-17-2-8 4-15 12-19Z" />
-        </svg>
+      {activePartner && (
+        <div className="benefits-map-canvas benefits-map-canvas--google">
+          <iframe
+            className="benefits-google-map-frame"
+            title={`${activePartner.name} location map`}
+            src={googleMapsEmbedUrl(activePartner)}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        </div>
+      )}
+      <div className="benefits-map-results">
+        <div>
+          <strong>{mappedPartners.length} partner locations</strong>
+          <p>Choose a partner to preview its Google Maps location.</p>
+        </div>
+        {activePartner && (
+          <a
+            href={googleMapsSearchUrl(activePartner)}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Open Maps
+            <MemberIcon name="arrow" size={15} />
+          </a>
+        )}
+      </div>
+      <div className="benefits-map-location-list">
         {mappedPartners.map((partner) => (
           <button
             key={partner.id}
-            className={selected?.id === partner.id ? "is-active" : ""}
-            style={{
-              left: `${partner.mapPosition.x}%`,
-              top: `${partner.mapPosition.y}%`,
-            }}
+            className={activePartner?.id === partner.id ? "is-active" : ""}
             type="button"
             onClick={() => onSelect(partner)}
             aria-label={`Open ${partner.name}`}
           >
             <MemberIcon name="pin" size={18} />
+            <span>
+              <strong>{partner.name}</strong>
+              <small>{partner.address}</small>
+            </span>
           </button>
         ))}
       </div>
-      <div className="benefits-map-results">
-        <strong>{mappedPartners.length} partner locations</strong>
-        <p>Online rewards remain available from the rewards list.</p>
-      </div>
-      {selected && <RewardCard partner={selected} onSelect={onRedeem} />}
+      {activePartner && <RewardCard partner={activePartner} onSelect={onRedeem} />}
     </section>
   );
 }
@@ -303,16 +348,14 @@ function BenefitModal({
         </div>
         <a
           href={
-            partner.mapPosition
-              ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                  partner.address,
-                )}`
+            hasPhysicalLocation(partner)
+              ? googleMapsSearchUrl(partner)
               : partner.website
           }
           target="_blank"
           rel="noreferrer"
         >
-          {partner.mapPosition ? "Get Directions" : "Visit Partner Website"}
+          {hasPhysicalLocation(partner) ? "Get Directions" : "Visit Partner Website"}
           <MemberIcon name="arrow" size={18} />
         </a>
       </section>

@@ -1,8 +1,13 @@
-export type NotificationType = "Renewal" | "Event" | "System";
+export type NotificationType =
+  | "Benefit"
+  | "Announcement"
+  | "Event"
+  | "Renewal"
+  | "System";
 export type NotificationPriority = "High" | "Medium" | "Low";
 
 export type SystemNotification = {
-  id: number;
+  id: string;
   type: NotificationType;
   priority: NotificationPriority;
   title: string;
@@ -15,7 +20,7 @@ export type SystemNotification = {
 
 export const systemNotifications: SystemNotification[] = [
   {
-    id: 1,
+    id: "seed-renewal",
     type: "Renewal",
     priority: "High",
     title: "Membership renewal due in 14 days",
@@ -27,7 +32,7 @@ export const systemNotifications: SystemNotification[] = [
     isRead: false,
   },
   {
-    id: 2,
+    id: "seed-event-reminder",
     type: "Event",
     priority: "Medium",
     title: "Community learning circle starts tomorrow",
@@ -39,7 +44,7 @@ export const systemNotifications: SystemNotification[] = [
     isRead: false,
   },
   {
-    id: 3,
+    id: "seed-event-window",
     type: "Event",
     priority: "Low",
     title: "New event registration window opened",
@@ -51,7 +56,7 @@ export const systemNotifications: SystemNotification[] = [
     isRead: true,
   },
   {
-    id: 4,
+    id: "seed-system-comment",
     type: "System",
     priority: "Low",
     title: "Comment submitted for moderator review",
