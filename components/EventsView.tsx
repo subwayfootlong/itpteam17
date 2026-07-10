@@ -74,7 +74,7 @@ function EventDescription({ description, eventId }: { description: string; event
       </p>
       {isTruncated && (
         <Link href={`/member/events/${eventId}`} className="mt-1 inline-block text-sm font-semibold text-[#0F6E00]">
-          ... See more
+          See more
         </Link>
       )}
     </div>
