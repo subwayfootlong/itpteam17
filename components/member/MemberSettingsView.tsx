@@ -62,6 +62,48 @@ type PreferencesResponse = {
   error?: string;
 };
 
+type SegmentedControlProps = {
+  label: string;
+  options: string[];
+  selectedIndex: number;
+  onChange: (index: number) => void;
+};
+
+function SegmentedControl({
+  label,
+  options,
+  selectedIndex,
+  onChange,
+}: SegmentedControlProps) {
+  return (
+    <div
+      role="group"
+      aria-label={label}
+      className="mb-2 mt-3 grid grid-cols-4 rounded-2xl bg-[#F4F7F4] p-1"
+    >
+      {options.map((option, index) => {
+        const isSelected = selectedIndex === index;
+
+        return (
+          <button
+            key={option}
+            type="button"
+            aria-pressed={isSelected}
+            onClick={() => onChange(index)}
+            className={`rounded-[14px] px-2 py-3 text-center text-sm font-medium transition-colors ${
+              isSelected
+                ? "bg-[#0F6E00] text-white shadow-[0_6px_18px_rgba(15,110,0,0.2)]"
+                : "text-[#6F7B6F]"
+            }`}
+          >
+            {option}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function MemberSettingsView() {
   const router = useRouter();
 
@@ -194,7 +236,7 @@ export default function MemberSettingsView() {
 
       <section className="mt-10">
         <h2 className="px-2 text-base font-bold text-[#3F473F]">
-          App Appearance
+          Appearance
         </h2>
 
         <div className="mt-4 rounded-2xl bg-white p-5 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
@@ -204,55 +246,16 @@ export default function MemberSettingsView() {
             <div className="flex-1">
               <p className="text-lg text-[#151C27]">Font Size</p>
 
-              <div className="mt-5">
-                <div className="relative px-3">
-                  <div className="absolute left-3 right-3 top-1/2 h-1 -translate-y-1/2 rounded-full bg-[#E8EEF9]" />
-
-                  <div
-                    role="slider"
-                    aria-valuemin={0}
-                    aria-valuemax={3}
-                    aria-valuenow={fontSizeIndex}
-                    tabIndex={0}
-                    className="relative grid grid-cols-4"
-                  >
-                    {["Small", "Medium", "Large", "Extra Large"].map(
-                      (label, index) => {
-                        const isSelected = fontSizeIndex === index;
-
-                        return (
-                          <button
-                            key={label}
-                            type="button"
-                            aria-label={`Set font size to ${label}`}
-                            onClick={() => setFontSizeIndex(index)}
-                            className="flex h-8 items-center justify-center"
-                          >
-                            <span
-                              className={
-                                isSelected
-                                  ? "h-6 w-6 rounded-full bg-[#0F6E00]"
-                                  : "h-3 w-3 rounded-full bg-transparent"
-                              }
-                            />
-                          </button>
-                        );
-                      },
-                    )}
-                  </div>
-                </div>
-
-                <div className="mt-2 grid grid-cols-4 text-center text-sm text-[#6F7B6F]">
-                  <p>Small</p>
-                  <p>Medium</p>
-                  <p>Large</p>
-                  <p>Extra Large</p>
-                </div>
-              </div>
+              <SegmentedControl
+                label="Font Size"
+                options={["Small", "Medium", "Large", "Extra Large"]}
+                selectedIndex={fontSizeIndex}
+                onChange={setFontSizeIndex}
+              />
             </div>
           </div>
 
-          <Link href="#" className="mt-8 flex items-center justify-between">
+          <Link href="#" className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Palette size={24} className="text-[#6F7B6F]" />
 
@@ -269,7 +272,7 @@ export default function MemberSettingsView() {
 
       <section className="mt-10">
         <h2 className="px-2 text-base font-bold text-[#3F473F]">
-          Common Settings
+          Notifications
         </h2>
 
         <div className="mt-4 rounded-2xl bg-white p-5 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
@@ -319,8 +322,16 @@ export default function MemberSettingsView() {
           <p className="mt-3 text-sm text-[#5F5E5E]">
             Email notifications are not connected yet.
           </p>
+        </div>
+      </section>
 
-          <Link href="#" className="mt-8 flex items-center justify-between">
+      <section className="mt-10">
+        <h2 className="px-2 text-base font-bold text-[#3F473F]">
+          Preferences
+        </h2>
+
+        <div className="mt-4 rounded-2xl bg-white p-5 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
+          <Link href="#" className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Globe size={24} className="text-[#6F7B6F]" />
 
@@ -343,6 +354,15 @@ export default function MemberSettingsView() {
         <div className="mt-4 rounded-2xl bg-white p-5 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
           <Link href="#" className="flex items-center justify-between">
             <div className="flex items-center gap-4">
+              <Info size={24} className="text-[#6F7B6F]" />
+              <p className="text-lg text-[#151C27]">Help & Support</p>
+            </div>
+
+            <ChevronRight size={22} className="text-[#6F7B6F]" />
+          </Link>
+
+          <Link href="#" className="mt-8 flex items-center justify-between">
+            <div className="flex items-center gap-4">
               <ShieldCheck size={24} className="text-[#6F7B6F]" />
               <p className="text-lg text-[#151C27]">Privacy Policy</p>
             </div>
@@ -362,10 +382,8 @@ export default function MemberSettingsView() {
           <div className="mt-8 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Info size={24} className="text-[#6F7B6F]" />
-              <p className="text-lg text-[#151C27]">Version Number</p>
+              <p className="text-lg text-[#151C27]">Version 2.4.0 (Build 108)</p>
             </div>
-
-            <p className="text-sm text-[#3F473F]">2.4.0 (Build 108)</p>
           </div>
         </div>
       </section>
