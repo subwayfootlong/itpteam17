@@ -20,6 +20,7 @@ export type MemberProfile = {
   designation: string | null;
   arabic_name: string | null;
   member_since: string | null;
+  profile_image_url: string | null;
 };
 
 export const dynamic = "force-dynamic";
@@ -33,7 +34,7 @@ export default async function ProfilePage() {
   const { data: member, error } = await supabaseAdmin
     .from("users")
     .select(
-      "id, salutation, first_name, last_name, email, role, member_id, membership_tier, membership_status, expiry_date, phone, organization, designation, arabic_name, member_since",
+      "id, salutation, first_name, last_name, email, role, member_id, membership_tier, membership_status, expiry_date, phone, organization, designation, arabic_name, member_since, profile_image_url",
     )
     .eq("id", currentUser.id)
     .single();

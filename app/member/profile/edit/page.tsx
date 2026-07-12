@@ -15,7 +15,7 @@ export default async function EditProfilePage() {
   const { data: member, error } = await supabaseAdmin
     .from("users")
     .select(
-      "salutation, first_name, last_name, arabic_name, phone, organization, designation",
+      "salutation, first_name, last_name, email, arabic_name, phone, organization, designation, profile_image_url",
     )
     .eq("id", currentUser.id)
     .single();

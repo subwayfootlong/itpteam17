@@ -18,6 +18,7 @@ export type CurrentUser = {
   membershipTier: string | null;
   membershipStatus: string | null;
   expiryDate: string | null;
+  profileImageUrl: string | null;
 };
 
 export async function getCurrentUser(): Promise<CurrentUser | null> {
@@ -33,7 +34,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     const { data } = await supabaseAdmin
       .from("users")
       .select(
-        "id, email, first_name, last_name, membership_tier, membership_status, expiry_date",
+        "id, email, first_name, last_name, membership_tier, membership_status, expiry_date, profile_image_url",
       )
       .eq("id", payload.sub)
       .maybeSingle();
@@ -50,6 +51,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
         membershipTier: null,
         membershipStatus: null,
         expiryDate: null,
+        profileImageUrl: null,
       };
     }
 
@@ -66,6 +68,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
       membershipTier: data.membership_tier ?? null,
       membershipStatus: data.membership_status ?? null,
       expiryDate: data.expiry_date ?? null,
+      profileImageUrl: data.profile_image_url ?? null,
     };
   } catch {
     return null;

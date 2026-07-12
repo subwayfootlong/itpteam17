@@ -4,6 +4,7 @@ import Link from "next/link";
 import { QRCodeCanvas } from "qrcode.react";
 import type { MemberProfile } from "@/app/member/profile/page";
 import { formatTierLabel } from "@/lib/membershipTiers";
+import { formatSalutationLabel } from "@/lib/memberProfileOptions";
 import { formatMemberName } from "@/lib/memberName";
 import { formatMemberDate } from "@/lib/dates";
 import { useRouter } from "next/navigation";
@@ -28,6 +29,27 @@ type Benefit = {
   title: string;
   subtitle: string;
   icon: React.ElementType;
+};
+
+type EventRegistration = {
+  id: string;
+  registered_at: string;
+  status: string | null;
+  rejection_message: string | null;
+  events:
+    | {
+        id: string;
+        title: string | null;
+        venue: string | null;
+        event_date: string | null;
+      }
+    | Array<{
+        id: string;
+        title: string | null;
+        venue: string | null;
+        event_date: string | null;
+      }>
+    | null;
 };
 
 const benefitsByTier: Record<string, Benefit[]> = {
@@ -159,7 +181,13 @@ const benefitsByTier: Record<string, Benefit[]> = {
   ],
 };
 
-export default function ProfileView({ member, registrations = [] }: { member: MemberProfile, registrations?: any[] }) {
+export default function ProfileView({
+  member,
+  registrations = [],
+}: {
+  member: MemberProfile;
+  registrations?: EventRegistration[];
+}) {
   const router = useRouter();
   const tier = member.membership_tier || "basic";
   const benefits = benefitsByTier[tier] || benefitsByTier.basic;
@@ -188,47 +216,45 @@ export default function ProfileView({ member, registrations = [] }: { member: Me
 
   return (
     <div className="px-5 py-5">
-          {/* Digital E-Card */}
-          <section className="relative overflow-hidden rounded-2xl bg-[#149100] p-5 text-white shadow-sm">
+      {/* Digital E-Card */}
+      <section className="relative overflow-hidden rounded-2xl bg-[#149100] p-5 text-white shadow-sm">
 
-            <div className="relative z-10 flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm uppercase tracking-[0.2em]">
-                  {formatTierLabel(member.membership_tier)} Member
-                </p>
+        <div className="relative z-10 flex items-start justify-between gap-4">
+          <div>
+            <p className="text-sm uppercase tracking-[0.2em]">
+              {formatTierLabel(member.membership_tier)} Member
+            </p>
 
-                <h2 className="mt-2 text-lg font-medium">
-                  {formatMemberName(member, "Member Name")}
-                </h2>
+            <h2 className="mt-2 text-lg font-medium">
+              {formatMemberName(member, "Member Name")}
+            </h2>
 
-                {member.arabic_name && (
-                  <p className="mt-1 text-sm text-white/80">
-                    {member.arabic_name}
-                  </p>
-                )}
+            {member.arabic_name && (
+              <p className="mt-1 text-sm text-white/80">{member.arabic_name}</p>
+            )}
 
-                <p className="mt-4 text-sm text-white/80">Member ID</p>
+            <p className="mt-4 text-sm text-white/80">Member ID</p>
 
-                <p className="text-lg font-bold tracking-[0.15em]">
-                  {member.member_id || "PGS-0000-0000"}
-                </p>
+            <p className="text-lg font-bold tracking-[0.15em]">
+              {member.member_id || "PGS-0000-0000"}
+            </p>
 
-                <p className="mt-4 text-xs uppercase text-white/70">
-                  Valid thru: {formatMemberDate(member.expiry_date)}
-                </p>
-              </div>
+            <p className="mt-4 text-xs uppercase text-white/70">
+              Valid thru: {formatMemberDate(member.expiry_date)}
+            </p>
+          </div>
 
-              <div className="flex flex-col items-center gap-2">
-                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20">
-                  <BadgeCheck size={30} />
-                </div>
-
-                <div className="rounded-lg bg-white p-2">
-                  <QRCodeCanvas value={qrValue} size={74} />
-                </div>
-              </div>
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20">
+              <BadgeCheck size={30} />
             </div>
-          </section>
+
+            <div className="rounded-lg bg-white p-2">
+              <QRCodeCanvas value={qrValue} size={74} />
+            </div>
+          </div>
+        </div>
+      </section>
 
           {/* Account Details */}
           <section className="mt-6">
@@ -243,7 +269,7 @@ export default function ProfileView({ member, registrations = [] }: { member: Me
                     Salutation
                   </p>
                   <p className="mt-1 text-[#151C27]">
-                    {member.salutation || "Not available"}
+                    {formatSalutationLabel(member.salutation) || "Not available"}
                   </p>
                 </div>
 

@@ -4,20 +4,24 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
+import MemberAvatar from "@/components/member/MemberAvatar";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import Button from "@/components/ui/Button";
 import PhoneInputField from "@/components/ui/PhoneInput";
+import { formatMemberName } from "@/lib/memberName";
 import { SALUTATIONS } from "@/lib/memberProfileOptions";
 
 export type EditProfileInitial = {
   salutation: string | null;
   first_name: string | null;
   last_name: string | null;
+  email: string | null;
   arabic_name: string | null;
   phone: string | null;
   organization: string | null;
   designation: string | null;
+  profile_image_url: string | null;
 };
 
 export default function EditProfileForm({ initial }: { initial: EditProfileInitial }) {
@@ -77,6 +81,21 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
         </Link>
         <h1 className="text-2xl font-bold text-[#0F6E00]">Edit Profile</h1>
       </header>
+
+      <section className="mt-8 flex flex-col items-center text-center">
+        <MemberAvatar
+          firstName={initial.first_name}
+          lastName={initial.last_name}
+          email={initial.email}
+          profileImageUrl={initial.profile_image_url}
+          size={96}
+          className="shadow-sm"
+        />
+
+        <h2 className="mt-3 text-2xl font-bold text-[#151C27]">
+          {formatMemberName(initial, "Member")}
+        </h2>
+      </section>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         <Select

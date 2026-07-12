@@ -1,11 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
+import MemberAvatar from "@/components/member/MemberAvatar";
+import type { CurrentUser } from "@/lib/currentUser";
 
-export default function MemberTopBar() {
+type MemberTopBarProps = {
+  user: CurrentUser | null;
+};
+
+export default function MemberTopBar({ user }: MemberTopBarProps) {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -46,16 +51,19 @@ export default function MemberTopBar() {
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between border-b border-gray-200 bg-[#FFFFFF] px-5 py-4">
       <div className="flex items-center gap-3">
-        <div className="relative h-11 w-11 overflow-hidden rounded-full bg-gray-200">
-          <Image
-            src="/profile-placeholder.jpg"
-            alt="Member profile"
-            fill
-            className="object-cover"
-            sizes="44px"
-            priority
+        <Link
+          href="/member/profile"
+          aria-label="Open profile"
+          className="rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F6E00] focus-visible:ring-offset-2"
+        >
+          <MemberAvatar
+            firstName={user?.firstName}
+            lastName={user?.lastName}
+            email={user?.email}
+            profileImageUrl={user?.profileImageUrl}
+            size={44}
           />
-        </div>
+        </Link>
 
         <h1 className="text-2xl font-bold text-[#0F6E00]">Pergas</h1>
       </div>
