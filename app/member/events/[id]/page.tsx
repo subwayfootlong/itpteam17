@@ -69,7 +69,7 @@ export default async function EventDetailsPage({
           <Link href="/member/events" aria-label="Back to events">
             <ArrowLeft size={24} className="text-[#0F6E00]" />
           </Link>
-          <h1 className="line-clamp-2 text-2xl font-bold text-[#0F6E00]">
+          <h1 className="member-text-2xl line-clamp-2 text-2xl font-bold text-[#0F6E00]">
             {eventRecord.title}
           </h1>
         </header>
@@ -84,7 +84,7 @@ export default async function EventDetailsPage({
             />
 
             {eventRecord.category && (
-              <span className="absolute left-5 top-5 rounded-full bg-[rgba(15,110,0,0.92)] px-4 py-1.5 text-sm font-semibold text-white">
+              <span className="member-text-sm absolute left-5 top-5 rounded-full bg-[rgba(15,110,0,0.92)] px-4 py-1.5 text-sm font-semibold text-white">
                 {eventRecord.category}
               </span>
             )}
@@ -92,11 +92,11 @@ export default async function EventDetailsPage({
 
           <div className="space-y-6 p-6">
             <div>
-              <h2 className="text-[2rem] font-bold leading-tight text-[#151C27]">
+              <h2 className="member-text-2xl text-[2rem] font-bold leading-tight text-[#151C27]">
                 {eventRecord.title}
               </h2>
               {eventRecord.description && (
-                <p className="mt-4 whitespace-pre-line break-words text-base leading-7 text-[#4F5B53]">
+                <p className="member-text-base mt-4 whitespace-pre-line break-words text-base leading-7 text-[#4F5B53]">
                   {eventRecord.description}
                 </p>
               )}
@@ -107,10 +107,10 @@ export default async function EventDetailsPage({
                 <div className="flex items-start gap-3">
                   <CalendarDays size={20} strokeWidth={2.2} className="mt-0.5 text-[#0F6E00]" />
                   <div>
-                    <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#6D786F]">
+                    <p className="member-text-sm text-sm font-semibold uppercase tracking-[0.12em] text-[#6D786F]">
                       Date
                     </p>
-                    <p className="mt-1 text-base text-[#151C27]">
+                    <p className="member-text-base mt-1 min-w-0 break-words text-[#151C27]">
                       {formatMemberDate(eventRecord.event_date)}
                     </p>
                   </div>
@@ -121,10 +121,10 @@ export default async function EventDetailsPage({
                 <div className="flex items-start gap-3">
                   <Clock size={20} strokeWidth={2.2} className="mt-0.5 text-[#0F6E00]" />
                   <div>
-                    <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#6D786F]">
+                    <p className="member-text-sm text-sm font-semibold uppercase tracking-[0.12em] text-[#6D786F]">
                       Time
                     </p>
-                    <p className="mt-1 text-base text-[#151C27]">
+                    <p className="member-text-base mt-1 min-w-0 break-words text-[#151C27]">
                       {formatTime(eventRecord.start_time, eventRecord.end_time)}
                     </p>
                   </div>
@@ -135,10 +135,10 @@ export default async function EventDetailsPage({
                 <div className="flex items-start gap-3">
                   <MapPin size={20} strokeWidth={2.2} className="mt-0.5 text-[#0F6E00]" />
                   <div>
-                    <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#6D786F]">
+                    <p className="member-text-sm text-sm font-semibold uppercase tracking-[0.12em] text-[#6D786F]">
                       Venue
                     </p>
-                    <p className="mt-1 text-base text-[#151C27]">
+                    <p className="member-text-base mt-1 min-w-0 break-words text-[#151C27]">
                       {eventRecord.venue || "Venue to be confirmed"}
                     </p>
                   </div>
@@ -149,10 +149,10 @@ export default async function EventDetailsPage({
                 <div className="flex items-start gap-3">
                   <Users size={20} strokeWidth={2.2} className="mt-0.5 text-[#0F6E00]" />
                   <div>
-                    <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#6D786F]">
+                    <p className="member-text-sm text-sm font-semibold uppercase tracking-[0.12em] text-[#6D786F]">
                       Availability
                     </p>
-                    <p className="mt-1 text-base text-[#151C27]">
+                    <p className="member-text-base mt-1 min-w-0 break-words text-[#151C27]">
                       {eventRecord.spots_available !== null
                         ? `${eventRecord.spots_available} spot${eventRecord.spots_available === 1 ? "" : "s"} left`
                         : "Availability to be confirmed"}

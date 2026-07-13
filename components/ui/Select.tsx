@@ -26,7 +26,10 @@ const Select: React.FC<SelectProps> = ({
   return (
     <div className={`w-full flex flex-col gap-1.5 ${className}`}>
       {label ? (
-        <label htmlFor={selectId} className="text-gray-900 text-sm font-semibold tracking-tight">
+        <label
+          htmlFor={selectId}
+          className="member-text-sm text-sm font-semibold tracking-tight text-gray-900"
+        >
           {label}
         </label>
       ) : null}
@@ -35,7 +38,7 @@ const Select: React.FC<SelectProps> = ({
         <select
           id={selectId}
           {...rest}
-          className="w-full h-12 px-4 bg-transparent text-gray-900 text-sm font-normal outline-none appearance-none cursor-pointer"
+          className="member-text-sm w-full h-12 cursor-pointer appearance-none bg-transparent px-4 text-sm font-normal text-gray-900 outline-none"
         >
           {placeholder ? (
             <option value="" disabled>
