@@ -28,17 +28,17 @@ const Select: React.FC<SelectProps> = ({
       {label ? (
         <label
           htmlFor={selectId}
-          className="member-text-sm text-sm font-semibold tracking-tight text-gray-900"
+          className="font-helvetica text-sm font-semibold tracking-tight text-gray-900"
         >
           {label}
         </label>
       ) : null}
 
-      <div className="relative w-full rounded-xl bg-slate-50 border border-stone-300 focus-within:border-[#53A63E] transition-all">
+      <div className="relative w-full rounded-xl border border-stone-300 bg-slate-50 transition-all focus-within:border-[#53A63E]">
         <select
           id={selectId}
           {...rest}
-          className="member-text-sm w-full h-12 cursor-pointer appearance-none bg-transparent px-4 text-sm font-normal text-gray-900 outline-none"
+          className="font-helvetica h-12 w-full cursor-pointer appearance-none bg-transparent px-4 text-sm font-normal text-gray-900 outline-none"
         >
           {placeholder ? (
             <option value="" disabled>

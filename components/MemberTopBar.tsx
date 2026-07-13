@@ -65,7 +65,9 @@ export default function MemberTopBar({ user }: MemberTopBarProps) {
           />
         </Link>
 
-        <h1 className="text-2xl font-bold text-[#0F6E00]">Pergas</h1>
+        <h1 className="member-text-2xl font-butler text-2xl font-bold text-[#0F6E00]">
+          Pergas
+        </h1>
       </div>
 
       <Link

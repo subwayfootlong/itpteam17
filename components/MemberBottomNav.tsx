@@ -45,7 +45,7 @@ export default function MemberBottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-1/2 z-40 w-full max-w-md -translate-x-1/2 border-t border-gray-200 bg-[#FFFFFF] px-4 py-2">
-      <div className="grid grid-cols-5 text-center text-xs">
+      <div className="grid grid-cols-5 text-center font-helvetica">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = isActiveRoute(item.href);
@@ -56,8 +56,8 @@ export default function MemberBottomNav() {
               href={item.href}
               className={
                 isActive
-                  ? "rounded-xl bg-[#E8F4E6] px-2 py-1 text-[#0F6E00] font-semibold"
-                  : "px-2 py-1 text-[#5F5E5E]"
+                  ? "member-text-xs rounded-xl bg-[#E8F4E6] px-2 py-1 text-xs font-semibold text-[#0F6E00]"
+                  : "member-text-xs px-2 py-1 text-xs text-[#5F5E5E]"
               }
               aria-current={isActive ? "page" : undefined}
             >

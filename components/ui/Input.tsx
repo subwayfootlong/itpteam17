@@ -19,13 +19,13 @@ const Input: React.FC<InputProps> = ({ label, id, iconLeft, iconRight, showPassw
       {label ? (
         <label
           htmlFor={inputId}
-          className="member-text-sm text-sm font-semibold tracking-tight text-gray-900"
+          className="font-helvetica text-sm font-semibold tracking-tight text-gray-900"
         >
           {label}
         </label>
       ) : null}
 
-      <div className="relative w-full rounded-xl bg-slate-50 border border-stone-300 focus-within:border-[#53A63E] transition-all">
+      <div className="relative w-full rounded-xl border border-stone-300 bg-slate-50 transition-all focus-within:border-[#53A63E]">
         {iconLeft ? (
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500">{iconLeft}</span>
         ) : null}
@@ -33,7 +33,7 @@ const Input: React.FC<InputProps> = ({ label, id, iconLeft, iconRight, showPassw
         <input
           id={inputId}
           {...rest}
-          className={`member-text-sm w-full h-12 ${iconLeft ? 'pl-12' : 'px-4'} ${showPasswordToggle ? 'pr-12' : 'pr-4'} bg-transparent text-sm font-normal text-gray-900 placeholder-stone-400 outline-none`}
+          className={`font-helvetica h-12 w-full bg-transparent text-sm font-normal text-gray-900 placeholder-stone-400 outline-none ${iconLeft ? 'pl-12' : 'px-4'} ${showPasswordToggle ? 'pr-12' : 'pr-4'}`}
         />
 
         {showPasswordToggle ? (

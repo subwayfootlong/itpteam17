@@ -16,7 +16,7 @@ const variantClasses: Record<Variant, string> = {
 
 const Button: React.FC<ButtonProps> = ({ variant = 'primary', loading = false, fullWidth = true, children, className = '', disabled, ...rest }) => {
   const sizeClass = fullWidth ? 'w-full h-12' : 'inline-flex h-10 px-3';
-  const base = `${sizeClass} member-text-sm rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.99]`;
+  const base = `${sizeClass} rounded-xl font-helvetica text-sm font-semibold flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.99]`;
   return (
     <button
       {...rest}

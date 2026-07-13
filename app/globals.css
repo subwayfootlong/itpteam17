@@ -5879,6 +5879,8 @@ a {
 
 /* =====================================================
    Member font-size accessibility preference
+   Scales only inside .member-font-scope (member shell).
+   Shared auth/admin UI is unaffected.
    ===================================================== */
 
 .member-font-scope {
@@ -5929,4 +5931,12 @@ a {
 .member-font-scope .member-text-2xl {
   font-size: calc(1.5rem * var(--member-font-scale)) !important;
   line-height: 1.3 !important;
+}
+
+/* Shared form controls used inside member pages (Input/Select/Button/Phone) */
+.member-font-scope :is(input, select, textarea):not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.member-font-scope label.text-sm,
+.member-font-scope button.text-sm {
+  font-size: calc(0.875rem * var(--member-font-scale)) !important;
+  line-height: 1.5 !important;
 }
