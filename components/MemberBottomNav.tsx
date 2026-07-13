@@ -44,8 +44,11 @@ export default function MemberBottomNav() {
   }
 
   return (
-    <nav className="fixed bottom-0 left-1/2 z-40 w-full max-w-md -translate-x-1/2 border-t border-gray-200 bg-[#FFFFFF] px-4 py-2">
-      <div className="grid grid-cols-5 text-center font-helvetica">
+    <nav
+      className="fixed bottom-0 left-1/2 z-40 w-full max-w-md -translate-x-1/2 border-t border-gray-200 bg-white px-2 py-2"
+      aria-label="Member navigation"
+    >
+      <div className="grid grid-cols-5 gap-1 text-center font-helvetica">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = isActiveRoute(item.href);
@@ -54,15 +57,22 @@ export default function MemberBottomNav() {
             <Link
               key={item.label}
               href={item.href}
-              className={
-                isActive
-                  ? "member-text-xs rounded-xl bg-[#E8F4E6] px-2 py-1 text-xs font-semibold text-[#0F6E00]"
-                  : "member-text-xs px-2 py-1 text-xs text-[#5F5E5E]"
-              }
               aria-current={isActive ? "page" : undefined}
+              className={`min-w-0 rounded-xl px-1 py-1 transition-colors ${
+                isActive
+                  ? "bg-[#E8F4E6] font-semibold text-[#0F6E00]"
+                  : "text-[#5F5E5E]"
+              }`}
             >
-              <Icon size={22} strokeWidth={2.4} className="mx-auto mb-1" />
-              <p>{item.label}</p>
+              <Icon
+                size={22}
+                strokeWidth={2.4}
+                className="mx-auto mb-1"
+                aria-hidden="true"
+              />
+              <span className="block whitespace-nowrap text-[15px] leading-tight">
+                {item.label}
+              </span>
             </Link>
           );
         })}

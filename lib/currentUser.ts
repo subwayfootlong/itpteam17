@@ -15,6 +15,8 @@ export type CurrentUser = {
   lastName: string;
   fullName: string;
   initials: string;
+  phone: string | null;
+  organization: string | null;
   membershipTier: string | null;
   membershipStatus: string | null;
   expiryDate: string | null;
@@ -34,7 +36,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     const { data } = await supabaseAdmin
       .from("users")
       .select(
-        "id, email, first_name, last_name, membership_tier, membership_status, expiry_date, profile_image_url",
+        "id, email, first_name, last_name, phone, organization, membership_tier, membership_status, expiry_date, profile_image_url",
       )
       .eq("id", payload.sub)
       .maybeSingle();
@@ -48,6 +50,8 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
         lastName: "",
         fullName: email ?? "Member",
         initials: email?.charAt(0).toUpperCase() ?? "M",
+        phone: null,
+        organization: null,
         membershipTier: null,
         membershipStatus: null,
         expiryDate: null,
@@ -65,6 +69,8 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
       lastName,
       fullName: formatMemberName(data),
       initials: memberInitials(data),
+      phone: data.phone?.trim() ?? null,
+      organization: data.organization?.trim() ?? null,
       membershipTier: data.membership_tier ?? null,
       membershipStatus: data.membership_status ?? null,
       expiryDate: data.expiry_date ?? null,

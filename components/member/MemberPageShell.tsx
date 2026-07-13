@@ -18,17 +18,14 @@ export default async function MemberPageShell({
 
   return (
     <main className="flex min-h-screen justify-center bg-white">
-      {/* max-w-md must stay the flex child so justify-center keeps the column centered */}
       <section className="min-h-screen w-full max-w-md bg-white font-helvetica">
+        {showTopBar && <MemberTopBar user={currentUser} />}
         <MemberFontSizeProvider>
-          {showTopBar && <MemberTopBar user={currentUser} />}
-
           <div className={showBottomNav ? "min-h-screen pb-24" : "min-h-screen"}>
             {children}
           </div>
-
-          {showBottomNav && <MemberBottomNav />}
         </MemberFontSizeProvider>
+        {showBottomNav && <MemberBottomNav />}
       </section>
     </main>
   );
