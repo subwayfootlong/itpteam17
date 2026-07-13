@@ -69,12 +69,12 @@ function EventDescription({ description, eventId }: { description: string; event
     <div className="mt-2 min-h-[3.75rem]">
       <p
         ref={descriptionRef}
-        className="line-clamp-2 break-words text-sm leading-5 text-[#5F5E5E]"
+        className="member-text-sm line-clamp-2 break-words text-sm leading-5 text-[#5F5E5E]"
       >
         {description}
       </p>
       {isTruncated && (
-        <Link href={`/member/events/${eventId}`} className="mt-1 inline-block text-sm font-semibold text-[#0F6E00]">
+        <Link href={`/member/events/${eventId}`} className="member-text-sm mt-1 inline-block text-sm font-semibold text-[#0F6E00]">
           See more
         </Link>
       )}
@@ -175,7 +175,7 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
     <div className="px-5 py-5">
       <div className="rounded-2xl border border-gray-200 bg-[#FFFFFF] p-6 shadow-sm">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-[#151C27]">{getMonthTitle(currentMonth)}</h2>
+          <h2 className="member-text-2xl text-2xl font-bold text-[#151C27]">{getMonthTitle(currentMonth)}</h2>
 
           <div className="flex gap-5 text-[#151C27]">
             <button type="button" aria-label="Previous month" onClick={goToPreviousMonth}>
@@ -188,13 +188,13 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-7 text-center text-[#5F5E5E]">
+        <div className="member-text-base mt-6 grid grid-cols-7 text-center text-[#5F5E5E]">
           {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
             <p key={`${day}-${index}`}>{day}</p>
           ))}
         </div>
 
-        <div className="mt-6 grid grid-cols-7 gap-y-3 text-center text-lg text-[#151C27]">
+        <div className="member-text-lg mt-6 grid grid-cols-7 gap-y-3 text-center text-lg text-[#151C27]">
           {calendarDays.map((date) => {
             const isSelected = date.dateKey === selectedDate;
             const hasEvent = eventDates.has(date.dateKey);
@@ -230,15 +230,15 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
       </div>
 
       {hasError && (
-        <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div className="member-text-sm mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           Failed to load events. Please check your Supabase connection.
         </div>
       )}
 
       <div className="mt-6 border-l-4 border-[#0F6E00] pl-4">
-        <p className="text-[#151C27]">Upcoming on {getDateLabel(selectedDate)}</p>
+        <p className="member-text-base text-[#151C27]">Upcoming on {getDateLabel(selectedDate)}</p>
 
-        <p className="text-[#151C27]">
+        <p className="member-text-base text-[#151C27]">
           {selectedDateEvents.length}{" "}
           {selectedDateEvents.length === 1 ? "session" : "sessions"} scheduled
         </p>
@@ -246,7 +246,7 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
 
       <div className="mt-6 min-h-[360px] space-y-7">
         {selectedDateEvents.length === 0 && !hasError ? (
-          <div className="flex min-h-[220px] items-center justify-center rounded-2xl border border-gray-200 p-6 text-center text-[#5F5E5E]">
+          <div className="member-text-base flex min-h-[220px] items-center justify-center rounded-2xl border border-gray-200 p-6 text-center text-[#5F5E5E]">
             No published events on this date.
           </div>
         ) : (
@@ -254,12 +254,10 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
             const isFull = event.spots_available !== null && event.spots_available <= 0;
             const hasRsvpLink = Boolean(event.external_rsvp_url?.trim());
 
-            const buttonLabel = isFull ? "Full" : hasRsvpLink ? "Register" : "Unavailable";
-
             return (
               <article
                 key={event.id}
-                className="flex h-[31rem] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-[#FFFFFF] shadow-sm"
+                className="flex min-h-[31rem] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-[#FFFFFF] shadow-sm"
               >
                 <div className="relative h-48 bg-gray-200">
                   <Link
@@ -276,17 +274,17 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
                   </Link>
 
                   {event.category && (
-                    <span className="absolute right-4 top-4 rounded-full bg-[#0F6E00] px-4 py-1 text-sm text-white">
+                    <span className="member-text-sm absolute right-4 top-4 rounded-full bg-[#0F6E00] px-4 py-1 text-sm text-white">
                       {event.category}
                     </span>
                   )}
                 </div>
 
                 <div className="flex flex-1 flex-col p-6">
-                  <h3 className="min-h-[3.5rem] text-2xl font-bold leading-snug text-[#151C27]">
+                  <h3 className="member-text-2xl min-h-[3.5rem] text-2xl font-bold leading-snug text-[#151C27]">
                     <Link
                       href={`/member/events/${event.id}`}
-                      className="line-clamp-2 inline-block"
+                      className="inline-block min-w-0 break-words line-clamp-2"
                     >
                       {event.title}
                     </Link>
@@ -299,14 +297,14 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
                   )}
 
                   <div className="mt-4 space-y-3 text-[#151C27]">
-                    <p className="flex items-center gap-2">
+                    <p className="member-text-base flex items-center gap-2">
                       <Clock size={18} strokeWidth={2.2} className="text-[#5F5E5E]" />
                       {formatTime(event.start_time, event.end_time)}
                     </p>
 
-                    <p className="flex items-center gap-2">
+                    <p className="member-text-base flex min-w-0 items-center gap-2">
                       <MapPin size={18} strokeWidth={2.2} className="text-[#5F5E5E]" />
-                      {event.venue || "Venue to be confirmed"}
+                      <span className="min-w-0 break-words">{event.venue || "Venue to be confirmed"}</span>
                     </p>
                   </div>
 
@@ -315,7 +313,7 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
                       href={event.external_rsvp_url!.trim()}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-auto block rounded-xl bg-[#0F6E00] hover:bg-[#0c5900] py-4 text-center font-semibold text-white transition-colors"
+                      className="member-text-base mt-auto block min-h-11 rounded-xl bg-[#0F6E00] px-4 py-4 text-center font-semibold text-white transition-colors hover:bg-[#0c5900]"
                     >
                       Register (External)
                     </a>
@@ -323,7 +321,7 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
                     <button
                       type="button"
                       disabled
-                      className="mt-auto w-full rounded-xl bg-green-50 border border-green-200 py-4 font-semibold text-green-700 flex items-center justify-center gap-1.5"
+                      className="member-text-base mt-auto flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-green-200 bg-green-50 px-4 py-4 font-semibold text-green-700"
                     >
                       <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
@@ -335,7 +333,7 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
                       type="button"
                       disabled={registeringId === event.id}
                       onClick={() => handleInAppRegister(event.id)}
-                      className="mt-auto w-full rounded-xl bg-[#0F6E00] hover:bg-[#0c5900] py-4 font-semibold text-white transition-colors"
+                      className="member-text-base mt-auto min-h-11 w-full rounded-xl bg-[#0F6E00] px-4 py-4 font-semibold text-white transition-colors hover:bg-[#0c5900]"
                     >
                       {registeringId === event.id ? 'Processing...' : 'Reapply'}
                     </button>
@@ -343,7 +341,7 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
                     <button
                       type="button"
                       disabled
-                      className="mt-auto w-full rounded-xl border border-gray-300 bg-gray-50 py-4 font-semibold text-gray-400"
+                      className="member-text-base mt-auto min-h-11 w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-4 font-semibold text-gray-400"
                     >
                       Full
                     </button>
@@ -352,7 +350,7 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
                       type="button"
                       disabled={registeringId === event.id}
                       onClick={() => handleInAppRegister(event.id)}
-                      className="mt-auto w-full rounded-xl bg-[#0F6E00] hover:bg-[#0c5900] py-4 font-semibold text-white transition-colors"
+                      className="member-text-base mt-auto min-h-11 w-full rounded-xl bg-[#0F6E00] px-4 py-4 font-semibold text-white transition-colors hover:bg-[#0c5900]"
                     >
                       {registeringId === event.id ? 'Processing...' : 'Register'}
                     </button>

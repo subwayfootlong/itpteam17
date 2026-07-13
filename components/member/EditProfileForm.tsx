@@ -79,7 +79,7 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
         <Link href="/member/profile" aria-label="Back to profile">
           <ArrowLeft size={24} className="text-[#0F6E00]" />
         </Link>
-        <h1 className="text-2xl font-bold text-[#0F6E00]">Edit Profile</h1>
+        <h1 className="member-text-2xl text-2xl font-bold text-[#0F6E00]">Edit Profile</h1>
       </header>
 
       <section className="mt-8 flex flex-col items-center text-center">
@@ -92,7 +92,7 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
           className="shadow-sm"
         />
 
-        <h2 className="mt-3 text-2xl font-bold text-[#151C27]">
+        <h2 className="member-text-2xl mt-3 text-2xl font-bold text-[#151C27]">
           {formatMemberName(initial, "Member")}
         </h2>
       </section>
@@ -155,7 +155,7 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
         />
 
         {error ? (
-          <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <p className="member-text-sm rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
           </p>
         ) : null}
@@ -163,7 +163,7 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
         <div className="grid grid-cols-2 gap-3 pt-2">
           <Link
             href="/member/profile"
-            className="flex h-12 items-center justify-center rounded-xl border border-gray-300 bg-white font-semibold text-[#151C27]"
+            className="member-text-base flex min-h-12 items-center justify-center rounded-xl border border-gray-300 bg-white px-4 py-3 font-semibold text-[#151C27]"
           >
             Cancel
           </Link>

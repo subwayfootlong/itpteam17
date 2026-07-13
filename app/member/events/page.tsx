@@ -50,10 +50,10 @@ export default async function EventsPage() {
       .map((r) => r.event_id)
   );
 
-  const eventsWithRegStatus = (events || []).map((e: any) => ({
-    ...e,
-    isRegistered: registeredEventIds.has(e.id),
-    isRejected: rejectedEventIds.has(e.id),
+  const eventsWithRegStatus = ((events ?? []) as EventRow[]).map((event) => ({
+    ...event,
+    isRegistered: registeredEventIds.has(event.id),
+    isRejected: rejectedEventIds.has(event.id),
   }));
 
   return (

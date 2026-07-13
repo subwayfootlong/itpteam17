@@ -5840,3 +5840,57 @@ a {
   height: 54px;
   background: #0f6e00;
 }
+
+/* =====================================================
+   Member font-size accessibility preference
+   ===================================================== */
+
+.member-font-scope {
+  --member-font-scale: 1;
+}
+
+.member-font-scope[data-font-size="small"] {
+  --member-font-scale: 0.9;
+}
+
+.member-font-scope[data-font-size="default"] {
+  --member-font-scale: 1;
+}
+
+.member-font-scope[data-font-size="large"] {
+  --member-font-scale: 1.125;
+}
+
+.member-font-scope[data-font-size="extraLarge"] {
+  --member-font-scale: 1.25;
+}
+
+.member-font-scope .member-text-xs {
+  font-size: calc(0.75rem * var(--member-font-scale)) !important;
+  line-height: 1.45 !important;
+}
+
+.member-font-scope .member-text-sm {
+  font-size: calc(0.875rem * var(--member-font-scale)) !important;
+  line-height: 1.5 !important;
+}
+
+.member-font-scope .member-text-base {
+  font-size: calc(1rem * var(--member-font-scale)) !important;
+  line-height: 1.55 !important;
+}
+
+.member-font-scope .member-text-lg {
+  font-size: calc(1.125rem * var(--member-font-scale)) !important;
+  line-height: 1.5 !important;
+}
+
+.member-font-scope .member-text-xl {
+  font-size: calc(1.25rem * var(--member-font-scale)) !important;
+  line-height: 1.4 !important;
+}
+
+.member-font-scope .member-text-2xl {
+  font-size: calc(1.5rem * var(--member-font-scale)) !important;
+  line-height: 1.3 !important;
+}

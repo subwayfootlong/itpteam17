@@ -18,6 +18,10 @@ import {
   ShieldCheck,
   Type,
 } from "lucide-react";
+import {
+  MEMBER_FONT_SIZES,
+  useMemberFontSize,
+} from "@/components/member/MemberFontSizeProvider";
 import type { NotificationPreferences } from "@/lib/notifications";
 
 type SettingsSwitchProps = {
@@ -90,7 +94,7 @@ function SegmentedControl({
             type="button"
             aria-pressed={isSelected}
             onClick={() => onChange(index)}
-            className={`rounded-[14px] px-2 py-3 text-center text-sm font-medium transition-colors ${
+            className={`member-text-sm rounded-[14px] px-2 py-3 text-center text-sm font-medium transition-colors ${
               isSelected
                 ? "bg-[#0F6E00] text-white shadow-[0_6px_18px_rgba(15,110,0,0.2)]"
                 : "text-[#6F7B6F]"
@@ -106,14 +110,14 @@ function SegmentedControl({
 
 export default function MemberSettingsView() {
   const router = useRouter();
+  const { fontSize, setFontSize } = useMemberFontSize();
 
   const [pushEnabled, setPushEnabled] = useState(true);
   const [emailEnabled, setEmailEnabled] = useState(false);
   const [loadingPreferences, setLoadingPreferences] = useState(true);
   const [savingPush, setSavingPush] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
-
-  const [fontSizeIndex, setFontSizeIndex] = useState(1);
+  const fontSizeIndex = MEMBER_FONT_SIZES.indexOf(fontSize);
 
   useEffect(() => {
     let ignore = false;
@@ -224,6 +228,14 @@ export default function MemberSettingsView() {
     router.refresh();
   }
 
+  function handleFontSizeChange(index: number) {
+    const selectedSize = MEMBER_FONT_SIZES[index];
+
+    if (selectedSize) {
+      setFontSize(selectedSize);
+    }
+  }
+
   return (
     <div className="px-5 py-6">
       <header className="flex items-center gap-3">
@@ -231,11 +243,11 @@ export default function MemberSettingsView() {
           <ArrowLeft size={24} className="text-[#0F6E00]" />
         </Link>
 
-        <h1 className="text-2xl font-bold text-[#0F6E00]">Settings</h1>
+        <h1 className="member-text-2xl text-2xl font-bold text-[#0F6E00]">Settings</h1>
       </header>
 
       <section className="mt-10">
-        <h2 className="px-2 text-base font-bold text-[#3F473F]">
+        <h2 className="member-text-base px-2 text-base font-bold text-[#3F473F]">
           Appearance
         </h2>
 
@@ -244,14 +256,21 @@ export default function MemberSettingsView() {
             <Type size={24} className="mt-1 text-[#6F7B6F]" />
 
             <div className="flex-1">
-              <p className="text-lg text-[#151C27]">Font Size</p>
+              <p className="member-text-lg text-lg text-[#151C27]">Font Size</p>
 
               <SegmentedControl
                 label="Font Size"
-                options={["Small", "Medium", "Large", "Extra Large"]}
+                options={["Small", "Default", "Large", "Extra Large"]}
                 selectedIndex={fontSizeIndex}
-                onChange={setFontSizeIndex}
+                onChange={handleFontSizeChange}
               />
+
+              <p className="sr-only" aria-live="polite">
+                Font size set to{" "}
+                {fontSize === "extraLarge"
+                  ? "Extra Large"
+                  : fontSize.charAt(0).toUpperCase() + fontSize.slice(1)}
+              </p>
             </div>
           </div>
 
@@ -260,8 +279,8 @@ export default function MemberSettingsView() {
               <Palette size={24} className="text-[#6F7B6F]" />
 
               <div>
-                <p className="text-lg text-[#151C27]">App Theme</p>
-                <p className="text-sm text-[#3F473F]">System Default</p>
+                <p className="member-text-lg text-lg text-[#151C27]">App Theme</p>
+                <p className="member-text-sm text-sm text-[#3F473F]">System Default</p>
               </div>
             </div>
 
@@ -271,7 +290,7 @@ export default function MemberSettingsView() {
       </section>
 
       <section className="mt-10">
-        <h2 className="px-2 text-base font-bold text-[#3F473F]">
+        <h2 className="member-text-base px-2 text-base font-bold text-[#3F473F]">
           Notifications
         </h2>
 
@@ -279,7 +298,7 @@ export default function MemberSettingsView() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Bell size={24} className="text-[#6F7B6F]" />
-              <p className="text-lg text-[#151C27]">Push Notifications</p>
+              <p className="member-text-lg text-lg text-[#151C27]">Push Notifications</p>
             </div>
 
             <SettingsSwitch
@@ -297,7 +316,7 @@ export default function MemberSettingsView() {
           <div className="mt-8 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Mail size={24} className="text-[#6F7B6F]" />
-              <p className="text-lg text-[#151C27]">Email Notifications</p>
+              <p className="member-text-lg text-lg text-[#151C27]">Email Notifications</p>
             </div>
 
             <SettingsSwitch
@@ -312,21 +331,21 @@ export default function MemberSettingsView() {
             />
           </div>
 
-          <p className="mt-3 text-sm text-[#5F5E5E]">
+          <p className="member-text-sm mt-3 text-sm text-[#5F5E5E]">
             {loadingPreferences
               ? "Loading notification settings..."
               : statusMessage ||
                 "Push notifications control benefit, announcement, and event alerts."}
           </p>
 
-          <p className="mt-3 text-sm text-[#5F5E5E]">
+          <p className="member-text-sm mt-3 text-sm text-[#5F5E5E]">
             Email notifications are not connected yet.
           </p>
         </div>
       </section>
 
       <section className="mt-10">
-        <h2 className="px-2 text-base font-bold text-[#3F473F]">
+        <h2 className="member-text-base px-2 text-base font-bold text-[#3F473F]">
           Preferences
         </h2>
 
@@ -336,8 +355,8 @@ export default function MemberSettingsView() {
               <Globe size={24} className="text-[#6F7B6F]" />
 
               <div>
-                <p className="text-lg text-[#151C27]">Language</p>
-                <p className="text-sm text-[#3F473F]">English</p>
+                <p className="member-text-lg text-lg text-[#151C27]">Language</p>
+                <p className="member-text-sm text-sm text-[#3F473F]">English</p>
               </div>
             </div>
 
@@ -347,7 +366,7 @@ export default function MemberSettingsView() {
       </section>
 
       <section className="mt-10">
-        <h2 className="px-2 text-base font-bold text-[#3F473F]">
+        <h2 className="member-text-base px-2 text-base font-bold text-[#3F473F]">
           About & Support
         </h2>
 
@@ -355,7 +374,7 @@ export default function MemberSettingsView() {
           <Link href="#" className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Info size={24} className="text-[#6F7B6F]" />
-              <p className="text-lg text-[#151C27]">Help & Support</p>
+              <p className="member-text-lg text-lg text-[#151C27]">Help & Support</p>
             </div>
 
             <ChevronRight size={22} className="text-[#6F7B6F]" />
@@ -364,7 +383,7 @@ export default function MemberSettingsView() {
           <Link href="#" className="mt-8 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <ShieldCheck size={24} className="text-[#6F7B6F]" />
-              <p className="text-lg text-[#151C27]">Privacy Policy</p>
+              <p className="member-text-lg text-lg text-[#151C27]">Privacy Policy</p>
             </div>
 
             <ExternalLink size={22} className="text-[#6F7B6F]" />
@@ -373,7 +392,7 @@ export default function MemberSettingsView() {
           <Link href="#" className="mt-8 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <FileText size={24} className="text-[#6F7B6F]" />
-              <p className="text-lg text-[#151C27]">Terms of Service</p>
+              <p className="member-text-lg text-lg text-[#151C27]">Terms of Service</p>
             </div>
 
             <ExternalLink size={22} className="text-[#6F7B6F]" />
@@ -382,7 +401,7 @@ export default function MemberSettingsView() {
           <div className="mt-8 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Info size={24} className="text-[#6F7B6F]" />
-              <p className="text-lg text-[#151C27]">Version 2.4.0 (Build 108)</p>
+              <p className="member-text-lg text-lg text-[#151C27]">Version 2.4.0 (Build 108)</p>
             </div>
           </div>
         </div>
@@ -391,7 +410,7 @@ export default function MemberSettingsView() {
       <button
         type="button"
         onClick={handleLogout}
-        className="mx-auto mt-14 flex items-center justify-center gap-2 font-bold text-red-600"
+        className="member-text-base mx-auto mt-14 flex items-center justify-center gap-2 font-bold text-red-600"
       >
         <LogOut size={20} />
         Log Out

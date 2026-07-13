@@ -18,7 +18,7 @@ export default async function HomePage() {
     <MemberPageShell>
       <div className="px-5 py-6">
         <section>
-          <h1 className="text-3xl font-bold leading-tight text-[#151C27]">
+          <h1 className="member-text-2xl text-3xl font-bold leading-tight text-[#151C27]">
             Assalamualaikum,
             <br />
             <span className="text-[#2EAE23]">
@@ -27,7 +27,7 @@ export default async function HomePage() {
             </span>
           </h1>
 
-          <p className="mt-3 text-lg leading-relaxed text-[#3F473F]">
+          <p className="member-text-lg mt-3 text-lg leading-relaxed text-[#3F473F]">
             Welcome back to your community dashboard.
           </p>
         </section>
@@ -51,11 +51,11 @@ export default async function HomePage() {
                 Featured Event
               </span>
 
-              <h2 className="mt-4 text-lg font-semibold">
+              <h2 className="member-text-lg mt-4 text-lg font-semibold">
                 Annual Islamic Scholars Dialogue 2024
               </h2>
 
-              <p className="mt-2 text-base leading-relaxed text-white/90">
+              <p className="member-text-base mt-2 text-base leading-relaxed text-white/90">
                 Join the conversation on modern challenges and spiritual
                 growth with leading scholars.
               </p>
@@ -67,20 +67,20 @@ export default async function HomePage() {
           <div className="relative">
             <div className="absolute -right-10 -top-16 h-40 w-40 rounded-full bg-white/10" />
 
-            <p className="text-sm uppercase tracking-[0.18em] text-white/90">
+            <p className="member-text-sm text-sm uppercase tracking-[0.18em] text-white/90">
               Your Status
             </p>
 
-            <h2 className="mt-3 text-xl font-medium">{tierLabel} Member</h2>
+            <h2 className="member-text-xl mt-3 text-xl font-medium">{tierLabel} Member</h2>
 
-            <div className="mt-5 flex items-center gap-2 text-white/95">
+            <div className="member-text-base mt-5 flex items-center gap-2 text-white/95">
               <CalendarDays size={18} />
               <p>Expires: {expiryLabel}</p>
             </div>
 
             <Link
               href="/member/profile"
-              className="mt-8 block rounded-xl bg-white py-4 text-center font-bold text-[#0F6E00]"
+              className="member-text-base mt-8 block min-h-11 rounded-xl bg-white px-4 py-4 text-center font-bold text-[#0F6E00]"
             >
               View Digital Card
             </Link>
@@ -96,41 +96,41 @@ export default async function HomePage() {
             <CalendarDays size={24} className="text-[#0F6E00]" />
           </div>
 
-          <h2 className="mt-6 text-lg font-medium text-[#151C27]">
+          <h2 className="member-text-lg mt-6 text-lg font-medium text-[#151C27]">
             The Path of Wisdom: Weekly Halqa
           </h2>
 
-          <p className="mt-3 text-base text-[#5F5E5E]">
+          <p className="member-text-base mt-3 text-base text-[#5F5E5E]">
             Every Friday • 7:30 PM
           </p>
 
           <Link
             href="/member/events"
-            className="mt-7 block rounded-xl bg-[#0F6E00] py-4 text-center font-bold text-white"
+            className="member-text-base mt-7 block min-h-11 rounded-xl bg-[#0F6E00] px-4 py-4 text-center font-bold text-white"
           >
             Register Now
           </Link>
         </section>
 
         <section className="mt-10 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-          <div className="flex items-center gap-4">
+          <div className="flex min-w-0 items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-gray-300 text-[#9B6500]">
               <Coffee size={28} />
             </div>
 
-            <div>
-              <h2 className="font-bold text-[#151C27]">Brew & Bean</h2>
-              <p className="text-sm text-[#5F5E5E]">Merchant Partner</p>
+            <div className="min-w-0 flex-1">
+              <h2 className="member-text-base min-w-0 break-words font-bold text-[#151C27]">Brew & Bean</h2>
+              <p className="member-text-sm text-sm text-[#5F5E5E]">Merchant Partner</p>
             </div>
           </div>
 
-          <div className="mt-5 rounded-lg border border-[#F5C985] bg-[#FFF0D9] py-3 text-center font-bold text-[#7A4B00]">
+          <div className="member-text-base mt-5 rounded-lg border border-[#F5C985] bg-[#FFF0D9] px-4 py-3 text-center font-bold text-[#7A4B00]">
             15% OFF TOTAL BILL
           </div>
 
           <Link
             href="/member/benefit"
-            className="mt-6 block rounded-xl border border-gray-300 py-4 text-center font-bold text-[#151C27]"
+            className="member-text-base mt-6 block min-h-11 rounded-xl border border-gray-300 px-4 py-4 text-center font-bold text-[#151C27]"
           >
             Explore Benefits
           </Link>
@@ -148,9 +148,9 @@ export default async function HomePage() {
             <div className="absolute inset-0 bg-black/40" />
 
             <div className="relative rounded-xl border border-white/30 bg-white/15 p-6 backdrop-blur-sm">
-              <h2 className="text-lg font-medium">Upgrade your Experience</h2>
+              <h2 className="member-text-lg text-lg font-medium">Upgrade your Experience</h2>
 
-              <p className="mt-4 leading-relaxed text-white/90">
+              <p className="member-text-base mt-4 leading-relaxed text-white/90">
                 Unlock exclusive access to scholar-led retreats, priority
                 event registration, and premium merchant perks.
               </p>
@@ -158,14 +158,14 @@ export default async function HomePage() {
               <div className="mt-6 grid grid-cols-2 gap-4">
                 <Link
                   href="/member/profile"
-                  className="rounded-lg bg-[#B47A00] py-3 text-center font-bold text-white"
+                  className="member-text-base rounded-lg bg-[#B47A00] px-4 py-3 text-center font-bold text-white"
                 >
                   Upgrade Now
                 </Link>
 
                 <Link
                   href="/member/benefit"
-                  className="rounded-lg border border-white/50 bg-white/10 py-3 text-center font-bold text-white"
+                  className="member-text-base rounded-lg border border-white/50 bg-white/10 px-4 py-3 text-center font-bold text-white"
                 >
                   Learn More
                 </Link>

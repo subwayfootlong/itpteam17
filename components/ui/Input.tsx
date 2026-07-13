@@ -17,7 +17,10 @@ const Input: React.FC<InputProps> = ({ label, id, iconLeft, iconRight, showPassw
   return (
     <div className={`w-full flex flex-col gap-1.5 ${className}`}>
       {label ? (
-        <label htmlFor={inputId} className="text-gray-900 text-sm font-semibold tracking-tight">
+        <label
+          htmlFor={inputId}
+          className="member-text-sm text-sm font-semibold tracking-tight text-gray-900"
+        >
           {label}
         </label>
       ) : null}
@@ -30,7 +33,7 @@ const Input: React.FC<InputProps> = ({ label, id, iconLeft, iconRight, showPassw
         <input
           id={inputId}
           {...rest}
-          className={`w-full h-12 ${iconLeft ? 'pl-12' : 'px-4'} ${showPasswordToggle ? 'pr-12' : 'pr-4'} bg-transparent text-gray-900 text-sm font-normal placeholder-stone-400 outline-none`}
+          className={`member-text-sm w-full h-12 ${iconLeft ? 'pl-12' : 'px-4'} ${showPasswordToggle ? 'pr-12' : 'pr-4'} bg-transparent text-sm font-normal text-gray-900 placeholder-stone-400 outline-none`}
         />
 
         {showPasswordToggle ? (
