@@ -6,12 +6,10 @@ import type {
   NotificationType,
   SystemNotification,
 } from "@/lib/data/system-notifications";
-import type { NotificationPreferences } from "@/lib/notifications";
 import MemberIcon from "@/components/member/MemberIcon";
 import MemberBottomNav from "@/components/MemberBottomNav";
 
 type Filter = "All" | "Unread" | NotificationType;
-type PreferenceKey = "benefit" | "announcement" | "event";
 
 const filters: Filter[] = [
   "All",
@@ -20,28 +18,6 @@ const filters: Filter[] = [
   "Announcement",
   "Event",
   "System",
-];
-
-const preferenceCopy: {
-  key: PreferenceKey;
-  title: string;
-  description: string;
-}[] = [
-  {
-    key: "benefit",
-    title: "Benefit updates",
-    description: "New and updated member rewards",
-  },
-  {
-    key: "announcement",
-    title: "Announcements",
-    description: "Official Pergas updates",
-  },
-  {
-    key: "event",
-    title: "Event updates",
-    description: "Registration windows and event reminders",
-  },
 ];
 
 function NotificationHeader({ unreadCount }: { unreadCount: number }) {
@@ -85,19 +61,15 @@ function NotificationIcon({ type }: { type: NotificationType }) {
 
 export default function NotificationsCenter({
   initialNotifications,
-  initialPreferences,
   showChrome = true,
 }: {
   initialNotifications: SystemNotification[];
-  initialPreferences: NotificationPreferences;
   showChrome?: boolean;
 }) {
   const [notifications, setNotifications] = useState(initialNotifications);
   const [filter, setFilter] = useState<Filter>("All");
   const [query, setQuery] = useState("");
   const [toast, setToast] = useState("");
-  const [preferences, setPreferences] =
-    useState<NotificationPreferences>(initialPreferences);
   const filterScrollerRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifications.filter((item) => !item.isRead).length;
@@ -205,39 +177,6 @@ export default function NotificationsCenter({
     }
   };
 
-  const togglePreference = async (key: PreferenceKey) => {
-    const copy = preferenceCopy.find((item) => item.key === key);
-    const previous = preferences;
-    const nextValue = !preferences[key];
-    const next = { ...preferences, [key]: nextValue };
-
-    setPreferences(next);
-
-    try {
-      const response = await fetch("/api/member/notification-preferences", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ [key]: nextValue }),
-      });
-      const result = (await response.json().catch(() => ({}))) as {
-        preferences?: NotificationPreferences;
-        error?: string;
-      };
-
-      if (!response.ok || !result.preferences) {
-        throw new Error(result.error ?? "Unable to save alert preference.");
-      }
-
-      setPreferences(result.preferences);
-      setToast(
-        `${copy?.title ?? "Alert preference"} ${nextValue ? "enabled" : "disabled"}.`,
-      );
-    } catch (error) {
-      setPreferences(previous);
-      setToast(error instanceof Error ? error.message : "Action failed.");
-    }
-  };
-
   const scrollFilters = (direction: "left" | "right") => {
     filterScrollerRef.current?.scrollBy({
       left: direction === "left" ? -150 : 150,
@@ -326,29 +265,6 @@ export default function NotificationsCenter({
             <strong>Unread updates</strong>
           </div>
           <p>New benefits, announcements, and event updates from Pergas admins.</p>
-        </section>
-
-        <section className="notifications-preferences-card">
-          <div className="notifications-section-heading">
-            <span>Push Settings</span>
-            <strong>Alert preferences</strong>
-          </div>
-          <div className="notifications-preference-list">
-            {preferenceCopy.map((preference) => (
-              <button
-                key={preference.key}
-                className={preferences[preference.key] ? "is-enabled" : ""}
-                type="button"
-                onClick={() => togglePreference(preference.key)}
-              >
-                <span>
-                  <strong>{preference.title}</strong>
-                  <small>{preference.description}</small>
-                </span>
-                <i>{preferences[preference.key] ? "On" : "Off"}</i>
-              </button>
-            ))}
-          </div>
         </section>
 
         <section className="notifications-list-section">

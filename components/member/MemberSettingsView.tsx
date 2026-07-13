@@ -24,6 +24,30 @@ import {
 } from "@/components/member/MemberFontSizeProvider";
 import type { NotificationPreferences } from "@/lib/notifications";
 
+type PreferenceKey = "benefit" | "announcement" | "event";
+
+const preferenceCopy: {
+  key: PreferenceKey;
+  title: string;
+  description: string;
+}[] = [
+  {
+    key: "benefit",
+    title: "Benefit updates",
+    description: "New and updated member rewards",
+  },
+  {
+    key: "announcement",
+    title: "Announcements",
+    description: "Official Pergas updates",
+  },
+  {
+    key: "event",
+    title: "Event updates",
+    description: "Registration windows and event reminders",
+  },
+];
+
 type SettingsSwitchProps = {
   enabled: boolean;
   onClick: () => void;
@@ -114,6 +138,11 @@ export default function MemberSettingsView() {
 
   const [pushEnabled, setPushEnabled] = useState(true);
   const [emailEnabled, setEmailEnabled] = useState(false);
+  const [preferences, setPreferences] = useState<NotificationPreferences>({
+    benefit: true,
+    announcement: true,
+    event: true,
+  });
   const [loadingPreferences, setLoadingPreferences] = useState(true);
   const [savingPush, setSavingPush] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
@@ -134,6 +163,7 @@ export default function MemberSettingsView() {
         }
 
         if (!ignore) {
+          setPreferences(result.preferences);
           const nextPushEnabled =
             result.preferences.benefit &&
             result.preferences.announcement &&
@@ -210,6 +240,54 @@ export default function MemberSettingsView() {
       );
     } finally {
       setSavingPush(false);
+    }
+  }
+
+  async function handlePreferenceToggle(key: PreferenceKey) {
+    if (loadingPreferences || savingPush) {
+      return;
+    }
+
+    const copy = preferenceCopy.find((item) => item.key === key);
+    const previousPreferences = preferences;
+    const nextPreferences = {
+      ...preferences,
+      [key]: !preferences[key],
+    };
+
+    setPreferences(nextPreferences);
+    setStatusMessage("");
+
+    try {
+      const response = await fetch("/api/member/notification-preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [key]: nextPreferences[key] }),
+      });
+      const result = (await response.json().catch(() => ({}))) as PreferencesResponse;
+
+      if (!response.ok || !result.preferences) {
+        throw new Error(result.error ?? "Unable to save notification settings.");
+      }
+
+      setPreferences(result.preferences);
+      setPushEnabled(
+        result.preferences.benefit &&
+          result.preferences.announcement &&
+          result.preferences.event,
+      );
+      setStatusMessage(
+        `${copy?.title ?? "Notification setting"} ${
+          result.preferences[key] ? "enabled" : "disabled"
+        }.`,
+      );
+    } catch (error) {
+      setPreferences(previousPreferences);
+      setStatusMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to save notification settings.",
+      );
     }
   }
 
@@ -337,6 +415,35 @@ export default function MemberSettingsView() {
               : statusMessage ||
                 "Push notifications control benefit, announcement, and event alerts."}
           </p>
+
+          <div className="mt-5 space-y-3">
+            {preferenceCopy.map((preference) => (
+              <div
+                key={preference.key}
+                className="flex items-center justify-between gap-4 rounded-2xl border border-gray-100 bg-[#F8FAF8] px-4 py-3"
+              >
+                <div>
+                  <p className="member-text-base text-base font-semibold text-[#151C27]">
+                    {preference.title}
+                  </p>
+                  <p className="member-text-sm mt-1 text-sm text-[#5F5E5E]">
+                    {preference.description}
+                  </p>
+                </div>
+
+                <SettingsSwitch
+                  enabled={preferences[preference.key]}
+                  onClick={() => handlePreferenceToggle(preference.key)}
+                  disabled={loadingPreferences || savingPush}
+                  label={
+                    preferences[preference.key]
+                      ? `${preference.title} enabled`
+                      : `${preference.title} disabled`
+                  }
+                />
+              </div>
+            ))}
+          </div>
 
           <p className="member-text-sm mt-3 text-sm text-[#5F5E5E]">
             Email notifications are not connected yet.
