@@ -1,4 +1,23 @@
+/* Google Fonts — closest web alternatives to Butler & Minion Pro */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
 @import "tailwindcss";
+
+/*
+ * Pergas typefaces (brand spec):
+ *   Headlines / Titles:   Butler       → Playfair Display
+ *   Body / Sub-headings:  Minion Pro   → Lora / Georgia
+ *   Headers, Footers, UI: Helvetica Neue → system sans stack
+ *   Arabic:               Traditional Arabic → system Arabic stack
+ */
+@theme {
+  --font-butler: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-minion: "Lora", Georgia, serif;
+  --font-helvetica: "Helvetica Neue", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-arabic: "Traditional Arabic", "Scheherazade New", "Noto Naskh Arabic", serif;
+  --font-sans: "Helvetica Neue", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-serif: "Playfair Display", Georgia, "Times New Roman", serif;
+}
 
 :root {
   --ink: #202320;
@@ -33,13 +52,30 @@ body {
   overflow-x: hidden;
   background: var(--cream);
   color: var(--ink);
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-helvetica);
+}
+
+h1, h2, h3, h4, h5, h6, .font-butler {
+  font-family: var(--font-butler);
+}
+
+.font-minion {
+  font-family: var(--font-minion);
+}
+
+.font-helvetica {
+  font-family: var(--font-helvetica);
+}
+
+.font-arabic {
+  font-family: var(--font-arabic);
 }
 
 button,
 input,
-select {
-  font-family: Arial, Helvetica, sans-serif;
+select,
+textarea {
+  font-family: var(--font-helvetica);
 }
 
 button,
@@ -112,7 +148,7 @@ a {
 .brand > span {
   padding-left: 12px;
   border-left: 1px solid #d5ded2;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 8px;
   font-weight: 700;
   letter-spacing: 0.13em;
@@ -133,7 +169,7 @@ a {
   height: 100%;
   align-items: center;
   color: #62736d;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 14px;
   font-weight: 600;
 }
@@ -219,7 +255,7 @@ a {
   display: flex;
   flex-direction: column;
   text-align: left;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
 }
 
 .member-copy strong {
@@ -279,7 +315,7 @@ a {
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.18em;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
 }
 
 .eyebrow::before {
@@ -292,7 +328,7 @@ a {
 .hero h1 {
   max-width: 660px;
   margin: 14px 0 13px;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: clamp(36px, 4.2vw, 58px);
   font-weight: 500;
   line-height: 1.06;
@@ -321,7 +357,7 @@ a {
 }
 
 .hero-stat > span {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-minion);
   color: var(--green-700);
   font-size: 44px;
 }
@@ -334,7 +370,7 @@ a {
   font-size: 13px;
   font-weight: 700;
   line-height: 1.35;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
 }
 
 .hero-stat small {
@@ -399,7 +435,7 @@ a {
 
 .section-label {
   color: var(--green-700);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.18em;
@@ -408,7 +444,7 @@ a {
 .section-intro h2,
 .directory-intro h2 {
   margin: 8px 0 0;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 32px;
   font-weight: 500;
   letter-spacing: -0.025em;
@@ -443,7 +479,7 @@ a {
 
 .membership-number {
   color: var(--green-600);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -469,7 +505,7 @@ a {
   border-radius: 4px;
   background: #fff3df;
   color: #8a5f17;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 8px;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -522,7 +558,7 @@ a {
   background: transparent;
   color: var(--ink);
   font-size: 14px;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
 }
 
 .search-field input::placeholder {
@@ -640,7 +676,7 @@ a {
 
 .results-heading h2 {
   margin: 0 0 5px;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 25px;
   font-weight: 500;
   letter-spacing: -0.02em;
@@ -650,7 +686,7 @@ a {
   margin: 0;
   color: #84918c;
   font-size: 12px;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
 }
 
 .reset-button {
@@ -710,7 +746,7 @@ a {
   place-items: center;
   border: 1px solid currentColor;
   border-radius: 50%;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-minion);
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -767,7 +803,7 @@ a {
 
 .partner-card h3 {
   margin: 9px 0 4px;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 20px;
   font-weight: 600;
 }
@@ -777,7 +813,7 @@ a {
   color: var(--green-700);
   font-size: 13px;
   font-weight: 800;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
 }
 
 .partner-description {
@@ -797,7 +833,7 @@ a {
   border-top: 1px solid #edf0ee;
   color: #798680;
   font-size: 10px;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
 }
 
 .location-line svg {
@@ -822,7 +858,7 @@ a {
   cursor: pointer;
   font-size: 11px;
   font-weight: 800;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
 }
 
 .card-action svg {
@@ -994,7 +1030,7 @@ a {
   background: rgba(255, 255, 255, 0.9);
   color: #526a62;
   font-size: 10px;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
 }
 
 .map-key span {
@@ -1024,7 +1060,7 @@ a {
   justify-content: space-between;
   color: #7a8983;
   font-size: 11px;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
 }
 
 .map-results p {
@@ -1061,7 +1097,7 @@ a {
 
 .empty-state h3 {
   margin: 18px 0 7px;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-minion);
   font-size: 21px;
 }
 
@@ -1095,7 +1131,7 @@ a {
   gap: 30px;
   color: #7c8984;
   font-size: 11px;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
 }
 
 .footer-inner p {
@@ -1162,12 +1198,12 @@ a {
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.16em;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
 }
 
 .benefit-modal h2 {
   margin: 0;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 31px;
   font-weight: 500;
   line-height: 1.15;
@@ -1238,7 +1274,7 @@ a {
   color: white;
   font-size: 12px;
   font-weight: 800;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
 }
 
 .announcements-hero {
@@ -1269,7 +1305,7 @@ a {
 .announcements-hero h1 {
   max-width: 780px;
   margin: 14px 0 14px;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: clamp(36px, 4vw, 56px);
   font-weight: 500;
   line-height: 1.08;
@@ -1304,7 +1340,7 @@ a {
 
 .moderation-card span {
   color: var(--muted);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 11px;
   line-height: 1.5;
 }
@@ -1352,7 +1388,7 @@ a {
 
 .feed-heading strong {
   color: #7d8b84;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 11px;
 }
 
@@ -1387,7 +1423,7 @@ a {
   justify-content: space-between;
   gap: 10px;
   color: var(--green-700);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -1439,7 +1475,7 @@ a {
 .thread-panel__header h2 {
   max-width: 720px;
   margin: 8px 0 8px;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 36px;
   font-weight: 500;
   line-height: 1.12;
@@ -1460,7 +1496,7 @@ a {
   border-radius: 999px;
   background: #fff3df;
   color: #94670d;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -1502,7 +1538,7 @@ a {
 
 .comments-heading h3 {
   margin: 7px 0 0;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 24px;
   font-weight: 500;
 }
@@ -1512,7 +1548,7 @@ a {
   align-items: center;
   gap: 6px;
   color: var(--green-700);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -1543,7 +1579,7 @@ a {
   border-radius: 50%;
   background: var(--green-100);
   color: var(--green-800);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 11px;
   font-weight: 800;
 }
@@ -1561,7 +1597,7 @@ a {
 
 .comment-card small {
   color: #8a9690;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 10px;
 }
 
@@ -1582,7 +1618,7 @@ a {
 
 .review-queue strong {
   color: #805d18;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 11px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -1606,7 +1642,7 @@ a {
 }
 
 .comment-composer label {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.07em;
@@ -1622,7 +1658,7 @@ a {
   outline: 0;
   background: white;
   color: var(--ink);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 13px;
   line-height: 1.6;
 }
@@ -1641,7 +1677,7 @@ a {
 
 .comment-composer small {
   color: #8a9690;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 10px;
 }
 
@@ -1671,7 +1707,7 @@ a {
   border-radius: 12px;
   background: #f5f6f4;
   color: var(--muted);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 12px;
   font-weight: 700;
 }
@@ -1681,7 +1717,7 @@ a {
   padding-bottom: 88px;
   background: #f6f7f6;
   color: #171c26;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
 }
 
 .benefits-mobile-header {
@@ -1740,7 +1776,7 @@ a {
 
 .benefits-intro h2 {
   margin: 0;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   color: #087100;
   font-size: 29px;
   line-height: 1.1;
@@ -1804,7 +1840,7 @@ a {
 }
 
 .benefits-pass-card strong {
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 22px;
   font-weight: 700;
 }
@@ -1927,7 +1963,7 @@ a {
   display: block;
   margin-top: 7px;
   color: #171c26;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 22px;
   line-height: 1.12;
 }
@@ -2088,7 +2124,7 @@ a {
 .benefits-results-heading strong {
   margin-top: 4px;
   color: #171c26;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 24px;
 }
 
@@ -2169,7 +2205,7 @@ a {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.12);
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.16);
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 23px;
   font-weight: 800;
 }
@@ -2230,7 +2266,7 @@ a {
 .benefit-reward-card h2 {
   margin: 12px 0 8px;
   color: #171c26;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 24px;
   line-height: 1.15;
 }
@@ -2470,7 +2506,7 @@ a {
 
 .benefits-empty-state h2 {
   margin: 14px 0 6px;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 24px;
 }
 
@@ -2580,7 +2616,7 @@ a {
 
 .benefits-redeem-sheet h2 {
   margin: 8px 0 5px;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 29px;
   line-height: 1.12;
 }
@@ -2653,7 +2689,7 @@ a {
   padding-bottom: 86px;
   background: #fbfcf9;
   color: #171c26;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
 }
 
 .community-header {
@@ -2680,7 +2716,7 @@ a {
 .community-header h1 {
   margin: 0;
   color: #087100;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 33px;
   font-weight: 700;
   line-height: 1.1;
@@ -2850,7 +2886,7 @@ a {
 .discussion-thread-card h2 {
   margin: 0;
   color: #151925;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 33px;
   font-weight: 700;
   line-height: 1.15;
@@ -2932,7 +2968,7 @@ a {
 
 .announcement-mini-card h3 {
   margin: 0 0 12px;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 22px;
 }
 
@@ -3009,7 +3045,7 @@ a {
 .moderated-comments__heading h3 {
   margin: 6px 0 0;
   color: #151925;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 24px;
 }
 
@@ -3219,7 +3255,7 @@ a {
 .community-create-card__intro h2 {
   margin: 6px 0 6px;
   color: #151c27;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 24px;
   line-height: 1.12;
 }
@@ -3297,7 +3333,7 @@ a {
 }
 
 .discussion-group-card strong {
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 23px;
   line-height: 1.1;
 }
@@ -3328,7 +3364,7 @@ a {
 
 .moderator-card h2 {
   margin: 0 0 10px;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 22px;
 }
 
@@ -3370,7 +3406,7 @@ a {
 .community-empty-state h2 {
   margin: 14px 0 6px;
   color: #151c27;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 24px;
 }
 
@@ -3628,7 +3664,7 @@ a {
 .community-create-header h1 {
   margin: 3px 0 0;
   color: #151c27;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 27px;
   font-weight: 800;
   line-height: 1.1;
@@ -3903,7 +3939,7 @@ a {
 .notifications-hero h1 {
   max-width: 760px;
   margin: 14px 0;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: clamp(36px, 4vw, 56px);
   font-weight: 500;
   line-height: 1.08;
@@ -3933,7 +3969,7 @@ a {
 }
 
 .notification-summary-card > span {
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   color: var(--green-700);
   font-size: 44px;
 }
@@ -3943,7 +3979,7 @@ a {
   margin: 0;
   flex-direction: column;
   color: #425c53;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 13px;
   font-weight: 800;
   line-height: 1.35;
@@ -3980,7 +4016,7 @@ a {
 .notification-preferences h2,
 .notification-toolbar h2 {
   margin: 8px 0 10px;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 27px;
   font-weight: 500;
   letter-spacing: -0.02em;
@@ -4715,7 +4751,7 @@ a {
   padding-bottom: 86px;
   background: #f6f7f6;
   color: #171c26;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
 }
 
 .benefits-mobile-header,
@@ -4744,7 +4780,7 @@ a {
 .community-header h1 {
   margin: 0;
   color: #087100;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 17px;
   font-weight: 800;
   line-height: 1.15;
@@ -4790,7 +4826,7 @@ a {
   padding-bottom: 86px;
   background: #ffffff;
   color: #171c26;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
 }
 
 .notifications-mobile-header {
@@ -4817,7 +4853,7 @@ a {
 .notifications-mobile-header h1 {
   margin: 0;
   color: #087100;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 17px;
   font-weight: 800;
   line-height: 1.15;
@@ -5093,7 +5129,7 @@ a {
 
 .notifications-title-row h2 {
   margin: 0;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   color: #087100;
   font-size: 29px;
   line-height: 1.1;
@@ -5326,7 +5362,7 @@ a {
 .notifications-section-heading strong {
   margin-top: 4px;
   color: #171c26;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 24px;
   line-height: 1.12;
 }
@@ -5528,7 +5564,7 @@ a {
 
 .notifications-empty-state h3 {
   margin: 14px 0 6px;
-  font-family: "Times New Roman", Georgia, serif;
+  font-family: var(--font-butler);
   font-size: 24px;
 }
 
@@ -5733,7 +5769,7 @@ a {
 .community-inline-heading h2 {
   margin: 0;
   color: #151c27;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 26px;
   font-weight: 800;
   line-height: 1.1;
@@ -5792,7 +5828,7 @@ a {
 .community-app-shell.is-member-embedded .announcement-detail-card h2,
 .community-app-shell.is-member-embedded .discussion-thread-card h2 {
   color: #151c27;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-helvetica);
   font-size: 21px;
   font-weight: 800;
   line-height: 1.18;

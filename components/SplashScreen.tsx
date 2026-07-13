@@ -19,7 +19,7 @@ const SplashScreen = () => {
         <div className="flex flex-col items-center gap-2">
           <Image
             className="w-32 h-36 object-contain" // w-32 is 128px (Well above the 56px minimum)
-            src="/secondarylogo.png"            // Updated to your new file name
+            src="/pergas-logo.png"
             alt="Pergas Secondary Logo"
             width={128}
             height={144}

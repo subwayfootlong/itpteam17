@@ -154,7 +154,7 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegisterSuccess, onBa
           <div className="relative mb-4 w-24 h-28">
             <Image
               className="object-contain"
-              src="/secondarylogo.png"
+              src="/pergas-logo.png"
               alt="Pergas Logo"
               fill
               sizes="96px"
