@@ -77,7 +77,7 @@ export function MemberFontSizeProvider({ children }: { children: ReactNode }) {
   return (
     <MemberFontSizeContext.Provider value={{ fontSize, setFontSize }}>
       <div
-        className="member-font-scope w-full"
+        className="member-font-scope"
         data-font-size={fontSize}
         suppressHydrationWarning
       >
