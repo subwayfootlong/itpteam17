@@ -26,30 +26,35 @@ export default function HomeMembershipCard({
   expiryDate,
 }: HomeMembershipCardProps) {
   const expirySoon = isExpirySoon(expiryDate);
+  const ctaLabel = expirySoon ? "Review Membership" : "View Digital Card";
 
   return (
     <section className="mt-8 overflow-hidden rounded-xl bg-[#0F7A00] p-6 text-white">
       <div className="relative">
-        <div className="absolute -right-10 -top-16 h-40 w-40 rounded-full bg-white/10" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-10 -top-16 h-40 w-40 rounded-full bg-white/10"
+        />
 
-        <p className="member-text-sm text-sm uppercase tracking-[0.18em] text-white/90">
+        <p className="member-text-sm relative z-10 text-sm uppercase tracking-[0.18em] text-white/90">
           Your Status
         </p>
 
-        <h2 className="member-text-xl mt-3 text-xl font-medium">
+        <h2 className="member-text-xl relative z-10 mt-3 text-xl font-medium">
           {tierLabel} Member
         </h2>
 
-        <div className="member-text-base mt-5 flex items-center gap-2 text-white/95">
+        <div className="member-text-base relative z-10 mt-5 flex items-center gap-2 text-white/95">
           <CalendarDays size={18} />
           <p>Expires: {expiryLabel}</p>
         </div>
 
         <Link
           href="/member/profile"
-          className="member-text-base mt-8 block min-h-11 rounded-xl bg-white px-4 py-4 text-center font-bold text-[#0F6E00]"
+          className="member-text-base relative z-10 mt-8 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-white px-4 py-4 text-center font-bold text-[#0F6E00]"
+          aria-label={ctaLabel}
         >
-          {expirySoon ? "Review Membership" : "View Digital Card"}
+          <span className="text-[#0F6E00]">{ctaLabel}</span>
         </Link>
       </div>
     </section>

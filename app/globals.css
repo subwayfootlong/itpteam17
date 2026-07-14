@@ -5940,3 +5940,125 @@ a {
   font-size: calc(0.875rem * var(--member-font-scale)) !important;
   line-height: 1.5 !important;
 }
+
+/* Benefits and community screens use custom class-based typography instead of
+   member-text utilities, so wire those shells into the same font scaling. */
+.member-font-scope :is(
+    .benefits-mobile-shell,
+    .community-app-shell,
+    .community-create-shell
+  ) {
+  --member-font-body-xs: calc(0.75rem * var(--member-font-scale));
+  --member-font-body-sm: calc(0.875rem * var(--member-font-scale));
+  --member-font-body-base: calc(1rem * var(--member-font-scale));
+  --member-font-body-lg: calc(1.125rem * var(--member-font-scale));
+  --member-font-title-lg: calc(1.5rem * var(--member-font-scale));
+  --member-font-title-xl: calc(1.75rem * var(--member-font-scale));
+}
+
+.member-font-scope .benefits-mobile-header h1,
+.member-font-scope .benefits-intro h2,
+.member-font-scope .benefits-empty-state h2,
+.member-font-scope .benefits-redeem-sheet h2,
+.member-font-scope .community-inline-heading h2,
+.member-font-scope .community-header h1,
+.member-font-scope .community-create-header h1,
+.member-font-scope .announcement-feature-card h2,
+.member-font-scope .announcement-detail-card h2,
+.member-font-scope .discussion-thread-card h2,
+.member-font-scope .discussion-feed-hero h2,
+.member-font-scope .community-create-card__intro h2,
+.member-font-scope .community-empty-state h2,
+.member-font-scope .moderator-card h2 {
+  font-size: var(--member-font-title-lg) !important;
+}
+
+.member-font-scope .benefits-redeem-sheet h3,
+.member-font-scope .announcement-mini-card h3,
+.member-font-scope .moderated-comments__heading h3,
+.member-font-scope .discussion-group-card strong,
+.member-font-scope .benefits-pass-card strong,
+.member-font-scope .benefits-map-preview strong,
+.member-font-scope .benefits-results-heading strong,
+.member-font-scope .benefits-map-results strong {
+  font-size: var(--member-font-body-lg) !important;
+}
+
+.member-font-scope .benefit-reward-card h2,
+.member-font-scope .benefits-pass-card > p {
+  font-size: var(--member-font-title-xl) !important;
+}
+
+.member-font-scope .benefits-intro p,
+.member-font-scope .benefits-pass-card span,
+.member-font-scope .benefits-pass-card small,
+.member-font-scope .benefits-pass-card li,
+.member-font-scope .benefits-map-preview span,
+.member-font-scope .benefits-results-heading span,
+.member-font-scope .benefit-reward-card p,
+.member-font-scope .benefit-reward-card__meta span,
+.member-font-scope .benefit-reward-card__meta small,
+.member-font-scope .benefits-empty-state p,
+.member-font-scope .benefits-map-results p,
+.member-font-scope .benefits-map-location-list strong,
+.member-font-scope .benefits-map-location-list small,
+.member-font-scope .benefits-sheet-kicker,
+.member-font-scope .benefits-redeem-sheet p,
+.member-font-scope .benefits-location-box span,
+.member-font-scope .benefits-location-box strong,
+.member-font-scope .benefits-terms-box strong,
+.member-font-scope .announcement-feature-card p,
+.member-font-scope .announcement-detail-card p,
+.member-font-scope .announcement-mini-card p,
+.member-font-scope .announcement-mini-card time,
+.member-font-scope .announcement-chip,
+.member-font-scope .official-line,
+.member-font-scope .community-tabs button,
+.member-font-scope .discussion-feed-hero span,
+.member-font-scope .discussion-feed-hero p,
+.member-font-scope .discussion-group-card small,
+.member-font-scope .community-empty-state p,
+.member-font-scope .moderator-card p,
+.member-font-scope .moderator-card small,
+.member-font-scope .discussion-thread-card header strong,
+.member-font-scope .discussion-thread-card header small,
+.member-font-scope .discussion-thread-card header p,
+.member-font-scope .discussion-thread-card > p,
+.member-font-scope .community-comment strong,
+.member-font-scope .community-comment small,
+.member-font-scope .community-comment p,
+.member-font-scope .community-empty-comments strong,
+.member-font-scope .community-empty-comments p,
+.member-font-scope .community-review-note strong,
+.member-font-scope .community-review-note p,
+.member-font-scope .community-composer label,
+.member-font-scope .community-composer small,
+.member-font-scope .community-create-header span,
+.member-font-scope .community-create-card label > span,
+.member-font-scope .community-create-card small,
+.member-font-scope .community-create-card__intro span,
+.member-font-scope .community-create-card__intro p,
+.member-font-scope .community-create-guidance p,
+.member-font-scope .community-create-error {
+  font-size: var(--member-font-body-sm) !important;
+}
+
+.member-font-scope .benefits-view-toggle button,
+.member-font-scope .benefits-filter-tabs button,
+.member-font-scope .benefits-search input,
+.member-font-scope .benefit-reward-card__actions button,
+.member-font-scope .benefits-map-preview button,
+.member-font-scope .benefits-map-results a,
+.member-font-scope .benefits-map-location-list button,
+.member-font-scope .benefits-empty-state button,
+.member-font-scope .benefits-redeem-sheet > a,
+.member-font-scope .announcement-feature-card button,
+.member-font-scope .announcement-mini-card button,
+.member-font-scope .discussion-feed-hero a,
+.member-font-scope .community-empty-state a,
+.member-font-scope .moderator-card button,
+.member-font-scope .discussion-thread-card footer button,
+.member-font-scope .community-composer button,
+.member-font-scope .community-create-card > button {
+  font-size: var(--member-font-body-base) !important;
+}
