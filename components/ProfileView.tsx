@@ -7,6 +7,7 @@ import { formatTierLabel } from "@/lib/membershipTiers";
 import { formatSalutationLabel } from "@/lib/memberProfileOptions";
 import { formatMemberName } from "@/lib/memberName";
 import { formatMemberDate } from "@/lib/dates";
+import { LOGOUT_LOGIN_HINT_KEY } from "@/lib/session";
 import { useRouter } from "next/navigation";
 import {
   BadgeCheck,
@@ -203,8 +204,8 @@ export default function ProfileView({
       method: "POST",
     });
 
-    router.push("/?screen=login");
-    router.refresh();
+    window.sessionStorage.setItem(LOGOUT_LOGIN_HINT_KEY, "1");
+    router.replace("/");
   }
 
   const qrValue = JSON.stringify({

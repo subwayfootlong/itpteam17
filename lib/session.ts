@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 export const SESSION_IDLE_TIMEOUT_MS = 15 * 60 * 1000;
 export const LAST_ACTIVITY_COOKIE = "last_activity";
+export const LOGOUT_LOGIN_HINT_KEY = "pergas:show-login-after-logout";
 
 export function getLastActivityTimestamp(
   cookieValue: string | undefined,

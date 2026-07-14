@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { SESSION_IDLE_TIMEOUT_MS } from "@/lib/session";
+import { LOGOUT_LOGIN_HINT_KEY, SESSION_IDLE_TIMEOUT_MS } from "@/lib/session";
 
 const ACTIVITY_SYNC_INTERVAL_MS = 60 * 1000;
 
@@ -21,8 +21,8 @@ export default function SessionTimeout() {
 
   const logout = useCallback(async () => {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/?screen=login");
-    router.refresh();
+    window.sessionStorage.setItem(LOGOUT_LOGIN_HINT_KEY, "1");
+    router.replace("/");
   }, [router]);
 
   const syncActivity = useCallback(async () => {

@@ -1,32 +1,44 @@
 "use client";
 
-import React, { Suspense, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import SplashScreen from "@/components/SplashScreen";
 import WelcomeScreen from "@/components/WelcomeScreen";
 import LoginScreen from "@/components/LoginScreen";
 import RegisterScreen from "@/components/RegisterScreen";
+import { LOGOUT_LOGIN_HINT_KEY } from "@/lib/session";
 
 export default function Home() {
-  return (
-    <Suspense fallback={<SplashScreen />}>
-      <HomeContent />
-    </Suspense>
-  );
+  return <HomeContent />;
 }
 
 function HomeContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const [currentScreen, setCurrentScreen] = useState<
     "splash" | "welcome" | "login" | "register"
-  >("splash");
-  const forcedScreen = searchParams.get("screen");
-  const visibleScreen = forcedScreen === "login" ? "login" : currentScreen;
+  >(() => {
+    if (typeof window !== "undefined") {
+      const loginHint = window.sessionStorage.getItem(LOGOUT_LOGIN_HINT_KEY);
+
+      if (loginHint === "1") {
+        return "login";
+      }
+    }
+
+    return "splash";
+  });
+  const [hasMounted, setHasMounted] = useState(false);
+  const visibleScreen = currentScreen;
 
   useEffect(() => {
-    if (forcedScreen === "login") {
+    setHasMounted(true);
+
+    if (typeof window !== "undefined" && currentScreen === "login") {
+      window.sessionStorage.removeItem(LOGOUT_LOGIN_HINT_KEY);
+    }
+
+    if (currentScreen !== "splash") {
       return;
     }
 
@@ -35,9 +47,17 @@ function HomeContent() {
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [forcedScreen]);
+  }, [currentScreen]);
 
   const handleGetStarted = () => {
+    setCurrentScreen("login");
+  };
+
+  const handleCreateAccount = () => {
+    setCurrentScreen("register");
+  };
+
+  const handleBackToLogin = () => {
     setCurrentScreen("login");
   };
 
@@ -50,6 +70,14 @@ function HomeContent() {
     router.refresh();
   };
 
+  if (!hasMounted) {
+    return (
+      <main className="min-h-screen w-full relative bg-white">
+        <SplashScreen />
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen w-full relative bg-white">
       {visibleScreen === "splash" && <SplashScreen />}
@@ -61,7 +89,7 @@ function HomeContent() {
       {visibleScreen === "login" && (
         <LoginScreen
           onLoginSuccess={handleLoginSuccess}
-          onCreateAccountClick={() => setCurrentScreen("register")}
+          onCreateAccountClick={handleCreateAccount}
           onForgotPasswordClick={() =>
             console.log("Routing to password recovery interface...")
           }
@@ -74,7 +102,7 @@ function HomeContent() {
       {visibleScreen === "register" && (
         <RegisterScreen
           onRegisterSuccess={handleRegisterSuccess}
-          onBackToLogin={() => setCurrentScreen("login")}
+          onBackToLogin={handleBackToLogin}
         />
       )}
     </main>

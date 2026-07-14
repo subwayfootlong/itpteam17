@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   ArrowLeft,
   Bell,
@@ -23,8 +23,10 @@ import {
   useMemberFontSize,
 } from "@/components/member/MemberFontSizeProvider";
 import type { NotificationPreferences } from "@/lib/notifications";
+import { LOGOUT_LOGIN_HINT_KEY } from "@/lib/session";
 
 type PreferenceKey = "benefit" | "announcement" | "event";
+const PUSH_NOTIFICATIONS_COOKIE = "pergas_push_notifications_enabled";
 
 const preferenceCopy: {
   key: PreferenceKey;
@@ -132,67 +134,24 @@ function SegmentedControl({
   );
 }
 
-export default function MemberSettingsView() {
+export default function MemberSettingsView({
+  initialPreferences,
+  initialPushEnabled,
+}: {
+  initialPreferences: NotificationPreferences;
+  initialPushEnabled: boolean;
+}) {
   const router = useRouter();
   const { fontSize, setFontSize } = useMemberFontSize();
 
-  const [pushEnabled, setPushEnabled] = useState(true);
+  const [pushEnabled, setPushEnabled] = useState(initialPushEnabled);
   const [emailEnabled, setEmailEnabled] = useState(false);
-  const [preferences, setPreferences] = useState<NotificationPreferences>({
-    benefit: true,
-    announcement: true,
-    event: true,
-  });
-  const [loadingPreferences, setLoadingPreferences] = useState(true);
+  const [preferences, setPreferences] = useState<NotificationPreferences>(
+    initialPreferences,
+  );
+  const [loadingPreferences] = useState(false);
   const [savingPush, setSavingPush] = useState(false);
-  const [statusMessage, setStatusMessage] = useState("");
   const fontSizeIndex = MEMBER_FONT_SIZES.indexOf(fontSize);
-
-  useEffect(() => {
-    let ignore = false;
-
-    async function loadPreferences() {
-      try {
-        const response = await fetch("/api/member/notification-preferences", {
-          cache: "no-store",
-        });
-        const result = (await response.json().catch(() => ({}))) as PreferencesResponse;
-
-        if (!response.ok || !result.preferences) {
-          throw new Error(result.error ?? "Unable to load notification settings.");
-        }
-
-        if (!ignore) {
-          setPreferences(result.preferences);
-          const nextPushEnabled =
-            result.preferences.benefit &&
-            result.preferences.announcement &&
-            result.preferences.event;
-
-          setPushEnabled(nextPushEnabled);
-          setStatusMessage("");
-        }
-      } catch (error) {
-        if (!ignore) {
-          setStatusMessage(
-            error instanceof Error
-              ? error.message
-              : "Unable to load notification settings.",
-          );
-        }
-      } finally {
-        if (!ignore) {
-          setLoadingPreferences(false);
-        }
-      }
-    }
-
-    loadPreferences();
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
 
   async function handlePushToggle() {
     if (savingPush || loadingPreferences) {
@@ -204,40 +163,11 @@ export default function MemberSettingsView() {
 
     setPushEnabled(nextValue);
     setSavingPush(true);
-    setStatusMessage("");
 
     try {
-      const response = await fetch("/api/member/notification-preferences", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          benefit: nextValue,
-          announcement: nextValue,
-          event: nextValue,
-        }),
-      });
-      const result = (await response.json().catch(() => ({}))) as PreferencesResponse;
-
-      if (!response.ok || !result.preferences) {
-        throw new Error(result.error ?? "Unable to save notification settings.");
-      }
-
-      const savedValue =
-        result.preferences.benefit &&
-        result.preferences.announcement &&
-        result.preferences.event;
-
-      setPushEnabled(savedValue);
-      setStatusMessage(
-        savedValue ? "Push notifications enabled." : "Push notifications disabled.",
-      );
+      document.cookie = `${PUSH_NOTIFICATIONS_COOKIE}=${nextValue ? "1" : "0"}; path=/; max-age=31536000; samesite=lax`;
     } catch (error) {
       setPushEnabled(previousValue);
-      setStatusMessage(
-        error instanceof Error
-          ? error.message
-          : "Unable to save notification settings.",
-      );
     } finally {
       setSavingPush(false);
     }
@@ -248,7 +178,6 @@ export default function MemberSettingsView() {
       return;
     }
 
-    const copy = preferenceCopy.find((item) => item.key === key);
     const previousPreferences = preferences;
     const nextPreferences = {
       ...preferences,
@@ -256,7 +185,6 @@ export default function MemberSettingsView() {
     };
 
     setPreferences(nextPreferences);
-    setStatusMessage("");
 
     try {
       const response = await fetch("/api/member/notification-preferences", {
@@ -271,23 +199,8 @@ export default function MemberSettingsView() {
       }
 
       setPreferences(result.preferences);
-      setPushEnabled(
-        result.preferences.benefit &&
-          result.preferences.announcement &&
-          result.preferences.event,
-      );
-      setStatusMessage(
-        `${copy?.title ?? "Notification setting"} ${
-          result.preferences[key] ? "enabled" : "disabled"
-        }.`,
-      );
     } catch (error) {
       setPreferences(previousPreferences);
-      setStatusMessage(
-        error instanceof Error
-          ? error.message
-          : "Unable to save notification settings.",
-      );
     }
   }
 
@@ -302,8 +215,8 @@ export default function MemberSettingsView() {
       method: "POST",
     });
 
-    router.push("/?screen=login");
-    router.refresh();
+    window.sessionStorage.setItem(LOGOUT_LOGIN_HINT_KEY, "1");
+    router.replace("/");
   }
 
   function handleFontSizeChange(index: number) {
@@ -391,29 +304,8 @@ export default function MemberSettingsView() {
             />
           </div>
 
-          <div className="mt-8 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Mail size={24} className="text-[#6F7B6F]" />
-              <p className="member-text-lg text-lg text-[#151C27]">Email Notifications</p>
-            </div>
-
-            <SettingsSwitch
-              enabled={emailEnabled}
-              onClick={() => setEmailEnabled((value) => !value)}
-              disabled
-              label={
-                emailEnabled
-                  ? "Email notifications enabled"
-                  : "Email notifications disabled"
-              }
-            />
-          </div>
-
           <p className="member-text-sm mt-3 text-sm text-[#5F5E5E]">
-            {loadingPreferences
-              ? "Loading notification settings..."
-              : statusMessage ||
-                "Push notifications control benefit, announcement, and event alerts."}
+            Push notifications control benefit, announcement, and event alerts.
           </p>
 
           <div className="mt-5 space-y-3">
@@ -434,7 +326,9 @@ export default function MemberSettingsView() {
                 <SettingsSwitch
                   enabled={preferences[preference.key]}
                   onClick={() => handlePreferenceToggle(preference.key)}
-                  disabled={loadingPreferences || savingPush}
+                  disabled={
+                    loadingPreferences || savingPush || !pushEnabled
+                  }
                   label={
                     preferences[preference.key]
                       ? `${preference.title} enabled`
@@ -443,6 +337,24 @@ export default function MemberSettingsView() {
                 />
               </div>
             ))}
+          </div>
+
+          <div className="mt-8 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Mail size={24} className="text-[#6F7B6F]" />
+              <p className="member-text-lg text-lg text-[#151C27]">Email Notifications</p>
+            </div>
+
+            <SettingsSwitch
+              enabled={emailEnabled}
+              onClick={() => setEmailEnabled((value) => !value)}
+              disabled
+              label={
+                emailEnabled
+                  ? "Email notifications enabled"
+                  : "Email notifications disabled"
+              }
+            />
           </div>
 
           <p className="member-text-sm mt-3 text-sm text-[#5F5E5E]">
