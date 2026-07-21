@@ -1,8 +1,6 @@
 import { supabaseAdmin } from "./supabaseServer";
 import type {
   Partner,
-  PartnerCategory,
-  SingaporeRegion,
 } from "@/lib/data/partners";
 
 type BenefitRow = {
@@ -16,8 +14,6 @@ type BenefitRow = {
   image_url: string | null;
   logo_url: string | null;
   logo_initials: string | null;
-  is_active: boolean | null;
-  created_at: string | null;
 };
 
 function initialsFromName(name: string) {
@@ -30,54 +26,9 @@ function initialsFromName(name: string) {
     .toUpperCase();
 }
 
-function mapCategory(category: string | null): PartnerCategory {
-  const normalized = (category ?? "").toLowerCase();
-
-  if (
-    normalized.includes("book") ||
-    normalized.includes("learn") ||
-    normalized.includes("education") ||
-    normalized.includes("workshop")
-  ) {
-    return "Books & Learning";
-  }
-
-  return "Lifestyle";
-}
-
-function mapRegion(address: string | null): SingaporeRegion | "Online" {
-  if (!address) return "Online";
-
-  const normalized = address.toLowerCase();
-  if (
-    normalized.includes("tampines") ||
-    normalized.includes("bedok") ||
-    normalized.includes("pasir ris") ||
-    normalized.includes("joo chiat") ||
-    normalized.includes("east")
-  ) {
-    return "East";
-  }
-
-  if (
-    normalized.includes("jurong") ||
-    normalized.includes("clementi") ||
-    normalized.includes("bukit batok") ||
-    normalized.includes("west")
-  ) {
-    return "West";
-  }
-
-  if (
-    normalized.includes("yishun") ||
-    normalized.includes("woodlands") ||
-    normalized.includes("sembawang") ||
-    normalized.includes("north")
-  ) {
-    return "North";
-  }
-
-  return "Central";
+function isOnlineBenefit(address: string | null) {
+  const normalized = address?.trim().toLowerCase();
+  return !normalized || normalized.includes("online");
 }
 
 function buildOffer(row: BenefitRow) {
@@ -94,32 +45,28 @@ function buildOffer(row: BenefitRow) {
   return description || amount || "Exclusive Pergas member reward";
 }
 
-function mapBenefit(row: BenefitRow, index: number): Partner {
+function mapBenefit(row: BenefitRow): Partner {
   const name = row.merchant_name?.trim() || "Pergas Partner";
   const address = row.address?.trim() || "Online or merchant-confirmed redemption";
-  const region = mapRegion(row.address);
-  const category = mapCategory(row.category);
+  const online = isOnlineBenefit(row.address);
 
   return {
     id: String(row.id),
     name,
     initials: row.logo_initials?.trim() || initialsFromName(name),
-    category,
-    region,
+    category: row.category?.trim() || "Other",
+    region: online ? "Online" : "Singapore",
     offer: buildOffer(row),
     description:
       row.description?.trim() ||
       `${name} is an admin-listed Friends of Pergas benefit partner.`,
     address,
-    distance: region === "Online" ? "Online benefit" : `${region} Singapore`,
+    distance: online ? "Online benefit" : "Singapore location",
     terms:
       row.discount_description?.trim() ||
       "Present an active Pergas membership when redeeming. Merchant terms and availability may apply.",
-    website: `https://www.google.com/search?q=${encodeURIComponent(name)}`,
     imageUrl: row.image_url?.trim() || undefined,
     logoUrl: row.logo_url?.trim() || undefined,
-    featured: index < 2,
-    mapPosition: undefined,
   };
 }
 
@@ -127,7 +74,7 @@ export async function getActiveBenefitPartners(): Promise<Partner[]> {
   const { data, error } = await supabaseAdmin
     .from("benefits")
     .select(
-      "id, merchant_name, category, discount_description, discount_amount, address, description, image_url, logo_url, logo_initials, is_active, created_at",
+      "id, merchant_name, category, discount_description, discount_amount, address, description, image_url, logo_url, logo_initials",
     )
     .eq("is_active", true)
     .order("merchant_name", { ascending: true });

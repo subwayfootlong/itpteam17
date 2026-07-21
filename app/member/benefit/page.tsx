@@ -1,7 +1,7 @@
 import MemberPageShell from "@/components/member/MemberPageShell";
 import BenefitsDirectory from "@/components/member/BenefitsDirectory";
 import { getCurrentUser } from "@/lib/currentUser";
-import { membershipBenefits, type Partner } from "@/lib/data/partners";
+import type { Partner } from "@/lib/data/partners";
 import { getActiveBenefitPartners } from "@/lib/benefits";
 import { formatTierLabel } from "@/lib/membershipTiers";
 
@@ -21,7 +21,6 @@ export default async function BenefitPage() {
     <MemberPageShell>
       <BenefitsDirectory
         partners={visiblePartners}
-        membershipBenefits={membershipBenefits}
         showChrome={false}
         member={{
           firstName: user?.firstName ?? "",

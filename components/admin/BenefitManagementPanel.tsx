@@ -32,7 +32,7 @@ type FilterValue = "all" | "active" | "inactive";
 
 const EMPTY_FORM: BenefitFormState = {
   merchant_name: "",
-  category: "Lifestyle",
+  category: "",
   discount_description: "",
   discount_amount: "",
   address: "",
@@ -42,16 +42,6 @@ const EMPTY_FORM: BenefitFormState = {
   logo_initials: "",
   is_active: true,
 };
-
-const CATEGORY_OPTIONS = [
-  "Lifestyle",
-  "Books & Learning",
-  "Food & Dining",
-  "Education",
-  "Healthcare",
-  "Services",
-  "Other",
-];
 
 const FILTER_OPTIONS: { label: string; value: FilterValue }[] = [
   { label: "All", value: "all" },
@@ -67,7 +57,7 @@ const STATUS_STYLE = {
 function formFromBenefit(benefit: AdminBenefit): BenefitFormState {
   return {
     merchant_name: benefit.merchant_name ?? "",
-    category: benefit.category ?? "Lifestyle",
+    category: benefit.category ?? "",
     discount_description: benefit.discount_description ?? "",
     discount_amount:
       benefit.discount_amount === null || benefit.discount_amount === undefined
@@ -140,6 +130,14 @@ export default function BenefitManagementPanel({
       categories,
     };
   }, [benefits]);
+
+  const categoryOptions = useMemo(
+    () =>
+      Array.from(
+        new Set(benefits.map((benefit) => benefit.category.trim()).filter(Boolean)),
+      ).sort((a, b) => a.localeCompare(b)),
+    [benefits],
+  );
 
   const filteredBenefits = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -579,18 +577,19 @@ export default function BenefitManagementPanel({
 
               <label className="space-y-1.5">
                 <span className="text-[12px] font-bold text-gray-600">Category</span>
-                <select
+                <input
+                  list="benefit-category-options"
                   value={form.category}
                   onChange={(event) => setForm((prev) => ({ ...prev, category: event.target.value }))}
                   className="w-full h-10 rounded-lg border border-gray-200 px-3 text-[13px] outline-none focus:border-[#3FAE2A] bg-white"
+                  placeholder="Enter or select a category"
                   required
-                >
-                  {CATEGORY_OPTIONS.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
+                />
+                <datalist id="benefit-category-options">
+                  {categoryOptions.map((category) => (
+                    <option key={category} value={category} />
                   ))}
-                </select>
+                </datalist>
               </label>
 
               <label className="space-y-1.5">

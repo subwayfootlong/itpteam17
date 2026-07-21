@@ -2,23 +2,12 @@
 
 import Link from "next/link";
 import { useMemo, useState, useCallback } from "react";
-import type {
-  MembershipBenefit,
-  Partner,
-  PartnerCategory,
-} from "@/lib/data/partners";
+import type { Partner } from "@/lib/data/partners";
 import MemberIcon from "@/components/member/MemberIcon";
 import MemberBottomNav from "@/components/MemberBottomNav";
 
-type CategoryFilter = "All" | PartnerCategory;
+type CategoryFilter = "All" | string;
 type BenefitView = "list" | "map";
-
-const categories: CategoryFilter[] = ["All", "Books & Learning", "Lifestyle"];
-
-const categoryIcons: Record<PartnerCategory, string> = {
-  "Books & Learning": "book",
-  Lifestyle: "spark",
-};
 
 function hasPhysicalLocation(partner: Partner) {
   const address = partner.address.trim().toLowerCase();
@@ -31,7 +20,7 @@ function hasPhysicalLocation(partner: Partner) {
 }
 
 function googleMapsQuery(partner: Partner) {
-  return `${partner.name}, ${partner.address}, Singapore`;
+  return `${partner.name}, ${partner.address}`;
 }
 
 function googleMapsEmbedUrl(partner: Partner) {
@@ -68,13 +57,15 @@ function BenefitsHeader({ initials }: { initials: string }) {
 }
 
 function MembershipSummary({
-  membershipBenefits,
+  partners,
   member,
 }: {
-  membershipBenefits: MembershipBenefit[];
+  partners: Partner[];
   member: MemberSummary;
 }) {
-  const shownBenefits = membershipBenefits.slice(0, 4);
+  const activeCategories = Array.from(
+    new Set(partners.map((partner) => partner.category.trim()).filter(Boolean)),
+  ).sort((a, b) => a.localeCompare(b));
   const displayName = [member.firstName, member.lastName]
     .filter(Boolean)
     .join(" ");
@@ -86,10 +77,10 @@ function MembershipSummary({
         <strong>{displayName || "Member"}</strong>
         <small>Active privileges available</small>
       </div>
-      <p>{membershipBenefits.length}</p>
-      <ul aria-label="Active member privileges">
-        {shownBenefits.map((benefit) => (
-          <li key={benefit.title}>{benefit.title}</li>
+      <p>{partners.length}</p>
+      <ul aria-label="Active partner benefits">
+        {activeCategories.map((category) => (
+          <li key={category}>{category}</li>
         ))}
       </ul>
     </section>
@@ -137,9 +128,11 @@ function PartnerMapPreview({
 }
 
 function CategoryTabs({
+  categories,
   selected,
   onSelect,
 }: {
+  categories: CategoryFilter[];
   selected: CategoryFilter;
   onSelect: (category: CategoryFilter) => void;
 }) {
@@ -152,7 +145,7 @@ function CategoryTabs({
           type="button"
           onClick={() => onSelect(category)}
         >
-          {category === "All" ? "All" : category.replace(" & Learning", "")}
+          {category}
         </button>
       ))}
     </div>
@@ -162,7 +155,7 @@ function CategoryTabs({
 function PartnerVisual({ partner }: { partner: Partner }) {
   return (
     <div
-      className={`benefit-partner-visual benefit-partner-visual--${partner.category === "Lifestyle" ? "lifestyle" : "books"} ${partner.imageUrl ? "has-image" : ""}`}
+      className={`benefit-partner-visual ${partner.imageUrl ? "has-image" : ""}`}
       aria-hidden="true"
     >
       {partner.imageUrl && (
@@ -188,7 +181,6 @@ function PartnerVisual({ partner }: { partner: Partner }) {
           partner.initials
         )}
       </span>
-      {partner.featured && <em>NEW</em>}
     </div>
   );
 }
@@ -206,7 +198,7 @@ function RewardCard({
       <div className="benefit-reward-card__body">
         <div className="benefit-reward-card__meta">
           <span>
-            <MemberIcon name={categoryIcons[partner.category]} size={15} />
+            <MemberIcon name="spark" size={15} />
             {partner.category}
           </span>
           <small>{partner.distance}</small>
@@ -214,11 +206,12 @@ function RewardCard({
         <h2>{partner.name}</h2>
         <p>{partner.offer}</p>
         <div className="benefit-reward-card__actions">
-          <button type="button" onClick={() => onSelect(partner)}>
+          <button
+            className="benefit-reward-card__claim"
+            type="button"
+            onClick={() => onSelect(partner)}
+          >
             Claim Reward
-          </button>
-          <button type="button" aria-label={`Share ${partner.name}`}>
-            <MemberIcon name="share" size={19} />
           </button>
         </div>
       </div>
@@ -338,7 +331,7 @@ function BenefitModal({
         <div className="benefits-location-box">
           <MemberIcon name="pin" size={20} />
           <span>
-            <strong>{partner.region} Singapore</strong>
+            <strong>{partner.region}</strong>
             {partner.address}
           </span>
         </div>
@@ -346,18 +339,16 @@ function BenefitModal({
           <strong>How to redeem</strong>
           <p>{partner.terms}</p>
         </div>
-        <a
-          href={
-            hasPhysicalLocation(partner)
-              ? googleMapsSearchUrl(partner)
-              : partner.website
-          }
-          target="_blank"
-          rel="noreferrer"
-        >
-          {hasPhysicalLocation(partner) ? "Get Directions" : "Visit Partner Website"}
-          <MemberIcon name="arrow" size={18} />
-        </a>
+        {hasPhysicalLocation(partner) && (
+          <a
+            href={googleMapsSearchUrl(partner)}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Get Directions
+            <MemberIcon name="arrow" size={18} />
+          </a>
+        )}
       </section>
     </div>
   );
@@ -365,7 +356,6 @@ function BenefitModal({
 
 export default function BenefitsDirectory({
   partners,
-  membershipBenefits,
   showChrome = true,
   member = {
     firstName: "",
@@ -375,7 +365,6 @@ export default function BenefitsDirectory({
   },
 }: {
   partners: Partner[];
-  membershipBenefits: MembershipBenefit[];
   showChrome?: boolean;
   member?: MemberSummary;
 }) {
@@ -384,6 +373,16 @@ export default function BenefitsDirectory({
   const [view, setView] = useState<BenefitView>("list");
   const [mapSelected, setMapSelected] = useState<Partner | null>(null);
   const [redeemPartner, setRedeemPartnerState] = useState<Partner | null>(null);
+
+  const categories = useMemo<CategoryFilter[]>(
+    () => [
+      "All",
+      ...Array.from(
+        new Set(partners.map((partner) => partner.category.trim()).filter(Boolean)),
+      ).sort((a, b) => a.localeCompare(b)),
+    ],
+    [partners],
+  );
 
   const setRedeemPartner = useCallback((partner: Partner | null) => {
     setRedeemPartnerState(partner);
@@ -440,7 +439,7 @@ export default function BenefitsDirectory({
         </section>
 
         <MembershipSummary
-          membershipBenefits={membershipBenefits}
+          partners={partners}
           member={member}
         />
 
@@ -491,7 +490,11 @@ export default function BenefitsDirectory({
               </button>
             </div>
 
-            <CategoryTabs selected={category} onSelect={setCategory} />
+            <CategoryTabs
+              categories={categories}
+              selected={category}
+              onSelect={setCategory}
+            />
 
             <section className="benefits-results-heading" aria-live="polite">
               <div>
