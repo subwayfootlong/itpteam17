@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 // import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { announcements as mockAnnouncements } from '@/lib/data/announcements';
-import { partners as mockPartners } from '@/lib/data/partners';
 
 export const dynamic = 'force-dynamic';
 
@@ -70,17 +69,15 @@ export async function GET(req: Request) {
   const eventsMap = new Map((eventsResult.data ?? []).map(e => [e.id, e]));
 
   const regCountMap = new Map<string, number>();
-  (registrationsResult.data ?? []).forEach((r: any) => {
+  (registrationsResult.data ?? []).forEach((r: { event_id: string | number | null }) => {
+    if (r.event_id === null) return;
     const eid = String(r.event_id);
     regCountMap.set(eid, (regCountMap.get(eid) ?? 0) + 1);
   });
 
   const benefitsMap = new Map<string, { merchant_name: string; discount_description: string }>();
-  mockPartners.forEach(b => {
-    benefitsMap.set(b.id, { merchant_name: b.name, discount_description: b.offer });
-  });
   (benefitsResult.data ?? []).forEach(b => {
-    benefitsMap.set(b.id, b);
+    benefitsMap.set(String(b.id), b);
   });
 
   // Build announcements title map — seed with mock data first (fallback for string IDs like "1","2").
