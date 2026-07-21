@@ -206,11 +206,12 @@ function RewardCard({
         <h2>{partner.name}</h2>
         <p>{partner.offer}</p>
         <div className="benefit-reward-card__actions">
-          <button type="button" onClick={() => onSelect(partner)}>
+          <button
+            className="benefit-reward-card__claim"
+            type="button"
+            onClick={() => onSelect(partner)}
+          >
             Claim Reward
-          </button>
-          <button type="button" aria-label={`Share ${partner.name}`}>
-            <MemberIcon name="share" size={19} />
           </button>
         </div>
       </div>

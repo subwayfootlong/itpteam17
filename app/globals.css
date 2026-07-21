@@ -2281,9 +2281,9 @@ a {
 
 .benefit-reward-card__actions {
   display: grid;
+  width: 100%;
   margin-top: 18px;
-  grid-template-columns: minmax(0, 1fr) 44px;
-  gap: 10px;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .benefit-reward-card__actions button {
@@ -2295,16 +2295,19 @@ a {
   font-weight: 900;
 }
 
-.benefit-reward-card__actions button:first-child {
+.benefit-reward-card .benefit-reward-card__claim {
+  width: 100%;
   background: #087100;
   color: white;
 }
 
-.benefit-reward-card__actions button:last-child {
-  display: grid;
-  place-items: center;
-  background: #edf3ea;
-  color: #087100;
+.benefit-reward-card .benefit-reward-card__claim:hover {
+  background: #065c00;
+}
+
+.benefit-reward-card .benefit-reward-card__claim:focus-visible {
+  outline: 3px solid rgba(8, 113, 0, 0.28);
+  outline-offset: 2px;
 }
 
 .benefits-map-screen {
