@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { ActionButton } from "@/components/admin/ui/Button";
+import { ActionLink } from "@/components/admin/ui/Button";
 import { FilterPills } from "@/components/admin/ui/FilterPills";
 import StatCard from "@/components/admin/ui/StatCard";
 import {
@@ -170,12 +170,6 @@ export default function BenefitManagementPanel({
     if (key === "created_at") return benefit.created_at ?? "";
     return "";
   });
-
-  const openCreateForm = () => {
-    setForm(EMPTY_FORM);
-    setEditingId(null);
-    setFormMode("create");
-  };
 
   const openEditForm = (benefit: AdminBenefit) => {
     setForm(formFromBenefit(benefit));
@@ -440,9 +434,9 @@ export default function BenefitManagementPanel({
             Create and manage partner benefits shown on the member benefits page.
           </p>
         </div>
-        <ActionButton onClick={openCreateForm} icon>
+        <ActionLink href="/admin/engagement/new" icon>
           New Benefit
-        </ActionButton>
+        </ActionLink>
       </div>
 
       {loadError && (
