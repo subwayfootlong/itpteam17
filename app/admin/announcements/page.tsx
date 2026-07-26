@@ -10,7 +10,6 @@ import {
   TableWrapper,
   TableHead,
   TableHeader,
-  TableBody,
   TableRow,
   TableCell,
   useSortState,
@@ -24,8 +23,8 @@ interface Announcement {
   created_at: string;
   updated_at: string;
   image_url: string | null;
-  views?: number;
-  comments?: number;
+  views: number | null;
+  comments: number;
 }
 
 const STATUS_STYLE: Record<string, { bg: string; color: string; dot: string }> = {
@@ -69,11 +68,7 @@ export default function AnnouncementsPage() {
         const r = await fetch(`/api/admin/announcements`);
         const d = await r.json();
         if (active) {
-          setItems((d.announcements ?? []).map((a: Announcement) => ({
-            ...a,
-            views: a.views ?? Math.floor(Math.random() * (5000 - 100) + 100),
-            comments: a.comments ?? Math.floor(Math.random() * (200 - 5) + 5)
-          })));
+          setItems(d.announcements ?? []);
         }
       } catch {
         if (active) toast.error('Failed to load announcements.');
@@ -186,11 +181,11 @@ export default function AnnouncementsPage() {
           <div className="flex items-center gap-3 text-[12px]" style={{ color: '#585859' }}>
             <div className="flex items-center gap-1" title="Views">
               <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-              <span>{item.views?.toLocaleString()}</span>
+              <span>{item.views === null ? '—' : item.views.toLocaleString()}</span>
             </div>
             <div className="flex items-center gap-1" title="Comments">
               <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-              <span>{item.comments?.toLocaleString()}</span>
+              <span>{item.comments.toLocaleString()}</span>
             </div>
           </div>
         </TableCell>
