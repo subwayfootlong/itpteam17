@@ -40,6 +40,7 @@ export function makePendingThread(
     id: `local-thread-${Date.now()}`,
     groupId,
     author: authorName,
+    authorRole: "Community Member",
     postedAt: "Just now",
     title: body.length > 54 ? `${body.slice(0, 54)}...` : body,
     body,

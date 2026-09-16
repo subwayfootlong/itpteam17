@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import type { CommunityComment } from "@/lib/data/announcements";
 import type {
   DiscussionGroup,
   DiscussionGroupId,
@@ -14,18 +13,10 @@ export default function DiscussionFeed({
   groupId,
   groups,
   threads,
-  localComments,
-  expandedThreadId,
-  onExpandThread,
-  onComment,
 }: {
   groupId: DiscussionGroupId;
   groups: DiscussionGroup[];
   threads: DiscussionThread[];
-  localComments: Record<string, CommunityComment[]>;
-  expandedThreadId: string | null;
-  onExpandThread: (threadId: string) => void;
-  onComment: (threadId: string, body: string) => Promise<void>;
 }) {
   const group = groups.find((item) => item.id === groupId) ?? groups[0];
   const visibleThreads = threads.filter((thread) => thread.groupId === groupId);
@@ -50,10 +41,6 @@ export default function DiscussionFeed({
             key={thread.id}
             thread={thread}
             groupTitle={group?.title ?? "Discussion"}
-            isExpanded={expandedThreadId === thread.id}
-            localComments={localComments[thread.id] ?? []}
-            onToggle={() => onExpandThread(thread.id)}
-            onComment={onComment}
           />
         ))
       ) : (

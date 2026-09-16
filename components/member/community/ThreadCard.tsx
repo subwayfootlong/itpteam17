@@ -1,33 +1,15 @@
-"use client";
-
-import { FormEvent, useState } from "react";
-import type { CommunityComment } from "@/lib/data/announcements";
+import Link from "next/link";
 import type { DiscussionThread } from "@/lib/communityTypes";
 import MemberIcon from "@/components/member/MemberIcon";
 
 export default function ThreadCard({
   thread,
   groupTitle,
-  isExpanded,
-  localComments,
-  onToggle,
-  onComment,
 }: {
   thread: DiscussionThread;
   groupTitle: string;
-  isExpanded: boolean;
-  localComments: CommunityComment[];
-  onToggle: () => void;
-  onComment: (threadId: string, body: string) => Promise<void>;
 }) {
-  const [draft, setDraft] = useState("");
-  const comments = [...thread.comments, ...localComments];
-  const approvedComments = comments.filter(
-    (comment) => comment.status === "approved",
-  );
-  const reviewComments = comments.filter(
-    (comment) => comment.status !== "approved",
-  );
+  const comments = thread.comments.filter((comment) => comment.status === "approved");
   const authorInitials =
     thread.author
       .split(/\s+/)
@@ -37,24 +19,18 @@ export default function ThreadCard({
       .slice(0, 2)
       .toUpperCase() || "M";
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!draft.trim()) return;
-    await onComment(thread.id, draft.trim());
-    setDraft("");
-  };
-
   return (
     <article className="discussion-thread-card">
       <header>
         <span className="thread-initials">{authorInitials}</span>
         <div>
           <strong>{groupTitle}</strong>
-          <small>{thread.postedAt}</small>
+          <small>Posted by {thread.author} · {thread.postedAt}</small>
         </div>
-        <p>{thread.author}</p>
       </header>
-      <h2>{thread.title}</h2>
+      <Link className="thread-card-link" href={`/member/community/${thread.id}`}>
+        <h2>{thread.title}</h2>
+      </Link>
       <p>{thread.body}</p>
       {thread.hasImage && <div className="thread-image-placeholder" />}
       {thread.status !== "approved" && (
@@ -64,65 +40,15 @@ export default function ThreadCard({
         </div>
       )}
       <footer>
-        <button type="button" onClick={onToggle}>
+        <Link href={`/member/community/${thread.id}`}>
           <MemberIcon name="comment" size={22} />
-          {comments.length} comments
-        </button>
+          {comments.length} {comments.length === 1 ? "reply" : "replies"}
+        </Link>
+        <Link className="thread-open-link" href={`/member/community/${thread.id}`}>
+          Open discussion
+          <MemberIcon name="arrowRight" size={18} />
+        </Link>
       </footer>
-
-      {isExpanded && (
-        <div className="thread-comments">
-          {approvedComments.map((comment) => (
-            <article className="community-comment" key={comment.id}>
-              <span aria-hidden="true">
-                {comment.author
-                  .split(" ")
-                  .map((part) => part[0])
-                  .join("")
-                  .slice(0, 2)}
-              </span>
-              <div>
-                <strong>{comment.author}</strong>
-                <small>
-                  {comment.role} - {comment.postedAt}
-                </small>
-                <p>{comment.body}</p>
-              </div>
-            </article>
-          ))}
-          {reviewComments.length > 0 && (
-            <div className="community-review-note">
-              <strong>Awaiting moderator review</strong>
-              {reviewComments.map((comment) => (
-                <p key={comment.id}>
-                  {comment.status === "flagged"
-                    ? "Your comment has been held for moderator review."
-                    : "Your comment is pending approval."}
-                </p>
-              ))}
-            </div>
-          )}
-          <form className="community-composer compact" onSubmit={handleSubmit}>
-            <label htmlFor={`thread-comment-${thread.id}`}>
-              Add a comment
-            </label>
-            <textarea
-              id={`thread-comment-${thread.id}`}
-              value={draft}
-              onChange={(event) => setDraft(event.target.value)}
-              maxLength={220}
-              placeholder="Join the discussion respectfully..."
-            />
-            <div>
-              <small>{draft.length}/220</small>
-              <button type="submit" disabled={!draft.trim()}>
-                Submit
-                <MemberIcon name="send" size={15} />
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
     </article>
   );
 }

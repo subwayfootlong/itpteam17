@@ -15,6 +15,7 @@ export type DiscussionThread = {
   id: string;
   groupId: DiscussionGroupId;
   author: string;
+  authorRole: string;
   postedAt: string;
   title: string;
   body: string;

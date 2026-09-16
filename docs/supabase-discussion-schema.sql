@@ -18,6 +18,7 @@ create table if not exists public.discussion (
   group_id text not null references public.discussion_groups(id) on delete cascade,
   user_id uuid references public.users(id) on delete set null,
   author_name text,
+  author_role text not null default 'Community Member',
   title text not null,
   body text not null,
   votes integer not null default 0,
@@ -30,6 +31,7 @@ create table if not exists public.discussion (
 create table if not exists public.discussion_comments (
   id uuid primary key default gen_random_uuid(),
   thread_id uuid not null references public.discussion(id) on delete cascade,
+  parent_comment_id uuid references public.discussion_comments(id) on delete cascade,
   user_id uuid references public.users(id) on delete set null,
   author_name text,
   author_role text not null default 'Active Member',
@@ -49,6 +51,9 @@ create index if not exists discussion_status_created_idx
 
 create index if not exists discussion_comments_thread_idx
   on public.discussion_comments(thread_id, created_at);
+
+create index if not exists discussion_comments_parent_idx
+  on public.discussion_comments(parent_comment_id, created_at);
 
 insert into public.discussion_groups (id, title, icon, tone, sort_order)
 values
