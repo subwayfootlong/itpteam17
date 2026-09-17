@@ -137,6 +137,20 @@ export async function PATCH(
     }
   }
 
+  // member_id defaults to phone at signup; keep it in sync on phone changes
+  // unless this same request is explicitly setting member_id (an admin override)
+  if ('phone' in updates && !('member_id' in body)) {
+    const { data: current } = await supabaseAdmin
+      .from('users')
+      .select('phone, member_id')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (current && current.member_id === current.phone) {
+      updates.member_id = updates.phone;
+    }
+  }
+
   if ('role' in updates && updates.role != null) {
     const role = String(updates.role).trim();
     if (role !== 'member' && role !== 'admin') {

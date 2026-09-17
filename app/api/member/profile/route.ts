@@ -74,17 +74,31 @@ export async function PATCH(req: Request) {
       );
     }
 
+    const { data: existingUser } = await supabaseAdmin
+      .from("users")
+      .select("phone, member_id")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const updates: Record<string, unknown> = {
+      salutation,
+      first_name: firstName,
+      last_name: lastName || null,
+      arabic_name: arabicName || null,
+      phone,
+      organization,
+      designation,
+    };
+
+    // member_id defaults to phone at signup; keep it in sync on phone changes
+    // unless an admin has already overridden it away from the previous phone number
+    if (existingUser && existingUser.member_id === existingUser.phone) {
+      updates.member_id = phone;
+    }
+
     const { data, error } = await supabaseAdmin
       .from("users")
-      .update({
-        salutation,
-        first_name: firstName,
-        last_name: lastName || null,
-        arabic_name: arabicName || null,
-        phone,
-        organization,
-        designation,
-      })
+      .update(updates)
       .eq("id", user.id)
       .select(
         "id, first_name, last_name, salutation, email, role, member_id, membership_tier, membership_status, expiry_date, phone, organization, designation, arabic_name, member_since",
