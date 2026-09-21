@@ -63,8 +63,15 @@ export default function CreateCommunityPostForm({
         );
       }
 
+      const threadId =
+        typeof result.thread?.id === "string" ? result.thread.id : null;
+
+      if (!threadId) {
+        throw new Error("The post was saved, but its discussion page could not be opened.");
+      }
+
       setSubmitState("done");
-      router.push(`/member/community?tab=discussions&group=${encodeURIComponent(groupId)}`);
+      router.push(`/member/community/${encodeURIComponent(threadId)}`);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to create your post.");

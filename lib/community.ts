@@ -55,6 +55,7 @@ type CommentRow = {
   created_at: string | null;
   author_name: string | null;
   author_role: string | null;
+  parent_comment_id?: string | null;
 };
 
 type AdminAnnouncementCommentRow = Omit<CommentRow, "announcement_id"> & {
@@ -79,6 +80,7 @@ type ThreadRow = {
   has_image: boolean | null;
   created_at: string | null;
   author_name: string | null;
+  author_role: string | null;
 };
 
 function mapAdminAnnouncementCategory(
@@ -111,6 +113,7 @@ function shouldShowComment(row: CommentRow, currentUserId?: string) {
 function mapComment(row: CommentRow, currentUserId?: string): CommunityComment {
   return {
     id: row.id,
+    parentId: row.parent_comment_id ?? null,
     author: row.author_name || "Pergas Member",
     role: row.author_role || "Active Member",
     body: row.body,
@@ -168,6 +171,7 @@ function mapThread(
     id: row.id,
     groupId: row.group_id,
     author: row.author_name || "Pergas Member",
+    authorRole: row.author_role || "Community Member",
     postedAt: formatRelativeDate(row.created_at),
     title: row.title,
     body: row.body,
@@ -219,12 +223,12 @@ export async function getCommunityData(
       .order("sort_order", { ascending: true }),
     supabaseAdmin
       .from("discussion")
-      .select("id, group_id, user_id, title, body, votes, status, has_image, created_at, author_name")
+      .select("id, group_id, user_id, title, body, votes, status, has_image, created_at, author_name, author_role")
       .in("status", ["approved", "pending", "flagged"])
       .order("created_at", { ascending: false }),
     supabaseAdmin
       .from("discussion_comments")
-      .select("id, thread_id, user_id, body, status, created_at, author_name, author_role")
+      .select("id, thread_id, user_id, body, status, created_at, author_name, author_role, parent_comment_id")
       .order("created_at", { ascending: true }),
   ]);
 
@@ -293,5 +297,49 @@ export async function getCommunityData(
           tone: row.tone || "green",
         })),
     threads,
+  };
+}
+
+export type DiscussionThreadDetail = {
+  thread: DiscussionThread;
+  groupTitle: string;
+};
+
+export async function getDiscussionThread(
+  threadId: string,
+  currentUserId?: string,
+): Promise<DiscussionThreadDetail | null> {
+  const { data: threadData, error: threadError } = await supabaseAdmin
+    .from("discussion")
+    .select("id, group_id, user_id, title, body, votes, status, has_image, created_at, author_name, author_role")
+    .eq("id", threadId)
+    .maybeSingle<ThreadRow>();
+
+  if (threadError || !threadData || !shouldShowThread(threadData, currentUserId)) {
+    return null;
+  }
+
+  const [groupResult, commentsResult] = await Promise.all([
+    supabaseAdmin
+      .from("discussion_groups")
+      .select("title")
+      .eq("id", threadData.group_id)
+      .maybeSingle<{ title: string }>(),
+    supabaseAdmin
+      .from("discussion_comments")
+      .select("id, thread_id, parent_comment_id, user_id, body, status, created_at, author_name, author_role")
+      .eq("thread_id", threadData.id)
+      .order("created_at", { ascending: true }),
+  ]);
+
+  const comments = commentsResult.error
+    ? []
+    : ((commentsResult.data ?? []) as CommentRow[])
+        .filter((row) => shouldShowComment(row, currentUserId))
+        .map((row) => mapComment(row, currentUserId));
+
+  return {
+    thread: mapThread(threadData, comments),
+    groupTitle: groupResult.data?.title ?? "Community Discussion",
   };
 }
