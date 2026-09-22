@@ -249,6 +249,15 @@ export default function ProfileView({
             >
               Valid thru: {formatMemberDate(member.expiry_date)}
             </p>
+
+            {getExpiryInfo(member.expiry_date).urgency !== "none" && (
+              <Link
+                href="/member/payment"
+                className="member-text-sm mt-4 inline-block rounded-xl bg-white px-5 py-2.5 text-center font-bold text-[#149100]! shadow-sm"
+              >
+                Pay Now
+              </Link>
+            )}
           </div>
 
           <div className="flex flex-col items-center gap-2">
