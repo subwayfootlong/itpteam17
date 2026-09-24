@@ -3,12 +3,15 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, Clock, MapPin } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Clock, List, MapPin } from "lucide-react";
 import type { EventRow } from "@/app/member/events/page";
+
+type EventsViewMode = "list" | "calendar";
 
 type EventsViewProps = {
   events: EventRow[];
   hasError: boolean;
+  initialView: EventsViewMode;
 };
 
 function toDateKey(date: Date) {
@@ -34,6 +37,18 @@ function getDateLabel(dateKey: string) {
   return new Date(`${dateKey}T00:00:00`).toLocaleDateString("en-SG", {
     month: "long",
     day: "numeric",
+  });
+}
+
+function getListDateHeading(dateKey: string) {
+  const date = new Date(`${dateKey}T00:00:00`);
+  const includeYear = date.getFullYear() !== new Date().getFullYear();
+
+  return date.toLocaleDateString("en-SG", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    ...(includeYear ? { year: "numeric" } : {}),
   });
 }
 
@@ -66,7 +81,7 @@ function EventDescription({ description, eventId }: { description: string; event
   }, [description]);
 
   return (
-    <div className="mt-2 min-h-[3.75rem]">
+    <div className="mt-2">
       <p
         ref={descriptionRef}
         className="member-text-sm line-clamp-2 break-words text-sm leading-5 text-[#5F5E5E]"
@@ -117,10 +132,19 @@ function buildCalendarDays(currentMonth: Date) {
   return days;
 }
 
-export default function EventsView({ events, hasError }: EventsViewProps) {
+export default function EventsView({ events, hasError, initialView }: EventsViewProps) {
   const today = new Date();
   const router = useRouter();
   const [registeringId, setRegisteringId] = useState<string | null>(null);
+  const [view, setView] = useState<EventsViewMode>(initialView);
+
+  const changeView = (nextView: EventsViewMode) => {
+    setView(nextView);
+    // Keep the choice in the URL so refresh / back navigation restores it
+    const url = new URL(window.location.href);
+    url.searchParams.set("view", nextView);
+    window.history.replaceState(null, "", url);
+  };
 
   const handleInAppRegister = async (eventId: string) => {
     setRegisteringId(eventId);
@@ -163,6 +187,25 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
     [events, selectedDate]
   );
 
+  const upcomingGroups = useMemo(() => {
+    const todayKey = getTodayDateKey();
+    const groups = new Map<string, EventRow[]>();
+
+    events
+      .filter((event) => event.event_date && event.event_date >= todayKey)
+      .forEach((event) => {
+        const key = event.event_date as string;
+        groups.set(key, [...(groups.get(key) ?? []), event]);
+      });
+
+    return [...groups.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([dateKey, dateEvents]) => ({
+        dateKey,
+        events: [...dateEvents].sort((a, b) => (a.start_time ?? "").localeCompare(b.start_time ?? "")),
+      }));
+  }, [events]);
+
   function goToPreviousMonth() {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
   }
@@ -171,62 +214,147 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
   }
 
+  function renderEventCard(event: EventRow) {
+    const isFull = event.spots_available !== null && event.spots_available <= 0;
+    const hasRsvpLink = Boolean(event.external_rsvp_url?.trim());
+
+    return (
+      <article
+        key={event.id}
+        className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-[#FFFFFF] shadow-sm"
+      >
+        <div className="relative bg-gray-200">
+          <Link
+            href={`/member/events/${event.id}`}
+            aria-label={`Open details for ${event.title}`}
+            className="block w-full"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={event.image_url || "/event-placeholder.jpg"}
+              alt={event.title}
+              className="block h-auto w-full"
+            />
+          </Link>
+
+          {event.category && (
+            <span className="member-text-sm absolute right-4 top-4 rounded-full bg-[#0F6E00] px-4 py-1 text-sm text-white">
+              {event.category}
+            </span>
+          )}
+        </div>
+
+        <div className="flex flex-1 flex-col p-6">
+          <h3 className="member-text-2xl text-2xl font-bold leading-snug text-[#151C27]">
+            <Link
+              href={`/member/events/${event.id}`}
+              className="inline-block min-w-0 break-words line-clamp-2"
+            >
+              {event.title}
+            </Link>
+          </h3>
+
+          {event.description && (
+            <EventDescription description={event.description} eventId={event.id} />
+          )}
+
+          <div className="mt-4 space-y-3 text-[#151C27]">
+            <p className="member-text-base flex items-center gap-2">
+              <Clock size={18} strokeWidth={2.2} className="text-[#5F5E5E]" />
+              {formatTime(event.start_time, event.end_time)}
+            </p>
+
+            <p className="member-text-base flex min-w-0 items-center gap-2">
+              <MapPin size={18} strokeWidth={2.2} className="text-[#5F5E5E]" />
+              <span className="min-w-0 break-words">{event.venue || "Venue to be confirmed"}</span>
+            </p>
+          </div>
+
+          {hasRsvpLink ? (
+            <a
+              href={event.external_rsvp_url!.trim()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="member-text-base mt-6 block min-h-11 rounded-xl bg-[#0F6E00] px-4 py-4 text-center font-semibold text-white transition-colors hover:bg-[#0c5900]"
+            >
+              Register (External)
+            </a>
+          ) : event.isRegistered ? (
+            <button
+              type="button"
+              disabled
+              className="member-text-base mt-6 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-green-200 bg-green-50 px-4 py-4 font-semibold text-green-700"
+            >
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+              Registered
+            </button>
+          ) : event.isRejected ? (
+            <button
+              type="button"
+              disabled={registeringId === event.id}
+              onClick={() => handleInAppRegister(event.id)}
+              className="member-text-base mt-6 min-h-11 w-full rounded-xl bg-[#0F6E00] px-4 py-4 font-semibold text-white transition-colors hover:bg-[#0c5900]"
+            >
+              {registeringId === event.id ? 'Processing...' : 'Reapply'}
+            </button>
+          ) : isFull ? (
+            <button
+              type="button"
+              disabled
+              className="member-text-base mt-6 min-h-11 w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-4 font-semibold text-gray-400"
+            >
+              Full
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled={registeringId === event.id}
+              onClick={() => handleInAppRegister(event.id)}
+              className="member-text-base mt-6 min-h-11 w-full rounded-xl bg-[#0F6E00] px-4 py-4 font-semibold text-white transition-colors hover:bg-[#0c5900]"
+            >
+              {registeringId === event.id ? 'Processing...' : 'Register'}
+            </button>
+          )}
+        </div>
+      </article>
+    );
+  }
+
+  const viewOptions = [
+    { value: "list" as const, label: "List", Icon: List },
+    { value: "calendar" as const, label: "Calendar", Icon: CalendarDays },
+  ];
+
   return (
     <div className="px-5 py-5">
-      <div className="rounded-2xl border border-gray-200 bg-[#FFFFFF] p-6 shadow-sm">
-        <div className="flex items-center justify-between">
-          <h2 className="member-text-2xl text-2xl font-bold text-[#151C27]">{getMonthTitle(currentMonth)}</h2>
+      <div
+        role="tablist"
+        aria-label="Events view"
+        className="grid grid-cols-2 gap-1 rounded-full bg-gray-100 p-1"
+      >
+        {viewOptions.map(({ value, label, Icon }) => {
+          const isActive = view === value;
 
-          <div className="flex gap-5 text-[#151C27]">
-            <button type="button" aria-label="Previous month" onClick={goToPreviousMonth}>
-              <ChevronLeft size={26} />
+          return (
+            <button
+              key={value}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => changeView(value)}
+              className={
+                isActive
+                  ? "member-text-base flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#0F6E00] font-semibold text-white shadow-sm transition-colors"
+                  : "member-text-base flex min-h-11 items-center justify-center gap-2 rounded-full font-semibold text-[#5F5E5E] transition-colors hover:text-[#151C27]"
+              }
+            >
+              <Icon size={18} strokeWidth={2.2} />
+              {label}
             </button>
-
-            <button type="button" aria-label="Next month" onClick={goToNextMonth}>
-              <ChevronRight size={26} />
-            </button>
-          </div>
-        </div>
-
-        <div className="member-text-base mt-6 grid grid-cols-7 text-center text-[#5F5E5E]">
-          {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
-            <p key={`${day}-${index}`}>{day}</p>
-          ))}
-        </div>
-
-        <div className="member-text-lg mt-6 grid grid-cols-7 gap-y-3 text-center text-lg text-[#151C27]">
-          {calendarDays.map((date) => {
-            const isSelected = date.dateKey === selectedDate;
-            const hasEvent = eventDates.has(date.dateKey);
-
-            return (
-              <button
-                key={date.dateKey}
-                type="button"
-                onClick={() => setSelectedDate(date.dateKey)}
-                className="flex h-14 flex-col items-center justify-start"
-              >
-                <span
-                  className={
-                    isSelected
-                      ? "flex h-10 w-10 items-center justify-center rounded-full bg-[#0F6E00] font-bold text-white"
-                      : date.isCurrentMonth
-                        ? "flex h-10 w-10 items-center justify-center text-[#151C27]"
-                        : "flex h-10 w-10 items-center justify-center text-gray-300"
-                  }
-                >
-                  {date.day}
-                </span>
-
-                <span
-                  className={
-                    hasEvent && !isSelected ? "mt-1 h-1 w-1 rounded-full bg-[#0F6E00]" : "mt-1 h-1 w-1"
-                  }
-                />
-              </button>
-            );
-          })}
-        </div>
+          );
+        })}
       </div>
 
       {hasError && (
@@ -235,132 +363,109 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
         </div>
       )}
 
-      <div className="mt-6 border-l-4 border-[#0F6E00] pl-4">
-        <p className="member-text-base text-[#151C27]">Upcoming on {getDateLabel(selectedDate)}</p>
-
-        <p className="member-text-base text-[#151C27]">
-          {selectedDateEvents.length}{" "}
-          {selectedDateEvents.length === 1 ? "session" : "sessions"} scheduled
-        </p>
-      </div>
-
-      <div className="mt-6 min-h-[360px] space-y-7">
-        {selectedDateEvents.length === 0 && !hasError ? (
-          <div className="member-text-base flex min-h-[220px] items-center justify-center rounded-2xl border border-gray-200 p-6 text-center text-[#5F5E5E]">
-            No published events on this date.
-          </div>
-        ) : (
-          selectedDateEvents.map((event) => {
-            const isFull = event.spots_available !== null && event.spots_available <= 0;
-            const hasRsvpLink = Boolean(event.external_rsvp_url?.trim());
-
-            return (
-              <article
-                key={event.id}
-                className="flex min-h-[31rem] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-[#FFFFFF] shadow-sm"
-              >
-                <div className="relative bg-gray-200">
-                  <Link
-                    href={`/member/events/${event.id}`}
-                    aria-label={`Open details for ${event.title}`}
-                    className="block w-full"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={event.image_url || "/event-placeholder.jpg"}
-                      alt={event.title}
-                      className="block h-auto w-full"
-                    />
-                  </Link>
-
-                  {event.category && (
-                    <span className="member-text-sm absolute right-4 top-4 rounded-full bg-[#0F6E00] px-4 py-1 text-sm text-white">
-                      {event.category}
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex flex-1 flex-col p-6">
-                  <h3 className="member-text-2xl min-h-[3.5rem] text-2xl font-bold leading-snug text-[#151C27]">
-                    <Link
-                      href={`/member/events/${event.id}`}
-                      className="inline-block min-w-0 break-words line-clamp-2"
-                    >
-                      {event.title}
-                    </Link>
-                  </h3>
-
-                  {event.description ? (
-                    <EventDescription description={event.description} eventId={event.id} />
-                  ) : (
-                    <div className="mt-2 min-h-[3.75rem]" />
-                  )}
-
-                  <div className="mt-4 space-y-3 text-[#151C27]">
-                    <p className="member-text-base flex items-center gap-2">
-                      <Clock size={18} strokeWidth={2.2} className="text-[#5F5E5E]" />
-                      {formatTime(event.start_time, event.end_time)}
-                    </p>
-
-                    <p className="member-text-base flex min-w-0 items-center gap-2">
-                      <MapPin size={18} strokeWidth={2.2} className="text-[#5F5E5E]" />
-                      <span className="min-w-0 break-words">{event.venue || "Venue to be confirmed"}</span>
+      {view === "list" ? (
+        <div className="mt-6 min-h-[360px]">
+          {upcomingGroups.length === 0 && !hasError ? (
+            <div className="member-text-base flex min-h-[220px] items-center justify-center rounded-2xl border border-gray-200 p-6 text-center text-[#5F5E5E]">
+              No upcoming events.
+            </div>
+          ) : (
+            <div className="space-y-8">
+              {upcomingGroups.map((group) => (
+                <section key={group.dateKey}>
+                  <div className="border-l-4 border-[#0F6E00] pl-4">
+                    <h2 className="member-text-lg text-lg font-bold text-[#151C27]">
+                      {getListDateHeading(group.dateKey)}
+                    </h2>
+                    <p className="member-text-sm text-sm text-[#5F5E5E]">
+                      {group.events.length} {group.events.length === 1 ? "session" : "sessions"} scheduled
                     </p>
                   </div>
 
-                  {hasRsvpLink ? (
-                    <a
-                      href={event.external_rsvp_url!.trim()}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="member-text-base mt-auto block min-h-11 rounded-xl bg-[#0F6E00] px-4 py-4 text-center font-semibold text-white transition-colors hover:bg-[#0c5900]"
+                  <div className="mt-4 space-y-7">{group.events.map(renderEventCard)}</div>
+                </section>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <>
+          <div className="mt-6 rounded-2xl border border-gray-200 bg-[#FFFFFF] p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <h2 className="member-text-2xl text-2xl font-bold text-[#151C27]">{getMonthTitle(currentMonth)}</h2>
+
+              <div className="flex gap-5 text-[#151C27]">
+                <button type="button" aria-label="Previous month" onClick={goToPreviousMonth}>
+                  <ChevronLeft size={26} />
+                </button>
+
+                <button type="button" aria-label="Next month" onClick={goToNextMonth}>
+                  <ChevronRight size={26} />
+                </button>
+              </div>
+            </div>
+
+            <div className="member-text-base mt-6 grid grid-cols-7 text-center text-[#5F5E5E]">
+              {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
+                <p key={`${day}-${index}`}>{day}</p>
+              ))}
+            </div>
+
+            <div className="member-text-lg mt-6 grid grid-cols-7 gap-y-3 text-center text-lg text-[#151C27]">
+              {calendarDays.map((date) => {
+                const isSelected = date.dateKey === selectedDate;
+                const hasEvent = eventDates.has(date.dateKey);
+
+                return (
+                  <button
+                    key={date.dateKey}
+                    type="button"
+                    onClick={() => setSelectedDate(date.dateKey)}
+                    className="flex h-14 flex-col items-center justify-start"
+                  >
+                    <span
+                      className={
+                        isSelected
+                          ? "flex h-10 w-10 items-center justify-center rounded-full bg-[#0F6E00] font-bold text-white"
+                          : date.isCurrentMonth
+                            ? "flex h-10 w-10 items-center justify-center text-[#151C27]"
+                            : "flex h-10 w-10 items-center justify-center text-gray-300"
+                      }
                     >
-                      Register (External)
-                    </a>
-                  ) : event.isRegistered ? (
-                    <button
-                      type="button"
-                      disabled
-                      className="member-text-base mt-auto flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-green-200 bg-green-50 px-4 py-4 font-semibold text-green-700"
-                    >
-                      <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                      </svg>
-                      Registered
-                    </button>
-                  ) : event.isRejected ? (
-                    <button
-                      type="button"
-                      disabled={registeringId === event.id}
-                      onClick={() => handleInAppRegister(event.id)}
-                      className="member-text-base mt-auto min-h-11 w-full rounded-xl bg-[#0F6E00] px-4 py-4 font-semibold text-white transition-colors hover:bg-[#0c5900]"
-                    >
-                      {registeringId === event.id ? 'Processing...' : 'Reapply'}
-                    </button>
-                  ) : isFull ? (
-                    <button
-                      type="button"
-                      disabled
-                      className="member-text-base mt-auto min-h-11 w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-4 font-semibold text-gray-400"
-                    >
-                      Full
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      disabled={registeringId === event.id}
-                      onClick={() => handleInAppRegister(event.id)}
-                      className="member-text-base mt-auto min-h-11 w-full rounded-xl bg-[#0F6E00] px-4 py-4 font-semibold text-white transition-colors hover:bg-[#0c5900]"
-                    >
-                      {registeringId === event.id ? 'Processing...' : 'Register'}
-                    </button>
-                  )}
-                </div>
-              </article>
-            );
-          })
-        )}
-      </div>
+                      {date.day}
+                    </span>
+
+                    <span
+                      className={
+                        hasEvent && !isSelected ? "mt-1 h-1 w-1 rounded-full bg-[#0F6E00]" : "mt-1 h-1 w-1"
+                      }
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-6 border-l-4 border-[#0F6E00] pl-4">
+            <p className="member-text-base text-[#151C27]">Upcoming on {getDateLabel(selectedDate)}</p>
+
+            <p className="member-text-base text-[#151C27]">
+              {selectedDateEvents.length}{" "}
+              {selectedDateEvents.length === 1 ? "session" : "sessions"} scheduled
+            </p>
+          </div>
+
+          <div className="mt-6 min-h-[360px] space-y-7">
+            {selectedDateEvents.length === 0 && !hasError ? (
+              <div className="member-text-base flex min-h-[220px] items-center justify-center rounded-2xl border border-gray-200 p-6 text-center text-[#5F5E5E]">
+                No published events on this date.
+              </div>
+            ) : (
+              selectedDateEvents.map(renderEventCard)
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
