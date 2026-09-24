@@ -259,17 +259,17 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
                 key={event.id}
                 className="flex min-h-[31rem] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-[#FFFFFF] shadow-sm"
               >
-                <div className="relative h-48 bg-gray-200">
+                <div className="relative bg-gray-200">
                   <Link
                     href={`/member/events/${event.id}`}
                     aria-label={`Open details for ${event.title}`}
-                    className="block h-full w-full"
+                    className="block w-full"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={event.image_url || "/event-placeholder.jpg"}
                       alt={event.title}
-                      className="h-full w-full object-cover"
+                      className="block h-auto w-full"
                     />
                   </Link>
 

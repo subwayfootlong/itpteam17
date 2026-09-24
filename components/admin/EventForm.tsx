@@ -308,6 +308,9 @@ export default function EventForm({ initialData, eventId }: EventFormProps) {
                 className="h-11 pl-10 pr-4 pt-2.5 w-full rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-800 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:bg-[#3FAE2A] file:text-white file:text-xs file:font-semibold file:cursor-pointer file:shadow-sm cursor-pointer hover:file:bg-[#35941f] outline-none transition-all focus:bg-white focus:border-[#3FAE2A] focus:ring-4 focus:ring-[#3FAE2A]/10 disabled:opacity-50"
               />
             </div>
+            <p className="text-xs text-gray-500">
+              Recommended: 4:5 portrait (e.g. 1080 × 1350 px, the standard Instagram/Facebook post size). The full image is shown on the event card, so taller images make the card taller.
+            </p>
             {uploading && <div className="text-sm text-[#3FAE2A] mt-1 font-medium">Uploading image...</div>}
             {form.image_url && (
               <div className="mt-3 rounded-xl overflow-hidden border border-gray-200 max-w-sm bg-gray-50">
