@@ -93,6 +93,12 @@ export async function PATCH(req: Request) {
   if (adminNote.length > 1000) {
     return NextResponse.json({ error: "Admin note must be 1,000 characters or fewer" }, { status: 400 });
   }
+  if (payload.action === "reject" && !adminNote) {
+    return NextResponse.json(
+      { error: "Add an admin note before rejecting this request" },
+      { status: 400 },
+    );
+  }
 
   const { data: request, error: requestError } = await supabaseAdmin
     .from("tier_upgrade_requests")
