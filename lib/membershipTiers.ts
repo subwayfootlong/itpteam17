@@ -1,8 +1,8 @@
 export const MEMBERSHIP_TIERS = [
   { value: 'basic', label: 'Basic' },
-  { value: 'ordinary', label: 'Ordinary' },
-  { value: 'associate', label: 'Associate' },
   { value: 'student', label: 'Student' },
+  { value: 'associate', label: 'Associate' },
+  { value: 'ordinary', label: 'Ordinary' },
 ] as const;
 
 export type MembershipTier = (typeof MEMBERSHIP_TIERS)[number]['value'];
