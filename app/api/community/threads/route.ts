@@ -4,6 +4,7 @@ import { getErrorMessage } from "@/lib/errors";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 import { moderationStatus } from "@/lib/community";
 import { formatTierLabel } from "@/lib/membershipTiers";
+import { evaluateTierAccess, normalizeTierAudience } from "@/lib/tierAccess";
 
 type ThreadRow = {
   id: string;
@@ -44,6 +45,25 @@ export async function POST(req: Request) {
         { error: "Missing discussion group or post" },
         { status: 400 },
       );
+    }
+
+    const { data: group, error: groupError } = await supabaseAdmin
+      .from("discussion_groups")
+      .select("id, audience_type, eligible_tiers, show_locked_preview")
+      .eq("id", groupId)
+      .maybeSingle();
+    const groupAccess = group
+      ? evaluateTierAccess(
+          {
+            membershipTier: user.membershipTier,
+            membershipStatus: user.membershipStatus,
+            expiryDate: user.expiryDate,
+          },
+          normalizeTierAudience(group),
+        )
+      : null;
+    if (groupError || !group || !groupAccess?.canAccess) {
+      return NextResponse.json({ error: "Discussion group not found" }, { status: 404 });
     }
 
     const { data, error } = await supabaseAdmin

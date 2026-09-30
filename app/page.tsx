@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import SplashScreen from "@/components/SplashScreen";
 import WelcomeScreen from "@/components/WelcomeScreen";
@@ -28,12 +28,14 @@ function HomeContent() {
 
     return "splash";
   });
-  const [hasMounted, setHasMounted] = useState(false);
+  const hasMounted = useSyncExternalStore(
+    () => () => undefined,
+    () => true,
+    () => false,
+  );
   const visibleScreen = currentScreen;
 
   useEffect(() => {
-    setHasMounted(true);
-
     if (typeof window !== "undefined" && currentScreen === "login") {
       window.sessionStorage.removeItem(LOGOUT_LOGIN_HINT_KEY);
     }

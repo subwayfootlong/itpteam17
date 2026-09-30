@@ -5,6 +5,12 @@ import type {
 } from "@/lib/data/system-notifications";
 import { formatRelativeDate } from "./dates";
 import { supabaseAdmin } from "./supabaseServer";
+import {
+  DEFAULT_TIER_AUDIENCE,
+  evaluateTierAccess,
+  normalizeTierAudience,
+  type TierAudience,
+} from "./tierAccess";
 
 type NotificationRow = {
   id: string;
@@ -22,6 +28,9 @@ type NotificationRow = {
 type UserRow = {
   id: string;
   role: string | null;
+  membership_tier: string | null;
+  membership_status: string | null;
+  expiry_date: string | null;
 };
 
 type ExistingNotificationKey = {
@@ -55,6 +64,7 @@ type NotifyMembersInput = {
   actionHref: string;
   sourceType: string;
   sourceId: string;
+  audience?: TierAudience;
 };
 
 type NotificationInsert = {
@@ -201,6 +211,24 @@ export async function getUnreadNotificationCount(userId: string) {
 async function syncMemberContentNotifications(userId: string) {
   const preferences = await getNotificationPreferences(userId);
 
+  const { data: user } = await supabaseAdmin
+    .from("users")
+    .select("membership_tier, membership_status, expiry_date")
+    .eq("id", userId)
+    .maybeSingle<{
+      membership_tier: string | null;
+      membership_status: string | null;
+      expiry_date: string | null;
+    }>();
+
+  if (!user) return;
+
+  const memberAccess = {
+    membershipTier: user.membership_tier,
+    membershipStatus: user.membership_status,
+    expiryDate: user.expiry_date,
+  };
+
   const { data: existing, error: existingError } = await supabaseAdmin
     .from("notifications")
     .select("source_type, source_id")
@@ -220,15 +248,15 @@ async function syncMemberContentNotifications(userId: string) {
   const [benefits, announcements, events] = await Promise.all([
     supabaseAdmin
       .from("benefits")
-      .select("id, merchant_name, discount_description, created_at")
+      .select("id, merchant_name, discount_description, created_at, audience_type, eligible_tiers, show_locked_preview")
       .eq("is_active", true),
     supabaseAdmin
       .from("announcements")
-      .select("id, title, created_at, updated_at")
+      .select("id, title, created_at, updated_at, audience_type, eligible_tiers, show_locked_preview")
       .eq("status", "published"),
     supabaseAdmin
       .from("events")
-      .select("id, title, event_date, created_at")
+      .select("id, title, event_date, created_at, audience_type, eligible_tiers, show_locked_preview")
       .eq("status", "published"),
   ]);
 
@@ -236,6 +264,7 @@ async function syncMemberContentNotifications(userId: string) {
 
   if (preferences.benefit && !benefits.error) {
     for (const benefit of benefits.data ?? []) {
+      if (!evaluateTierAccess(memberAccess, normalizeTierAudience(benefit)).canAccess) continue;
       const id = String(benefit.id);
       if (existingKeys.has(`benefit:${id}`)) continue;
 
@@ -260,6 +289,7 @@ async function syncMemberContentNotifications(userId: string) {
 
   if (preferences.announcement && !announcements.error) {
     for (const announcement of announcements.data ?? []) {
+      if (!evaluateTierAccess(memberAccess, normalizeTierAudience(announcement)).canAccess) continue;
       const id = String(announcement.id);
       if (existingKeys.has(`announcement:${id}`)) continue;
 
@@ -285,6 +315,7 @@ async function syncMemberContentNotifications(userId: string) {
 
   if (preferences.event && !events.error) {
     for (const event of events.data ?? []) {
+      if (!evaluateTierAccess(memberAccess, normalizeTierAudience(event)).canAccess) continue;
       const id = String(event.id);
       if (existingKeys.has(`event:${id}`)) continue;
 
@@ -338,15 +369,42 @@ async function getMemberPreferenceMap(memberIds: string[]) {
 export async function notifyMembers(input: NotifyMembersInput) {
   const { data: users, error: userError } = await supabaseAdmin
     .from("users")
-    .select("id, role");
+    .select("id, role, membership_tier, membership_status, expiry_date");
 
   if (userError) {
     throw userError;
   }
 
-  const memberIds = ((users ?? []) as UserRow[])
-    .filter((user) => user.role !== "admin")
+  const audience = input.audience ?? DEFAULT_TIER_AUDIENCE;
+  const members = ((users ?? []) as UserRow[]).filter((user) => user.role !== "admin");
+  const eligibleMembers = members.filter(
+    (user) =>
+      evaluateTierAccess(
+        {
+          membershipTier: user.membership_tier,
+          membershipStatus: user.membership_status,
+          expiryDate: user.expiry_date,
+        },
+        audience,
+      ).canAccess,
+  );
+  const memberIds = eligibleMembers.map((user) => user.id);
+
+  const eligibleIdSet = new Set(memberIds);
+  const excludedMemberIds = members
+    .filter((user) => !eligibleIdSet.has(user.id))
     .map((user) => user.id);
+
+  if (excludedMemberIds.length > 0) {
+    const { error: cleanupError } = await supabaseAdmin
+      .from("notifications")
+      .update({ is_deleted: true, is_read: true })
+      .eq("source_type", input.sourceType)
+      .eq("source_id", input.sourceId)
+      .in("user_id", excludedMemberIds);
+
+    if (cleanupError) throw cleanupError;
+  }
 
   if (memberIds.length === 0) return;
 
@@ -405,6 +463,7 @@ export async function notifyBenefitAvailable(input: {
   id: string;
   merchantName: string;
   offer: string;
+  audience?: TierAudience;
 }) {
   await safeNotifyMembers({
     type: "Benefit",
@@ -415,12 +474,14 @@ export async function notifyBenefitAvailable(input: {
     actionHref: "/member/benefit",
     sourceType: "benefit",
     sourceId: input.id,
+    audience: input.audience,
   });
 }
 
 export async function notifyAnnouncementPublished(input: {
   id: string;
   title: string;
+  audience?: TierAudience;
 }) {
   await safeNotifyMembers({
     type: "Announcement",
@@ -431,6 +492,7 @@ export async function notifyAnnouncementPublished(input: {
     actionHref: "/member/community?tab=announcements",
     sourceType: "announcement",
     sourceId: input.id,
+    audience: input.audience,
   });
 }
 
@@ -438,6 +500,7 @@ export async function notifyEventPublished(input: {
   id: string;
   title: string;
   eventDate?: string | null;
+  audience?: TierAudience;
 }) {
   await safeNotifyMembers({
     type: "Event",
@@ -450,5 +513,6 @@ export async function notifyEventPublished(input: {
     actionHref: "/member/events",
     sourceType: "event",
     sourceId: input.id,
+    audience: input.audience,
   });
 }
