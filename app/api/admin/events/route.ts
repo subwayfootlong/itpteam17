@@ -1,22 +1,21 @@
 import { NextResponse } from 'next/server';
-// AUTH: uncomment these two lines when you add JWT auth
-// import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
+import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { notifyEventPublished } from '@/lib/notifications';
 import { supabaseAdmin } from '@/lib/supabaseServer';
+import { tierAudienceToDatabase, validateTierAudience } from '@/lib/tierAccess';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
-  // AUTH: uncomment when ready
-  // const admin = await getVerifiedAdmin();
-  // if (!admin) return unauthorizedResponse();
+  const admin = await getVerifiedAdmin();
+  if (!admin) return unauthorizedResponse();
 
   const url = new URL(req.url);
   const status = url.searchParams.get('status') ?? '';
 
   let query = supabaseAdmin
     .from('events')
-    .select('id, title, event_date, start_time, end_time, venue, category, capacity, spots_available, status, external_rsvp_url, created_at, image_url')
+    .select('id, title, event_date, start_time, end_time, venue, category, capacity, spots_available, status, external_rsvp_url, created_at, image_url, audience_type, eligible_tiers, show_locked_preview')
     .order('event_date', { ascending: false });
 
   if (status) query = query.eq('status', status);
@@ -30,9 +29,8 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  // AUTH: uncomment when ready
-  // const admin = await getVerifiedAdmin();
-  // if (!admin) return unauthorizedResponse();
+  const admin = await getVerifiedAdmin();
+  if (!admin) return unauthorizedResponse();
 
   let body;
   try {
@@ -46,6 +44,11 @@ export async function POST(req: Request) {
   }
   if (!body.event_date || typeof body.event_date !== 'string') {
     return NextResponse.json({ error: 'Event date is required' }, { status: 400 });
+  }
+
+  const audience = validateTierAudience(body);
+  if (!audience.ok) {
+    return NextResponse.json({ error: audience.error }, { status: 400 });
   }
 
   const { data, error } = await supabaseAdmin
@@ -63,7 +66,8 @@ export async function POST(req: Request) {
       external_rsvp_url: body.external_rsvp_url || null,
       image_url: body.image_url || null,
       status: body.status ?? 'draft',
-      // created_by: admin.sub,  // uncomment with auth
+      ...tierAudienceToDatabase(audience.value),
+      // Add created_by: admin.sub if the events table includes that column.
     })
     .select()
     .single();
@@ -77,6 +81,7 @@ export async function POST(req: Request) {
       id: String(data.id),
       title: data.title,
       eventDate: data.event_date,
+      audience: audience.value,
     });
   }
 

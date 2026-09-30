@@ -10,11 +10,11 @@ import {
   TableWrapper,
   TableHead,
   TableHeader,
-  TableBody,
   TableRow,
   TableCell,
   useSortState,
 } from '@/components/admin/ui/Table';
+import { formatAudienceLabel, normalizeTierAudience } from '@/lib/tierAccess';
 
 interface Event {
   id: string;
@@ -30,6 +30,9 @@ interface Event {
   external_rsvp_url: string | null;
   image_url: string | null;
   created_at: string;
+  audience_type: string | null;
+  eligible_tiers: string[] | null;
+  show_locked_preview: boolean | null;
 }
 
 // ─── Registration progress bar ───────────────────────────────────────────────
@@ -107,7 +110,22 @@ export default function EventsPage() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchEvents(); }, []); // Fetch once, filter locally
+  useEffect(() => {
+    let active = true;
+    fetch(`/api/admin/events`, { cache: 'no-store' })
+      .then((response) => response.json())
+      .then((data) => {
+        if (active) setEvents(data.events ?? []);
+      })
+      .catch(console.error)
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []); // Fetch once, filter locally
 
   const handleStatusChange = async (id: string, status: string) => {
     await fetch(`/api/admin/events/${id}`, {
@@ -261,6 +279,13 @@ export default function EventsPage() {
 
         {/* Status */}
         <TableCell>
+          <span className="inline-flex max-w-[170px] rounded-full bg-[#eef5ec] px-2.5 py-1 text-[11px] font-bold text-[#27500A]">
+            {formatAudienceLabel(normalizeTierAudience(ev))}
+          </span>
+        </TableCell>
+
+        {/* Status */}
+        <TableCell>
           <Badge colorClass={cfg.colorClass} dotColor={cfg.dotColor}>{ev.status}</Badge>
         </TableCell>
 
@@ -398,7 +423,7 @@ export default function EventsPage() {
       <TableWrapper
         data={sortedEvents}
         renderRow={renderRow}
-        colCount={6}
+        colCount={7}
         loading={loading}
         defaultPageSize={10}
         emptyState={
@@ -416,6 +441,7 @@ export default function EventsPage() {
           <TableHeader sortKey="event_date"    sortState={sortState} onSort={handleSort}>Date &amp; Time</TableHeader>
           <TableHeader sortKey="registrations" sortState={sortState} onSort={handleSort}>Registrations</TableHeader>
           <TableHeader sortKey="category"      sortState={sortState} onSort={handleSort}>Category</TableHeader>
+          <TableHeader>Audience</TableHeader>
           <TableHeader sortKey="status"        sortState={sortState} onSort={handleSort}>Status</TableHeader>
           <TableHeader className="text-right">Actions</TableHeader>
         </TableHead>
