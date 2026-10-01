@@ -21,7 +21,13 @@ export type EventRow = {
   isRejected?: boolean;
 };
 
-export default async function EventsPage() {
+export default async function EventsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const { view } = await searchParams;
+  const initialView = view === "calendar" ? "calendar" : "list";
   const currentUser = await getCurrentUser();
 
   const { data: events, error } = await supabaseAdmin
@@ -61,6 +67,7 @@ export default async function EventsPage() {
       <EventsView
         events={eventsWithRegStatus as EventRow[]}
         hasError={Boolean(error)}
+        initialView={initialView}
       />
     </MemberPageShell>
   );

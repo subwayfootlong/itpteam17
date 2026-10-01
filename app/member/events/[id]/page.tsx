@@ -75,12 +75,12 @@ export default async function EventDetailsPage({
         </header>
 
         <article className="mt-8 overflow-hidden rounded-[28px] bg-white shadow-[0_18px_50px_rgba(18,44,22,0.1)]">
-          <div className="relative h-64 bg-gray-200">
+          <div className="relative bg-gray-200">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={eventRecord.image_url || "/event-placeholder.jpg"}
               alt={eventRecord.title}
-              className="h-full w-full object-cover"
+              className="block h-auto w-full"
             />
 
             {eventRecord.category && (

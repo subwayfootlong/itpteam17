@@ -104,6 +104,7 @@ export async function POST(req: Request) {
         phone,
         password_hash,
         role: 'member',
+        member_id: phone,
         membership_tier: DEFAULT_TIER,
         membership_status: 'active',
         member_since: today,

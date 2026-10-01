@@ -54,8 +54,15 @@ export default function HomeActionPrompt({ user }: { user: CurrentUser }) {
         </p>
 
         <Link
+          href="/member/payment"
+          className="member-text-base mt-5 block rounded-xl bg-[#0F6E00] px-4 py-3 text-center font-semibold text-white"
+        >
+          Pay Now
+        </Link>
+
+        <Link
           href="/member/profile"
-          className="member-text-base mt-5 block rounded-xl border border-[#D9C08A] px-4 py-3 text-center font-semibold text-[#151C27]"
+          className="member-text-base mt-3 block rounded-xl border border-[#D9C08A] px-4 py-3 text-center font-semibold text-[#151C27]"
         >
           Review Membership
         </Link>
