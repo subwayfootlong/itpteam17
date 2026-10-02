@@ -13,7 +13,7 @@ export default function HomeAnnouncementCard({
   announcement,
 }: HomeAnnouncementCardProps) {
   return (
-    <section className="mt-8 rounded-xl border border-[#D9E8D7] bg-[#F3FAF2] p-5">
+    <section className="mt-4 rounded-xl border border-[#D9E8D7] bg-[#F3FAF2] p-5">
       <div className="flex items-start gap-3">
         <div className="rounded-full bg-[#DDF3D9] p-2 text-[#0F6E00]">
           <Megaphone size={20} />

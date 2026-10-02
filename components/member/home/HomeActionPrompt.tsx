@@ -23,7 +23,7 @@ export default function HomeActionPrompt({ user }: { user: CurrentUser }) {
 
   if (hasIncompleteProfile) {
     return (
-      <section className="mt-8 rounded-xl border border-[#F5D9A8] bg-[#FFF8EE] p-5">
+      <section className="mt-4 rounded-xl border border-[#F5D9A8] bg-[#FFF8EE] p-5">
         <h2 className="member-text-lg font-semibold text-[#151C27]">
           Complete Your Profile
         </h2>
@@ -44,7 +44,7 @@ export default function HomeActionPrompt({ user }: { user: CurrentUser }) {
 
   if (isExpirySoon(user.expiryDate)) {
     return (
-      <section className="mt-8 rounded-xl border border-[#F5D9A8] bg-[#FFF8EE] p-5">
+      <section className="mt-4 rounded-xl border border-[#F5D9A8] bg-[#FFF8EE] p-5">
         <h2 className="member-text-lg font-semibold text-[#151C27]">
           Membership Renewal Reminder
         </h2>

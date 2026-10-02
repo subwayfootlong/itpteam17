@@ -37,7 +37,7 @@ export default function NextRegisteredEventCard({
 }) {
   if (!event) {
     return (
-      <section className="mt-8 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+      <section className="mt-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
         <h2 className="member-text-lg font-semibold text-[#151C27]">
           No upcoming registrations
         </h2>
@@ -57,7 +57,7 @@ export default function NextRegisteredEventCard({
   }
 
   return (
-    <section className="mt-8 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <section className="mt-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
       <p className="member-text-xs font-semibold uppercase tracking-wide text-[#0F6E00]">
         Your Next Event
       </p>
