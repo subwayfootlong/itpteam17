@@ -95,6 +95,8 @@ export async function POST(req: Request) {
       category: body.category ?? 'General',
       image_url: body.image_url || null,
       status: body.status ?? 'draft',
+      poll_enabled: Boolean(body.poll_enabled),
+      poll_question: body.poll_enabled ? (body.poll_question || null) : null,
       // created_by: admin.sub,
     })
     .select()

@@ -5,10 +5,12 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import AnnouncementForm, { AnnouncementFormData } from '@/components/admin/AnnouncementForm';
 import AnnouncementMetricsCard from '@/components/admin/AnnouncementMetricsCard';
+import AnnouncementPollCard from '@/components/admin/AnnouncementPollCard';
 
 export default function EditAnnouncementPage() {
   const { id } = useParams<{ id: string }>();
   const [initialData, setInitialData] = useState<Partial<AnnouncementFormData> | null>(null);
+  const [liveForm, setLiveForm] = useState<AnnouncementFormData | null>(null);
   const [metrics, setMetrics] = useState({ views: 0, clicks: 0, reactions: 0 });
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -25,6 +27,8 @@ export default function EditAnnouncementPage() {
           category: a.category ?? 'General',
           image_url: a.image_url ?? '',
           status: a.status ?? 'draft',
+          poll_enabled: Boolean(a.poll_enabled),
+          poll_question: a.poll_question ?? '',
         });
         
         // Extract metrics (assuming API returns these fields)
@@ -69,10 +73,22 @@ export default function EditAnnouncementPage() {
       
       <div className="flex flex-col xl:flex-row gap-6 items-start">
         <div className="w-full xl:flex-1">
-          {initialData && <AnnouncementForm initialData={initialData} announcementId={id} />}
+          {initialData && (
+            <AnnouncementForm
+              initialData={initialData}
+              announcementId={id}
+              onFormChange={setLiveForm}
+            />
+          )}
         </div>
-        <div className="w-full xl:w-[400px] shrink-0 xl:sticky xl:top-6">
+        <div className="w-full xl:w-[400px] shrink-0 xl:sticky xl:top-6 flex flex-col gap-6">
           <AnnouncementMetricsCard metrics={metrics} />
+          {liveForm?.poll_enabled && (
+            <AnnouncementPollCard
+              announcementId={id}
+              pollQuestion={liveForm.poll_question || 'Will you be attending?'}
+            />
+          )}
         </div>
       </div>
     </div>

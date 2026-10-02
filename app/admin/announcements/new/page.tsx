@@ -15,7 +15,9 @@ export default function NewAnnouncementPage() {
           Write and publish an official update for all Pergas members.
         </p>
       </div>
-      <AnnouncementForm />
+      <div className="max-w-4xl">
+        <AnnouncementForm />
+      </div>
     </div>
   );
 }

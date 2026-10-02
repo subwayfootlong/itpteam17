@@ -129,7 +129,7 @@ export default function EventForm({ initialData, eventId }: EventFormProps) {
   const minStartTime = getMinTime();
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-4xl space-y-6 pb-12">
+    <form onSubmit={handleSubmit} className="space-y-6 pb-12">
       {error && (
         <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm font-medium shadow-sm">
           {error}

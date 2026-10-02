@@ -41,10 +41,14 @@ export async function PATCH(
     return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
   }
 
-  const allowed = ['title', 'content', 'category', 'image_url', 'status'];
+  const allowed = ['title', 'content', 'category', 'image_url', 'status', 'poll_enabled', 'poll_question'];
   const updates: Record<string, unknown> = {};
   for (const key of allowed) {
     if (key in body) updates[key] = body[key] === '' ? null : body[key];
+  }
+  if ('poll_enabled' in body) {
+    updates.poll_enabled = Boolean(body.poll_enabled);
+    if (!body.poll_enabled) updates.poll_question = null;
   }
 
   const { data: existing } = await supabaseAdmin
