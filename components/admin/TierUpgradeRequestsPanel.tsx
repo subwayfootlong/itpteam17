@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Check, Clock3, RefreshCw, Search, X } from "lucide-react";
+import { Check, Clock3, History, RefreshCw, Search, X } from "lucide-react";
 import { formatTierLabel, TIER_COLORS } from "@/lib/membershipTiers";
 import { Badge } from "@/components/admin/ui/Badge";
 
@@ -32,6 +32,17 @@ const STATUS_STYLES: Record<RequestStatus, string> = {
   approved: "bg-green-50 text-green-700",
   rejected: "bg-red-50 text-red-700",
 };
+
+const HISTORY_TABS: Array<{
+  value: "all" | RequestStatus;
+  label: string;
+  icon: typeof History;
+}> = [
+  { value: "pending", label: "Pending", icon: Clock3 },
+  { value: "approved", label: "Approved", icon: Check },
+  { value: "rejected", label: "Rejected", icon: X },
+  { value: "all", label: "All History", icon: History },
+];
 
 export default function TierUpgradeRequestsPanel() {
   const [requests, setRequests] = useState<TierRequest[]>([]);
@@ -160,8 +171,34 @@ export default function TierUpgradeRequestsPanel() {
         ))}
       </div>
 
-      <div className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:flex-row">
-        <div className="relative flex-1">
+      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="flex flex-wrap gap-2 border-b border-gray-100 pb-4">
+          {HISTORY_TABS.map((tab) => {
+            const Icon = tab.icon;
+            const count = tab.value === "all" ? requests.length : stats[tab.value];
+            const active = filter === tab.value;
+            return (
+              <button
+                key={tab.value}
+                type="button"
+                onClick={() => setFilter(tab.value)}
+                className={`inline-flex min-h-10 items-center gap-2 rounded-lg px-4 text-[13px] font-bold transition-colors ${
+                  active
+                    ? "bg-[#27500A] text-white shadow-sm"
+                    : "bg-gray-50 text-gray-600 hover:bg-[#e8f5e3] hover:text-[#27500A]"
+                }`}
+              >
+                <Icon size={15} />
+                {tab.label}
+                <span className={`rounded-full px-2 py-0.5 text-[11px] ${active ? "bg-white/20 text-white" : "bg-white text-gray-500"}`}>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="relative mt-4 flex-1">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             value={search}
@@ -170,16 +207,6 @@ export default function TierUpgradeRequestsPanel() {
             className="h-10 w-full rounded-lg border border-gray-200 bg-gray-50/50 pl-9 pr-3 text-[13px] outline-none focus:border-[#3FAE2A] focus:bg-white focus:ring-4 focus:ring-[#3FAE2A]/10"
           />
         </div>
-        <select
-          value={filter}
-          onChange={(event) => setFilter(event.target.value as "all" | RequestStatus)}
-          className="h-10 min-w-40 rounded-lg border border-gray-200 bg-gray-50/50 px-3 text-[13px] outline-none focus:border-[#3FAE2A] focus:bg-white"
-        >
-          <option value="all">All requests</option>
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="rejected">Rejected</option>
-        </select>
       </div>
 
       {error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>}
@@ -188,7 +215,9 @@ export default function TierUpgradeRequestsPanel() {
         {loading ? (
           <div className="rounded-xl border border-gray-200 bg-white p-10 text-center text-sm text-gray-500">Loading tier requests…</div>
         ) : visibleRequests.length === 0 ? (
-          <div className="rounded-xl border border-gray-200 bg-white p-10 text-center text-sm text-gray-500">No tier requests match this view.</div>
+          <div className="rounded-xl border border-gray-200 bg-white p-10 text-center text-sm text-gray-500">
+            {filter === "pending" ? "No tier requests are waiting for review." : "No tier request history matches this view."}
+          </div>
         ) : visibleRequests.map((request) => (
           <article key={request.id} className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
             <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
