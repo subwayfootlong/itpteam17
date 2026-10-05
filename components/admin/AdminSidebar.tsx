@@ -33,6 +33,16 @@ const NAV_ITEMS = [
     ),
   },
   {
+    label: 'Tier Requests',
+    href: '/admin/tier-requests',
+    icon: (
+      <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m0 0-5 5m5-5 5 5" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 19h14" />
+      </svg>
+    ),
+  },
+  {
     label: 'Events',
     href: '/admin/events',
     icon: (

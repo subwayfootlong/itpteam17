@@ -12,6 +12,13 @@ import type {
 } from "./communityTypes";
 
 import { formatRelativeDate } from "./dates";
+import type { CurrentUser } from "./currentUser";
+import {
+  DEFAULT_TIER_AUDIENCE,
+  evaluateTierAccess,
+  isActiveMembership,
+  normalizeTierAudience,
+} from "./tierAccess";
 
 export type {
   CommunityData,
@@ -43,6 +50,9 @@ type AdminAnnouncementRow = {
   created_at: string | null;
   updated_at: string | null;
   image_url: string | null;
+  audience_type: string | null;
+  eligible_tiers: string[] | null;
+  show_locked_preview: boolean | null;
 };
 
 type CommentRow = {
@@ -67,6 +77,9 @@ type GroupRow = {
   title: string;
   icon: string | null;
   tone: "green" | "gold" | null;
+  audience_type: string | null;
+  eligible_tiers: string[] | null;
+  show_locked_preview: boolean | null;
 };
 
 type ThreadRow = {
@@ -187,8 +200,15 @@ function shouldShowThread(row: ThreadRow, currentUserId?: string) {
 }
 
 export async function getCommunityData(
-  currentUserId?: string,
+  currentUser?: CurrentUser | null,
 ): Promise<CommunityData> {
+  const currentUserId = currentUser?.id;
+  const memberAccess = {
+    membershipTier: currentUser?.membershipTier,
+    membershipStatus: currentUser?.membershipStatus,
+    expiryDate: currentUser?.expiryDate,
+  };
+  const memberIsActive = isActiveMembership(memberAccess);
   const [
     adminAnnouncementsResult,
     adminAnnouncementCommentsResult,
@@ -200,7 +220,7 @@ export async function getCommunityData(
   ] = await Promise.all([
     supabaseAdmin
       .from("announcements")
-      .select("id, title, content, category, created_at, updated_at, image_url")
+      .select("id, title, content, category, created_at, updated_at, image_url, audience_type, eligible_tiers, show_locked_preview")
       .eq("status", "published")
       .order("updated_at", { ascending: false }),
     supabaseAdmin
@@ -219,7 +239,7 @@ export async function getCommunityData(
       .order("created_at", { ascending: true }),
     supabaseAdmin
       .from("discussion_groups")
-      .select("id, title, icon, tone")
+      .select("id, title, icon, tone, audience_type, eligible_tiers, show_locked_preview")
       .order("sort_order", { ascending: true }),
     supabaseAdmin
       .from("discussion")
@@ -258,10 +278,21 @@ export async function getCommunityData(
     threadCommentsById.set(row.thread_id, comments);
   }
 
+  const visibleGroups = groupsResult.error
+    ? []
+    : ((groupsResult.data ?? []) as GroupRow[]).filter((row) =>
+        evaluateTierAccess(memberAccess, normalizeTierAudience(row)).canAccess,
+      );
+  const visibleGroupIds = new Set(visibleGroups.map((group) => group.id));
+
   const threads = threadsResult.error
     ? []
     : ((threadsResult.data ?? []) as ThreadRow[])
-        .filter((row) => shouldShowThread(row, currentUserId))
+        .filter(
+          (row) =>
+            visibleGroupIds.has(row.group_id) &&
+            shouldShowThread(row, currentUserId),
+        )
         .map((row) =>
           mapThread(row, threadCommentsById.get(row.id) ?? []),
         );
@@ -273,12 +304,16 @@ export async function getCommunityData(
 
   const adminAnnouncements = adminAnnouncementsResult.error
     ? []
-    : ((adminAnnouncementsResult.data ?? []) as AdminAnnouncementRow[]).map(
-        (row) => mapAdminAnnouncement(row, adminCommentsById.get(row.id) ?? []),
-      );
+    : ((adminAnnouncementsResult.data ?? []) as AdminAnnouncementRow[])
+        .filter((row) =>
+          evaluateTierAccess(memberAccess, normalizeTierAudience(row)).canAccess,
+        )
+        .map((row) =>
+          mapAdminAnnouncement(row, adminCommentsById.get(row.id) ?? []),
+        );
 
   const communityAnnouncements =
-    announcementsResult.error || announcementCommentsResult.error
+    !memberIsActive || announcementsResult.error || announcementCommentsResult.error
       ? []
       : ((announcementsResult.data ?? []) as AnnouncementRow[]).map((row) =>
           mapAnnouncement(row, announcementCommentsById.get(row.id) ?? []),
@@ -287,9 +322,7 @@ export async function getCommunityData(
   return {
     announcements:
       adminAnnouncements.length > 0 ? adminAnnouncements : communityAnnouncements,
-    groups: groupsResult.error
-      ? []
-      : ((groupsResult.data ?? []) as GroupRow[]).map((row) => ({
+    groups: visibleGroups.map((row) => ({
           id: row.id,
           title: row.title,
           posts: threadCounts[row.id] ?? 0,
@@ -307,8 +340,9 @@ export type DiscussionThreadDetail = {
 
 export async function getDiscussionThread(
   threadId: string,
-  currentUserId?: string,
+  currentUser?: CurrentUser | null,
 ): Promise<DiscussionThreadDetail | null> {
+  const currentUserId = currentUser?.id;
   const { data: threadData, error: threadError } = await supabaseAdmin
     .from("discussion")
     .select("id, group_id, user_id, title, body, votes, status, has_image, created_at, author_name, author_role")
@@ -322,15 +356,34 @@ export async function getDiscussionThread(
   const [groupResult, commentsResult] = await Promise.all([
     supabaseAdmin
       .from("discussion_groups")
-      .select("title")
+      .select("title, audience_type, eligible_tiers, show_locked_preview")
       .eq("id", threadData.group_id)
-      .maybeSingle<{ title: string }>(),
+      .maybeSingle<{
+        title: string;
+        audience_type: string | null;
+        eligible_tiers: string[] | null;
+        show_locked_preview: boolean | null;
+      }>(),
     supabaseAdmin
       .from("discussion_comments")
       .select("id, thread_id, parent_comment_id, user_id, body, status, created_at, author_name, author_role")
       .eq("thread_id", threadData.id)
       .order("created_at", { ascending: true }),
   ]);
+
+  const groupAccess = evaluateTierAccess(
+    {
+      membershipTier: currentUser?.membershipTier,
+      membershipStatus: currentUser?.membershipStatus,
+      expiryDate: currentUser?.expiryDate,
+    },
+    groupResult.data
+      ? normalizeTierAudience(groupResult.data)
+      : DEFAULT_TIER_AUDIENCE,
+  );
+  if (groupResult.error || !groupResult.data || !groupAccess.canAccess) {
+    return null;
+  }
 
   const comments = commentsResult.error
     ? []

@@ -37,6 +37,9 @@ const PhoneInputField: React.FC<PhoneInputFieldProps> = ({
 
   const countryOptions = useMemo(() => getCountries(), []);
 
+  /* The component intentionally mirrors externally controlled values into its
+     editable country/national fields. This is an external-state synchronization. */
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!value) {
       setNational("");
@@ -50,6 +53,7 @@ const PhoneInputField: React.FC<PhoneInputFieldProps> = ({
     setCountry((parsed.country ?? defaultCountry) as Country);
     setNational(parsed.nationalNumber);
   }, [value, defaultCountry]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const emitChange = (nextCountry: Country, nextNational: string) => {
     setCountry(nextCountry);

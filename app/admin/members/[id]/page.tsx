@@ -30,6 +30,17 @@ interface Member {
   created_at: string;
 }
 
+interface EventRegistration {
+  id: string;
+  status: string;
+  rejection_message: string | null;
+  registered_at: string;
+  events:
+    | { title: string; event_date: string | null; venue: string | null }
+    | Array<{ title: string; event_date: string | null; venue: string | null }>
+    | null;
+}
+
 const STATUS_COLORS: Record<string, string> = {
   active:    'bg-[#e8f5e3] text-[#27500A]',
   expired:   'bg-red-50 text-red-600',
@@ -56,7 +67,7 @@ function DetailRow({ label, value }: { label: string; value: React.ReactNode }) 
 export default function MemberViewPage() {
   const { id } = useParams<{ id: string }>();
   const [member, setMember] = useState<Member | null>(null);
-  const [registrations, setRegistrations] = useState<any[]>([]);
+  const [registrations, setRegistrations] = useState<EventRegistration[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

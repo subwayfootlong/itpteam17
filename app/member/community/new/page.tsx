@@ -12,7 +12,7 @@ export default async function CreateCommunityPostPage({
 }) {
   const params = await searchParams;
   const user = await getCurrentUser();
-  const data = await getCommunityData(user?.id);
+  const data = await getCommunityData(user);
 
   return (
     <MemberPageShell>

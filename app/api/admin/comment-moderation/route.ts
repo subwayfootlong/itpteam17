@@ -4,6 +4,7 @@ import {
   type ModerationSource,
   type ModerationStatus,
 } from "@/lib/commentModeration";
+import { getVerifiedAdmin, unauthorizedResponse } from "@/lib/adminAuth";
 
 const SOURCES: ModerationSource[] = [
   "admin-announcement",
@@ -18,6 +19,9 @@ const ACTION_STATUS: Record<string, ModerationStatus> = {
 };
 
 export async function PATCH(req: Request) {
+  const admin = await getVerifiedAdmin();
+  if (!admin) return unauthorizedResponse();
+
   let body: unknown;
 
   try {
@@ -30,6 +34,7 @@ export async function PATCH(req: Request) {
     id?: unknown;
     source?: unknown;
     action?: unknown;
+    currentStatus?: unknown;
   };
 
   if (typeof payload.id !== "string" || payload.id.trim().length === 0) {
@@ -50,6 +55,14 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: "Invalid moderation action" }, { status: 400 });
   }
 
+  if (
+    payload.currentStatus !== undefined &&
+    (typeof payload.currentStatus !== "string" ||
+      !["approved", "pending", "flagged"].includes(payload.currentStatus))
+  ) {
+    return NextResponse.json({ error: "Invalid current moderation status" }, { status: 400 });
+  }
+
   const status = ACTION_STATUS[payload.action];
   const source = payload.source as ModerationSource;
 
@@ -57,6 +70,7 @@ export async function PATCH(req: Request) {
     getModerationTable(source),
     payload.id,
     status,
+    payload.currentStatus as ModerationStatus | undefined,
   );
 
   if (error) {
@@ -64,7 +78,14 @@ export async function PATCH(req: Request) {
   }
 
   if (!data) {
-    return NextResponse.json({ error: "Moderation item not found" }, { status: 404 });
+    return NextResponse.json(
+      {
+        error: payload.currentStatus
+          ? "This item was changed by another administrator. Refresh and try again."
+          : "Moderation item not found",
+      },
+      { status: payload.currentStatus ? 409 : 404 },
+    );
   }
 
   return NextResponse.json({
@@ -80,12 +101,19 @@ async function supabaseUpdateStatus(
   table: string,
   id: string,
   status: ModerationStatus,
+  currentStatus?: ModerationStatus,
 ) {
   const { supabaseAdmin } = await import("@/lib/supabaseServer");
-  const { data, error } = await supabaseAdmin
+  let query = supabaseAdmin
     .from(table)
     .update({ status })
-    .eq("id", id)
+    .eq("id", id);
+
+  if (currentStatus) {
+    query = query.eq("status", currentStatus);
+  }
+
+  const { data, error } = await query
     .select("id, status")
     .maybeSingle<{ id: string; status: ModerationStatus }>();
 

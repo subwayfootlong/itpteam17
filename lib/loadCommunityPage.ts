@@ -3,6 +3,7 @@ import { getCurrentUser } from "./currentUser";
 import { announcements } from "./data/announcements";
 import type { Announcement } from "./data/announcements";
 import type { DiscussionGroup, DiscussionThread } from "./communityTypes";
+import { isActiveMembership } from "./tierAccess";
 
 export type CommunityPageProps = {
   announcements: Announcement[];
@@ -16,14 +17,11 @@ export async function loadCommunityPageData(): Promise<CommunityPageProps> {
   const memberName = currentUser?.fullName ?? "Member";
 
   try {
-    const communityData = await getCommunityData(currentUser?.id);
+    const communityData = await getCommunityData(currentUser);
 
     return {
       memberName,
-      announcements:
-        communityData.announcements.length > 0
-          ? communityData.announcements
-          : announcements,
+      announcements: communityData.announcements,
       groups: communityData.groups,
       threads: communityData.threads,
     };
@@ -33,7 +31,13 @@ export async function loadCommunityPageData(): Promise<CommunityPageProps> {
 
   return {
     memberName,
-    announcements,
+    announcements: isActiveMembership({
+      membershipTier: currentUser?.membershipTier,
+      membershipStatus: currentUser?.membershipStatus,
+      expiryDate: currentUser?.expiryDate,
+    })
+      ? announcements
+      : [],
     groups: [],
     threads: [],
   };
