@@ -9,8 +9,11 @@ export default async function CommentModerationPage() {
 
   return (
     <div className="space-y-6">
+      <CommentModerationPanel
+        initialComments={comments}
+        referenceTime={new Date().toISOString()}
+      />
       <DiscussionGroupAudienceManager />
-      <CommentModerationPanel initialComments={comments} />
     </div>
   );
 }
