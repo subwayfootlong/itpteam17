@@ -26,7 +26,7 @@ const actions = [
 
 export default function HomeQuickActions() {
   return (
-    <section className="mt-8">
+    <section className="mt-4">
       <h2 className="member-text-xl font-semibold text-[#0F6E00]">
         Quick Actions
       </h2>

@@ -10,6 +10,7 @@ type CategoryFilter = "All" | string;
 type BenefitView = "list" | "map";
 
 function hasPhysicalLocation(partner: Partner) {
+  if (partner.isLocked) return false;
   const address = partner.address.trim().toLowerCase();
   return (
     partner.region !== "Online" &&
@@ -193,7 +194,7 @@ function RewardCard({
   onSelect: (partner: Partner) => void;
 }) {
   return (
-    <article className="benefit-reward-card">
+    <article className={`benefit-reward-card${partner.isLocked ? " is-locked" : ""}`}>
       <PartnerVisual partner={partner} />
       <div className="benefit-reward-card__body">
         <div className="benefit-reward-card__meta">
@@ -205,13 +206,20 @@ function RewardCard({
         </div>
         <h2>{partner.name}</h2>
         <p>{partner.offer}</p>
+        {partner.isLocked && (
+          <span className="member-text-sm mt-2 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-sm font-semibold text-amber-800">
+            <MemberIcon name="shield" size={15} />
+            Tier-restricted reward
+          </span>
+        )}
         <div className="benefit-reward-card__actions">
           <button
             className="benefit-reward-card__claim"
             type="button"
-            onClick={() => onSelect(partner)}
+            onClick={() => !partner.isLocked && onSelect(partner)}
+            disabled={partner.isLocked}
           >
-            Claim Reward
+            {partner.isLocked ? "Locked" : "Claim Reward"}
           </button>
         </div>
       </div>

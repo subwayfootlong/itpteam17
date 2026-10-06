@@ -11,4 +11,6 @@ export type Partner = {
   terms: string;
   imageUrl?: string;
   logoUrl?: string;
+  isLocked?: boolean;
+  requiredTierLabels?: string[];
 };

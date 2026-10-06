@@ -145,7 +145,7 @@ export async function getModerationComments(): Promise<ModerationComment[]> {
       return mapRow(
         row,
         "admin-announcement",
-        "Admin announcement",
+        "Official announcement comment",
         parentId,
         adminTitleMap.get(parentId) || "Admin announcement",
       );
@@ -155,7 +155,7 @@ export async function getModerationComments(): Promise<ModerationComment[]> {
       return mapRow(
         row,
         "community-announcement",
-        "Community announcement",
+        "Community announcement comment",
         parentId,
         announcementTitleMap.get(parentId) || "Community announcement",
       );
@@ -163,7 +163,7 @@ export async function getModerationComments(): Promise<ModerationComment[]> {
     ...postRows.map((row) => ({
       id: row.id,
       source: "discussion-post" as ModerationSource,
-      sourceLabel: "Discussion post",
+      sourceLabel: "Post",
       status: row.status,
       authorName: row.author_name || "Pergas Member",
       authorRole: "Active Member",
@@ -177,7 +177,7 @@ export async function getModerationComments(): Promise<ModerationComment[]> {
       return mapRow(
         row,
         "discussion-thread",
-        "Discussion thread",
+        "Reply",
         parentId,
         threadTitleMap.get(parentId) || "Discussion thread",
       );

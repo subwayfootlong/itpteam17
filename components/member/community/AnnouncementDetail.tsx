@@ -1,20 +1,33 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import type { Announcement, CommunityComment } from "@/lib/data/announcements";
+import type {
+  Announcement,
+  CommunityComment,
+  PollResponseValue,
+} from "@/lib/data/announcements";
 import MemberIcon from "@/components/member/MemberIcon";
 import { pluralize } from "./utils";
+
+const POLL_OPTIONS: { value: PollResponseValue; label: string }[] = [
+  { value: "yes", label: "Yes, I'll attend" },
+  { value: "maybe", label: "Maybe" },
+  { value: "no", label: "No" },
+];
 
 export default function AnnouncementDetail({
   announcement,
   localComments,
   onComment,
+  onVote,
 }: {
   announcement: Announcement;
   localComments: CommunityComment[];
   onComment: (announcementId: string, body: string) => Promise<void>;
+  onVote: (announcementId: string, response: PollResponseValue) => Promise<void>;
 }) {
   const [draft, setDraft] = useState("");
+  const [voting, setVoting] = useState(false);
   const comments = [...announcement.comments, ...localComments];
   const approvedComments = comments.filter(
     (comment) => comment.status === "approved",
@@ -32,6 +45,21 @@ export default function AnnouncementDetail({
     await onComment(announcement.id, draft.trim());
     setDraft("");
   };
+
+  const handleVote = async (response: PollResponseValue) => {
+    if (voting || announcement.myPollResponse === response) return;
+    setVoting(true);
+    try {
+      await onVote(announcement.id, response);
+    } finally {
+      setVoting(false);
+    }
+  };
+
+  const pollCounts = announcement.pollCounts;
+  const pollTotal = pollCounts
+    ? pollCounts.yes + pollCounts.no + pollCounts.maybe
+    : 0;
 
   return (
     <section className="community-screen">
@@ -55,6 +83,37 @@ export default function AnnouncementDetail({
         <p className="announcement-detail-card__body-copy">
           {announcement.body}
         </p>
+
+        {announcement.pollEnabled && (
+          <div className="announcement-poll">
+            <p className="announcement-poll__question">
+              {announcement.pollQuestion || "Will you be attending?"}
+            </p>
+            <div className="announcement-poll__options">
+              {POLL_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  disabled={voting}
+                  onClick={() => handleVote(option.value)}
+                  className={
+                    announcement.myPollResponse === option.value
+                      ? "is-selected"
+                      : undefined
+                  }
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            {pollCounts && pollTotal > 0 && (
+              <p className="announcement-poll__tally">
+                {pluralize(pollTotal, "response")} · {pollCounts.yes} yes,{" "}
+                {pollCounts.maybe} maybe, {pollCounts.no} no
+              </p>
+            )}
+          </div>
+        )}
       </article>
 
       <section className="moderated-comments">

@@ -12,7 +12,11 @@ export default async function BenefitPage() {
   let visiblePartners: Partner[] = [];
 
   try {
-    visiblePartners = await getActiveBenefitPartners();
+    visiblePartners = await getActiveBenefitPartners({
+      membershipTier: user?.membershipTier,
+      membershipStatus: user?.membershipStatus,
+      expiryDate: user?.expiryDate,
+    });
   } catch (error) {
     console.warn("Unable to load benefit data:", error);
   }

@@ -2,6 +2,12 @@ import { supabaseAdmin } from "./supabaseServer";
 import type {
   Partner,
 } from "@/lib/data/partners";
+import {
+  evaluateTierAccess,
+  normalizeTierAudience,
+  type MemberAccessContext,
+  type TierAccessResult,
+} from "./tierAccess";
 
 type BenefitRow = {
   id: string | number;
@@ -14,6 +20,9 @@ type BenefitRow = {
   image_url: string | null;
   logo_url: string | null;
   logo_initials: string | null;
+  audience_type: string | null;
+  eligible_tiers: string[] | null;
+  show_locked_preview: boolean | null;
 };
 
 function initialsFromName(name: string) {
@@ -45,7 +54,7 @@ function buildOffer(row: BenefitRow) {
   return description || amount || "Exclusive Pergas member reward";
 }
 
-function mapBenefit(row: BenefitRow): Partner {
+function mapBenefit(row: BenefitRow, access: TierAccessResult): Partner {
   const name = row.merchant_name?.trim() || "Pergas Partner";
   const address = row.address?.trim() || "Online or merchant-confirmed redemption";
   const online = isOnlineBenefit(row.address);
@@ -56,25 +65,33 @@ function mapBenefit(row: BenefitRow): Partner {
     initials: row.logo_initials?.trim() || initialsFromName(name),
     category: row.category?.trim() || "Other",
     region: online ? "Online" : "Singapore",
-    offer: buildOffer(row),
-    description:
-      row.description?.trim() ||
-      `${name} is an admin-listed Friends of Pergas benefit partner.`,
-    address,
+    offer: access.canAccess
+      ? buildOffer(row)
+      : `Available to ${access.requiredTierLabels.join(" and ")} members`,
+    description: access.canAccess
+      ? row.description?.trim() ||
+        `${name} is an admin-listed Friends of Pergas benefit partner.`
+      : "This reward is reserved for eligible membership tiers.",
+    address: access.canAccess ? address : "Restricted member reward",
     distance: online ? "Online benefit" : "Singapore location",
-    terms:
-      row.discount_description?.trim() ||
-      "Present an active Pergas membership when redeeming. Merchant terms and availability may apply.",
+    terms: access.canAccess
+      ? row.discount_description?.trim() ||
+        "Present an active Pergas membership when redeeming. Merchant terms and availability may apply."
+      : "Upgrade or renew your membership to access this reward.",
     imageUrl: row.image_url?.trim() || undefined,
     logoUrl: row.logo_url?.trim() || undefined,
+    isLocked: !access.canAccess,
+    requiredTierLabels: access.requiredTierLabels,
   };
 }
 
-export async function getActiveBenefitPartners(): Promise<Partner[]> {
+export async function getActiveBenefitPartners(
+  member: MemberAccessContext,
+): Promise<Partner[]> {
   const { data, error } = await supabaseAdmin
     .from("benefits")
     .select(
-      "id, merchant_name, category, discount_description, discount_amount, address, description, image_url, logo_url, logo_initials",
+      "id, merchant_name, category, discount_description, discount_amount, address, description, image_url, logo_url, logo_initials, audience_type, eligible_tiers, show_locked_preview",
     )
     .eq("is_active", true)
     .order("merchant_name", { ascending: true });
@@ -83,5 +100,11 @@ export async function getActiveBenefitPartners(): Promise<Partner[]> {
     throw error;
   }
 
-  return ((data ?? []) as BenefitRow[]).map(mapBenefit);
+  return ((data ?? []) as BenefitRow[])
+    .map((row) => ({
+      row,
+      access: evaluateTierAccess(member, normalizeTierAudience(row)),
+    }))
+    .filter(({ access }) => access.canAccess || access.canPreview)
+    .map(({ row, access }) => mapBenefit(row, access));
 }

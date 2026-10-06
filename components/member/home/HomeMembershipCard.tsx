@@ -29,7 +29,7 @@ export default function HomeMembershipCard({
   const ctaLabel = expirySoon ? "Review Membership" : "View Digital Card";
 
   return (
-    <section className="mt-8 overflow-hidden rounded-xl bg-[#0F7A00] p-6 text-white">
+    <section className="mt-4 overflow-hidden rounded-xl bg-[#0F7A00] p-6 text-white">
       <div className="relative">
         <div
           aria-hidden="true"

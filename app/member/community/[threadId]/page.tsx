@@ -13,7 +13,7 @@ export default async function DiscussionThreadPage({
 }) {
   const { threadId } = await params;
   const user = await getCurrentUser();
-  const detail = await getDiscussionThread(threadId, user?.id);
+  const detail = await getDiscussionThread(threadId, user);
 
   if (!detail) notFound();
 

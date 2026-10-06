@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { getCurrentUser } from '@/lib/currentUser';
+import { evaluateTierAccess, normalizeTierAudience } from '@/lib/tierAccess';
 
 export async function GET(req: Request) {
   const user = await getCurrentUser();
@@ -17,11 +18,23 @@ export async function GET(req: Request) {
 
   const { data: event, error } = await supabaseAdmin
     .from('events')
-    .select('id, external_rsvp_url')
+    .select('id, external_rsvp_url, audience_type, eligible_tiers, show_locked_preview, status')
     .eq('id', eventId)
     .single();
 
   if (error || !event) {
+    return new Response('Event not found', { status: 404 });
+  }
+
+  const access = evaluateTierAccess(
+    {
+      membershipTier: user.membershipTier,
+      membershipStatus: user.membershipStatus,
+      expiryDate: user.expiryDate,
+    },
+    normalizeTierAudience(event),
+  );
+  if (event.status !== 'published' || !access.canAccess) {
     return new Response('Event not found', { status: 404 });
   }
 
@@ -47,7 +60,7 @@ export async function POST(req: Request) {
   let body;
   try {
     body = await req.json();
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
@@ -59,7 +72,7 @@ export async function POST(req: Request) {
   // Fetch event details
   const { data: event, error: eventError } = await supabaseAdmin
     .from('events')
-    .select('id, title, capacity, spots_available, status')
+    .select('id, title, capacity, spots_available, status, audience_type, eligible_tiers, show_locked_preview')
     .eq('id', eventId)
     .single();
 
@@ -71,8 +84,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'This event is not open for registration' }, { status: 400 });
   }
 
+  const access = evaluateTierAccess(
+    {
+      membershipTier: user.membershipTier,
+      membershipStatus: user.membershipStatus,
+      expiryDate: user.expiryDate,
+    },
+    normalizeTierAudience(event),
+  );
+  if (!access.canAccess) {
+    return NextResponse.json({ error: 'This event is not available for your membership tier.' }, { status: 403 });
+  }
+
   // Check existing registration
-  const { data: existingReg, error: regError } = await supabaseAdmin
+  const { data: existingReg } = await supabaseAdmin
     .from('event_registrations')
     .select('id, status')
     .eq('event_id', eventId)

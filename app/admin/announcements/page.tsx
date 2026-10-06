@@ -14,6 +14,7 @@ import {
   TableCell,
   useSortState,
 } from '@/components/admin/ui/Table';
+import { formatAudienceLabel, normalizeTierAudience } from '@/lib/tierAccess';
 
 interface Announcement {
   id: string;
@@ -25,6 +26,9 @@ interface Announcement {
   image_url: string | null;
   views: number | null;
   comments: number;
+  audience_type: string | null;
+  eligible_tiers: string[] | null;
+  show_locked_preview: boolean | null;
 }
 
 const STATUS_STYLE: Record<string, { bg: string; color: string; dot: string }> = {
@@ -172,6 +176,11 @@ export default function AnnouncementsPage() {
           </span>
         </TableCell>
         <TableCell>
+          <span className="inline-flex max-w-[170px] rounded-full bg-[#eef5ec] px-2.5 py-1 text-[11px] font-bold text-[#27500A]">
+            {formatAudienceLabel(normalizeTierAudience(item))}
+          </span>
+        </TableCell>
+        <TableCell>
           <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium capitalize" style={{ background: ss.bg, color: ss.color }}>
             <span className="w-1.5 h-1.5 rounded-full" style={{ background: ss.dot }} />
             {item.status}
@@ -266,7 +275,7 @@ export default function AnnouncementsPage() {
       <TableWrapper
         data={sortedItems}
         renderRow={renderRow}
-        colCount={6}
+        colCount={7}
         loading={loading}
         defaultPageSize={10}
         emptyState={
@@ -281,6 +290,7 @@ export default function AnnouncementsPage() {
         <TableHead>
           <TableHeader sortKey="title"      sortState={sortState} onSort={handleSort}>Title</TableHeader>
           <TableHeader sortKey="category"   sortState={sortState} onSort={handleSort}>Category</TableHeader>
+          <TableHeader>Audience</TableHeader>
           <TableHeader sortKey="status"     sortState={sortState} onSort={handleSort}>Status</TableHeader>
           <TableHeader>Engagement</TableHeader>
           <TableHeader sortKey="updated_at" sortState={sortState} onSort={handleSort}>Last Updated</TableHeader>

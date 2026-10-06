@@ -6,6 +6,10 @@ export type AnnouncementCategory =
 
 export type CommentStatus = "approved" | "pending" | "flagged";
 
+export type PollResponseValue = "yes" | "no" | "maybe";
+
+export type PollCounts = Record<PollResponseValue, number>;
+
 export type CommunityComment = {
   id: string;
   parentId?: string | null;
@@ -29,6 +33,10 @@ export type Announcement = {
   pinned?: boolean;
   commentsEnabled: boolean;
   comments: CommunityComment[];
+  pollEnabled?: boolean;
+  pollQuestion?: string | null;
+  pollCounts?: PollCounts;
+  myPollResponse?: PollResponseValue | null;
 };
 
 export const announcements: Announcement[] = [

@@ -1,8 +1,8 @@
 export const MEMBERSHIP_TIERS = [
   { value: 'basic', label: 'Basic' },
-  { value: 'ordinary', label: 'Ordinary' },
-  { value: 'associate', label: 'Associate' },
   { value: 'student', label: 'Student' },
+  { value: 'associate', label: 'Associate' },
+  { value: 'ordinary', label: 'Ordinary' },
 ] as const;
 
 export type MembershipTier = (typeof MEMBERSHIP_TIERS)[number]['value'];
@@ -20,4 +20,16 @@ export function formatTierLabel(tier: string | null | undefined): string {
   if (!tier) return 'Basic';
   const match = MEMBERSHIP_TIERS.find((t) => t.value === tier);
   return match?.label ?? tier.charAt(0).toUpperCase() + tier.slice(1);
+}
+
+export function isMembershipTier(value: unknown): value is MembershipTier {
+  return MEMBERSHIP_TIERS.some((tier) => tier.value === value);
+}
+
+export function getAvailableTierUpgrades(
+  currentTier: string | null | undefined,
+): (typeof MEMBERSHIP_TIERS)[number][] {
+  const currentIndex = MEMBERSHIP_TIERS.findIndex((tier) => tier.value === currentTier);
+  const safeIndex = currentIndex >= 0 ? currentIndex : 0;
+  return MEMBERSHIP_TIERS.slice(safeIndex + 1);
 }

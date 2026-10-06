@@ -3023,6 +3023,64 @@ a {
   white-space: pre-line;
 }
 
+.announcement-poll {
+  margin: 22px 0 30px;
+  padding: 20px;
+  border: 1px solid #cfe9c9;
+  border-radius: 14px;
+  background: #eef9eb;
+}
+
+.announcement-poll__question {
+  margin: 0 0 14px;
+  color: #151925;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.announcement-poll__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.announcement-poll__options button {
+  padding: 10px 18px;
+  border: 1px solid #31ae22;
+  border-radius: 999px;
+  background: white;
+  color: #087100;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 800;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.announcement-poll__options button:not(:disabled):hover {
+  background: #eef9eb;
+  transform: translateY(-1px);
+}
+
+.announcement-poll__options button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.announcement-poll__options button.is-selected {
+  background: #087100;
+  color: white;
+}
+
+.announcement-poll__tally {
+  margin: 14px 0 0;
+  color: #536057;
+  font-size: 13px;
+}
+
 .moderated-comments {
   margin-top: 22px;
   padding: 24px;

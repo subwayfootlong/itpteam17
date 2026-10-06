@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server';
-// AUTH: uncomment when ready
-// import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
+import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { notifyAnnouncementPublished } from '@/lib/notifications';
 import { supabaseAdmin } from '@/lib/supabaseServer';
+import { tierAudienceToDatabase, validateTierAudience } from '@/lib/tierAccess';
 
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  // const admin = await getVerifiedAdmin();
-  // if (!admin) return unauthorizedResponse();
+  const admin = await getVerifiedAdmin();
+  if (!admin) return unauthorizedResponse();
 
   const { id } = await params;
   const { data, error } = await supabaseAdmin
@@ -30,8 +30,8 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  // const admin = await getVerifiedAdmin();
-  // if (!admin) return unauthorizedResponse();
+  const admin = await getVerifiedAdmin();
+  if (!admin) return unauthorizedResponse();
 
   const { id } = await params;
   let body;
@@ -41,10 +41,29 @@ export async function PATCH(
     return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
   }
 
-  const allowed = ['title', 'content', 'category', 'image_url', 'status'];
+  const allowed = ['title', 'content', 'category', 'image_url', 'status', 'poll_enabled', 'poll_question'];
   const updates: Record<string, unknown> = {};
+  const audienceChanged =
+    'audience_type' in body ||
+    'eligible_tiers' in body ||
+    'show_locked_preview' in body;
   for (const key of allowed) {
     if (key in body) updates[key] = body[key] === '' ? null : body[key];
+  }
+  if ('poll_enabled' in body) {
+    updates.poll_enabled = Boolean(body.poll_enabled);
+    if (!body.poll_enabled) updates.poll_question = null;
+  }
+
+  if (audienceChanged) {
+    const audience = validateTierAudience(body);
+    if (!audience.ok) {
+      return NextResponse.json({ error: audience.error }, { status: 400 });
+    }
+    Object.assign(
+      updates,
+      tierAudienceToDatabase({ ...audience.value, showLockedPreview: false }),
+    );
   }
 
   const { data: existing } = await supabaseAdmin
@@ -64,10 +83,15 @@ export async function PATCH(
     console.error('Announcements PATCH Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  if (data?.status === 'published' && existing?.status !== 'published') {
+  if (data?.status === 'published' && (existing?.status !== 'published' || audienceChanged)) {
     await notifyAnnouncementPublished({
       id: String(data.id),
       title: data.title,
+      audience: {
+        audienceType: data.audience_type === 'selected_tiers' ? 'selected_tiers' : 'all',
+        eligibleTiers: Array.isArray(data.eligible_tiers) ? data.eligible_tiers : [],
+        showLockedPreview: false,
+      },
     });
   }
 
@@ -78,8 +102,8 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  // const admin = await getVerifiedAdmin();
-  // if (!admin) return unauthorizedResponse();
+  const admin = await getVerifiedAdmin();
+  if (!admin) return unauthorizedResponse();
 
   const { id } = await params;
   const { error } = await supabaseAdmin.from('announcements').delete().eq('id', id);

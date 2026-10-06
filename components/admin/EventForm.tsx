@@ -2,8 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import AudienceAccessFields, {
+  DEFAULT_AUDIENCE_ACCESS,
+  type AudienceAccessValue,
+} from '@/components/admin/AudienceAccessFields';
 
-export interface EventFormData {
+export interface EventFormData extends AudienceAccessValue {
   title: string;
   description: string;
   event_date: string;
@@ -29,6 +33,7 @@ const EMPTY: EventFormData = {
   external_rsvp_url: '',
   image_url: '',
   status: 'draft',
+  ...DEFAULT_AUDIENCE_ACCESS,
 };
 
 const CATEGORIES = ['General', 'Workshop', 'AGM', 'Appreciation', 'Community Service', 'Seminar', 'Conference', 'Other'];
@@ -73,8 +78,8 @@ export default function EventForm({ initialData, eventId }: EventFormProps) {
 
       const { url } = await res.json();
       set('image_url', url);
-    } catch (err: any) {
-      setError(err.message || 'Image upload failed.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Image upload failed.');
     } finally {
       setUploading(false);
     }
@@ -92,6 +97,15 @@ export default function EventForm({ initialData, eventId }: EventFormProps) {
       ...form,
       capacity: form.capacity ? parseInt(form.capacity) : null,
     };
+
+    if (
+      form.audience_type === 'selected_tiers' &&
+      form.eligible_tiers.length === 0
+    ) {
+      setError('Select at least one eligible membership tier.');
+      setSaving(false);
+      return;
+    }
 
     const url = eventId ? `/api/admin/events/${eventId}` : '/api/admin/events';
     const method = eventId ? 'PATCH' : 'POST';
@@ -129,7 +143,7 @@ export default function EventForm({ initialData, eventId }: EventFormProps) {
   const minStartTime = getMinTime();
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-4xl space-y-6 pb-12">
+    <form onSubmit={handleSubmit} className="space-y-6 pb-12">
       {error && (
         <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm font-medium shadow-sm">
           {error}
@@ -266,7 +280,7 @@ export default function EventForm({ initialData, eventId }: EventFormProps) {
                 className="h-11 px-4 rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-800 outline-none transition-all focus:bg-white focus:border-[#3FAE2A] focus:ring-4 focus:ring-[#3FAE2A]/10 cursor-pointer appearance-none"
               >
                 <option value="draft">Draft — hidden from members</option>
-                <option value="published">Published — visible to all</option>
+                <option value="published">Published — visible to selected audience</option>
                 <option value="archived">Archived — removed from feed</option>
               </select>
             </div>
@@ -331,6 +345,14 @@ export default function EventForm({ initialData, eventId }: EventFormProps) {
               </div>
             )}
           </div>
+
+          <AudienceAccessFields
+            value={form}
+            onChange={(audience) =>
+              setForm((current) => ({ ...current, ...audience }))
+            }
+            allowLockedPreview
+          />
         </div>
 
         {/* Footer Actions */}

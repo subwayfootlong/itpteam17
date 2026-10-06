@@ -166,7 +166,7 @@ export default function MemberSettingsView({
 
     try {
       document.cookie = `${PUSH_NOTIFICATIONS_COOKIE}=${nextValue ? "1" : "0"}; path=/; max-age=31536000; samesite=lax`;
-    } catch (error) {
+    } catch {
       setPushEnabled(previousValue);
     } finally {
       setSavingPush(false);
@@ -199,7 +199,7 @@ export default function MemberSettingsView({
       }
 
       setPreferences(result.preferences);
-    } catch (error) {
+    } catch {
       setPreferences(previousPreferences);
     }
   }
