@@ -2831,8 +2831,7 @@ a {
 .announcement-detail-card__image img {
   display: block;
   width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
+  height: auto;
 }
 
 .thread-image-placeholder::before {
@@ -3879,11 +3878,6 @@ a {
     padding-right: 28px;
     padding-left: 28px;
   }
-
-  .announcement-feature-card__image,
-  .announcement-detail-card__image {
-    min-height: 320px;
-  }
 }
 
 @media (max-width: 420px) {
@@ -3909,11 +3903,6 @@ a {
 
   .community-screen {
     padding: 24px 20px 36px;
-  }
-
-  .announcement-feature-card__image,
-  .announcement-detail-card__image {
-    min-height: 260px;
   }
 
   .announcement-feature-card__body,
@@ -5086,11 +5075,6 @@ a {
 .moderated-comments {
   border-radius: 16px;
   box-shadow: 0 10px 24px rgba(27, 66, 53, 0.05);
-}
-
-.announcement-feature-card__image,
-.announcement-detail-card__image {
-  min-height: 210px;
 }
 
 .announcement-feature-card__body,
