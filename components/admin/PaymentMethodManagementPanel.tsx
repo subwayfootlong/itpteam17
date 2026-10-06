@@ -13,6 +13,7 @@ import {
   useSortState,
 } from "@/components/admin/ui/Table";
 import { useToast } from "@/components/ui/Toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import type { AdminPaymentMethod } from "@/lib/adminPaymentMethods";
 
 type PaymentMethodFormState = {
@@ -626,7 +627,7 @@ export default function PaymentMethodManagementPanel({
                     </div>
                   )}
                   <label className="mt-3 inline-flex cursor-pointer items-center justify-center rounded-lg bg-white border border-gray-200 px-3 py-2 text-[12px] font-bold text-gray-700 hover:bg-gray-50">
-                    {uploadingQr ? "Uploading..." : "Upload QR Code"}
+                    {uploadingQr ? <LoadingSpinner label="Uploading…" size="sm" /> : "Upload QR Code"}
                     <input
                       type="file"
                       accept="image/png,image/jpeg,image/webp"
@@ -652,7 +653,7 @@ export default function PaymentMethodManagementPanel({
                 disabled={busy === "form"}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#3FAE2A] text-white text-[13px] font-bold hover:brightness-110 disabled:opacity-50 font-helvetica"
               >
-                {busy === "form" ? "Saving..." : formMode === "edit" ? "Save Changes" : "Create Payment Method"}
+                {busy === "form" ? <LoadingSpinner label="Saving…" size="sm" light /> : formMode === "edit" ? "Save Changes" : "Create Payment Method"}
               </button>
             </div>
           </form>

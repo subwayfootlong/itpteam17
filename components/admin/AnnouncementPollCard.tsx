@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import StatCard from '@/components/admin/ui/StatCard';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 type PollResponse = {
   id: string;
@@ -57,7 +58,9 @@ export default function AnnouncementPollCard({
 
       <div className="p-6 flex flex-col gap-4 font-helvetica bg-gray-50/30 flex-1">
         {loading ? (
-          <div className="text-sm text-gray-400">Loading responses...</div>
+          <div className="flex min-h-40 items-center justify-center text-gray-500">
+            <LoadingSpinner label="Loading responses…" />
+          </div>
         ) : (
           <>
             <StatCard label="Yes" value={counts.yes} accent={RESPONSE_COLORS.yes} />

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Check, Clock3, History, RefreshCw, Search, X } from "lucide-react";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { formatTierLabel, TIER_COLORS } from "@/lib/membershipTiers";
 import { Badge } from "@/components/admin/ui/Badge";
 
@@ -213,7 +214,9 @@ export default function TierUpgradeRequestsPanel() {
 
       <div className="space-y-3">
         {loading ? (
-          <div className="rounded-xl border border-gray-200 bg-white p-10 text-center text-sm text-gray-500">Loading tier requests…</div>
+          <div className="flex min-h-32 items-center justify-center rounded-xl border border-gray-200 bg-white p-10 text-gray-500">
+            <LoadingSpinner label="Loading tier requests…" />
+          </div>
         ) : visibleRequests.length === 0 ? (
           <div className="rounded-xl border border-gray-200 bg-white p-10 text-center text-sm text-gray-500">
             {filter === "pending" ? "No tier requests are waiting for review." : "No tier request history matches this view."}

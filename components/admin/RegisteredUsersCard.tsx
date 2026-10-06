@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 // Shared progress bar function
 function RegistrationBar({ capacity, spotsAvailable }: { capacity: number | null; spotsAvailable: number | null }) {
@@ -141,7 +142,7 @@ export default function RegisteredUsersCard({
         <div className="flex-1 overflow-y-auto pr-2 space-y-3 mt-2 min-h-[300px]">
           {loading ? (
              <div className="flex justify-center py-8">
-               <div className="w-6 h-6 border-2 border-[#3FAE2A] border-t-transparent rounded-full animate-spin" />
+               <LoadingSpinner label="Loading registrations…" />
              </div>
           ) : filteredUsers.length === 0 ? (
             <div className="text-center text-sm text-gray-400 py-8">No registered users found.</div>

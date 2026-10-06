@@ -6,6 +6,7 @@ import AudienceAccessFields, {
   DEFAULT_AUDIENCE_ACCESS,
   type AudienceAccessValue,
 } from '@/components/admin/AudienceAccessFields';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export interface AnnouncementFormData extends AudienceAccessValue {
   title: string;
@@ -211,7 +212,7 @@ export default function AnnouncementForm({ initialData, announcementId, onFormCh
                 className="h-4 w-4 rounded border-gray-300 text-[#3FAE2A] focus:ring-[#3FAE2A]"
               />
               Add an attendance poll
-              <span className="text-xs text-gray-400 font-normal">(e.g. "Will you attend the AGM?")</span>
+              <span className="text-xs text-gray-400 font-normal">(e.g. &ldquo;Will you attend the AGM?&rdquo;)</span>
             </label>
             {form.poll_enabled && (
               <input
@@ -284,7 +285,7 @@ export default function AnnouncementForm({ initialData, announcementId, onFormCh
             disabled={saving || uploading}
             className="px-8 py-2.5 bg-[#3FAE2A] hover:bg-[#35941f] shadow-md shadow-[#3FAE2A]/20 disabled:opacity-70 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all"
           >
-            {saving ? 'Processing...' : announcementId ? 'Save Changes' : 'Post Announcement'}
+            {saving ? <LoadingSpinner label="Processing…" size="sm" light /> : announcementId ? 'Save Changes' : 'Post Announcement'}
           </button>
         </div>
       </div>

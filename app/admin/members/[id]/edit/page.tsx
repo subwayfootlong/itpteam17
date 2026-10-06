@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import LoadingSpinner, { LoadingState } from '@/components/ui/LoadingSpinner';
 import { DEFAULT_TIER, MEMBERSHIP_TIERS } from '@/lib/membershipTiers';
 import { formatMemberDisplayName, formatMemberName } from '@/lib/memberName';
 import { ARS_STATUSES, SALUTATIONS } from '@/lib/memberProfileOptions';
@@ -98,11 +99,7 @@ export default function MemberEditPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-2 border-[#3FAE2A] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+    return <LoadingState label="Loading member…" className="h-64" />;
   }
 
   if (!member) {
@@ -292,7 +289,7 @@ export default function MemberEditPage() {
             disabled={saving}
             className="px-6 py-2.5 bg-[#3FAE2A] hover:bg-[#35941f] shadow-md shadow-[#3FAE2A]/20 disabled:opacity-70 disabled:cursor-not-allowed text-white text-[13px] font-bold rounded-xl transition-all"
           >
-            {saving ? 'Saving...' : 'Save Changes'}
+            {saving ? <LoadingSpinner label="Saving…" size="sm" light /> : 'Save Changes'}
           </button>
         </div>
       </div>

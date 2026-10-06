@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import EventForm, { EventFormData } from '@/components/admin/EventForm';
 import RegisteredUsersCard from '@/components/admin/RegisteredUsersCard';
+import { LoadingState } from '@/components/ui/LoadingSpinner';
 
 export default function EditEventPage() {
   const { id } = useParams<{ id: string }>();
@@ -42,11 +43,7 @@ export default function EditEventPage() {
   }, [id]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-2 border-[#3FAE2A] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+    return <LoadingState label="Loading event…" className="h-64" />;
   }
 
   if (notFound) {

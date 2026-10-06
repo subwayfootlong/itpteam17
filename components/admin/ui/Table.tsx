@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from 'react';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 // ─── TableWrapper ─────────────────────────────────────────────────────────────
 // Handles optional built-in pagination.
@@ -158,15 +159,11 @@ export function TableWrapper<T>({
               {children}
               <tbody className="divide-y divide-gray-100 text-[13px]">
                 {loading ? (
-                  [...Array(5)].map((_, rowIndex) => (
-                    <tr key={rowIndex}>
-                      {[...Array(colCount)].map((_, cellIndex) => (
-                        <td key={cellIndex} className="px-5 py-4">
-                          <div className="h-3 bg-gray-100 rounded animate-pulse" />
-                        </td>
-                      ))}
-                    </tr>
-                  ))
+                  <tr>
+                    <td colSpan={colCount} className="py-12 text-center text-gray-500">
+                      <LoadingSpinner label="Loading records…" />
+                    </td>
+                  </tr>
                 ) : pagedData.length === 0 && emptyState ? (
                   <tr>
                     <td colSpan={colCount} className="py-12 text-center text-gray-500">
