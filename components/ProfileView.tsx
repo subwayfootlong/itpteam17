@@ -205,10 +205,13 @@ export default function ProfileView({
       try {
         const response = await fetch("/api/member/qr-token", { cache: "no-store", signal: controller.signal });
         if (!response.ok) {
+          const failure = await response.json().catch(() => null);
           errorMessage = response.status === 401
             ? "Your session has expired. Please log out and log in again."
             : response.status === 404
-              ? "Your membership record is unavailable. Please contact Pergas."
+              ? failure?.code === "member_not_found"
+                ? "Your membership record is unavailable. Please log in again."
+                : "The QR service could not be found. Please restart the app server and refresh this page."
               : "The server could not generate your QR. Retrying automatically...";
           throw new Error("QR unavailable");
         }

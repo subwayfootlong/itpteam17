@@ -28,7 +28,7 @@ export async function GET(request: Request) {
     }
     const { data, error } = await supabaseAdmin.from("users").select("id").eq("id", userId).maybeSingle();
     if (error) return respond({ error: "Unable to generate membership QR. Please try again." }, 503);
-    if (!data?.id) return respond({ error: "Membership record unavailable" }, 404);
+    if (!data?.id) return respond({ code: "member_not_found", error: "Membership record unavailable" }, 404);
     // member_id is optional and can contain a phone number. Use the stable record ID.
     const signed = generateMembershipQrToken(data.id);
     return respond({ verificationUrl: membershipVerificationUrl(signed, request.url), expiresIn: MEMBERSHIP_QR_TTL });
