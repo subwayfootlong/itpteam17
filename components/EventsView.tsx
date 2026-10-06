@@ -113,7 +113,7 @@ function EventPosterBanner({
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
 
       {category && (
-        <span className="absolute left-3 top-3 z-10 rounded-full border border-white/40 bg-white/95 px-2.5 py-0.5 text-[11px] font-bold text-[#0F6E00] shadow-xs backdrop-blur-md">
+        <span className="absolute left-3 top-3 rounded-full border border-white/40 bg-white/95 px-2.5 py-0.5 text-[11px] font-bold text-[#0F6E00] shadow-xs backdrop-blur-md">
           {category}
         </span>
       )}
@@ -184,7 +184,7 @@ function EventCard({
   const hasRsvpLink = Boolean(event.external_rsvp_url?.trim());
 
   return (
-    <article className="group mb-4 flex flex-col overflow-hidden rounded-2xl border border-neutral-200/70 bg-white shadow-xs transition-all hover:border-neutral-300 hover:shadow-sm">
+    <article className="group mb-4 flex flex-col overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs transition-all hover:border-neutral-300 hover:shadow-sm">
       {/* 16:9 Banner */}
       <div className="relative">
         {event.isLocked ? (
@@ -224,7 +224,7 @@ function EventCard({
               Locked
             </span>
           ) : isFull ? (
-            <span className="rounded-full bg-neutral-900/80 px-2.5 py-0.5 text-[11px] font-bold text-white shadow-xs backdrop-blur-md">
+            <span className="rounded-full bg-neutral-900/85 px-2.5 py-0.5 text-[11px] font-bold text-white shadow-xs backdrop-blur-md" style={{ color: "#ffffff" }}>
               Full
             </span>
           ) : null}
@@ -244,7 +244,7 @@ function EventCard({
           </div>
 
           {/* Event Title */}
-          <h3 className="mt-2 line-clamp-2 text-base font-bold leading-snug text-neutral-900 group-hover:text-[#0F6E00] transition-colors">
+          <h3 className="mt-2 line-clamp-2 text-base font-bold font-sans leading-snug text-neutral-900 group-hover:text-[#0F6E00] transition-colors">
             {event.isLocked ? (
               event.title
             ) : (
@@ -262,8 +262,8 @@ function EventCard({
             </span>
 
             {event.spots_available !== null && (
-              <span className="flex items-center gap-1 text-neutral-400">
-                <Users size={12} className="shrink-0" />
+              <span className="flex items-center gap-1 text-neutral-500">
+                <Users size={12} className="shrink-0 text-neutral-400" />
                 <span>
                   {event.spots_available > 0
                     ? `${event.spots_available} spots left`
@@ -283,7 +283,7 @@ function EventCard({
           ) : null}
         </div>
 
-        {/* Action Button Section */}
+        {/* Action Button Section with Guaranteed High-Contrast White Text */}
         <div className="mt-4 pt-3 border-t border-neutral-100">
           {event.isLocked ? (
             <button
@@ -312,11 +312,14 @@ function EventCard({
               disabled={isRegistering}
               onClick={() => onRegister(event.id)}
               className="min-h-11 w-full rounded-xl bg-[#0F6E00] px-4 py-2.5 text-xs font-bold text-white shadow-2xs transition-all hover:bg-[#173F14] active:scale-[0.99] disabled:opacity-50"
+              style={{ backgroundColor: "#0F6E00", color: "#ffffff" }}
             >
-              {isRegistering ? "Processing..." : "Reapply for Event"}
+              <span className="text-white font-bold" style={{ color: "#ffffff" }}>
+                {isRegistering ? "Processing..." : "Reapply for Event"}
+              </span>
             </button>
           ) : isFull ? (
-            <div className="flex min-h-11 w-full items-center justify-center rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-xs font-semibold text-neutral-400">
+            <div className="flex min-h-11 w-full items-center justify-center rounded-xl border border-neutral-200 bg-stone-100 px-4 py-2.5 text-xs font-semibold text-neutral-500">
               Event is Full
             </div>
           ) : hasRsvpLink ? (
@@ -325,15 +328,21 @@ function EventCard({
               target="_blank"
               rel="noopener noreferrer"
               className="flex min-h-11 w-full items-center justify-center rounded-xl bg-[#0F6E00] px-4 py-2.5 text-xs font-bold text-white shadow-2xs transition-all hover:bg-[#173F14] active:scale-[0.99]"
+              style={{ backgroundColor: "#0F6E00", color: "#ffffff" }}
             >
-              Register (External) ↗
+              <span className="text-white font-bold" style={{ color: "#ffffff" }}>
+                Register (External) ↗
+              </span>
             </a>
           ) : (
             <Link
               href={`/member/events/${event.id}`}
               className="flex min-h-11 w-full items-center justify-center rounded-xl bg-[#0F6E00] px-4 py-2.5 text-xs font-bold text-white shadow-2xs transition-all hover:bg-[#173F14] active:scale-[0.99]"
+              style={{ backgroundColor: "#0F6E00", color: "#ffffff" }}
             >
-              View Details & RSVP
+              <span className="text-white font-bold" style={{ color: "#ffffff" }}>
+                View Details & RSVP
+              </span>
             </Link>
           )}
         </div>
@@ -478,7 +487,7 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
   return (
     <div className="space-y-4 px-4 py-5 font-helvetica">
       {/* 1. View Mode Switcher Toggle (List View vs Calendar) */}
-      <div className="flex rounded-2xl bg-neutral-100 p-1 shadow-inner">
+      <div className="flex rounded-2xl bg-stone-100 p-1 shadow-inner border border-stone-200/50">
         <button
           type="button"
           onClick={() => setViewMode("list")}
@@ -506,59 +515,81 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
         </button>
       </div>
 
-      {/* 2. Category & Filter Pill Rail (Horizontal scrolling) */}
-      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 no-scrollbar">
-        <button
-          type="button"
-          onClick={() => setSelectedFilter("upcoming")}
-          className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all active:scale-95 ${
-            selectedFilter === "upcoming"
-              ? "bg-[#0F6E00] text-white shadow-xs"
-              : "border border-neutral-200/80 bg-white text-neutral-700 hover:border-neutral-300"
-          }`}
-        >
-          Upcoming
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setSelectedFilter("all")}
-          className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all active:scale-95 ${
-            selectedFilter === "all"
-              ? "bg-[#0F6E00] text-white shadow-xs"
-              : "border border-neutral-200/80 bg-white text-neutral-700 hover:border-neutral-300"
-          }`}
-        >
-          All Events
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setSelectedFilter("registered")}
-          className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all active:scale-95 ${
-            selectedFilter === "registered"
-              ? "bg-[#0F6E00] text-white shadow-xs"
-              : "border border-neutral-200/80 bg-white text-neutral-700 hover:border-neutral-300"
-          }`}
-        >
-          My Registered
-        </button>
-
-        {categories.map((category) => (
+      {/* 2. Category & Filter Pill Rail (Visible ONLY in List View) */}
+      {viewMode === "list" && (
+        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 no-scrollbar">
           <button
-            key={category}
             type="button"
-            onClick={() => setSelectedFilter(category)}
+            onClick={() => setSelectedFilter("upcoming")}
             className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all active:scale-95 ${
-              selectedFilter === category
+              selectedFilter === "upcoming"
                 ? "bg-[#0F6E00] text-white shadow-xs"
                 : "border border-neutral-200/80 bg-white text-neutral-700 hover:border-neutral-300"
             }`}
+            style={
+              selectedFilter === "upcoming"
+                ? { backgroundColor: "#0F6E00", color: "#ffffff" }
+                : undefined
+            }
           >
-            {category}
+            Upcoming
           </button>
-        ))}
-      </div>
+
+          <button
+            type="button"
+            onClick={() => setSelectedFilter("all")}
+            className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all active:scale-95 ${
+              selectedFilter === "all"
+                ? "bg-[#0F6E00] text-white shadow-xs"
+                : "border border-neutral-200/80 bg-white text-neutral-700 hover:border-neutral-300"
+            }`}
+            style={
+              selectedFilter === "all"
+                ? { backgroundColor: "#0F6E00", color: "#ffffff" }
+                : undefined
+            }
+          >
+            All Events
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setSelectedFilter("registered")}
+            className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all active:scale-95 ${
+              selectedFilter === "registered"
+                ? "bg-[#0F6E00] text-white shadow-xs"
+                : "border border-neutral-200/80 bg-white text-neutral-700 hover:border-neutral-300"
+            }`}
+            style={
+              selectedFilter === "registered"
+                ? { backgroundColor: "#0F6E00", color: "#ffffff" }
+                : undefined
+            }
+          >
+            My Registered
+          </button>
+
+          {categories.map((category) => (
+            <button
+              key={category}
+              type="button"
+              onClick={() => setSelectedFilter(category)}
+              className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all active:scale-95 ${
+                selectedFilter === category
+                  ? "bg-[#0F6E00] text-white shadow-xs"
+                  : "border border-neutral-200/80 bg-white text-neutral-700 hover:border-neutral-300"
+              }`}
+              style={
+                selectedFilter === category
+                  ? { backgroundColor: "#0F6E00", color: "#ffffff" }
+                  : undefined
+              }
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+      )}
 
       {hasError && (
         <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-xs font-medium text-red-700">
@@ -577,14 +608,14 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
           </div>
 
           {listEvents.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-neutral-200 bg-neutral-50/50 p-8 text-center">
+            <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50/70 p-8 text-center">
               <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#E8F4E6] text-[#0F6E00]">
                 <CalendarDays size={22} />
               </div>
               <h3 className="text-sm font-bold text-neutral-900">
                 No events found
               </h3>
-              <p className="mt-1 text-xs text-neutral-500">
+              <p className="mt-1 text-xs text-neutral-600">
                 There are no events matching this filter. Switch filters or check back later!
               </p>
             </div>
@@ -609,7 +640,7 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
           <div className="rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-xs">
             {/* Month Header */}
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-bold text-neutral-900">
+              <h2 className="text-base font-bold font-sans text-neutral-900">
                 {getMonthTitle(currentMonth)}
               </h2>
 
@@ -665,6 +696,9 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
                               ? "font-semibold text-neutral-800 hover:bg-neutral-100"
                               : "font-normal text-neutral-300"
                       }`}
+                      style={
+                        isSelected ? { color: "#ffffff", backgroundColor: "#0F6E00" } : undefined
+                      }
                     >
                       {date.day}
                     </span>
@@ -673,9 +707,7 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
                     <span
                       className={`mt-1 h-1.5 w-1.5 rounded-full transition-opacity ${
                         hasEvent
-                          ? isSelected
-                            ? "bg-[#0F6E00]"
-                            : "bg-[#0F6E00]"
+                          ? "bg-[#0F6E00]"
                           : "opacity-0"
                       }`}
                     />
@@ -687,7 +719,7 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
 
           {/* Selected Date Header */}
           <div className="flex items-center justify-between px-1">
-            <p className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+            <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">
               Events on {getDateLabel(selectedDate)}
             </p>
             <span className="rounded-full bg-[#E8F4E6] px-2.5 py-0.5 text-xs font-bold text-[#0F6E00]">
@@ -698,11 +730,11 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
 
           {/* Events for Selected Date */}
           {selectedDateEvents.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-neutral-200 bg-neutral-50/50 p-6 text-center">
-              <p className="text-sm font-semibold text-neutral-700">
+            <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50/70 p-6 text-center">
+              <p className="text-sm font-semibold text-neutral-800">
                 No events scheduled for this day
               </p>
-              <p className="mt-1 text-xs text-neutral-400">
+              <p className="mt-1 text-xs text-neutral-500">
                 Tap dates marked with green dots to view scheduled events.
               </p>
             </div>

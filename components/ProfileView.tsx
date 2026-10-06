@@ -395,9 +395,9 @@ export default function ProfileView({
 
           {/* Validity & Dates Row with soft badge pills */}
           <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-neutral-100 pt-3.5">
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-xs font-medium text-neutral-700">
-              <span className="text-neutral-400">Member Since:</span>
-              <span className="font-semibold text-neutral-900">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-stone-200/80 bg-stone-100/80 px-3 py-1 text-xs font-medium text-stone-700">
+              <span className="text-stone-500">Member Since:</span>
+              <span className="font-bold text-stone-900">
                 {formatMemberDate(member.member_since)}
               </span>
             </div>
@@ -504,19 +504,19 @@ export default function ProfileView({
         </div>
 
         {registrations.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-neutral-200 bg-neutral-50/50 p-6 text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-neutral-100 bg-white text-[#0F6E00] shadow-2xs">
+          <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50/70 p-6 text-center">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-stone-200/80 bg-white text-[#0F6E00] shadow-2xs">
               <CalendarCheck size={22} />
             </div>
-            <h3 className="text-sm font-bold text-neutral-900">
+            <h3 className="text-sm font-bold font-sans text-neutral-900">
               No upcoming registrations
             </h3>
-            <p className="mx-auto mt-1 max-w-xs text-xs leading-relaxed text-neutral-500">
+            <p className="mx-auto mt-1 max-w-xs text-xs leading-relaxed text-neutral-600">
               Explore upcoming workshops, scholarly lectures, and community events!
             </p>
             <Link
               href="/member/events"
-              className="mt-3.5 inline-flex items-center gap-1 rounded-xl border border-neutral-200 bg-white px-3.5 py-2 text-xs font-semibold text-[#0F6E00] shadow-2xs transition-all hover:bg-neutral-50 active:scale-95"
+              className="mt-3.5 inline-flex items-center gap-1 rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-[#0F6E00] shadow-2xs transition-all hover:bg-stone-50 active:scale-95"
             >
               <span>Explore upcoming events</span>
               <span aria-hidden="true">&rarr;</span>

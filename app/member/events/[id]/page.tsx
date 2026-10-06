@@ -91,150 +91,145 @@ export default async function EventDetailsPage({
         : "Open RSVP";
 
   return (
-    <MemberPageShell showTopBar={false} showBottomNav={false}>
-      <div className="flex min-h-screen flex-col justify-between font-helvetica">
-        <div className="px-4 py-5">
-          {/* Top Navigation Header */}
-          <header className="flex items-center gap-3">
-            <Link
-              href="/member/events"
-              aria-label="Back to events directory"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-neutral-200/80 bg-white text-neutral-700 shadow-2xs transition-all hover:bg-neutral-50 active:scale-95"
-            >
-              <ArrowLeft size={18} />
-            </Link>
-            <h1 className="text-base font-bold text-neutral-900 line-clamp-1">
-              Event Details
-            </h1>
-          </header>
+    <MemberPageShell showTopBar={false} showBottomNav={true}>
+      <div className="px-4 py-5 font-helvetica pb-8">
+        {/* Top Navigation Header */}
+        <header className="flex items-center gap-3">
+          <Link
+            href="/member/events"
+            aria-label="Back to events directory"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-neutral-200/80 bg-white text-neutral-700 shadow-2xs transition-all hover:bg-neutral-50 active:scale-95"
+          >
+            <ArrowLeft size={18} />
+          </Link>
+          <h1 className="text-base font-bold font-sans text-neutral-900 line-clamp-1">
+            Event Details
+          </h1>
+        </header>
 
-          {/* 1. Hero Poster Banner (with fallback) */}
-          <div className="mt-4">
-            <EventDetailHero
-              imageUrl={eventRecord.image_url}
-              title={eventRecord.title}
-              category={eventRecord.category}
-            />
-          </div>
-
-          {/* 2. Title & Status Badges */}
-          <div className="mt-5">
-            <div className="flex flex-wrap items-center gap-2">
-              {isRegistered ? (
-                <span className="inline-flex items-center gap-1 rounded-full border border-[#CDE5CA] bg-[#E8F4E6] px-3 py-1 text-xs font-bold text-[#0F6E00]">
-                  ✓ You&apos;re Registered
-                </span>
-              ) : isFull ? (
-                <span className="rounded-full border border-neutral-200 bg-neutral-100 px-3 py-1 text-xs font-semibold text-neutral-600">
-                  Event Full
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#CDE5CA] bg-[#E8F4E6] px-3 py-1 text-xs font-bold text-[#0F6E00]">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#0F6E00]" />
-                  Open for Registration
-                </span>
-              )}
-
-              {eventRecord.category && (
-                <span className="rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs font-medium text-neutral-600">
-                  {eventRecord.category}
-                </span>
-              )}
-            </div>
-
-            <h2 className="mt-3 text-xl sm:text-2xl font-bold tracking-tight text-neutral-950 leading-tight">
-              {eventRecord.title}
-            </h2>
-          </div>
-
-          {/* 3. Unified Meta Details Card (Merging the 4 isolated cards) */}
-          <section className="mt-5 overflow-hidden rounded-2xl border border-neutral-200/70 bg-white shadow-xs divide-y divide-neutral-100">
-            {/* Row 1: DATE */}
-            <div className="flex items-center gap-3.5 p-3.5">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] text-[#0F6E00]">
-                <CalendarDays size={20} strokeWidth={2.2} />
-              </div>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
-                  Date
-                </p>
-                <p className="mt-0.5 text-sm font-semibold text-neutral-900">
-                  {formatMemberDate(eventRecord.event_date)}
-                </p>
-              </div>
-            </div>
-
-            {/* Row 2: TIME */}
-            <div className="flex items-center gap-3.5 p-3.5">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] text-[#0F6E00]">
-                <Clock size={20} strokeWidth={2.2} />
-              </div>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
-                  Time
-                </p>
-                <p className="mt-0.5 text-sm font-semibold text-neutral-900">
-                  {formatTime(eventRecord.start_time, eventRecord.end_time)}
-                </p>
-              </div>
-            </div>
-
-            {/* Row 3: VENUE */}
-            <div className="flex items-center gap-3.5 p-3.5">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] text-[#0F6E00]">
-                <MapPin size={20} strokeWidth={2.2} />
-              </div>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
-                  Venue
-                </p>
-                <p className="mt-0.5 text-sm font-semibold text-neutral-900">
-                  {eventRecord.venue || "Venue to be confirmed"}
-                </p>
-              </div>
-            </div>
-
-            {/* Row 4: AVAILABILITY */}
-            <div className="flex items-center gap-3.5 p-3.5">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] text-[#0F6E00]">
-                <Users size={20} strokeWidth={2.2} />
-              </div>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
-                  Availability
-                </p>
-                <p className="mt-0.5 text-sm font-semibold text-neutral-900">
-                  {spotsAvailableText}
-                </p>
-              </div>
-            </div>
-          </section>
-
-          {/* 4. Description Section */}
-          {eventRecord.description && (
-            <section className="mt-5 rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-xs">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-400">
-                About This Event
-              </h3>
-              <p className="mt-2.5 text-sm leading-relaxed text-neutral-700 whitespace-pre-line break-words">
-                {eventRecord.description}
-              </p>
-            </section>
-          )}
-
-          {/* Spacer so content doesn't get covered by sticky action bar */}
-          <div className="h-6" />
+        {/* 1. Hero Poster Banner (with fallback) */}
+        <div className="mt-4">
+          <EventDetailHero
+            imageUrl={eventRecord.image_url}
+            title={eventRecord.title}
+            category={eventRecord.category}
+          />
         </div>
 
-        {/* 5. Sticky Bottom Action Bar */}
-        <div className="sticky bottom-0 z-40 border-t border-neutral-200/80 bg-white/95 p-4 backdrop-blur-md safe-area-bottom shadow-lg">
+        {/* 2. Title & Status Badges */}
+        <div className="mt-5">
+          <div className="flex flex-wrap items-center gap-2">
+            {isRegistered ? (
+              <span className="inline-flex items-center gap-1 rounded-full border border-[#CDE5CA] bg-[#E8F4E6] px-3 py-1 text-xs font-bold text-[#0F6E00]">
+                ✓ You&apos;re Registered
+              </span>
+            ) : isFull ? (
+              <span className="rounded-full border border-neutral-200 bg-stone-100 px-3 py-1 text-xs font-semibold text-neutral-600">
+                Event Full
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#CDE5CA] bg-[#E8F4E6] px-3 py-1 text-xs font-bold text-[#0F6E00]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#0F6E00]" />
+                Open for Registration
+              </span>
+            )}
+
+            {eventRecord.category && (
+              <span className="rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs font-medium text-neutral-600">
+                {eventRecord.category}
+              </span>
+            )}
+          </div>
+
+          <h2 className="mt-3 text-xl sm:text-2xl font-bold font-sans tracking-tight text-neutral-950 leading-tight">
+            {eventRecord.title}
+          </h2>
+        </div>
+
+        {/* 3. Unified Meta Details Card (Merging the 4 isolated cards) */}
+        <section className="mt-5 overflow-hidden rounded-2xl border border-neutral-200/70 bg-white shadow-xs divide-y divide-neutral-100">
+          {/* Row 1: DATE */}
+          <div className="flex items-center gap-3.5 p-3.5">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] text-[#0F6E00]">
+              <CalendarDays size={20} strokeWidth={2.2} />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                Date
+              </p>
+              <p className="mt-0.5 text-sm font-semibold text-neutral-900">
+                {formatMemberDate(eventRecord.event_date)}
+              </p>
+            </div>
+          </div>
+
+          {/* Row 2: TIME */}
+          <div className="flex items-center gap-3.5 p-3.5">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] text-[#0F6E00]">
+              <Clock size={20} strokeWidth={2.2} />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                Time
+              </p>
+              <p className="mt-0.5 text-sm font-semibold text-neutral-900">
+                {formatTime(eventRecord.start_time, eventRecord.end_time)}
+              </p>
+            </div>
+          </div>
+
+          {/* Row 3: VENUE */}
+          <div className="flex items-center gap-3.5 p-3.5">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] text-[#0F6E00]">
+              <MapPin size={20} strokeWidth={2.2} />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                Venue
+              </p>
+              <p className="mt-0.5 text-sm font-semibold text-neutral-900">
+                {eventRecord.venue || "Venue to be confirmed"}
+              </p>
+            </div>
+          </div>
+
+          {/* Row 4: AVAILABILITY */}
+          <div className="flex items-center gap-3.5 p-3.5">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] text-[#0F6E00]">
+              <Users size={20} strokeWidth={2.2} />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+                Availability
+              </p>
+              <p className="mt-0.5 text-sm font-semibold text-neutral-900">
+                {spotsAvailableText}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* 4. Description Section */}
+        {eventRecord.description && (
+          <section className="mt-5 rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-xs">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+              About This Event
+            </h3>
+            <p className="mt-2.5 text-sm leading-relaxed text-neutral-700 whitespace-pre-line break-words">
+              {eventRecord.description}
+            </p>
+          </section>
+        )}
+
+        {/* 5. RSVP & Registration Action Section */}
+        <section className="mt-6">
           <EventRsvpSection
             eventId={eventRecord.id}
             initialRegistration={registration}
             externalRsvpUrl={eventRecord.external_rsvp_url}
             isFull={isFull}
           />
-        </div>
+        </section>
       </div>
     </MemberPageShell>
   );
