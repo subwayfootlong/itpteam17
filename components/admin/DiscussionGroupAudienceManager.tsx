@@ -5,6 +5,7 @@ import AudienceAccessFields, {
   type AudienceAccessValue,
 } from "@/components/admin/AudienceAccessFields";
 import { useToast } from "@/components/ui/Toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { formatAudienceLabel, normalizeTierAudience } from "@/lib/tierAccess";
 
 type AdminDiscussionGroup = {
@@ -104,7 +105,9 @@ export default function DiscussionGroupAudienceManager() {
       </div>
 
       {loading ? (
-        <p className="mt-5 text-sm text-gray-500">Loading discussion spaces...</p>
+        <div className="mt-5 flex min-h-24 items-center justify-center text-gray-500">
+          <LoadingSpinner label="Loading discussion spaces…" />
+        </div>
       ) : (
         <div className="mt-5 grid gap-3 md:grid-cols-2">
           {groups.map((group) => (
@@ -154,7 +157,7 @@ export default function DiscussionGroupAudienceManager() {
               disabled={saving}
               className="rounded-lg bg-[#3FAE2A] px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
             >
-              {saving ? "Saving..." : "Save access"}
+              {saving ? <LoadingSpinner label="Saving…" size="sm" light /> : "Save access"}
             </button>
           </div>
         </div>

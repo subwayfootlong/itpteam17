@@ -7,14 +7,16 @@ type MemberPageShellProps = {
   children: React.ReactNode;
   showTopBar?: boolean;
   showBottomNav?: boolean;
+  loading?: boolean;
 };
 
 export default async function MemberPageShell({
   children,
   showTopBar = true,
   showBottomNav = true,
+  loading = false,
 }: MemberPageShellProps) {
-  const currentUser = showTopBar ? await getCurrentUser() : null;
+  const currentUser = showTopBar && !loading ? await getCurrentUser() : null;
 
   return (
     <main className="flex min-h-screen justify-center bg-white">

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 interface EventRsvpSectionProps {
   eventId: string;
@@ -117,7 +118,7 @@ export default function EventRsvpSection({
           disabled={loading}
           className="member-text-base min-h-11 w-full rounded-2xl bg-[#0F6E00] px-4 py-4 text-center text-base font-bold text-white transition-all shadow-md shadow-[#0F6E00]/20 hover:bg-[#0c5900] disabled:opacity-50"
         >
-          {loading ? 'Processing...' : isRejected ? 'Reapply for Event' : 'Register for Event'}
+          {loading ? <LoadingSpinner label="Processing…" size="sm" light /> : isRejected ? 'Reapply for Event' : 'Register for Event'}
         </button>
       )}
     </div>
