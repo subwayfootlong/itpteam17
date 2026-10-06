@@ -6,6 +6,7 @@ import AudienceAccessFields, {
   DEFAULT_AUDIENCE_ACCESS,
   type AudienceAccessValue,
 } from '@/components/admin/AudienceAccessFields';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export interface EventFormData extends AudienceAccessValue {
   title: string;
@@ -369,7 +370,7 @@ export default function EventForm({ initialData, eventId }: EventFormProps) {
             disabled={saving || uploading}
             className="px-8 py-2.5 bg-[#3FAE2A] hover:bg-[#35941f] shadow-md shadow-[#3FAE2A]/20 disabled:opacity-70 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all"
           >
-            {saving ? 'Processing...' : eventId ? 'Save Changes' : 'Create Event'}
+            {saving ? <LoadingSpinner label="Processing…" size="sm" light /> : eventId ? 'Save Changes' : 'Create Event'}
           </button>
         </div>
       </div>

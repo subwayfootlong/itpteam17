@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { LoadingState } from '@/components/ui/LoadingSpinner';
 import AnnouncementForm, { AnnouncementFormData } from '@/components/admin/AnnouncementForm';
 import AnnouncementMetricsCard from '@/components/admin/AnnouncementMetricsCard';
 import AnnouncementPollCard from '@/components/admin/AnnouncementPollCard';
@@ -46,11 +47,7 @@ export default function EditAnnouncementPage() {
   }, [id]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-2 border-[#3FAE2A] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+    return <LoadingState label="Loading announcement…" className="h-64" />;
   }
 
   if (notFound) {

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CalendarDays, ChevronLeft, ChevronRight, Clock, List, LockKeyhole, MapPin } from "lucide-react";
 import type { EventRow } from "@/app/member/events/page";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 type EventsViewMode = "list" | "calendar";
 
@@ -321,7 +322,7 @@ export default function EventsView({ events, hasError, initialView }: EventsView
               onClick={() => handleInAppRegister(event.id)}
               className="member-text-base mt-6 min-h-11 w-full rounded-xl bg-[#0F6E00] px-4 py-4 font-semibold text-white transition-colors hover:bg-[#0c5900]"
             >
-              {registeringId === event.id ? 'Processing...' : 'Reapply'}
+              {registeringId === event.id ? <LoadingSpinner label="Processing…" size="sm" light /> : 'Reapply'}
             </button>
           ) : isFull ? (
             <button
@@ -338,7 +339,7 @@ export default function EventsView({ events, hasError, initialView }: EventsView
               onClick={() => handleInAppRegister(event.id)}
               className="member-text-base mt-6 min-h-11 w-full rounded-xl bg-[#0F6E00] px-4 py-4 font-semibold text-white transition-colors hover:bg-[#0c5900]"
             >
-              {registeringId === event.id ? 'Processing...' : 'Register'}
+              {registeringId === event.id ? <LoadingSpinner label="Processing…" size="sm" light /> : 'Register'}
             </button>
           )}
         </div>

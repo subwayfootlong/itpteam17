@@ -15,6 +15,7 @@ import {
   LogOut,
   Mail,
   Palette,
+  KeyRound,
   ShieldCheck,
   Type,
 } from "lucide-react";
@@ -276,6 +277,32 @@ export default function MemberSettingsView({
             </div>
 
             <ChevronRight size={22} className="text-[#6F7B6F]" />
+          </Link>
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <h2 className="member-text-base px-2 text-base font-bold text-[#3F473F]">
+          Account
+        </h2>
+
+        <div className="mt-4 rounded-2xl bg-white p-5 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
+          <Link
+            href="/member/settings/password"
+            className="flex items-center justify-between gap-4"
+          >
+            <div className="flex min-w-0 items-center gap-4">
+              <KeyRound size={24} className="shrink-0 text-[#6F7B6F]" />
+
+              <div className="min-w-0">
+                <p className="member-text-lg text-lg text-[#151C27]">Password</p>
+                <p className="member-text-sm text-sm text-[#3F473F]">
+                  Change your account password
+                </p>
+              </div>
+            </div>
+
+            <ChevronRight size={22} className="shrink-0 text-[#6F7B6F]" />
           </Link>
         </div>
       </section>
