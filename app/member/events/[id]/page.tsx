@@ -7,6 +7,7 @@ import { getCurrentUser } from "@/lib/currentUser";
 import { formatMemberDate } from "@/lib/dates";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 import EventRsvpSection from "@/components/member/EventRsvpSection";
+import { evaluateTierAccess, normalizeTierAudience } from "@/lib/tierAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +32,7 @@ export default async function EventDetailsPage({
   const { data: event, error } = await supabaseAdmin
     .from("events")
     .select(
-      "id, title, description, event_date, start_time, end_time, venue, image_url, external_rsvp_url, category, capacity, spots_available, status",
+      "id, title, description, event_date, start_time, end_time, venue, image_url, external_rsvp_url, category, capacity, spots_available, status, audience_type, eligible_tiers, show_locked_preview",
     )
     .eq("id", id)
     .eq("status", "published")
@@ -42,6 +43,18 @@ export default async function EventDetailsPage({
   }
 
   const eventRecord = event as EventRow;
+  const access = evaluateTierAccess(
+    {
+      membershipTier: currentUser.membershipTier,
+      membershipStatus: currentUser.membershipStatus,
+      expiryDate: currentUser.expiryDate,
+    },
+    normalizeTierAudience(eventRecord),
+  );
+
+  if (!access.canAccess) {
+    notFound();
+  }
 
   // Fetch current user's registration for this event
   const { data: registration } = await supabaseAdmin

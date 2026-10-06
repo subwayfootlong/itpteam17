@@ -22,7 +22,7 @@ export default async function HomePage() {
     return null;
   }
 
-  const homeData = await getMemberHomeData(user.id);
+  const homeData = await getMemberHomeData(user);
   const displayFirstName = user.firstName || user.fullName || "Member";
   const displayLastName = user.lastName ?? "";
   const tierLabel = formatTierLabel(user.membershipTier);

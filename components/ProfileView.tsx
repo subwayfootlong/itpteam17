@@ -288,6 +288,16 @@ export default function ProfileView({
         </div>
       </section>
 
+      {tier !== "ordinary" && (
+        <Link
+          href="/member/tier-upgrade"
+          className="flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-[#0F6E00]/30 bg-[#E8F4E6]/60 px-4 py-3 text-sm font-semibold text-[#0F6E00] shadow-2xs transition-all hover:bg-[#E8F4E6] active:scale-[0.99]"
+        >
+          <Award size={18} />
+          <span>Request Tier Upgrade</span>
+        </Link>
+      )}
+
       {/* 2. Account Details Overhaul (Benchmark: Marriott Bonvoy & Zomato) */}
       <section>
         <div className="mb-3 flex items-center justify-between">

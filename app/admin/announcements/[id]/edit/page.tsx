@@ -25,6 +25,9 @@ export default function EditAnnouncementPage() {
           category: a.category ?? 'General',
           image_url: a.image_url ?? '',
           status: a.status ?? 'draft',
+          audience_type: a.audience_type === 'selected_tiers' ? 'selected_tiers' : 'all',
+          eligible_tiers: Array.isArray(a.eligible_tiers) ? a.eligible_tiers : [],
+          show_locked_preview: false,
         });
         
         // Extract metrics (assuming API returns these fields)

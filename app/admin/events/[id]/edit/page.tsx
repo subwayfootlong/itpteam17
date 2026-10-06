@@ -30,6 +30,9 @@ export default function EditEventPage() {
           external_rsvp_url: ev.external_rsvp_url ?? '',
           image_url: ev.image_url ?? '',
           status: ev.status ?? 'draft',
+          audience_type: ev.audience_type === 'selected_tiers' ? 'selected_tiers' : 'all',
+          eligible_tiers: Array.isArray(ev.eligible_tiers) ? ev.eligible_tiers : [],
+          show_locked_preview: Boolean(ev.show_locked_preview),
           capacity_num: ev.capacity,
           spots_available: ev.spots_available,
         });

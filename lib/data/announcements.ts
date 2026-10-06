@@ -8,6 +8,7 @@ export type CommentStatus = "approved" | "pending" | "flagged";
 
 export type CommunityComment = {
   id: string;
+  parentId?: string | null;
   author: string;
   role: string;
   body: string;

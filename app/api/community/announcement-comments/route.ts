@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/currentUser";
 import { getErrorMessage } from "@/lib/errors";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 import { moderationStatus } from "@/lib/community";
+import { evaluateTierAccess, isActiveMembership, normalizeTierAudience } from "@/lib/tierAccess";
 
 type CommentRow = {
   id: string;
@@ -19,6 +20,13 @@ export async function POST(req: Request) {
     if (!user) {
       return NextResponse.json({ error: "Please log in first" }, { status: 401 });
     }
+    if (!isActiveMembership({
+      membershipTier: user.membershipTier,
+      membershipStatus: user.membershipStatus,
+      expiryDate: user.expiryDate,
+    })) {
+      return NextResponse.json({ error: "An active membership is required." }, { status: 403 });
+    }
 
     const { announcementId, body } = await req.json();
     const trimmedBody = typeof body === "string" ? body.trim() : "";
@@ -32,6 +40,29 @@ export async function POST(req: Request) {
 
     if (announcementId.startsWith("admin:")) {
       const adminAnnouncementId = announcementId.replace(/^admin:/, "");
+      const { data: announcement, error: announcementError } = await supabaseAdmin
+        .from("announcements")
+        .select("status, audience_type, eligible_tiers, show_locked_preview")
+        .eq("id", adminAnnouncementId)
+        .maybeSingle();
+      const access = announcement
+        ? evaluateTierAccess(
+            {
+              membershipTier: user.membershipTier,
+              membershipStatus: user.membershipStatus,
+              expiryDate: user.expiryDate,
+            },
+            normalizeTierAudience(announcement),
+          )
+        : null;
+      if (
+        announcementError ||
+        !announcement ||
+        announcement.status !== "published" ||
+        !access?.canAccess
+      ) {
+        return NextResponse.json({ error: "Announcement not found" }, { status: 404 });
+      }
       const { data, error } = await supabaseAdmin
         .from("announcement_comments")
         .insert({

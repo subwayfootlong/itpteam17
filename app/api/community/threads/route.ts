@@ -3,6 +3,8 @@ import { getCurrentUser } from "@/lib/currentUser";
 import { getErrorMessage } from "@/lib/errors";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 import { moderationStatus } from "@/lib/community";
+import { formatTierLabel } from "@/lib/membershipTiers";
+import { evaluateTierAccess, normalizeTierAudience } from "@/lib/tierAccess";
 
 type ThreadRow = {
   id: string;
@@ -15,6 +17,7 @@ type ThreadRow = {
   has_image: boolean | null;
   created_at: string | null;
   author_name: string | null;
+  author_role: string | null;
 };
 
 function makeTitle(body: string) {
@@ -44,19 +47,39 @@ export async function POST(req: Request) {
       );
     }
 
+    const { data: group, error: groupError } = await supabaseAdmin
+      .from("discussion_groups")
+      .select("id, audience_type, eligible_tiers, show_locked_preview")
+      .eq("id", groupId)
+      .maybeSingle();
+    const groupAccess = group
+      ? evaluateTierAccess(
+          {
+            membershipTier: user.membershipTier,
+            membershipStatus: user.membershipStatus,
+            expiryDate: user.expiryDate,
+          },
+          normalizeTierAudience(group),
+        )
+      : null;
+    if (groupError || !group || !groupAccess?.canAccess) {
+      return NextResponse.json({ error: "Discussion group not found" }, { status: 404 });
+    }
+
     const { data, error } = await supabaseAdmin
       .from("discussion")
       .insert({
         group_id: groupId,
         user_id: user.id,
         author_name: user.fullName,
+        author_role: `${formatTierLabel(user.membershipTier)} Member`,
         title: threadTitle,
         body: trimmedBody,
         votes: 0,
         has_image: false,
         status: moderationStatus(trimmedBody),
       })
-      .select("id, group_id, user_id, title, body, votes, status, has_image, created_at, author_name")
+      .select("id, group_id, user_id, title, body, votes, status, has_image, created_at, author_name, author_role")
       .single<ThreadRow>();
 
     if (error) {
@@ -68,6 +91,7 @@ export async function POST(req: Request) {
         id: data.id,
         groupId: data.group_id,
         author: data.author_name || user.fullName,
+        authorRole: data.author_role || "Community Member",
         postedAt: "Just now",
         title: data.title,
         body: data.body,

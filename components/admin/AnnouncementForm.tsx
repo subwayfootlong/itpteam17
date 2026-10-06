@@ -2,8 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import AudienceAccessFields, {
+  DEFAULT_AUDIENCE_ACCESS,
+  type AudienceAccessValue,
+} from '@/components/admin/AudienceAccessFields';
 
-export interface AnnouncementFormData {
+export interface AnnouncementFormData extends AudienceAccessValue {
   title: string;
   content: string;
   category: string;
@@ -17,6 +21,7 @@ const EMPTY: AnnouncementFormData = {
   category: 'General',
   image_url: '',
   status: 'draft',
+  ...DEFAULT_AUDIENCE_ACCESS,
 };
 
 const CATEGORIES = ['General', 'Volunteer', 'Workshop', 'AGM', 'Community Service', 'Religious', 'Administrative'];
@@ -61,8 +66,8 @@ export default function AnnouncementForm({ initialData, announcementId }: Announ
 
       const { url } = await res.json();
       set('image_url', url);
-    } catch (err: any) {
-      setError(err.message || 'Image upload failed.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Image upload failed.');
     } finally {
       setUploading(false);
     }
@@ -75,6 +80,15 @@ export default function AnnouncementForm({ initialData, announcementId }: Announ
     e.preventDefault();
     setSaving(true);
     setError('');
+
+    if (
+      form.audience_type === 'selected_tiers' &&
+      form.eligible_tiers.length === 0
+    ) {
+      setError('Select at least one eligible membership tier.');
+      setSaving(false);
+      return;
+    }
 
     const url = announcementId ? `/api/admin/announcements/${announcementId}` : '/api/admin/announcements';
     const method = announcementId ? 'PATCH' : 'POST';
@@ -155,7 +169,7 @@ export default function AnnouncementForm({ initialData, announcementId }: Announ
                 className="h-11 px-4 rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-800 outline-none transition-all focus:bg-white focus:border-[#3FAE2A] focus:ring-4 focus:ring-[#3FAE2A]/10 cursor-pointer appearance-none"
               >
                 <option value="draft">Draft — hidden from members</option>
-                <option value="published">Published — visible to all</option>
+                <option value="published">Published — visible to selected audience</option>
                 <option value="archived">Archived — removed from feed</option>
               </select>
             </div>
@@ -212,6 +226,14 @@ export default function AnnouncementForm({ initialData, announcementId }: Announ
               </div>
             )}
           </div>
+
+          <AudienceAccessFields
+            value={form}
+            onChange={(audience) =>
+              setForm((current) => ({ ...current, ...audience }))
+            }
+            allowLockedPreview={false}
+          />
         </div>
 
         {/* Footer Actions */}

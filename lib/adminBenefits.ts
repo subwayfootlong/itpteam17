@@ -13,10 +13,13 @@ export type AdminBenefit = {
   logo_initials: string | null;
   is_active: boolean;
   created_at: string | null;
+  audience_type: "all" | "selected_tiers";
+  eligible_tiers: string[];
+  show_locked_preview: boolean;
 };
 
 export const ADMIN_BENEFIT_SELECT =
-  "id, merchant_name, category, discount_description, discount_amount, address, description, image_url, logo_url, logo_initials, is_active, created_at";
+  "id, merchant_name, category, discount_description, discount_amount, address, description, image_url, logo_url, logo_initials, is_active, created_at, audience_type, eligible_tiers, show_locked_preview";
 
 export async function getAdminBenefits(): Promise<AdminBenefit[]> {
   const { data, error } = await supabaseAdmin

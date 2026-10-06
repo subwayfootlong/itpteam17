@@ -1,4 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabaseServer";
+import type { CurrentUser } from "@/lib/currentUser";
+import { evaluateTierAccess, normalizeTierAudience } from "@/lib/tierAccess";
 
 export type MemberHomeData = {
   latestAnnouncement: {
@@ -51,6 +53,9 @@ type AnnouncementRow = {
   title: string | null;
   content: string | null;
   created_at: string | null;
+  audience_type: string | null;
+  eligible_tiers: string[] | null;
+  show_locked_preview: boolean | null;
 };
 
 type EventRow = {
@@ -62,6 +67,9 @@ type EventRow = {
   venue: string | null;
   category: string | null;
   image_url: string | null;
+  audience_type?: string | null;
+  eligible_tiers?: string[] | null;
+  show_locked_preview?: boolean | null;
 };
 
 type RegistrationRow = {
@@ -74,6 +82,9 @@ type BenefitRow = {
   discount_description: string | null;
   description: string | null;
   image_url: string | null;
+  audience_type: string | null;
+  eligible_tiers: string[] | null;
+  show_locked_preview: boolean | null;
 };
 
 function getTodayInSingapore() {
@@ -149,9 +160,14 @@ function normalizeBenefit(benefit: BenefitRow | null | undefined) {
 }
 
 export async function getMemberHomeData(
-  userId: string,
+  user: CurrentUser,
 ): Promise<MemberHomeData> {
   const today = getTodayInSingapore();
+  const memberAccess = {
+    membershipTier: user.membershipTier,
+    membershipStatus: user.membershipStatus,
+    expiryDate: user.expiryDate,
+  };
 
   const [
     announcementResult,
@@ -161,11 +177,11 @@ export async function getMemberHomeData(
   ] = await Promise.all([
     supabaseAdmin
       .from("announcements")
-      .select("id, title, content, created_at")
+      .select("id, title, content, created_at, audience_type, eligible_tiers, show_locked_preview")
       .eq("status", "published")
       .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle<AnnouncementRow>(),
+      .limit(20)
+      .returns<AnnouncementRow[]>(),
 
     supabaseAdmin
       .from("event_registrations")
@@ -182,7 +198,7 @@ export async function getMemberHomeData(
           )
         `,
       )
-      .eq("user_id", userId)
+      .eq("user_id", user.id)
       .eq("status", "registered")
       .returns<RegistrationRow[]>(),
 
@@ -197,13 +213,16 @@ export async function getMemberHomeData(
           start_time,
           venue,
           category,
-          image_url
+            image_url,
+            audience_type,
+            eligible_tiers,
+            show_locked_preview
         `,
       )
       .eq("status", "published")
       .gte("event_date", today)
       .order("event_date", { ascending: true })
-      .limit(6)
+      .limit(20)
       .returns<EventRow[]>(),
 
     supabaseAdmin
@@ -214,13 +233,16 @@ export async function getMemberHomeData(
           merchant_name,
           discount_description,
           description,
-          image_url
+          image_url,
+          audience_type,
+          eligible_tiers,
+          show_locked_preview
         `,
       )
       .eq("is_active", true)
       .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle<BenefitRow>(),
+      .limit(20)
+      .returns<BenefitRow[]>(),
   ]);
 
   if (announcementResult.error) {
@@ -270,25 +292,34 @@ export async function getMemberHomeData(
       .filter((event) => event.eventDate >= today)
       .sort(compareRegisteredEvents) ?? [];
 
-  const normalizedFeaturedEvents = (featuredEventResult.data ?? [])
+  const latestAnnouncement = announcementResult.data?.find((announcement) =>
+    evaluateTierAccess(memberAccess, normalizeTierAudience(announcement)).canAccess,
+  );
+  const accessibleEvents = (featuredEventResult.data ?? [])
+    .filter((event) =>
+      evaluateTierAccess(memberAccess, normalizeTierAudience(event)).canAccess,
+    )
     .map(normalizeEvent)
     .filter(
       (event): event is NonNullable<ReturnType<typeof normalizeEvent>> =>
         Boolean(event),
     );
+  const featuredBenefit = benefitResult.data?.find((benefit) =>
+    evaluateTierAccess(memberAccess, normalizeTierAudience(benefit)).canAccess,
+  );
 
   return {
-    latestAnnouncement: announcementResult.data
+    latestAnnouncement: latestAnnouncement
       ? {
-          id: announcementResult.data.id,
-          title: announcementResult.data.title?.trim() || "Latest announcement",
-          content: announcementResult.data.content?.trim() || "",
-          publishedAt: announcementResult.data.created_at,
+          id: latestAnnouncement.id,
+          title: latestAnnouncement.title?.trim() || "Latest announcement",
+          content: latestAnnouncement.content?.trim() || "",
+          publishedAt: latestAnnouncement.created_at,
         }
       : null,
     nextRegisteredEvent: registeredEvents[0] ?? null,
-    featuredEvent: normalizedFeaturedEvents[0] ?? null,
-    featuredEvents: normalizedFeaturedEvents,
-    featuredBenefit: normalizeBenefit(benefitResult.data),
+    featuredEvent: accessibleEvents[0] ?? null,
+    featuredEvents: accessibleEvents.slice(0, 6),
+    featuredBenefit: normalizeBenefit(featuredBenefit),
   };
 }

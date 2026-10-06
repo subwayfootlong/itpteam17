@@ -60,16 +60,8 @@ export default function AnnouncementsEngagement({
   const [selectedGroupId, setSelectedGroupId] =
     useState<DiscussionGroupId | null>(initialGroupId);
   const [threads] = useState(initialThreads);
-  const [expandedThreadId, setExpandedThreadId] = useState<string | null>(
-    initialThreads.find((thread) => thread.groupId === initialGroupId)?.id ??
-      initialThreads[0]?.id ??
-      null,
-  );
   const [moderatorNotice, setModeratorNotice] = useState(false);
   const [announcementComments, setAnnouncementComments] = useState<
-    Record<string, CommunityComment[]>
-  >({});
-  const [threadComments, setThreadComments] = useState<
     Record<string, CommunityComment[]>
   >({});
 
@@ -134,30 +126,6 @@ export default function AnnouncementsEngagement({
     }));
   };
 
-  const handleThreadComment = async (threadId: string, body: string) => {
-    let comment = makePendingComment(
-      body,
-      (threadComments[threadId] ?? []).length + 1,
-      memberName,
-    );
-
-    try {
-      const response = await postJson<CommentResponse>(
-        "/api/community/thread-comments",
-        { threadId, body },
-      );
-      comment = response.comment;
-    } catch (error) {
-      console.warn("Saved thread comment locally:", error);
-    }
-
-    setThreadComments((current) => ({
-      ...current,
-      [threadId]: [...(current[threadId] ?? []), comment],
-    }));
-    setExpandedThreadId(threadId);
-  };
-
   return (
     <div className={shellClassName}>
       {showChrome && (
@@ -200,14 +168,6 @@ export default function AnnouncementsEngagement({
             groupId={selectedGroupId}
             groups={groups}
             threads={threads}
-            localComments={threadComments}
-            expandedThreadId={expandedThreadId}
-            onExpandThread={(threadId) =>
-              setExpandedThreadId((current) =>
-                current === threadId ? null : threadId,
-              )
-            }
-            onComment={handleThreadComment}
           />
         ) : activeTab === "announcements" ? (
           <AnnouncementList
