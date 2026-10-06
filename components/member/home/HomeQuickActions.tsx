@@ -7,28 +7,28 @@ const actions = [
     description: "Pass & details",
     href: "/member/profile",
     icon: CreditCard,
-    tint: "bg-[#E8F4E6] text-[#0F6E00]",
+    tint: "bg-brand-primary-100 text-brand-primary-800",
   },
   {
     label: "Events",
     description: "Browse & RSVP",
     href: "/member/events",
     icon: CalendarDays,
-    tint: "bg-[#E8F7F5] text-[#1E988A]",
+    tint: "bg-brand-secondary-soft text-brand-secondary-dark",
   },
   {
     label: "Benefits",
     description: "Merchant perks",
     href: "/member/benefit",
     icon: Gift,
-    tint: "bg-[#FFF0D9] text-[#7A4B00]",
+    tint: "bg-brand-accent-soft text-[#7A4B00]",
   },
   {
     label: "Announcements",
     description: "Latest news",
     href: "/member/community?tab=announcements",
     icon: Megaphone,
-    tint: "bg-[#F3FAF2] text-[#245F1B]",
+    tint: "bg-brand-primary-50 text-brand-primary-800",
   },
 ];
 

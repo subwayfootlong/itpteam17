@@ -1,12 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Bell,
+  CalendarDays,
+  Check,
+  ChevronRight,
+  Clock,
+  Gift,
+  Megaphone,
+  Search,
+  ShieldCheck,
+  X,
+} from "lucide-react";
 import type {
   NotificationType,
   SystemNotification,
 } from "@/lib/data/system-notifications";
-import MemberIcon from "@/components/member/MemberIcon";
 import MemberBottomNav from "@/components/MemberBottomNav";
 
 type Filter = "All" | "Unread" | NotificationType;
@@ -20,42 +31,55 @@ const filters: Filter[] = [
   "System",
 ];
 
+const typeStyles: Record<
+  NotificationType,
+  { icon: React.ElementType; circle: string; chip: string }
+> = {
+  Benefit: {
+    icon: Gift,
+    circle: "bg-brand-accent-soft text-amber-900",
+    chip: "bg-brand-accent-soft text-amber-900",
+  },
+  Announcement: {
+    icon: Megaphone,
+    circle: "bg-brand-primary-100 text-brand-primary-800",
+    chip: "bg-brand-primary-100 text-brand-primary-900",
+  },
+  Event: {
+    icon: CalendarDays,
+    circle: "bg-brand-secondary-soft text-brand-secondary-dark",
+    chip: "bg-brand-secondary-soft text-brand-secondary-dark",
+  },
+  Renewal: {
+    icon: Clock,
+    circle: "bg-rose-50 text-brand-rose",
+    chip: "bg-rose-50 text-brand-rose",
+  },
+  System: {
+    icon: ShieldCheck,
+    circle: "bg-neutral-100 text-neutral-700",
+    chip: "bg-neutral-100 text-neutral-700",
+  },
+};
+
 function NotificationHeader({ unreadCount }: { unreadCount: number }) {
   return (
-    <header className="notifications-mobile-header">
-      <div>
-        <span className="notifications-member-avatar">AK</span>
-        <h1>Pergas</h1>
-      </div>
+    <header className="sticky top-0 z-40 flex items-center justify-between border-b border-neutral-100 bg-white/90 px-5 py-3.5 backdrop-blur-md">
+      <h1 className="text-lg font-bold tracking-tight text-neutral-900">
+        Pergas
+      </h1>
       <Link
-        className="notifications-bell-button"
         href="/member/notifications"
         aria-label={`${unreadCount} unread notifications`}
         aria-current="page"
+        className="relative flex h-10 w-10 items-center justify-center rounded-full text-neutral-700"
       >
-        <MemberIcon name="bell" size={22} />
-        {unreadCount > 0 && <span />}
+        <Bell size={20} aria-hidden="true" />
+        {unreadCount > 0 && (
+          <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full border-2 border-white bg-brand-rose" />
+        )}
       </Link>
     </header>
-  );
-}
-
-function NotificationIcon({ type }: { type: NotificationType }) {
-  const icon =
-    type === "Benefit"
-      ? "card"
-      : type === "Announcement"
-        ? "verified"
-        : type === "Event"
-          ? "calendar"
-          : type === "Renewal"
-            ? "clock"
-            : "shield";
-
-  return (
-    <span className={`notifications-type-icon is-${type.toLowerCase()}`}>
-      <MemberIcon name={icon} size={20} />
-    </span>
   );
 }
 
@@ -70,7 +94,6 @@ export default function NotificationsCenter({
   const [filter, setFilter] = useState<Filter>("All");
   const [query, setQuery] = useState("");
   const [toast, setToast] = useState("");
-  const filterScrollerRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifications.filter((item) => !item.isRead).length;
   const readCount = notifications.length - unreadCount;
@@ -177,150 +200,204 @@ export default function NotificationsCenter({
     }
   };
 
-  const scrollFilters = (direction: "left" | "right") => {
-    filterScrollerRef.current?.scrollBy({
-      left: direction === "left" ? -150 : 150,
-      behavior: "smooth",
-    });
-  };
-
   return (
-    <div className="notifications-mobile-shell">
+    <div>
       {showChrome && <NotificationHeader unreadCount={unreadCount} />}
 
-      <main className="notifications-mobile-main">
-        <section className="notifications-title-row">
+      <main className="mx-auto w-full max-w-md px-4 pb-28 pt-4">
+        <section className="flex items-start justify-between gap-3">
           <div>
-            <h2>Notifications</h2>
-            <p>{unreadCount} unread updates</p>
-          </div>
-          <div className="notifications-actions-row">
-            <button type="button" onClick={markAllRead} disabled={unreadCount === 0}>
-              Mark All Read
-            </button>
-            <button type="button" onClick={clearRead} disabled={readCount === 0}>
-              Delete Read
-            </button>
+            <h2 className="font-butler text-2xl font-semibold leading-tight text-brand-primary-800">
+              Notifications
+            </h2>
+            <p className="mt-1 flex items-center gap-1.5 text-sm text-neutral-600">
+              {unreadCount > 0 && (
+                <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-primary-800 px-1.5 text-[11px] font-bold text-white">
+                  {unreadCount}
+                </span>
+              )}
+              {unreadCount === 0 ? "You're all caught up" : "unread updates"}
+            </p>
           </div>
         </section>
 
-        <label className="notifications-search">
+        <div className="mt-3 flex gap-2">
+          <button
+            type="button"
+            onClick={markAllRead}
+            disabled={unreadCount === 0}
+            className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-brand-primary-800 px-3.5 py-1.5 text-xs font-semibold text-brand-primary-800 transition-transform duration-100 hover:bg-brand-primary-50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <Check size={14} aria-hidden="true" />
+            Mark all read
+          </button>
+          <button
+            type="button"
+            onClick={clearRead}
+            disabled={readCount === 0}
+            className="inline-flex min-h-9 items-center rounded-full border border-neutral-300 bg-white px-3.5 py-1.5 text-xs font-semibold text-neutral-700 transition-transform duration-100 hover:border-neutral-400 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            Delete read
+          </button>
+        </div>
+
+        <label className="relative mt-4 block">
           <span className="sr-only">Search notifications</span>
-          <MemberIcon name="search" size={22} />
+          <Search
+            size={18}
+            aria-hidden="true"
+            className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-brand-primary-800"
+          />
           <input
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search notifications..."
+            className="h-12 w-full rounded-full border border-neutral-300 bg-white pl-11 pr-11 text-sm text-neutral-900 shadow-sm placeholder:text-neutral-500 focus:border-brand-primary-700 focus:outline-none focus:ring-4 focus:ring-brand-primary-600/15"
           />
           {query && (
             <button
               type="button"
               onClick={() => setQuery("")}
               aria-label="Clear search"
+              className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-neutral-500 transition-transform duration-100 hover:bg-neutral-200 active:scale-95"
             >
-              <MemberIcon name="close" size={17} />
+              <X size={16} aria-hidden="true" />
             </button>
           )}
         </label>
 
-        <div className="notifications-filter-shell">
-          <button
-            className="notifications-filter-control"
-            type="button"
-            onClick={() => scrollFilters("left")}
-            aria-label="Scroll notification filters left"
-          >
-            <MemberIcon name="back" size={17} />
-          </button>
-          <div
-            className="notifications-filter-tabs"
-            ref={filterScrollerRef}
-            aria-label="Notification filters"
-          >
-            {filters.map((item) => (
+        <div
+          className="no-scrollbar -mx-4 mt-1 flex gap-2 overflow-x-auto px-4 py-3"
+          role="group"
+          aria-label="Notification filters"
+        >
+          {filters.map((item) => {
+            const isActive = filter === item;
+
+            return (
               <button
                 key={item}
-                className={filter === item ? "is-active" : ""}
                 type="button"
+                aria-pressed={isActive}
                 onClick={() => setFilter(item)}
+                className={`shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-100 active:scale-95 ${
+                  isActive
+                    ? "bg-brand-primary-800 text-white shadow-sm"
+                    : "border border-neutral-300 bg-white text-neutral-700 shadow-xs hover:border-brand-primary-600 hover:text-brand-primary-800"
+                }`}
               >
                 {item}
               </button>
-            ))}
-          </div>
-          <button
-            className="notifications-filter-control"
-            type="button"
-            onClick={() => scrollFilters("right")}
-            aria-label="Scroll notification filters right"
-          >
-            <MemberIcon name="arrow" size={17} />
-          </button>
+            );
+          })}
         </div>
 
-        <section className="notifications-summary-card">
-          <div>
-            <span>{unreadCount}</span>
-            <strong>Unread updates</strong>
-          </div>
-          <p>New benefits, announcements, and event updates from Pergas admins.</p>
-        </section>
-
-        <section className="notifications-list-section">
-          <div className="notifications-section-heading">
-            <span>Member Inbox</span>
-            <strong>{filteredNotifications.length} alerts shown</strong>
+        <section aria-label="Member inbox">
+          <div className="mb-2.5 flex items-center justify-between px-0.5">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500">
+              Member inbox
+            </span>
+            <strong className="text-xs font-semibold text-neutral-700">
+              {filteredNotifications.length}{" "}
+              {filteredNotifications.length === 1 ? "alert" : "alerts"}
+            </strong>
           </div>
 
           {filteredNotifications.length > 0 ? (
-            <div className="notifications-mobile-list">
-              {filteredNotifications.map((notification) => (
-                <article
-                  className={`notifications-mobile-card ${
-                    notification.isRead ? "" : "is-unread"
-                  }`}
-                  key={notification.id}
-                >
-                  <NotificationIcon type={notification.type} />
-                  <div>
-                    <header>
-                      <span>{notification.type}</span>
-                      <small>{notification.timestamp}</small>
-                    </header>
-                    <h3>{notification.title}</h3>
-                    <p>{notification.message}</p>
-                    <div className="notifications-card-actions">
-                      <a href={notification.actionHref}>
-                        {notification.actionLabel}
-                        <MemberIcon name="arrow" size={14} />
-                      </a>
-                      <button
-                        type="button"
-                        onClick={() => toggleRead(notification.id)}
+            <div className="space-y-3">
+              {filteredNotifications.map((notification) => {
+                const style = typeStyles[notification.type];
+                const Icon = style.icon;
+
+                return (
+                  <article
+                    key={notification.id}
+                    className={`relative overflow-hidden rounded-2xl border p-4 shadow-sm ${
+                      notification.isRead
+                        ? "border-neutral-200 bg-white"
+                        : "border-brand-primary-200 bg-brand-primary-50"
+                    }`}
+                  >
+                    {!notification.isRead && (
+                      <span
+                        aria-hidden="true"
+                        className="absolute inset-y-0 left-0 w-1.5 bg-brand-primary-700"
+                      />
+                    )}
+                    <div className="flex gap-3">
+                      <span
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${style.circle}`}
                       >
-                        <MemberIcon name="check" size={14} />
-                        {notification.isRead ? "Mark unread" : "Mark read"}
-                      </button>
+                        <Icon size={18} aria-hidden="true" />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <header className="flex items-center justify-between gap-2">
+                          <span
+                            className={`rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${style.chip}`}
+                          >
+                            {notification.type}
+                          </span>
+                          <small className="text-[11px] text-neutral-500">
+                            {notification.timestamp}
+                          </small>
+                        </header>
+                        <h3 className="mt-1.5 text-sm font-semibold leading-snug text-neutral-950">
+                          {notification.title}
+                        </h3>
+                        <p className="mt-1 line-clamp-3 text-xs leading-relaxed text-neutral-600">
+                          {notification.message}
+                        </p>
+                        <div className="mt-3 flex items-center justify-between gap-2 border-t border-neutral-200/70 pt-2.5">
+                          <a
+                            href={notification.actionHref}
+                            className="inline-flex items-center gap-0.5 text-xs font-semibold text-brand-primary-800 transition-transform duration-100 active:scale-95"
+                          >
+                            {notification.actionLabel}
+                            <ChevronRight size={14} aria-hidden="true" />
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => toggleRead(notification.id)}
+                            className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold text-neutral-600 transition-transform duration-100 hover:bg-neutral-100 active:scale-95"
+                          >
+                            <Check size={13} aria-hidden="true" />
+                            {notification.isRead ? "Mark unread" : "Mark read"}
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </article>
-              ))}
+                  </article>
+                );
+              })}
             </div>
           ) : (
-            <div className="notifications-empty-state">
-              <MemberIcon name="bell" size={30} />
-              <h3>No notifications found</h3>
-              <p>New benefits, announcements, and event updates will appear here.</p>
+            <div className="flex flex-col items-center rounded-2xl border border-dashed border-neutral-300 bg-white p-8 text-center">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary-100 text-brand-primary-800">
+                <Bell size={22} aria-hidden="true" />
+              </span>
+              <h3 className="mt-3 text-base font-semibold text-neutral-900">
+                No notifications found
+              </h3>
+              <p className="mt-1 text-sm text-neutral-600">
+                New benefits, announcements, and event updates will appear here.
+              </p>
             </div>
           )}
         </section>
       </main>
 
       {toast && (
-        <div className="notifications-mobile-toast" role="status">
-          {toast}
-          <button type="button" onClick={() => setToast("")}>
+        <div
+          role="status"
+          className="fixed bottom-24 left-1/2 z-50 flex w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 items-center justify-between gap-3 rounded-xl bg-neutral-900 px-4 py-3 text-sm text-white shadow-lg"
+        >
+          <span>{toast}</span>
+          <button
+            type="button"
+            onClick={() => setToast("")}
+            className="shrink-0 text-xs font-semibold text-brand-primary-200 active:scale-95"
+          >
             Dismiss
           </button>
         </div>

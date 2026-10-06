@@ -58,7 +58,7 @@ export default function FeaturedEventCard({
       <div className="flex flex-1 flex-col justify-between p-4">
         <div>
           {/* Date Row */}
-          <div className="flex items-center gap-1.5 text-xs font-medium text-[#0F6E00]">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-brand-primary-800">
             <CalendarDays size={14} className="shrink-0" />
             <span className="truncate">
               {formatEventSchedule(event.eventDate, event.startTime)}
@@ -89,8 +89,8 @@ export default function FeaturedEventCard({
         {/* Full-width View Event Button with Pergas Green and guaranteed high-contrast white text */}
         <Link
           href={`/member/events/${event.id}`}
-          className="mt-4 block w-full rounded-xl bg-[#0F6E00] px-3 py-2.5 text-center text-xs font-bold shadow-xs transition-all hover:bg-[#173F14] active:scale-[0.98]"
-          style={{ backgroundColor: "#0F6E00", color: "#ffffff" }}
+          className="mt-4 block w-full rounded-xl bg-brand-primary-800 px-3 py-2.5 text-center text-xs font-bold shadow-xs transition-all hover:bg-brand-primary-900 active:scale-[0.98]"
+          style={{ backgroundColor: "#245F1B", color: "#ffffff" }}
         >
           <span className="font-bold text-white" style={{ color: "#ffffff" }}>
             View Event

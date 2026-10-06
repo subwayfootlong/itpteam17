@@ -54,7 +54,7 @@ export default function MemberTopBar({ user }: MemberTopBarProps) {
         <Link
           href="/member/profile"
           aria-label="Open profile"
-          className="rounded-full ring-2 ring-transparent transition-all hover:ring-[#3FAE2A]/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F6E00] focus-visible:ring-offset-2 active:scale-95"
+          className="rounded-full ring-2 ring-transparent transition-all hover:ring-brand-primary-600/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-800 focus-visible:ring-offset-2 active:scale-95"
         >
           <MemberAvatar
             firstName={user?.firstName}
@@ -66,7 +66,7 @@ export default function MemberTopBar({ user }: MemberTopBarProps) {
         </Link>
 
         <div>
-          <span className="block text-[11px] font-semibold uppercase tracking-wider text-[#0F6E00] leading-tight">
+          <span className="block text-[11px] font-semibold uppercase tracking-wider text-brand-primary-800 leading-tight">
             Portal
           </span>
           <h1 className="text-lg font-bold tracking-tight text-neutral-900 leading-tight">

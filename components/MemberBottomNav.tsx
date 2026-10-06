@@ -45,7 +45,7 @@ export default function MemberBottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-1/2 z-50 w-full max-w-md -translate-x-1/2 border-t border-neutral-200/80 bg-white/90 backdrop-blur-xl px-2 py-2 shadow-lg"
+      className="fixed bottom-0 left-1/2 z-50 w-full max-w-md -translate-x-1/2 border-t border-neutral-200 bg-white/95 px-2 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-md"
       aria-label="Member navigation"
     >
       <div className="grid grid-cols-5 gap-1 text-center">
@@ -58,32 +58,31 @@ export default function MemberBottomNav() {
               key={item.label}
               href={item.href}
               aria-current={isActive ? "page" : undefined}
-              className={`group flex min-w-0 flex-col items-center justify-center rounded-xl py-1 px-1 transition-all active:scale-95 ${
+              className={`group flex min-w-0 flex-col items-center justify-center rounded-xl px-1 py-1 transition-transform duration-100 active:scale-95 ${
                 isActive
-                  ? "bg-[#E8F4E6] text-[#0F6E00]"
-                  : "text-neutral-400 hover:text-neutral-700"
+                  ? "font-semibold text-brand-primary-800"
+                  : "font-normal text-neutral-400 hover:text-neutral-600"
               }`}
             >
-              <div className="relative flex h-6 w-6 items-center justify-center">
-                <Icon
-                  size={20}
-                  strokeWidth={isActive ? 2.5 : 2}
-                  className={`transition-transform group-hover:scale-105 ${
-                    isActive ? "text-[#0F6E00]" : "text-neutral-400 group-hover:text-neutral-600"
-                  }`}
-                  aria-hidden="true"
-                />
-              </div>
+              <Icon
+                size={22}
+                strokeWidth={isActive ? 2.5 : 2}
+                fill={isActive ? "currentColor" : "none"}
+                fillOpacity={isActive ? 0.15 : 0}
+                aria-hidden="true"
+              />
 
-              <span
-                className={`mt-1 block truncate text-[11px] leading-tight tracking-tight ${
-                  isActive
-                    ? "font-semibold text-[#0F6E00]"
-                    : "font-medium text-neutral-400 group-hover:text-neutral-600"
-                }`}
-              >
+              <span className="mt-1 block truncate text-[11px] leading-tight tracking-tight">
                 {item.label}
               </span>
+
+              {/* Active indicator dot (space is reserved so tabs never shift) */}
+              <span
+                aria-hidden="true"
+                className={`mx-auto mt-0.5 h-1 w-1 rounded-full ${
+                  isActive ? "bg-brand-primary-800" : "bg-transparent"
+                }`}
+              />
             </Link>
           );
         })}

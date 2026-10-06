@@ -71,13 +71,13 @@ function SettingsSwitch({
       onClick={onClick}
       disabled={disabled}
       className={`relative h-7 w-12 rounded-full transition-colors ${
-        enabled ? "bg-[#0F6E00]" : "bg-neutral-200"
+        enabled ? "bg-brand-primary-800" : "bg-neutral-200"
       } ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
     >
       <span
         className={`absolute top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-xs transition-all ${
           enabled
-            ? "left-[calc(100%-1.5rem)] text-[#0F6E00]"
+            ? "left-[calc(100%-1.5rem)] text-brand-primary-800"
             : "left-1 text-transparent"
         }`}
       >
@@ -122,7 +122,7 @@ function SegmentedControl({
             onClick={() => onChange(index)}
             className={`rounded-lg px-2 py-2 text-center text-xs font-semibold transition-all ${
               isSelected
-                ? "bg-white text-[#0F6E00] shadow-xs"
+                ? "bg-white text-brand-primary-800 shadow-xs"
                 : "text-neutral-500 hover:text-neutral-800"
             }`}
           >
@@ -234,9 +234,9 @@ export default function MemberSettingsView({
         <Link
           href="/member/profile"
           aria-label="Back to profile"
-          className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-100 text-neutral-700 transition-colors hover:bg-neutral-200/70 active:scale-95"
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700 transition-colors hover:bg-neutral-200/70 active:scale-95"
         >
-          <ArrowLeft size={20} className="text-[#0F6E00]" />
+          <ArrowLeft size={20} className="text-brand-primary-800" />
         </Link>
 
         <div>
@@ -255,9 +255,9 @@ export default function MemberSettingsView({
           Appearance
         </h2>
 
-        <div className="rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-xs">
-          <div className="flex items-start gap-3.5">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-neutral-100 text-neutral-700">
+        <div className="mb-4 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
+          <div className="flex items-start gap-3.5 p-4">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
               <Type size={18} />
             </div>
 
@@ -285,9 +285,9 @@ export default function MemberSettingsView({
             </div>
           </div>
 
-          <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-4">
+          <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-100 text-neutral-700">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
                 <Palette size={18} />
               </div>
 
@@ -301,7 +301,7 @@ export default function MemberSettingsView({
               </div>
             </div>
 
-            <ChevronRight size={18} className="text-neutral-400" />
+            <ChevronRight size={18} className="text-neutral-300" />
           </div>
         </div>
       </section>
@@ -312,10 +312,10 @@ export default function MemberSettingsView({
           Notifications
         </h2>
 
-        <div className="rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-xs">
-          <div className="flex items-center justify-between">
+        <div className="mb-4 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
+          <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#E8F4E6] text-[#0F6E00]">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-primary-100 text-brand-primary-800">
                 <Bell size={18} />
               </div>
               <div>
@@ -340,7 +340,7 @@ export default function MemberSettingsView({
             />
           </div>
 
-          <div className="mt-4 space-y-2.5 border-t border-neutral-100 pt-4">
+          <div className="space-y-2.5 p-4">
             {preferenceCopy.map((preference) => (
               <div
                 key={preference.key}
@@ -369,9 +369,9 @@ export default function MemberSettingsView({
             ))}
           </div>
 
-          <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-4">
+          <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-100 text-neutral-700">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
                 <Mail size={18} />
               </div>
               <div>
@@ -404,10 +404,10 @@ export default function MemberSettingsView({
           Preferences
         </h2>
 
-        <div className="rounded-2xl border border-neutral-200/70 bg-white p-4 shadow-xs">
-          <div className="flex items-center justify-between">
+        <div className="mb-4 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
+          <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-100 text-neutral-700">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
                 <Globe size={18} />
               </div>
 
@@ -434,41 +434,41 @@ export default function MemberSettingsView({
           About & Support
         </h2>
 
-        <div className="overflow-hidden rounded-2xl border border-neutral-200/70 bg-white shadow-xs divide-y divide-neutral-100">
+        <div className="mb-4 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-100 text-neutral-700">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
                 <Info size={18} />
               </div>
               <p className="text-sm font-semibold text-neutral-900">
                 Help & Support
               </p>
             </div>
-            <ChevronRight size={18} className="text-neutral-400" />
+            <ChevronRight size={18} className="text-neutral-300" />
           </div>
 
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-100 text-neutral-700">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
                 <ShieldCheck size={18} />
               </div>
               <p className="text-sm font-semibold text-neutral-900">
                 Privacy Policy
               </p>
             </div>
-            <ExternalLink size={16} className="text-neutral-400" />
+            <ExternalLink size={16} className="text-neutral-300" />
           </div>
 
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-100 text-neutral-700">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
                 <FileText size={18} />
               </div>
               <p className="text-sm font-semibold text-neutral-900">
                 Terms of Service
               </p>
             </div>
-            <ExternalLink size={16} className="text-neutral-400" />
+            <ExternalLink size={16} className="text-neutral-300" />
           </div>
 
           <div className="flex items-center justify-between p-4 bg-neutral-50/50">
@@ -485,7 +485,7 @@ export default function MemberSettingsView({
         <button
           type="button"
           onClick={handleLogout}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-white py-3 px-4 text-sm font-semibold text-rose-600 shadow-2xs transition-all hover:bg-rose-50 active:scale-[0.99]"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-white px-4 py-3 text-sm font-semibold text-brand-rose shadow-2xs transition-transform duration-100 hover:bg-rose-50 active:scale-[0.98]"
         >
           <LogOut size={18} />
           <span>Log Out</span>

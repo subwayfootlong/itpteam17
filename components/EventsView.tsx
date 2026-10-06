@@ -68,7 +68,7 @@ function EventPosterBanner({
 
   if (!imageUrl || imageFailed) {
     return (
-      <div className="relative aspect-[16/9] w-full overflow-hidden bg-gradient-to-br from-[#173F14] via-[#245F1B] to-[#0F6E00] flex flex-col items-center justify-center p-6 text-white select-none">
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-gradient-to-br from-brand-primary-900 via-brand-primary-800 to-brand-primary-800 flex flex-col items-center justify-center p-6 text-white select-none">
         {/* Subtle decorative glowing shapes */}
         <div
           aria-hidden="true"
@@ -76,7 +76,7 @@ function EventPosterBanner({
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -bottom-6 -left-6 h-32 w-32 rounded-full bg-[#3FAE2A]/20 blur-xl"
+          className="pointer-events-none absolute -bottom-6 -left-6 h-32 w-32 rounded-full bg-brand-primary-600/20 blur-xl"
         />
         <div
           aria-hidden="true"
@@ -87,13 +87,13 @@ function EventPosterBanner({
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/25 bg-white/15 shadow-inner backdrop-blur-md">
             <CalendarDays size={24} className="text-white" />
           </div>
-          <span className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[#BCE6B2]">
+          <span className="mt-2 text-[10px] font-bold uppercase tracking-widest text-brand-primary-200">
             Pergas Event
           </span>
         </div>
 
         {category && (
-          <span className="absolute left-3 top-3 z-10 rounded-full border border-white/30 bg-white/95 px-2.5 py-0.5 text-[11px] font-bold text-[#0F6E00] shadow-xs backdrop-blur-md">
+          <span className="absolute left-3 top-3 z-10 rounded-full border border-white/30 bg-white/95 px-2.5 py-0.5 text-[11px] font-bold text-brand-primary-800 shadow-xs backdrop-blur-md">
             {category}
           </span>
         )}
@@ -113,7 +113,7 @@ function EventPosterBanner({
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
 
       {category && (
-        <span className="absolute left-3 top-3 rounded-full border border-white/40 bg-white/95 px-2.5 py-0.5 text-[11px] font-bold text-[#0F6E00] shadow-xs backdrop-blur-md">
+        <span className="absolute left-3 top-3 rounded-full border border-white/40 bg-white/95 px-2.5 py-0.5 text-[11px] font-bold text-brand-primary-800 shadow-xs backdrop-blur-md">
           {category}
         </span>
       )}
@@ -162,7 +162,7 @@ function EventDescription({
       {isTruncated && !isLocked && (
         <Link
           href={`/member/events/${eventId}`}
-          className="mt-1 inline-block text-xs font-semibold text-[#0F6E00] hover:underline"
+          className="mt-1 inline-block text-xs font-semibold text-brand-primary-800 hover:underline"
         >
           See more
         </Link>
@@ -210,7 +210,7 @@ function EventCard({
         {/* Floating status pill on top right */}
         <div className="absolute right-3 top-3 z-10">
           {event.isRegistered ? (
-            <span className="inline-flex items-center gap-1 rounded-full border border-[#CDE5CA] bg-[#E8F4E6]/95 px-2.5 py-0.5 text-[11px] font-bold text-[#0F6E00] shadow-xs backdrop-blur-md">
+            <span className="inline-flex items-center gap-1 rounded-full border border-brand-primary-200 bg-brand-primary-100/95 px-2.5 py-0.5 text-[11px] font-bold text-brand-primary-800 shadow-xs backdrop-blur-md">
               <Check size={12} strokeWidth={3} />
               Registered
             </span>
@@ -235,7 +235,7 @@ function EventCard({
       <div className="flex flex-1 flex-col justify-between p-4">
         <div>
           {/* Schedule Row */}
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-[#0F6E00]">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-brand-primary-800">
             <CalendarDays size={14} className="shrink-0" />
             <span>
               {formatMemberDate(event.event_date)} •{" "}
@@ -244,7 +244,7 @@ function EventCard({
           </div>
 
           {/* Event Title */}
-          <h3 className="mt-2 line-clamp-2 text-base font-bold font-sans leading-snug text-neutral-900 group-hover:text-[#0F6E00] transition-colors">
+          <h3 className="mt-2 line-clamp-2 text-base font-bold font-sans leading-snug text-neutral-900 group-hover:text-brand-primary-800 transition-colors">
             {event.isLocked ? (
               event.title
             ) : (
@@ -301,7 +301,7 @@ function EventCard({
           ) : event.isRegistered ? (
             <Link
               href={`/member/events/${event.id}`}
-              className="flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-[#CDE5CA] bg-[#E8F4E6] px-4 py-2.5 text-xs font-bold text-[#0F6E00] transition-all hover:bg-[#d9edd6] active:scale-[0.99]"
+              className="flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-brand-primary-200 bg-brand-primary-100 px-4 py-2.5 text-xs font-bold text-brand-primary-800 transition-all hover:bg-brand-primary-200 active:scale-[0.99]"
             >
               <Check size={14} strokeWidth={3} />
               <span>You&apos;re Registered • View Details</span>
@@ -311,8 +311,8 @@ function EventCard({
               type="button"
               disabled={isRegistering}
               onClick={() => onRegister(event.id)}
-              className="min-h-11 w-full rounded-xl bg-[#0F6E00] px-4 py-2.5 text-xs font-bold text-white shadow-2xs transition-all hover:bg-[#173F14] active:scale-[0.99] disabled:opacity-50"
-              style={{ backgroundColor: "#0F6E00", color: "#ffffff" }}
+              className="min-h-11 w-full rounded-xl bg-brand-primary-800 px-4 py-2.5 text-xs font-bold text-white shadow-2xs transition-all hover:bg-brand-primary-900 active:scale-[0.99] disabled:opacity-50"
+              style={{ backgroundColor: "#245F1B", color: "#ffffff" }}
             >
               <span className="text-white font-bold" style={{ color: "#ffffff" }}>
                 {isRegistering ? "Processing..." : "Reapply for Event"}
@@ -327,8 +327,8 @@ function EventCard({
               href={event.external_rsvp_url!.trim()}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex min-h-11 w-full items-center justify-center rounded-xl bg-[#0F6E00] px-4 py-2.5 text-xs font-bold text-white shadow-2xs transition-all hover:bg-[#173F14] active:scale-[0.99]"
-              style={{ backgroundColor: "#0F6E00", color: "#ffffff" }}
+              className="flex min-h-11 w-full items-center justify-center rounded-xl bg-brand-primary-800 px-4 py-2.5 text-xs font-bold text-white shadow-2xs transition-all hover:bg-brand-primary-900 active:scale-[0.99]"
+              style={{ backgroundColor: "#245F1B", color: "#ffffff" }}
             >
               <span className="text-white font-bold" style={{ color: "#ffffff" }}>
                 Register (External) ↗
@@ -337,8 +337,8 @@ function EventCard({
           ) : (
             <Link
               href={`/member/events/${event.id}`}
-              className="flex min-h-11 w-full items-center justify-center rounded-xl bg-[#0F6E00] px-4 py-2.5 text-xs font-bold text-white shadow-2xs transition-all hover:bg-[#173F14] active:scale-[0.99]"
-              style={{ backgroundColor: "#0F6E00", color: "#ffffff" }}
+              className="flex min-h-11 w-full items-center justify-center rounded-xl bg-brand-primary-800 px-4 py-2.5 text-xs font-bold text-white shadow-2xs transition-all hover:bg-brand-primary-900 active:scale-[0.99]"
+              style={{ backgroundColor: "#245F1B", color: "#ffffff" }}
             >
               <span className="text-white font-bold" style={{ color: "#ffffff" }}>
                 View Details & RSVP
@@ -521,14 +521,14 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
           <button
             type="button"
             onClick={() => setSelectedFilter("upcoming")}
-            className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all active:scale-95 ${
+            className={`shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-100 active:scale-95 ${
               selectedFilter === "upcoming"
-                ? "bg-[#0F6E00] text-white shadow-xs"
-                : "border border-neutral-200/80 bg-white text-neutral-700 hover:border-neutral-300"
+                ? "bg-brand-primary-800 text-white shadow-sm"
+                : "border border-neutral-300 bg-white text-neutral-700 shadow-xs hover:border-brand-primary-600 hover:text-brand-primary-800"
             }`}
             style={
               selectedFilter === "upcoming"
-                ? { backgroundColor: "#0F6E00", color: "#ffffff" }
+                ? { backgroundColor: "#245F1B", color: "#ffffff" }
                 : undefined
             }
           >
@@ -538,14 +538,14 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
           <button
             type="button"
             onClick={() => setSelectedFilter("all")}
-            className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all active:scale-95 ${
+            className={`shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-100 active:scale-95 ${
               selectedFilter === "all"
-                ? "bg-[#0F6E00] text-white shadow-xs"
-                : "border border-neutral-200/80 bg-white text-neutral-700 hover:border-neutral-300"
+                ? "bg-brand-primary-800 text-white shadow-sm"
+                : "border border-neutral-300 bg-white text-neutral-700 shadow-xs hover:border-brand-primary-600 hover:text-brand-primary-800"
             }`}
             style={
               selectedFilter === "all"
-                ? { backgroundColor: "#0F6E00", color: "#ffffff" }
+                ? { backgroundColor: "#245F1B", color: "#ffffff" }
                 : undefined
             }
           >
@@ -555,14 +555,14 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
           <button
             type="button"
             onClick={() => setSelectedFilter("registered")}
-            className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all active:scale-95 ${
+            className={`shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-100 active:scale-95 ${
               selectedFilter === "registered"
-                ? "bg-[#0F6E00] text-white shadow-xs"
-                : "border border-neutral-200/80 bg-white text-neutral-700 hover:border-neutral-300"
+                ? "bg-brand-primary-800 text-white shadow-sm"
+                : "border border-neutral-300 bg-white text-neutral-700 shadow-xs hover:border-brand-primary-600 hover:text-brand-primary-800"
             }`}
             style={
               selectedFilter === "registered"
-                ? { backgroundColor: "#0F6E00", color: "#ffffff" }
+                ? { backgroundColor: "#245F1B", color: "#ffffff" }
                 : undefined
             }
           >
@@ -574,14 +574,14 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
               key={category}
               type="button"
               onClick={() => setSelectedFilter(category)}
-              className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all active:scale-95 ${
+              className={`shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-100 active:scale-95 ${
                 selectedFilter === category
-                  ? "bg-[#0F6E00] text-white shadow-xs"
-                  : "border border-neutral-200/80 bg-white text-neutral-700 hover:border-neutral-300"
+                  ? "bg-brand-primary-800 text-white shadow-sm"
+                  : "border border-neutral-300 bg-white text-neutral-700 shadow-xs hover:border-brand-primary-600 hover:text-brand-primary-800"
               }`}
               style={
                 selectedFilter === category
-                  ? { backgroundColor: "#0F6E00", color: "#ffffff" }
+                  ? { backgroundColor: "#245F1B", color: "#ffffff" }
                   : undefined
               }
             >
@@ -609,7 +609,7 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
 
           {listEvents.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50/70 p-8 text-center">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#E8F4E6] text-[#0F6E00]">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary-100 text-brand-primary-800">
                 <CalendarDays size={22} />
               </div>
               <h3 className="text-sm font-bold text-neutral-900">
@@ -666,7 +666,7 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
             </div>
 
             {/* Days of Week Row */}
-            <div className="mt-4 grid grid-cols-7 text-center text-[11px] font-bold tracking-wider text-neutral-400">
+            <div className="mt-4 grid grid-cols-7 text-center text-[11px] font-semibold tracking-wider text-neutral-400">
               {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map((day) => (
                 <span key={day}>{day}</span>
               ))}
@@ -684,31 +684,29 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
                     key={date.dateKey}
                     type="button"
                     onClick={() => setSelectedDate(date.dateKey)}
-                    className="flex flex-col items-center justify-center py-1 transition-transform active:scale-95"
+                    className="flex flex-col items-center justify-center py-1 transition-transform duration-100 active:scale-95"
                   >
                     <span
                       className={`flex h-8 w-8 items-center justify-center rounded-full text-xs transition-colors ${
                         isSelected
-                          ? "bg-[#0F6E00] font-bold text-white shadow-xs"
+                          ? "bg-brand-primary-800 font-bold text-white"
                           : isToday
-                            ? "bg-[#E8F4E6] font-bold text-[#0F6E00]"
+                            ? "bg-brand-primary-100 font-bold text-brand-primary-800"
                             : date.isCurrentMonth
                               ? "font-semibold text-neutral-800 hover:bg-neutral-100"
                               : "font-normal text-neutral-300"
                       }`}
                       style={
-                        isSelected ? { color: "#ffffff", backgroundColor: "#0F6E00" } : undefined
+                        isSelected ? { color: "#ffffff", backgroundColor: "#245F1B" } : undefined
                       }
                     >
                       {date.day}
                     </span>
 
-                    {/* Emerald Dot Indicator for Days with Events */}
+                    {/* Brand-green dot indicator for Days with Events */}
                     <span
-                      className={`mt-1 h-1.5 w-1.5 rounded-full transition-opacity ${
-                        hasEvent
-                          ? "bg-[#0F6E00]"
-                          : "opacity-0"
+                      className={`mx-auto mt-1 h-1.5 w-1.5 rounded-full transition-opacity ${
+                        hasEvent ? "bg-brand-primary-700" : "opacity-0"
                       }`}
                     />
                   </button>
@@ -722,7 +720,7 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
             <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">
               Events on {getDateLabel(selectedDate)}
             </p>
-            <span className="rounded-full bg-[#E8F4E6] px-2.5 py-0.5 text-xs font-bold text-[#0F6E00]">
+            <span className="rounded-full bg-brand-primary-100 px-2.5 py-0.5 text-xs font-bold text-brand-primary-800">
               {selectedDateEvents.length}{" "}
               {selectedDateEvents.length === 1 ? "session" : "sessions"}
             </span>

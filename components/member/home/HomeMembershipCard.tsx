@@ -29,7 +29,7 @@ export default function HomeMembershipCard({
   const ctaLabel = expirySoon ? "Review Membership" : "View Digital Card";
 
   return (
-    <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#173F14] via-[#245F1B] to-[#0F6E00] p-5 text-white shadow-xl">
+    <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-primary-800 via-brand-primary-700 to-brand-primary-900 p-5 text-white shadow-md">
       {/* Ambient background glow and sheen accents */}
       <div
         aria-hidden="true"
@@ -37,7 +37,7 @@ export default function HomeMembershipCard({
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-8 -left-8 h-40 w-40 rounded-full bg-[#3FAE2A]/20 blur-2xl"
+        className="pointer-events-none absolute -bottom-8 -left-8 h-40 w-40 rounded-full bg-brand-primary-600/20 blur-2xl"
       />
       <div
         aria-hidden="true"
@@ -51,25 +51,25 @@ export default function HomeMembershipCard({
             <span>{tierLabel}</span>
           </div>
 
-          <span className="text-xs font-bold uppercase tracking-widest text-[#E8F4E6]/90">
+          <span className="text-xs font-bold uppercase tracking-widest text-brand-primary-100">
             Pergas
           </span>
         </div>
 
         {/* Center / Status & Details */}
         <div className="mt-5">
-          <p className="text-xs font-medium uppercase tracking-wider text-[#BCE6B2]">
+          <p className="text-xs font-medium uppercase tracking-wider text-brand-primary-200">
             Membership Status
           </p>
           <h2 className="mt-1 text-xl font-bold tracking-tight text-white">
             {tierLabel} Member
           </h2>
 
-          <div className="mt-3.5 flex items-center gap-2 text-xs font-medium text-[#E4F5DF]">
-            <CalendarDays size={15} className="text-[#BCE6B2]" />
+          <div className="mt-3.5 flex items-center gap-2 text-xs font-medium text-brand-primary-100">
+            <CalendarDays size={15} className="text-brand-primary-200" />
             <span>Expires: {expiryLabel}</span>
             {expirySoon && (
-              <span className="ml-1 rounded-md border border-[#FFB547]/40 bg-[#FFB547]/25 px-1.5 py-0.5 text-[10px] font-bold uppercase text-[#FFB547]">
+              <span className="ml-1 rounded-md border border-brand-accent/40 bg-brand-accent/25 px-1.5 py-0.5 text-[10px] font-bold uppercase text-brand-accent">
                 Expiring soon
               </span>
             )}
@@ -80,12 +80,11 @@ export default function HomeMembershipCard({
         <div className="mt-6">
           <Link
             href="/member/profile"
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-center text-sm font-bold shadow-md transition-all hover:bg-neutral-50 active:scale-[0.98]"
-            style={{ backgroundColor: "#ffffff", color: "#0F6E00" }}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-center text-sm font-bold text-brand-primary-800 shadow-md transition-transform duration-100 hover:bg-neutral-50 active:scale-[0.98]"
             aria-label={ctaLabel}
           >
-            <CreditCard size={16} className="shrink-0 text-[#0F6E00]" style={{ color: "#0F6E00" }} />
-            <span className="font-bold text-[#0F6E00]" style={{ color: "#0F6E00" }}>
+            <CreditCard size={16} className="shrink-0 text-brand-primary-800" />
+            <span className="font-bold text-brand-primary-800">
               {ctaLabel}
             </span>
           </Link>

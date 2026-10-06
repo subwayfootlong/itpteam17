@@ -220,7 +220,7 @@ export default function ProfileView({
   return (
     <div className="space-y-6 px-4 py-5 font-helvetica">
       {/* 1. Digital Membership Pass (Benchmark: Setel & Monzo) */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#173F14] via-[#245F1B] to-[#0F6E00] p-5 text-white shadow-xl">
+      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-primary-800 via-brand-primary-700 to-brand-primary-900 p-5 text-white shadow-md">
         {/* Subtle sheen and ambient glow */}
         <div
           aria-hidden="true"
@@ -228,7 +228,7 @@ export default function ProfileView({
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-[#3FAE2A]/20 blur-2xl"
+          className="pointer-events-none absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-brand-primary-600/20 blur-2xl"
         />
         <div
           aria-hidden="true"
@@ -242,7 +242,7 @@ export default function ProfileView({
               <span className="inline-flex items-center rounded-full border border-white/25 bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-md">
                 {formatTierLabel(member.membership_tier)}
               </span>
-              <span className="text-xs font-bold uppercase tracking-widest text-[#E8F4E6]/80">
+              <span className="text-xs font-bold uppercase tracking-widest text-brand-primary-100/80">
                 Pergas
               </span>
             </div>
@@ -259,10 +259,10 @@ export default function ProfileView({
 
             {/* Member ID */}
             <div className="mt-4">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-[#BCE6B2]">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-primary-200">
                 Member ID
               </p>
-              <p className="font-mono text-sm font-bold tracking-widest text-[#E8F4E6]">
+              <p className="font-mono text-sm tracking-widest text-brand-primary-100">
                 {member.member_id || "PGS-0000-0000"}
               </p>
             </div>
@@ -278,10 +278,10 @@ export default function ProfileView({
 
           {/* QR Code Container */}
           <div className="flex shrink-0 flex-col items-center">
-            <div className="rounded-2xl bg-white p-2.5 shadow-md">
+            <div className="inline-block rounded-xl bg-white p-2.5">
               <QRCodeCanvas value={qrValue} size={78} />
             </div>
-            <span className="mt-1.5 text-[10px] font-medium tracking-wide text-[#E8F4E6]/80">
+            <span className="mt-1.5 text-[10px] font-medium tracking-wide text-brand-primary-100/80">
               Digital Pass
             </span>
           </div>
@@ -291,7 +291,7 @@ export default function ProfileView({
       {tier !== "ordinary" && (
         <Link
           href="/member/tier-upgrade"
-          className="flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-[#0F6E00]/30 bg-[#E8F4E6]/60 px-4 py-3 text-sm font-semibold text-[#0F6E00] shadow-2xs transition-all hover:bg-[#E8F4E6] active:scale-[0.99]"
+          className="flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-brand-primary-800/30 bg-brand-primary-100/60 px-4 py-3 text-sm font-semibold text-brand-primary-800 shadow-2xs transition-all hover:bg-brand-primary-100 active:scale-[0.99]"
         >
           <Award size={18} />
           <span>Request Tier Upgrade</span>
@@ -402,7 +402,7 @@ export default function ProfileView({
               </span>
             </div>
 
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-[#CDE5CA] bg-[#E8F4E6] px-3 py-1 text-xs font-medium text-[#0F6E00]">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-brand-primary-200 bg-brand-primary-100 px-3 py-1 text-xs font-medium text-brand-primary-800">
               <span>Renewal Date:</span>
               <span className="font-bold">
                 {formatMemberDate(member.expiry_date)}
@@ -413,7 +413,7 @@ export default function ProfileView({
           {/* Edit Profile CTA Button */}
           <Link
             href="/member/profile/edit"
-            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-[#0F6E00]/30 bg-[#E8F4E6]/50 px-4 py-2.5 text-center text-sm font-semibold text-[#0F6E00] shadow-2xs transition-all hover:bg-[#E8F4E6] active:scale-[0.99]"
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-brand-primary-800/30 bg-brand-primary-100/50 px-4 py-2.5 text-center text-sm font-semibold text-brand-primary-800 shadow-2xs transition-all hover:bg-brand-primary-100 active:scale-[0.99]"
           >
             <Edit3 size={16} />
             <span>Edit Profile</span>
@@ -432,7 +432,7 @@ export default function ProfileView({
               Tier benefits & privileges
             </p>
           </div>
-          <span className="rounded-full bg-[#E8F4E6] px-2.5 py-0.5 text-xs font-bold text-[#0F6E00]">
+          <span className="rounded-full bg-brand-primary-100 px-2.5 py-0.5 text-xs font-bold text-brand-primary-800">
             {benefits.length} perks
           </span>
         </div>
@@ -444,10 +444,10 @@ export default function ProfileView({
             const isGold = index % 3 === 2;
 
             const iconClass = isTeal
-              ? "bg-[#E8F7F5] text-[#1E988A]"
+              ? "bg-brand-secondary-soft text-brand-secondary-dark"
               : isGold
-                ? "bg-[#FFF0D9] text-[#7A4B00]"
-                : "bg-[#E8F4E6] text-[#0F6E00]";
+                ? "bg-brand-accent-soft text-[#7A4B00]"
+                : "bg-brand-primary-100 text-brand-primary-800";
 
             return (
               <div
@@ -470,7 +470,7 @@ export default function ProfileView({
                 </div>
 
                 <div className="mt-3 flex items-center justify-between border-t border-neutral-100 pt-3">
-                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0F6E00]">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-brand-primary-800">
                     <Check size={12} strokeWidth={3} />
                     Active Benefit
                   </span>
@@ -497,7 +497,7 @@ export default function ProfileView({
           </div>
           <Link
             href="/member/events"
-            className="text-xs font-semibold text-[#0F6E00] transition-colors hover:text-[#173F14]"
+            className="text-xs font-semibold text-brand-primary-800 transition-colors hover:text-brand-primary-900"
           >
             Browse events
           </Link>
@@ -505,7 +505,7 @@ export default function ProfileView({
 
         {registrations.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50/70 p-6 text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-stone-200/80 bg-white text-[#0F6E00] shadow-2xs">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-stone-200/80 bg-white text-brand-primary-800 shadow-2xs">
               <CalendarCheck size={22} />
             </div>
             <h3 className="text-sm font-bold font-sans text-neutral-900">
@@ -516,7 +516,7 @@ export default function ProfileView({
             </p>
             <Link
               href="/member/events"
-              className="mt-3.5 inline-flex items-center gap-1 rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-[#0F6E00] shadow-2xs transition-all hover:bg-stone-50 active:scale-95"
+              className="mt-3.5 inline-flex items-center gap-1 rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-brand-primary-800 shadow-2xs transition-all hover:bg-stone-50 active:scale-95"
             >
               <span>Explore upcoming events</span>
               <span aria-hidden="true">&rarr;</span>
@@ -524,7 +524,7 @@ export default function ProfileView({
           </div>
         ) : (
           <div className="rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-xs">
-            <div className="relative space-y-6 border-l-2 border-[#E8F4E6] pl-6">
+            <div className="relative space-y-6 border-l-2 border-brand-primary-100 pl-6">
               {registrations.map((reg) => {
                 const event = Array.isArray(reg.events)
                   ? reg.events[0]
@@ -545,7 +545,7 @@ export default function ProfileView({
                   <div key={reg.id} className="relative">
                     <span
                       className={`absolute -left-[31px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-white shadow-xs ${
-                        isRejected ? "bg-rose-500" : "bg-[#0F6E00]"
+                        isRejected ? "bg-rose-500" : "bg-brand-primary-800"
                       }`}
                     />
 
@@ -565,7 +565,7 @@ export default function ProfileView({
                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
                           isRejected
                             ? "border border-rose-200 bg-rose-50 text-rose-700"
-                            : "border border-[#CDE5CA] bg-[#E8F4E6] text-[#0F6E00]"
+                            : "border border-brand-primary-200 bg-brand-primary-100 text-brand-primary-800"
                         }`}
                       >
                         {isRejected ? "Rejected" : "Registered"}
@@ -603,69 +603,66 @@ export default function ProfileView({
       </section>
 
       {/* 5. Action Hub: Admin Portal, Settings & Logout (Benchmark: Zomato / Marriott) */}
-      <section className="space-y-3">
-        {member.role === "admin" && (
-          <Link
-            href="/admin"
-            className="flex items-center justify-between rounded-2xl border border-[#CDE5CA] bg-gradient-to-r from-[#F3FAF2] to-white p-4 shadow-xs transition-all hover:shadow-sm active:scale-[0.99]"
-          >
-            <div className="flex items-center gap-3.5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#E8F4E6] text-[#0F6E00] shadow-2xs">
+      <section>
+        <div className="mb-4 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
+          {member.role === "admin" && (
+            <Link
+              href="/admin"
+              className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 active:scale-[0.98]"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-primary-100 text-brand-primary-800">
                 <ShieldCheck size={20} strokeWidth={2.2} />
               </div>
-              <div>
-                <p className="text-sm font-bold text-neutral-900 leading-tight">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold leading-tight text-neutral-900">
                   Admin Portal
                 </p>
-                <p className="mt-0.5 text-xs text-neutral-500 leading-tight">
+                <p className="mt-0.5 text-xs leading-tight text-neutral-500">
                   Manage members, events & content
                 </p>
               </div>
-            </div>
-            <ChevronRight size={18} className="text-neutral-400" />
-          </Link>
-        )}
+              <span className="rounded-full bg-brand-primary-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-primary-800">
+                Admin
+              </span>
+              <ChevronRight size={18} className="shrink-0 text-neutral-300" />
+            </Link>
+          )}
 
-        <div className="overflow-hidden rounded-2xl border border-neutral-200/70 bg-white shadow-xs divide-y divide-neutral-100">
           <Link
             href="/member/settings"
-            className="flex items-center justify-between p-4 transition-colors hover:bg-neutral-50 active:bg-neutral-100/60"
+            className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 active:scale-[0.98]"
           >
-            <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-100 text-neutral-700">
-                <Settings size={18} />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-neutral-900 leading-tight">
-                  Settings
-                </p>
-                <p className="mt-0.5 text-xs text-neutral-400 leading-tight">
-                  Notifications, font size & preferences
-                </p>
-              </div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+              <Settings size={18} />
             </div>
-            <ChevronRight size={18} className="text-neutral-400" />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold leading-tight text-neutral-900">
+                Settings
+              </p>
+              <p className="mt-0.5 text-xs leading-tight text-neutral-500">
+                Notifications, font size & preferences
+              </p>
+            </div>
+            <ChevronRight size={18} className="shrink-0 text-neutral-300" />
           </Link>
 
           <button
             type="button"
             onClick={handleLogout}
-            className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-rose-50/40 active:bg-rose-100/40"
+            className="flex w-full items-center gap-3.5 p-4 text-left transition-transform duration-100 hover:bg-rose-50/40 active:scale-[0.98]"
           >
-            <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-50 text-rose-600">
-                <LogOut size={18} />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-rose-600 leading-tight">
-                  Log Out
-                </p>
-                <p className="mt-0.5 text-xs text-rose-400 leading-tight">
-                  Sign out of your session
-                </p>
-              </div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-50 text-brand-rose">
+              <LogOut size={18} />
             </div>
-            <ChevronRight size={18} className="text-rose-300" />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold leading-tight text-brand-rose">
+                Log Out
+              </p>
+              <p className="mt-0.5 text-xs leading-tight text-neutral-500">
+                Sign out of your session
+              </p>
+            </div>
+            <ChevronRight size={18} className="shrink-0 text-neutral-300" />
           </button>
         </div>
       </section>
