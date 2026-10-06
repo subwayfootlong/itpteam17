@@ -11,7 +11,13 @@ import {
 import { useToast } from '@/components/ui/Toast';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
-const TEMPLATE_ROW = ['mr', 'Ahmad', 'Rahman', 'ahmad@example.com', '+65 91234567', 'Pergas', 'Educator', 'active'];
+const TEMPLATE_ROW = ['mr', 'Ahmad', 'Rahman', 'ahmad@example.com', '91234567', 'Pergas', 'Educator', 'active'];
+
+const RESULT_STATUS_LABELS: Record<BatchOnboardingResult['status'], string> = {
+  created: 'Created',
+  skipped: 'Not added',
+  failed: 'Needs attention',
+};
 
 function downloadCsv(filename: string, rows: ReadonlyArray<ReadonlyArray<unknown>>) {
   const content = rows.map((row) => row.map(csvCell).join(',')).join('\r\n');
@@ -51,7 +57,7 @@ export default function BatchOnboardingPanel() {
       const missing = BATCH_ONBOARDING_HEADERS.filter((header) => !headers.includes(header));
       if (missing.length > 0) {
         setRows([]);
-        setFileError(`Missing columns: ${missing.join(', ')}`);
+        setFileError(`This file is missing required columns: ${missing.join(', ')}. Download a fresh template and try again.`);
         return;
       }
       const mapped = parsed.slice(1).map((values, index) => {
@@ -59,6 +65,7 @@ export default function BatchOnboardingPanel() {
         for (const header of BATCH_ONBOARDING_HEADERS) {
           row[header] = values[headers.indexOf(header)]?.trim() ?? '';
         }
+        row.phone = row.phone.replace(/^'\s*(?=\+)/, '');
         return row;
       });
       if (mapped.length === 0) setFileError('The CSV does not contain any member rows.');
@@ -84,7 +91,7 @@ export default function BatchOnboardingPanel() {
       setResults(data.results ?? []);
       const created = Number(data.summary?.created ?? 0);
       if (created > 0) toast.success(`${created} member${created === 1 ? '' : 's'} created. Download the report now to keep the temporary passwords.` , 7000);
-      else toast.warning('No members were created. Review the result messages.');
+      else toast.warning('No accounts were created. Check the “What happened” column below and correct the listed details.');
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Import failed');
     } finally {
@@ -144,7 +151,7 @@ export default function BatchOnboardingPanel() {
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 px-5 py-4">
             <div><h3 className="font-bold text-[#1a2e1a]">Import preview</h3><p className="text-[12px] text-gray-500">Verify the names, emails and phone numbers before creating accounts.</p></div>
             <button type="button" onClick={importMembers} disabled={importing || results.length > 0} className="rounded-lg bg-[#3FAE2A] px-5 py-2.5 text-[13px] font-bold text-white shadow-sm hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50">
-              {importing ? <LoadingSpinner label="Creating accounts…" size="sm" light /> : results.length ? 'Import completed' : `Create ${rows.length} accounts`}
+              {importing ? <LoadingSpinner label="Creating accounts…" size="sm" light /> : results.length ? 'Review results' : `Create ${rows.length} accounts`}
             </button>
           </div>
           <div className="max-h-[360px] overflow-auto">
@@ -159,10 +166,10 @@ export default function BatchOnboardingPanel() {
       {results.length > 0 && (
         <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 px-5 py-4">
-            <div><h3 className="font-bold text-[#1a2e1a]">Import results</h3><p className="text-[12px] text-gray-500"><span className="font-bold text-green-700">{counts.created} created</span> · {counts.skipped} skipped · {counts.failed} failed. Temporary passwords are shown only in this report.</p></div>
-            <button type="button" onClick={() => downloadCsv(`pergas-onboarding-results-${Date.now()}.csv`, [['row', 'email', 'status', 'message', 'temporary_password'], ...results.map((result) => [result.rowNumber, result.email, result.status, result.message, result.temporaryPassword ?? ''])])} className="rounded-lg border border-gray-200 px-4 py-2 text-[13px] font-bold text-gray-700 hover:bg-gray-50">↓ Download result report</button>
+            <div><h3 className="font-bold text-[#1a2e1a]">Import results</h3><p className="text-[12px] text-gray-500"><span className="font-bold text-green-700">{counts.created} created</span> · {counts.skipped} not added · {counts.failed} need attention. Temporary passwords are shown only in this report.</p></div>
+            <button type="button" onClick={() => downloadCsv(`pergas-onboarding-results-${Date.now()}.csv`, [['row', 'email', 'status', 'what_happened', 'temporary_password'], ...results.map((result) => [result.rowNumber, result.email, RESULT_STATUS_LABELS[result.status], result.message, result.temporaryPassword ?? ''])])} className="rounded-lg border border-gray-200 px-4 py-2 text-[13px] font-bold text-gray-700 hover:bg-gray-50">↓ Download result report</button>
           </div>
-          <div className="max-h-[360px] overflow-auto"><table className="w-full min-w-[760px] text-left text-[12px]"><thead className="sticky top-0 bg-gray-50 text-[11px] uppercase tracking-wide text-gray-500"><tr><th className="px-4 py-3">Row</th><th className="px-4 py-3">Email</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Message</th><th className="px-4 py-3">Temporary password</th></tr></thead><tbody className="divide-y divide-gray-100">{results.map((result) => <tr key={`${result.rowNumber}-${result.email}`}><td className="px-4 py-3 text-gray-400">{result.rowNumber}</td><td className="px-4 py-3 font-medium text-gray-700">{result.email || '—'}</td><td className="px-4 py-3"><span className={`rounded-full px-2.5 py-1 font-bold ${result.status === 'created' ? 'bg-green-50 text-green-700' : result.status === 'skipped' ? 'bg-amber-50 text-amber-700' : 'bg-red-50 text-red-700'}`}>{result.status}</span></td><td className="px-4 py-3 text-gray-600">{result.message}</td><td className="px-4 py-3 font-mono font-semibold text-gray-800">{result.temporaryPassword ?? '—'}</td></tr>)}</tbody></table></div>
+          <div className="max-h-[360px] overflow-auto"><table className="w-full min-w-[760px] text-left text-[12px]"><thead className="sticky top-0 bg-gray-50 text-[11px] uppercase tracking-wide text-gray-500"><tr><th className="px-4 py-3">Row</th><th className="px-4 py-3">Email</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">What happened</th><th className="px-4 py-3">Temporary password</th></tr></thead><tbody className="divide-y divide-gray-100">{results.map((result) => <tr key={`${result.rowNumber}-${result.email}`}><td className="px-4 py-3 text-gray-400">{result.rowNumber}</td><td className="px-4 py-3 font-medium text-gray-700">{result.email || '—'}</td><td className="px-4 py-3"><span className={`whitespace-nowrap rounded-full px-2.5 py-1 font-bold ${result.status === 'created' ? 'bg-green-50 text-green-700' : result.status === 'skipped' ? 'bg-amber-50 text-amber-700' : 'bg-red-50 text-red-700'}`}>{RESULT_STATUS_LABELS[result.status]}</span></td><td className="px-4 py-3 text-gray-600">{result.message}</td><td className="px-4 py-3 font-mono font-semibold text-gray-800">{result.temporaryPassword ?? '—'}</td></tr>)}</tbody></table></div>
         </section>
       )}
     </div>
