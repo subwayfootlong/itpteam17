@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { QRCodeCanvas } from 'qrcode.react';
 import { formatTierLabel } from '@/lib/membershipTiers';
 import { formatMemberDisplayName, formatMemberName } from '@/lib/memberName';
 import { formatArsStatusLabel, formatSalutationLabel } from '@/lib/memberProfileOptions';
@@ -100,13 +99,6 @@ export default function MemberViewPage() {
     );
   }
 
-  const qrValue = JSON.stringify({
-    memberId: member.member_id,
-    name: formatMemberDisplayName(member, 'Member'),
-    status: member.membership_status,
-    tier: member.membership_tier,
-  });
-
   const statusClass = STATUS_COLORS[member.membership_status] ?? STATUS_COLORS.suspended;
   const arsValue = member.ars_status ?? 'no';
   const arsClass = ARS_COLORS[arsValue] ?? ARS_COLORS.no;
@@ -144,12 +136,6 @@ export default function MemberViewPage() {
               <span className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wide ${member.membership_status === 'active' ? 'bg-[#3FAE2A] text-white shadow-sm' : 'bg-[#C51A4A] text-white shadow-sm'}`}>
                 {member.membership_status}
               </span>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 flex items-center justify-center mb-6 relative z-10 border border-white/10">
-              <div className="rounded-lg bg-white p-2">
-                <QRCodeCanvas value={qrValue} size={80} />
-              </div>
             </div>
 
             <div className="space-y-3 relative z-10">
