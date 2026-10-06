@@ -3,6 +3,11 @@ import { getCurrentUser } from "@/lib/currentUser";
 import { getErrorMessage } from "@/lib/errors";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 import type { PollCounts, PollResponseValue } from "@/lib/data/announcements";
+import {
+  evaluateTierAccess,
+  normalizeTierAudience,
+  type TierAudienceRow,
+} from "@/lib/tierAccess";
 
 const VALID_RESPONSES: PollResponseValue[] = ["yes", "no", "maybe"];
 
@@ -33,15 +38,32 @@ export async function POST(req: Request) {
 
     const { data: announcement, error: announcementError } = await supabaseAdmin
       .from("announcements")
-      .select("id, poll_enabled")
+      .select("id, status, poll_enabled, audience_type, eligible_tiers, show_locked_preview")
       .eq("id", id)
-      .maybeSingle<{ id: string; poll_enabled: boolean | null }>();
+      .maybeSingle<
+        TierAudienceRow & { id: string; status: string | null; poll_enabled: boolean | null }
+      >();
 
     if (announcementError) {
       return NextResponse.json({ error: announcementError.message }, { status: 500 });
     }
-    if (!announcement || !announcement.poll_enabled) {
+    if (!announcement || announcement.status !== "published" || !announcement.poll_enabled) {
       return NextResponse.json({ error: "This announcement has no active poll" }, { status: 400 });
+    }
+
+    const access = evaluateTierAccess(
+      {
+        membershipTier: user.membershipTier,
+        membershipStatus: user.membershipStatus,
+        expiryDate: user.expiryDate,
+      },
+      normalizeTierAudience(announcement),
+    );
+    if (!access.canAccess) {
+      return NextResponse.json(
+        { error: "You don't have access to this announcement" },
+        { status: 403 },
+      );
     }
 
     const { error: upsertError } = await supabaseAdmin
