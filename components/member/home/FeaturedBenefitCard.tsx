@@ -16,7 +16,7 @@ export default function FeaturedBenefitCard({
   benefit: FeaturedBenefit;
 }) {
   return (
-    <section className="mt-8 rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+    <section className="mt-4 rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
       <div className="flex min-w-0 items-center gap-4">
         <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-[#F8FBF7] text-[#0F6E00]">
           {benefit.imageUrl ? (

@@ -23,7 +23,7 @@ export default function HomeActionPrompt({ user }: { user: CurrentUser }) {
 
   if (hasIncompleteProfile) {
     return (
-      <section className="mt-8 rounded-xl border border-[#F5D9A8] bg-[#FFF8EE] p-5">
+      <section className="mt-4 rounded-xl border border-[#F5D9A8] bg-[#FFF8EE] p-5">
         <h2 className="member-text-lg font-semibold text-[#151C27]">
           Complete Your Profile
         </h2>
@@ -44,7 +44,7 @@ export default function HomeActionPrompt({ user }: { user: CurrentUser }) {
 
   if (isExpirySoon(user.expiryDate)) {
     return (
-      <section className="mt-8 rounded-xl border border-[#F5D9A8] bg-[#FFF8EE] p-5">
+      <section className="mt-4 rounded-xl border border-[#F5D9A8] bg-[#FFF8EE] p-5">
         <h2 className="member-text-lg font-semibold text-[#151C27]">
           Membership Renewal Reminder
         </h2>
@@ -54,8 +54,15 @@ export default function HomeActionPrompt({ user }: { user: CurrentUser }) {
         </p>
 
         <Link
+          href="/member/payment"
+          className="member-text-base mt-5 block rounded-xl bg-[#0F6E00] px-4 py-3 text-center font-semibold text-white"
+        >
+          Pay Now
+        </Link>
+
+        <Link
           href="/member/profile"
-          className="member-text-base mt-5 block rounded-xl border border-[#D9C08A] px-4 py-3 text-center font-semibold text-[#151C27]"
+          className="member-text-base mt-3 block rounded-xl border border-[#D9C08A] px-4 py-3 text-center font-semibold text-[#151C27]"
         >
           Review Membership
         </Link>

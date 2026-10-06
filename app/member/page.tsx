@@ -1,12 +1,12 @@
 import MemberPageShell from "@/components/member/MemberPageShell";
 import FeaturedBenefitCard from "@/components/member/home/FeaturedBenefitCard";
-import FeaturedEventCard from "@/components/member/home/FeaturedEventCard";
 import HomeActionPrompt from "@/components/member/home/HomeActionPrompt";
 import HomeAnnouncementCard from "@/components/member/home/HomeAnnouncementCard";
 import HomeGreeting from "@/components/member/home/HomeGreeting";
 import HomeMembershipCard from "@/components/member/home/HomeMembershipCard";
 import HomeQuickActions from "@/components/member/home/HomeQuickActions";
 import NextRegisteredEventCard from "@/components/member/home/NextRegisteredEventCard";
+import UpcomingEventBanner from "@/components/member/home/UpcomingEventBanner";
 import { getCurrentUser } from "@/lib/currentUser";
 import { formatMemberDate } from "@/lib/dates";
 import { getMemberHomeData } from "@/lib/memberHome";
@@ -42,6 +42,10 @@ export default async function HomePage() {
           <HomeAnnouncementCard announcement={homeData.latestAnnouncement} />
         )}
 
+        {shouldShowFeaturedEvent && homeData.featuredEvent && (
+          <UpcomingEventBanner event={homeData.featuredEvent} />
+        )}
+
         <HomeMembershipCard
           tierLabel={tierLabel}
           expiryLabel={expiryLabel}
@@ -51,10 +55,6 @@ export default async function HomePage() {
         <HomeQuickActions />
 
         <NextRegisteredEventCard event={homeData.nextRegisteredEvent} />
-
-        {shouldShowFeaturedEvent && homeData.featuredEvent && (
-          <FeaturedEventCard event={homeData.featuredEvent} />
-        )}
 
         {homeData.featuredBenefit && (
           <FeaturedBenefitCard benefit={homeData.featuredBenefit} />

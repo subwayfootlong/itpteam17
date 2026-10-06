@@ -15,7 +15,9 @@ export default function NewEventPage() {
           Add a new programme or seminar. Set status to <strong>Published</strong> to make it visible to members.
         </p>
       </div>
-      <EventForm />
+      <div className="max-w-4xl">
+        <EventForm />
+      </div>
     </div>
   );
 }

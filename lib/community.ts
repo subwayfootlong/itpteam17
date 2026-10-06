@@ -4,6 +4,8 @@ import type {
   AnnouncementCategory,
   CommentStatus,
   CommunityComment,
+  PollCounts,
+  PollResponseValue,
 } from "@/lib/data/announcements";
 import type {
   CommunityData,
@@ -50,10 +52,22 @@ type AdminAnnouncementRow = {
   created_at: string | null;
   updated_at: string | null;
   image_url: string | null;
+  poll_enabled: boolean | null;
+  poll_question: string | null;
   audience_type: string | null;
   eligible_tiers: string[] | null;
   show_locked_preview: boolean | null;
 };
+
+type PollResponseRow = {
+  announcement_id: string;
+  user_id: string;
+  response: PollResponseValue;
+};
+
+function emptyPollCounts(): PollCounts {
+  return { yes: 0, no: 0, maybe: 0 };
+}
 
 type CommentRow = {
   id: string;
@@ -157,6 +171,8 @@ function mapAnnouncement(
 function mapAdminAnnouncement(
   row: AdminAnnouncementRow,
   comments: CommunityComment[],
+  pollCounts: PollCounts,
+  myPollResponse: PollResponseValue | null,
 ): Announcement {
   const body = row.content?.trim() || "Announcement details will be updated soon.";
   const imageUrl = row.image_url?.trim();
@@ -173,6 +189,10 @@ function mapAdminAnnouncement(
     pinned: false,
     commentsEnabled: true,
     comments,
+    pollEnabled: Boolean(row.poll_enabled),
+    pollQuestion: row.poll_question,
+    pollCounts,
+    myPollResponse,
   };
 }
 
@@ -211,6 +231,7 @@ export async function getCommunityData(
   const memberIsActive = isActiveMembership(memberAccess);
   const [
     adminAnnouncementsResult,
+    pollResponsesResult,
     adminAnnouncementCommentsResult,
     announcementsResult,
     announcementCommentsResult,
@@ -220,9 +241,14 @@ export async function getCommunityData(
   ] = await Promise.all([
     supabaseAdmin
       .from("announcements")
-      .select("id, title, content, category, created_at, updated_at, image_url, audience_type, eligible_tiers, show_locked_preview")
+      .select(
+        "id, title, content, category, created_at, updated_at, image_url, poll_enabled, poll_question, audience_type, eligible_tiers, show_locked_preview",
+      )
       .eq("status", "published")
       .order("updated_at", { ascending: false }),
+    supabaseAdmin
+      .from("announcement_poll_responses")
+      .select("announcement_id, user_id, response"),
     supabaseAdmin
       .from("announcement_comments")
       .select("id, announcement_id, user_id, body:content, status, created_at, author_name, author_role")
@@ -302,6 +328,20 @@ export async function getCommunityData(
     return acc;
   }, {});
 
+  const pollCountsById = new Map<string, PollCounts>();
+  const myPollResponseById = new Map<string, PollResponseValue>();
+  if (!pollResponsesResult.error) {
+    for (const row of (pollResponsesResult.data ?? []) as PollResponseRow[]) {
+      const counts = pollCountsById.get(row.announcement_id) ?? emptyPollCounts();
+      counts[row.response] += 1;
+      pollCountsById.set(row.announcement_id, counts);
+
+      if (currentUserId && row.user_id === currentUserId) {
+        myPollResponseById.set(row.announcement_id, row.response);
+      }
+    }
+  }
+
   const adminAnnouncements = adminAnnouncementsResult.error
     ? []
     : ((adminAnnouncementsResult.data ?? []) as AdminAnnouncementRow[])
@@ -309,7 +349,12 @@ export async function getCommunityData(
           evaluateTierAccess(memberAccess, normalizeTierAudience(row)).canAccess,
         )
         .map((row) =>
-          mapAdminAnnouncement(row, adminCommentsById.get(row.id) ?? []),
+          mapAdminAnnouncement(
+            row,
+            adminCommentsById.get(row.id) ?? [],
+            pollCountsById.get(row.id) ?? emptyPollCounts(),
+            myPollResponseById.get(row.id) ?? null,
+          ),
         );
 
   const communityAnnouncements =

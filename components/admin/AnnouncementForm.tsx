@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AudienceAccessFields, {
   DEFAULT_AUDIENCE_ACCESS,
@@ -13,6 +13,8 @@ export interface AnnouncementFormData extends AudienceAccessValue {
   category: string;
   image_url: string;
   status: 'draft' | 'published' | 'archived';
+  poll_enabled: boolean;
+  poll_question: string;
 }
 
 const EMPTY: AnnouncementFormData = {
@@ -21,6 +23,8 @@ const EMPTY: AnnouncementFormData = {
   category: 'General',
   image_url: '',
   status: 'draft',
+  poll_enabled: false,
+  poll_question: '',
   ...DEFAULT_AUDIENCE_ACCESS,
 };
 
@@ -29,11 +33,17 @@ const CATEGORIES = ['General', 'Volunteer', 'Workshop', 'AGM', 'Community Servic
 interface AnnouncementFormProps {
   initialData?: Partial<AnnouncementFormData>;
   announcementId?: string;
+  onFormChange?: (form: AnnouncementFormData) => void;
 }
 
-export default function AnnouncementForm({ initialData, announcementId }: AnnouncementFormProps) {
+export default function AnnouncementForm({ initialData, announcementId, onFormChange }: AnnouncementFormProps) {
   const router = useRouter();
   const [form, setForm] = useState<AnnouncementFormData>({ ...EMPTY, ...initialData });
+
+  useEffect(() => {
+    onFormChange?.(form);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form]);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
@@ -73,8 +83,10 @@ export default function AnnouncementForm({ initialData, announcementId }: Announ
     }
   };
 
-  const set = (field: keyof AnnouncementFormData, value: string) =>
-    setForm((prev) => ({ ...prev, [field]: value }));
+  const set = <K extends keyof AnnouncementFormData>(
+    field: K,
+    value: AnnouncementFormData[K],
+  ) => setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,7 +126,7 @@ export default function AnnouncementForm({ initialData, announcementId }: Announ
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-4xl space-y-6 pb-12">
+    <form onSubmit={handleSubmit} className="space-y-6 pb-12">
       {error && (
         <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm font-medium shadow-sm">
           {error}
@@ -187,6 +199,28 @@ export default function AnnouncementForm({ initialData, announcementId }: Announ
               className="px-4 py-3 rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-800 placeholder-gray-400 outline-none transition-all focus:bg-white focus:border-[#3FAE2A] focus:ring-4 focus:ring-[#3FAE2A]/10 resize-y"
             />
             <div className="text-xs text-gray-400 text-right">{form.content.length} characters</div>
+          </div>
+
+          {/* Attendance Poll */}
+          <div className="flex flex-col gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50/50">
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.poll_enabled}
+                onChange={(e) => set('poll_enabled', e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-[#3FAE2A] focus:ring-[#3FAE2A]"
+              />
+              Add an attendance poll
+              <span className="text-xs text-gray-400 font-normal">(e.g. "Will you attend the AGM?")</span>
+            </label>
+            {form.poll_enabled && (
+              <input
+                value={form.poll_question}
+                onChange={(e) => set('poll_question', e.target.value)}
+                placeholder="Will you be attending the AGM?"
+                className="h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-800 placeholder-gray-400 outline-none transition-all focus:border-[#3FAE2A] focus:ring-4 focus:ring-[#3FAE2A]/10"
+              />
+            )}
           </div>
 
           {/* Image URL */}
