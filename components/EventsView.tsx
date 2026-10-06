@@ -3,8 +3,19 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, Clock, LockKeyhole, MapPin } from "lucide-react";
+import {
+  CalendarDays,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  List,
+  LockKeyhole,
+  MapPin,
+  Users,
+} from "lucide-react";
 import type { EventRow } from "@/app/member/events/page";
+import { formatMemberDate } from "@/lib/dates";
 
 type EventsViewProps = {
   events: EventRow[];
@@ -32,18 +43,93 @@ function getMonthTitle(date: Date) {
 
 function getDateLabel(dateKey: string) {
   return new Date(`${dateKey}T00:00:00`).toLocaleDateString("en-SG", {
-    month: "long",
+    weekday: "short",
+    month: "short",
     day: "numeric",
   });
 }
 
 function formatTime(startTime: string | null, endTime: string | null) {
-  if (!startTime && !endTime) return "Time to be confirmed";
+  if (!startTime && !endTime) return "Time TBC";
   if (startTime && endTime) return `${startTime} - ${endTime}`;
-  return startTime || endTime;
+  return startTime || endTime || "Time TBC";
 }
 
-function EventDescription({ description, eventId, isLocked = false }: { description: string; eventId: string; isLocked?: boolean }) {
+function EventPosterBanner({
+  imageUrl,
+  title,
+  category,
+}: {
+  imageUrl?: string | null;
+  title: string;
+  category?: string | null;
+}) {
+  const [imageFailed, setImageFailed] = useState(false);
+
+  if (!imageUrl || imageFailed) {
+    return (
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-gradient-to-br from-[#173F14] via-[#245F1B] to-[#0F6E00] flex flex-col items-center justify-center p-6 text-white select-none">
+        {/* Subtle decorative glowing shapes */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-6 -top-6 h-32 w-32 rounded-full bg-white/10 blur-xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-6 -left-6 h-32 w-32 rounded-full bg-[#3FAE2A]/20 blur-xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-white/10 via-transparent to-black/25"
+        />
+
+        <div className="relative z-10 flex flex-col items-center text-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/25 bg-white/15 shadow-inner backdrop-blur-md">
+            <CalendarDays size={24} className="text-white" />
+          </div>
+          <span className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[#BCE6B2]">
+            Pergas Event
+          </span>
+        </div>
+
+        {category && (
+          <span className="absolute left-3 top-3 z-10 rounded-full border border-white/30 bg-white/95 px-2.5 py-0.5 text-[11px] font-bold text-[#0F6E00] shadow-xs backdrop-blur-md">
+            {category}
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative aspect-[16/9] w-full overflow-hidden bg-neutral-100">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={imageUrl}
+        alt={title}
+        onError={() => setImageFailed(true)}
+        className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+      />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
+
+      {category && (
+        <span className="absolute left-3 top-3 z-10 rounded-full border border-white/40 bg-white/95 px-2.5 py-0.5 text-[11px] font-bold text-[#0F6E00] shadow-xs backdrop-blur-md">
+          {category}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function EventDescription({
+  description,
+  eventId,
+  isLocked = false,
+}: {
+  description: string;
+  eventId: string;
+  isLocked?: boolean;
+}) {
   const descriptionRef = useRef<HTMLParagraphElement | null>(null);
   const [isTruncated, setIsTruncated] = useState(false);
 
@@ -66,19 +152,193 @@ function EventDescription({ description, eventId, isLocked = false }: { descript
   }, [description]);
 
   return (
-    <div className="mt-2 min-h-[3.75rem]">
+    <div className="mt-2">
       <p
         ref={descriptionRef}
-        className="member-text-sm line-clamp-2 break-words text-sm leading-5 text-[#5F5E5E]"
+        className="line-clamp-2 break-words text-xs leading-relaxed text-neutral-600"
       >
         {description}
       </p>
       {isTruncated && !isLocked && (
-        <Link href={`/member/events/${eventId}`} className="member-text-sm mt-1 inline-block text-sm font-semibold text-[#0F6E00]">
+        <Link
+          href={`/member/events/${eventId}`}
+          className="mt-1 inline-block text-xs font-semibold text-[#0F6E00] hover:underline"
+        >
           See more
         </Link>
       )}
     </div>
+  );
+}
+
+function EventCard({
+  event,
+  onRegister,
+  isRegistering,
+}: {
+  event: EventRow;
+  onRegister: (id: string) => void;
+  isRegistering: boolean;
+}) {
+  const isFull = event.spots_available !== null && event.spots_available <= 0;
+  const hasRsvpLink = Boolean(event.external_rsvp_url?.trim());
+
+  return (
+    <article className="group mb-4 flex flex-col overflow-hidden rounded-2xl border border-neutral-200/70 bg-white shadow-xs transition-all hover:border-neutral-300 hover:shadow-sm">
+      {/* 16:9 Banner */}
+      <div className="relative">
+        {event.isLocked ? (
+          <EventPosterBanner
+            imageUrl={event.image_url}
+            title={event.title}
+            category={event.category}
+          />
+        ) : (
+          <Link
+            href={`/member/events/${event.id}`}
+            aria-label={`View details for ${event.title}`}
+            className="block"
+          >
+            <EventPosterBanner
+              imageUrl={event.image_url}
+              title={event.title}
+              category={event.category}
+            />
+          </Link>
+        )}
+
+        {/* Floating status pill on top right */}
+        <div className="absolute right-3 top-3 z-10">
+          {event.isRegistered ? (
+            <span className="inline-flex items-center gap-1 rounded-full border border-[#CDE5CA] bg-[#E8F4E6]/95 px-2.5 py-0.5 text-[11px] font-bold text-[#0F6E00] shadow-xs backdrop-blur-md">
+              <Check size={12} strokeWidth={3} />
+              Registered
+            </span>
+          ) : event.isRejected ? (
+            <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50/95 px-2.5 py-0.5 text-[11px] font-bold text-rose-700 shadow-xs backdrop-blur-md">
+              Rejected
+            </span>
+          ) : event.isLocked ? (
+            <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50/95 px-2.5 py-0.5 text-[11px] font-bold text-amber-800 shadow-xs backdrop-blur-md">
+              <LockKeyhole size={11} />
+              Locked
+            </span>
+          ) : isFull ? (
+            <span className="rounded-full bg-neutral-900/80 px-2.5 py-0.5 text-[11px] font-bold text-white shadow-xs backdrop-blur-md">
+              Full
+            </span>
+          ) : null}
+        </div>
+      </div>
+
+      {/* Card Content Body */}
+      <div className="flex flex-1 flex-col justify-between p-4">
+        <div>
+          {/* Schedule Row */}
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-[#0F6E00]">
+            <CalendarDays size={14} className="shrink-0" />
+            <span>
+              {formatMemberDate(event.event_date)} •{" "}
+              {formatTime(event.start_time, event.end_time)}
+            </span>
+          </div>
+
+          {/* Event Title */}
+          <h3 className="mt-2 line-clamp-2 text-base font-bold leading-snug text-neutral-900 group-hover:text-[#0F6E00] transition-colors">
+            {event.isLocked ? (
+              event.title
+            ) : (
+              <Link href={`/member/events/${event.id}`}>{event.title}</Link>
+            )}
+          </h3>
+
+          {/* Venue & Capacity Row */}
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-neutral-500">
+            <span className="flex items-center gap-1.5">
+              <MapPin size={13} className="shrink-0 text-neutral-400" />
+              <span className="truncate">
+                {event.venue || "Venue to be confirmed"}
+              </span>
+            </span>
+
+            {event.spots_available !== null && (
+              <span className="flex items-center gap-1 text-neutral-400">
+                <Users size={12} className="shrink-0" />
+                <span>
+                  {event.spots_available > 0
+                    ? `${event.spots_available} spots left`
+                    : "Full"}
+                </span>
+              </span>
+            )}
+          </div>
+
+          {/* Description Preview */}
+          {event.description ? (
+            <EventDescription
+              description={event.description}
+              eventId={event.id}
+              isLocked={event.isLocked}
+            />
+          ) : null}
+        </div>
+
+        {/* Action Button Section */}
+        <div className="mt-4 pt-3 border-t border-neutral-100">
+          {event.isLocked ? (
+            <button
+              type="button"
+              disabled
+              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs font-semibold text-amber-800"
+            >
+              <LockKeyhole size={14} />
+              <span>
+                {event.requiredTierLabels?.length
+                  ? `${event.requiredTierLabels.join(" / ")} members only`
+                  : "Active membership required"}
+              </span>
+            </button>
+          ) : event.isRegistered ? (
+            <Link
+              href={`/member/events/${event.id}`}
+              className="flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-[#CDE5CA] bg-[#E8F4E6] px-4 py-2.5 text-xs font-bold text-[#0F6E00] transition-all hover:bg-[#d9edd6] active:scale-[0.99]"
+            >
+              <Check size={14} strokeWidth={3} />
+              <span>You&apos;re Registered • View Details</span>
+            </Link>
+          ) : event.isRejected ? (
+            <button
+              type="button"
+              disabled={isRegistering}
+              onClick={() => onRegister(event.id)}
+              className="min-h-11 w-full rounded-xl bg-[#0F6E00] px-4 py-2.5 text-xs font-bold text-white shadow-2xs transition-all hover:bg-[#173F14] active:scale-[0.99] disabled:opacity-50"
+            >
+              {isRegistering ? "Processing..." : "Reapply for Event"}
+            </button>
+          ) : isFull ? (
+            <div className="flex min-h-11 w-full items-center justify-center rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-xs font-semibold text-neutral-400">
+              Event is Full
+            </div>
+          ) : hasRsvpLink ? (
+            <a
+              href={event.external_rsvp_url!.trim()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex min-h-11 w-full items-center justify-center rounded-xl bg-[#0F6E00] px-4 py-2.5 text-xs font-bold text-white shadow-2xs transition-all hover:bg-[#173F14] active:scale-[0.99]"
+            >
+              Register (External) ↗
+            </a>
+          ) : (
+            <Link
+              href={`/member/events/${event.id}`}
+              className="flex min-h-11 w-full items-center justify-center rounded-xl bg-[#0F6E00] px-4 py-2.5 text-xs font-bold text-white shadow-2xs transition-all hover:bg-[#173F14] active:scale-[0.99]"
+            >
+              View Details & RSVP
+            </Link>
+          )}
+        </div>
+      </div>
+    </article>
   );
 }
 
@@ -119,41 +379,54 @@ function buildCalendarDays(currentMonth: Date) {
 
 export default function EventsView({ events, hasError }: EventsViewProps) {
   const today = new Date();
+  const todayKey = getTodayDateKey();
   const router = useRouter();
   const [registeringId, setRegisteringId] = useState<string | null>(null);
+
+  // 1. View Mode Switcher: Default to "list"
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+
+  // 2. Filter Pills
+  const [selectedFilter, setSelectedFilter] = useState<string>("upcoming");
+
+  // Calendar State
+  const [currentMonth, setCurrentMonth] = useState(
+    new Date(today.getFullYear(), today.getMonth(), 1)
+  );
+  const [selectedDate, setSelectedDate] = useState(todayKey);
 
   const handleInAppRegister = async (eventId: string) => {
     setRegisteringId(eventId);
     try {
-      const res = await fetch('/api/events/rsvp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/events/rsvp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ eventId }),
       });
       if (res.ok) {
         router.refresh();
       } else {
         const d = await res.json();
-        alert(d.error || 'Failed to register');
+        alert(d.error || "Failed to register");
       }
     } catch {
-      alert('Network error. Please try again.');
+      alert("Network error. Please try again.");
     } finally {
       setRegisteringId(null);
     }
   };
 
-  const [currentMonth, setCurrentMonth] = useState(
-    new Date(today.getFullYear(), today.getMonth(), 1)
+  const calendarDays = useMemo(
+    () => buildCalendarDays(currentMonth),
+    [currentMonth]
   );
-  const [selectedDate, setSelectedDate] = useState(getTodayDateKey());
-
-  const calendarDays = useMemo(() => buildCalendarDays(currentMonth), [currentMonth]);
 
   const eventDates = useMemo(
     () =>
       new Set(
-        events.filter((event) => event.event_date).map((event) => event.event_date as string)
+        events
+          .filter((event) => event.event_date)
+          .map((event) => event.event_date as string)
       ),
     [events]
   );
@@ -163,228 +436,290 @@ export default function EventsView({ events, hasError }: EventsViewProps) {
     [events, selectedDate]
   );
 
+  // Extract unique categories for filter pills
+  const categories = useMemo(() => {
+    const unique = new Set<string>();
+    for (const e of events) {
+      if (e.category?.trim()) {
+        unique.add(e.category.trim());
+      }
+    }
+    return Array.from(unique);
+  }, [events]);
+
+  // Filtered events for List View
+  const listEvents = useMemo(() => {
+    return events.filter((event) => {
+      if (selectedFilter === "all") return true;
+      if (selectedFilter === "upcoming") {
+        return event.event_date ? event.event_date >= todayKey : true;
+      }
+      if (selectedFilter === "registered") {
+        return Boolean(event.isRegistered);
+      }
+      return (
+        event.category?.toLowerCase() === selectedFilter.toLowerCase()
+      );
+    });
+  }, [events, selectedFilter, todayKey]);
+
   function goToPreviousMonth() {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
+    setCurrentMonth(
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)
+    );
   }
 
   function goToNextMonth() {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+    setCurrentMonth(
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1)
+    );
   }
 
   return (
-    <div className="px-5 py-5">
-      <div className="rounded-2xl border border-gray-200 bg-[#FFFFFF] p-6 shadow-sm">
-        <div className="flex items-center justify-between">
-          <h2 className="member-text-2xl text-2xl font-bold text-[#151C27]">{getMonthTitle(currentMonth)}</h2>
+    <div className="space-y-4 px-4 py-5 font-helvetica">
+      {/* 1. View Mode Switcher Toggle (List View vs Calendar) */}
+      <div className="flex rounded-2xl bg-neutral-100 p-1 shadow-inner">
+        <button
+          type="button"
+          onClick={() => setViewMode("list")}
+          className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold transition-all active:scale-[0.98] ${
+            viewMode === "list"
+              ? "bg-white text-neutral-900 shadow-xs"
+              : "text-neutral-500 hover:text-neutral-700"
+          }`}
+        >
+          <List size={16} strokeWidth={2.5} />
+          <span>List View</span>
+        </button>
 
-          <div className="flex gap-5 text-[#151C27]">
-            <button type="button" aria-label="Previous month" onClick={goToPreviousMonth}>
-              <ChevronLeft size={26} />
-            </button>
+        <button
+          type="button"
+          onClick={() => setViewMode("calendar")}
+          className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold transition-all active:scale-[0.98] ${
+            viewMode === "calendar"
+              ? "bg-white text-neutral-900 shadow-xs"
+              : "text-neutral-500 hover:text-neutral-700"
+          }`}
+        >
+          <CalendarDays size={16} strokeWidth={2.5} />
+          <span>Calendar</span>
+        </button>
+      </div>
 
-            <button type="button" aria-label="Next month" onClick={goToNextMonth}>
-              <ChevronRight size={26} />
-            </button>
-          </div>
-        </div>
+      {/* 2. Category & Filter Pill Rail (Horizontal scrolling) */}
+      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 no-scrollbar">
+        <button
+          type="button"
+          onClick={() => setSelectedFilter("upcoming")}
+          className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all active:scale-95 ${
+            selectedFilter === "upcoming"
+              ? "bg-[#0F6E00] text-white shadow-xs"
+              : "border border-neutral-200/80 bg-white text-neutral-700 hover:border-neutral-300"
+          }`}
+        >
+          Upcoming
+        </button>
 
-        <div className="member-text-base mt-6 grid grid-cols-7 text-center text-[#5F5E5E]">
-          {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
-            <p key={`${day}-${index}`}>{day}</p>
-          ))}
-        </div>
+        <button
+          type="button"
+          onClick={() => setSelectedFilter("all")}
+          className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all active:scale-95 ${
+            selectedFilter === "all"
+              ? "bg-[#0F6E00] text-white shadow-xs"
+              : "border border-neutral-200/80 bg-white text-neutral-700 hover:border-neutral-300"
+          }`}
+        >
+          All Events
+        </button>
 
-        <div className="member-text-lg mt-6 grid grid-cols-7 gap-y-3 text-center text-lg text-[#151C27]">
-          {calendarDays.map((date) => {
-            const isSelected = date.dateKey === selectedDate;
-            const hasEvent = eventDates.has(date.dateKey);
+        <button
+          type="button"
+          onClick={() => setSelectedFilter("registered")}
+          className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all active:scale-95 ${
+            selectedFilter === "registered"
+              ? "bg-[#0F6E00] text-white shadow-xs"
+              : "border border-neutral-200/80 bg-white text-neutral-700 hover:border-neutral-300"
+          }`}
+        >
+          My Registered
+        </button>
 
-            return (
-              <button
-                key={date.dateKey}
-                type="button"
-                onClick={() => setSelectedDate(date.dateKey)}
-                className="flex h-14 flex-col items-center justify-start"
-              >
-                <span
-                  className={
-                    isSelected
-                      ? "flex h-10 w-10 items-center justify-center rounded-full bg-[#0F6E00] font-bold text-white"
-                      : date.isCurrentMonth
-                        ? "flex h-10 w-10 items-center justify-center text-[#151C27]"
-                        : "flex h-10 w-10 items-center justify-center text-gray-300"
-                  }
-                >
-                  {date.day}
-                </span>
-
-                <span
-                  className={
-                    hasEvent && !isSelected ? "mt-1 h-1 w-1 rounded-full bg-[#0F6E00]" : "mt-1 h-1 w-1"
-                  }
-                />
-              </button>
-            );
-          })}
-        </div>
+        {categories.map((category) => (
+          <button
+            key={category}
+            type="button"
+            onClick={() => setSelectedFilter(category)}
+            className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all active:scale-95 ${
+              selectedFilter === category
+                ? "bg-[#0F6E00] text-white shadow-xs"
+                : "border border-neutral-200/80 bg-white text-neutral-700 hover:border-neutral-300"
+            }`}
+          >
+            {category}
+          </button>
+        ))}
       </div>
 
       {hasError && (
-        <div className="member-text-sm mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-          Failed to load events. Please check your Supabase connection.
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-xs font-medium text-red-700">
+          Failed to load events. Please check your network connection.
         </div>
       )}
 
-      <div className="mt-6 border-l-4 border-[#0F6E00] pl-4">
-        <p className="member-text-base text-[#151C27]">Upcoming on {getDateLabel(selectedDate)}</p>
-
-        <p className="member-text-base text-[#151C27]">
-          {selectedDateEvents.length}{" "}
-          {selectedDateEvents.length === 1 ? "session" : "sessions"} scheduled
-        </p>
-      </div>
-
-      <div className="mt-6 min-h-[360px] space-y-7">
-        {selectedDateEvents.length === 0 && !hasError ? (
-          <div className="member-text-base flex min-h-[220px] items-center justify-center rounded-2xl border border-gray-200 p-6 text-center text-[#5F5E5E]">
-            No published events on this date.
+      {/* VIEW MODE: LIST VIEW */}
+      {viewMode === "list" && (
+        <div className="pt-1">
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+              {listEvents.length} {listEvents.length === 1 ? "Event" : "Events"}{" "}
+              Listed
+            </p>
           </div>
-        ) : (
-          selectedDateEvents.map((event) => {
-            const isFull = event.spots_available !== null && event.spots_available <= 0;
-            const hasRsvpLink = Boolean(event.external_rsvp_url?.trim());
 
-            return (
-              <article
-                key={event.id}
-                className="flex min-h-[31rem] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-[#FFFFFF] shadow-sm"
-              >
-                <div className="relative h-48 bg-gray-200">
-                  {event.isLocked ? (
-                    <div className="block h-full w-full" aria-label={`${event.title} is tier restricted`}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={event.image_url || "/event-placeholder.jpg"}
-                      alt={event.title}
-                      className="h-full w-full object-cover"
-                    />
-                    </div>
-                  ) : (
-                    <Link
-                      href={`/member/events/${event.id}`}
-                      aria-label={`Open details for ${event.title}`}
-                      className="block h-full w-full"
+          {listEvents.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-neutral-200 bg-neutral-50/50 p-8 text-center">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#E8F4E6] text-[#0F6E00]">
+                <CalendarDays size={22} />
+              </div>
+              <h3 className="text-sm font-bold text-neutral-900">
+                No events found
+              </h3>
+              <p className="mt-1 text-xs text-neutral-500">
+                There are no events matching this filter. Switch filters or check back later!
+              </p>
+            </div>
+          ) : (
+            <div>
+              {listEvents.map((event) => (
+                <EventCard
+                  key={event.id}
+                  event={event}
+                  onRegister={handleInAppRegister}
+                  isRegistering={registeringId === event.id}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* VIEW MODE: CALENDAR VIEW (Monarch iOS Reference) */}
+      {viewMode === "calendar" && (
+        <div className="space-y-4 pt-1">
+          <div className="rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-xs">
+            {/* Month Header */}
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-bold text-neutral-900">
+                {getMonthTitle(currentMonth)}
+              </h2>
+
+              <div className="flex items-center gap-1 text-neutral-600">
+                <button
+                  type="button"
+                  aria-label="Previous month"
+                  onClick={goToPreviousMonth}
+                  className="rounded-lg p-1.5 transition-colors hover:bg-neutral-100 hover:text-neutral-900 active:scale-95"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+
+                <button
+                  type="button"
+                  aria-label="Next month"
+                  onClick={goToNextMonth}
+                  className="rounded-lg p-1.5 transition-colors hover:bg-neutral-100 hover:text-neutral-900 active:scale-95"
+                >
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+            </div>
+
+            {/* Days of Week Row */}
+            <div className="mt-4 grid grid-cols-7 text-center text-[11px] font-bold tracking-wider text-neutral-400">
+              {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map((day) => (
+                <span key={day}>{day}</span>
+              ))}
+            </div>
+
+            {/* Calendar Days Grid */}
+            <div className="mt-3 grid grid-cols-7 gap-y-2 text-center">
+              {calendarDays.map((date) => {
+                const isSelected = date.dateKey === selectedDate;
+                const isToday = date.dateKey === todayKey;
+                const hasEvent = eventDates.has(date.dateKey);
+
+                return (
+                  <button
+                    key={date.dateKey}
+                    type="button"
+                    onClick={() => setSelectedDate(date.dateKey)}
+                    className="flex flex-col items-center justify-center py-1 transition-transform active:scale-95"
+                  >
+                    <span
+                      className={`flex h-8 w-8 items-center justify-center rounded-full text-xs transition-colors ${
+                        isSelected
+                          ? "bg-[#0F6E00] font-bold text-white shadow-xs"
+                          : isToday
+                            ? "bg-[#E8F4E6] font-bold text-[#0F6E00]"
+                            : date.isCurrentMonth
+                              ? "font-semibold text-neutral-800 hover:bg-neutral-100"
+                              : "font-normal text-neutral-300"
+                      }`}
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={event.image_url || "/event-placeholder.jpg"}
-                        alt={event.title}
-                        className="h-full w-full object-cover"
-                      />
-                    </Link>
-                  )}
-
-                  {event.category && (
-                    <span className="member-text-sm absolute right-4 top-4 rounded-full bg-[#0F6E00] px-4 py-1 text-sm text-white">
-                      {event.category}
+                      {date.day}
                     </span>
-                  )}
-                </div>
 
-                <div className="flex flex-1 flex-col p-6">
-                  <h3 className="member-text-2xl min-h-[3.5rem] text-2xl font-bold leading-snug text-[#151C27]">
-                    {event.isLocked ? event.title : (
-                      <Link
-                        href={`/member/events/${event.id}`}
-                        className="inline-block min-w-0 break-words line-clamp-2"
-                      >
-                        {event.title}
-                      </Link>
-                    )}
-                  </h3>
+                    {/* Emerald Dot Indicator for Days with Events */}
+                    <span
+                      className={`mt-1 h-1.5 w-1.5 rounded-full transition-opacity ${
+                        hasEvent
+                          ? isSelected
+                            ? "bg-[#0F6E00]"
+                            : "bg-[#0F6E00]"
+                          : "opacity-0"
+                      }`}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-                  {event.description ? (
-                    <EventDescription description={event.description} eventId={event.id} isLocked={event.isLocked} />
-                  ) : (
-                    <div className="mt-2 min-h-[3.75rem]" />
-                  )}
+          {/* Selected Date Header */}
+          <div className="flex items-center justify-between px-1">
+            <p className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+              Events on {getDateLabel(selectedDate)}
+            </p>
+            <span className="rounded-full bg-[#E8F4E6] px-2.5 py-0.5 text-xs font-bold text-[#0F6E00]">
+              {selectedDateEvents.length}{" "}
+              {selectedDateEvents.length === 1 ? "session" : "sessions"}
+            </span>
+          </div>
 
-                  <div className="mt-4 space-y-3 text-[#151C27]">
-                    <p className="member-text-base flex items-center gap-2">
-                      <Clock size={18} strokeWidth={2.2} className="text-[#5F5E5E]" />
-                      {formatTime(event.start_time, event.end_time)}
-                    </p>
-
-                    <p className="member-text-base flex min-w-0 items-center gap-2">
-                      <MapPin size={18} strokeWidth={2.2} className="text-[#5F5E5E]" />
-                      <span className="min-w-0 break-words">{event.venue || "Venue to be confirmed"}</span>
-                    </p>
-                  </div>
-
-                  {event.isLocked ? (
-                    <button
-                      type="button"
-                      disabled
-                      className="member-text-base mt-auto flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-4 font-semibold text-amber-800"
-                    >
-                      <LockKeyhole size={17} />
-                      {event.requiredTierLabels?.length
-                        ? `${event.requiredTierLabels.join(" / ")} members only`
-                        : "Active membership required"}
-                    </button>
-                  ) : hasRsvpLink ? (
-                    <a
-                      href={event.external_rsvp_url!.trim()}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="member-text-base mt-auto block min-h-11 rounded-xl bg-[#0F6E00] px-4 py-4 text-center font-semibold text-white transition-colors hover:bg-[#0c5900]"
-                    >
-                      Register (External)
-                    </a>
-                  ) : event.isRegistered ? (
-                    <button
-                      type="button"
-                      disabled
-                      className="member-text-base mt-auto flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-green-200 bg-green-50 px-4 py-4 font-semibold text-green-700"
-                    >
-                      <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                      </svg>
-                      Registered
-                    </button>
-                  ) : event.isRejected ? (
-                    <button
-                      type="button"
-                      disabled={registeringId === event.id}
-                      onClick={() => handleInAppRegister(event.id)}
-                      className="member-text-base mt-auto min-h-11 w-full rounded-xl bg-[#0F6E00] px-4 py-4 font-semibold text-white transition-colors hover:bg-[#0c5900]"
-                    >
-                      {registeringId === event.id ? 'Processing...' : 'Reapply'}
-                    </button>
-                  ) : isFull ? (
-                    <button
-                      type="button"
-                      disabled
-                      className="member-text-base mt-auto min-h-11 w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-4 font-semibold text-gray-400"
-                    >
-                      Full
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      disabled={registeringId === event.id}
-                      onClick={() => handleInAppRegister(event.id)}
-                      className="member-text-base mt-auto min-h-11 w-full rounded-xl bg-[#0F6E00] px-4 py-4 font-semibold text-white transition-colors hover:bg-[#0c5900]"
-                    >
-                      {registeringId === event.id ? 'Processing...' : 'Register'}
-                    </button>
-                  )}
-                </div>
-              </article>
-            );
-          })
-        )}
-      </div>
+          {/* Events for Selected Date */}
+          {selectedDateEvents.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-neutral-200 bg-neutral-50/50 p-6 text-center">
+              <p className="text-sm font-semibold text-neutral-700">
+                No events scheduled for this day
+              </p>
+              <p className="mt-1 text-xs text-neutral-400">
+                Tap dates marked with green dots to view scheduled events.
+              </p>
+            </div>
+          ) : (
+            <div>
+              {selectedDateEvents.map((event) => (
+                <EventCard
+                  key={event.id}
+                  event={event}
+                  onRegister={handleInAppRegister}
+                  isRegistering={registeringId === event.id}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
