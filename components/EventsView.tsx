@@ -102,28 +102,18 @@ function EventPosterBanner({
   }
 
   return (
-    <div className="relative aspect-[16/10] w-full overflow-hidden bg-neutral-950 flex items-center justify-center">
-      {/* 1. Ambient blurred backdrop of the flyer to fill card proportions seamlessly */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={imageUrl}
-        alt=""
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center scale-110 blur-md opacity-40"
-      />
-
-      {/* 2. Full uncropped flyer — preserves faces, heads, asatizah portraits and typography */}
+    <div className="relative aspect-[16/9] w-full overflow-hidden bg-neutral-100">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={imageUrl}
         alt={title}
         onError={() => setImageFailed(true)}
-        className="relative z-10 h-full w-full object-contain object-center drop-shadow-sm transition-transform duration-300 group-hover:scale-[1.02]"
+        className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
       />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-10" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
 
       {category && (
-        <span className="absolute left-3 top-3 z-20 rounded-full border border-white/40 bg-white/95 px-2.5 py-0.5 text-[11px] font-bold text-[#0F6E00] shadow-xs backdrop-blur-md">
+        <span className="absolute left-3 top-3 rounded-full border border-white/40 bg-white/95 px-2.5 py-0.5 text-[11px] font-bold text-[#0F6E00] shadow-xs backdrop-blur-md">
           {category}
         </span>
       )}

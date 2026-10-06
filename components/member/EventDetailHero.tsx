@@ -50,28 +50,18 @@ export default function EventDetailHero({
   }
 
   return (
-    <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] max-h-[460px] overflow-hidden rounded-2xl bg-neutral-950 flex items-center justify-center shadow-xs">
-      {/* 1. Ambient blurred background using the flyer's own colors to fill margins naturally */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={imageUrl}
-        alt=""
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center scale-110 blur-xl opacity-40"
-      />
-
-      {/* 2. Uncropped full flyer — respects the original portrait or landscape orientation */}
+    <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-neutral-100 shadow-xs">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={imageUrl}
         alt={title}
         onError={() => setImageFailed(true)}
-        className="relative z-10 h-full w-full object-contain object-center drop-shadow-lg"
+        className="h-full w-full object-cover object-center"
       />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-10" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
       {category && (
-        <span className="absolute left-3.5 top-3.5 z-20 rounded-full border border-white/40 bg-white/95 px-3 py-1 text-xs font-bold text-[#0F6E00] shadow-xs backdrop-blur-md">
+        <span className="absolute left-3.5 top-3.5 rounded-full border border-white/40 bg-white/95 px-3 py-1 text-xs font-bold text-[#0F6E00] shadow-xs backdrop-blur-md">
           {category}
         </span>
       )}
