@@ -37,60 +37,66 @@ export default function FeaturedEventCard({
   event: FeaturedEvent;
 }) {
   return (
-    <section className="mt-8 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
-      <div className="relative h-48 bg-gray-200">
+    <article className="flex w-[280px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-neutral-100 bg-white shadow-sm transition-all hover:border-neutral-200 hover:shadow-md">
+      {/* 16:9 Banner Container */}
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-neutral-100">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={event.imageUrl || "/event-placeholder.png"}
           alt=""
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-        <div className="absolute left-5 top-5">
-          <span className="rounded-full bg-[#0F6E00] px-3 py-1 text-sm font-semibold text-white">
-            Featured Event
-          </span>
-        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+
+        {/* Floating Category Chip */}
+        <span className="absolute left-3 top-3 rounded-md border border-white/50 bg-white/90 px-2.5 py-0.5 text-xs font-semibold text-neutral-800 shadow-xs backdrop-blur-md">
+          {event.category || "Featured Event"}
+        </span>
       </div>
 
-      <div className="p-5">
-        {event.category && (
-          <p className="member-text-xs font-semibold uppercase tracking-wide text-[#0F6E00]">
-            {event.category}
-          </p>
-        )}
+      {/* Content Container */}
+      <div className="flex flex-1 flex-col justify-between p-4">
+        <div>
+          {/* Date Row */}
+          <div className="flex items-center gap-1.5 text-xs font-medium text-[#0F6E00]">
+            <CalendarDays size={14} className="shrink-0" />
+            <span className="truncate">
+              {formatEventSchedule(event.eventDate, event.startTime)}
+            </span>
+          </div>
 
-        <h2 className="member-text-lg mt-2 font-semibold text-[#151C27]">
-          {event.title}
-        </h2>
+          {/* Title */}
+          <h3 className="mt-1.5 line-clamp-1 text-base font-bold leading-snug text-neutral-900">
+            {event.title}
+          </h3>
 
-        {event.description && (
-          <p className="member-text-sm mt-2 line-clamp-3 text-[#5F5E5E]">
-            {event.description}
-          </p>
-        )}
-
-        <div className="member-text-sm mt-4 space-y-2 text-[#5F5E5E]">
-          <p className="flex items-center gap-2">
-            <CalendarDays size={18} className="text-[#0F6E00]" />
-            <span>{formatEventSchedule(event.eventDate, event.startTime)}</span>
-          </p>
-
+          {/* Venue (if present) */}
           {event.venue && (
-            <p className="flex items-center gap-2">
-              <MapPin size={18} className="text-[#0F6E00]" />
-              <span>{event.venue}</span>
+            <p className="mt-1 flex items-center gap-1.5 truncate text-xs text-neutral-500">
+              <MapPin size={13} className="shrink-0 text-neutral-400" />
+              <span className="truncate">{event.venue}</span>
+            </p>
+          )}
+
+          {/* Description clamped */}
+          {event.description && (
+            <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-neutral-600">
+              {event.description}
             </p>
           )}
         </div>
 
+        {/* Full-width View Event Button with Pergas Green and guaranteed high-contrast white text */}
         <Link
           href={`/member/events/${event.id}`}
-          className="member-text-base mt-5 block rounded-xl bg-[#0F6E00] px-4 py-3 text-center font-semibold text-white"
+          className="mt-4 block w-full rounded-xl bg-[#0F6E00] px-3 py-2.5 text-center text-xs font-bold shadow-xs transition-all hover:bg-[#173F14] active:scale-[0.98]"
+          style={{ backgroundColor: "#0F6E00", color: "#ffffff" }}
         >
-          View Event
+          <span className="font-bold text-white" style={{ color: "#ffffff" }}>
+            View Event
+          </span>
         </Link>
       </div>
-    </section>
+    </article>
   );
 }

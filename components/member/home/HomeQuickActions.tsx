@@ -4,34 +4,44 @@ import { CalendarDays, CreditCard, Gift, Megaphone } from "lucide-react";
 const actions = [
   {
     label: "Digital Card",
+    description: "Pass & details",
     href: "/member/profile",
     icon: CreditCard,
+    tint: "bg-[#E8F4E6] text-[#0F6E00]",
   },
   {
     label: "Events",
+    description: "Browse & RSVP",
     href: "/member/events",
     icon: CalendarDays,
+    tint: "bg-[#E8F7F5] text-[#1E988A]",
   },
   {
     label: "Benefits",
+    description: "Merchant perks",
     href: "/member/benefit",
     icon: Gift,
+    tint: "bg-[#FFF0D9] text-[#7A4B00]",
   },
   {
     label: "Announcements",
+    description: "Latest news",
     href: "/member/community?tab=announcements",
     icon: Megaphone,
+    tint: "bg-[#F3FAF2] text-[#245F1B]",
   },
 ];
 
 export default function HomeQuickActions() {
   return (
-    <section className="mt-8">
-      <h2 className="member-text-xl font-semibold text-[#0F6E00]">
-        Quick Actions
-      </h2>
+    <section className="mt-7">
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-base font-bold tracking-tight text-neutral-900">
+          Quick Actions
+        </h2>
+      </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         {actions.map((action) => {
           const Icon = action.icon;
 
@@ -39,13 +49,22 @@ export default function HomeQuickActions() {
             <Link
               key={action.label}
               href={action.href}
-              className="flex min-h-24 flex-col items-center justify-center rounded-xl border border-gray-200 bg-white p-4 text-center shadow-sm"
+              className="group flex items-center gap-3 rounded-xl border border-neutral-100 bg-white p-3.5 shadow-xs transition-all hover:border-neutral-200 hover:shadow-sm active:scale-95"
             >
-              <Icon size={24} className="text-[#0F6E00]" />
+              <div
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${action.tint} transition-transform group-hover:scale-105`}
+              >
+                <Icon size={20} strokeWidth={2.2} />
+              </div>
 
-              <span className="member-text-sm mt-2 font-semibold text-[#151C27]">
-                {action.label}
-              </span>
+              <div className="min-w-0 flex-1 text-left">
+                <span className="block text-sm font-semibold leading-tight text-neutral-800">
+                  {action.label}
+                </span>
+                <span className="mt-0.5 block truncate text-[11px] leading-tight text-neutral-400">
+                  {action.description}
+                </span>
+              </div>
             </Link>
           );
         })}

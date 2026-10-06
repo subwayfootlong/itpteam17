@@ -1,3 +1,4 @@
+import Link from "next/link";
 import MemberPageShell from "@/components/member/MemberPageShell";
 import FeaturedBenefitCard from "@/components/member/home/FeaturedBenefitCard";
 import FeaturedEventCard from "@/components/member/home/FeaturedEventCard";
@@ -26,21 +27,27 @@ export default async function HomePage() {
   const displayLastName = user.lastName ?? "";
   const tierLabel = formatTierLabel(user.membershipTier);
   const expiryLabel = formatMemberDate(user.expiryDate ?? null);
-  const shouldShowFeaturedEvent =
-    homeData.featuredEvent &&
-    homeData.featuredEvent.id !== homeData.nextRegisteredEvent?.id;
+  const registeredEventId = homeData.nextRegisteredEvent?.id;
+  const displayEvents = (homeData.featuredEvents && homeData.featuredEvents.length > 0
+    ? homeData.featuredEvents
+    : homeData.featuredEvent
+      ? [homeData.featuredEvent]
+      : []
+  ).filter((event) => event.id !== registeredEventId);
 
   return (
     <MemberPageShell>
-      <div className="px-5 py-6">
+      <div className="mx-auto max-w-md px-4 py-5">
         <HomeGreeting
           firstName={displayFirstName}
           lastName={displayLastName}
         />
 
-        {homeData.latestAnnouncement && (
-          <HomeAnnouncementCard announcement={homeData.latestAnnouncement} />
-        )}
+        <HomeAnnouncementCard
+          announcement={homeData.latestAnnouncement}
+          featuredEvent={homeData.featuredEvent}
+          featuredBenefit={homeData.featuredBenefit}
+        />
 
         <HomeMembershipCard
           tierLabel={tierLabel}
@@ -52,8 +59,32 @@ export default async function HomePage() {
 
         <NextRegisteredEventCard event={homeData.nextRegisteredEvent} />
 
-        {shouldShowFeaturedEvent && homeData.featuredEvent && (
-          <FeaturedEventCard event={homeData.featuredEvent} />
+        {displayEvents.length > 0 && (
+          <section className="mt-8">
+            <div className="mb-3.5 flex items-center justify-between">
+              <div>
+                <h2 className="text-base font-bold tracking-tight text-neutral-900">
+                  Featured Events
+                </h2>
+                <p className="text-xs text-neutral-500">
+                  Curated programs & gatherings
+                </p>
+              </div>
+
+              <Link
+                href="/member/events"
+                className="text-xs font-semibold text-[#0F6E00] transition-colors hover:text-[#173F14]"
+              >
+                See all
+              </Link>
+            </div>
+
+            <div className="-mx-4 flex snap-x snap-mandatory gap-3.5 overflow-x-auto px-4 pb-2 no-scrollbar">
+              {displayEvents.map((event) => (
+                <FeaturedEventCard key={event.id} event={event} />
+              ))}
+            </div>
+          </section>
         )}
 
         {homeData.featuredBenefit && (

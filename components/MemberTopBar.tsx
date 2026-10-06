@@ -49,25 +49,30 @@ export default function MemberTopBar({ user }: MemberTopBarProps) {
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between border-b border-gray-200 bg-[#FFFFFF] px-5 py-4">
+    <header className="sticky top-0 z-40 flex items-center justify-between border-b border-neutral-100 bg-white/80 backdrop-blur-md px-5 py-3.5 transition-colors">
       <div className="flex items-center gap-3">
         <Link
           href="/member/profile"
           aria-label="Open profile"
-          className="rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F6E00] focus-visible:ring-offset-2"
+          className="rounded-full ring-2 ring-transparent transition-all hover:ring-[#3FAE2A]/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F6E00] focus-visible:ring-offset-2 active:scale-95"
         >
           <MemberAvatar
             firstName={user?.firstName}
             lastName={user?.lastName}
             email={user?.email}
             profileImageUrl={user?.profileImageUrl}
-            size={44}
+            size={40}
           />
         </Link>
 
-        <h1 className="member-text-2xl font-butler text-2xl font-bold text-[#0F6E00]">
-          Pergas
-        </h1>
+        <div>
+          <span className="block text-[11px] font-semibold uppercase tracking-wider text-[#0F6E00] leading-tight">
+            Portal
+          </span>
+          <h1 className="text-lg font-bold tracking-tight text-neutral-900 leading-tight">
+            Pergas
+          </h1>
+        </div>
       </div>
 
       <Link
@@ -77,11 +82,14 @@ export default function MemberTopBar({ user }: MemberTopBarProps) {
             ? `${unreadCount} unread notifications`
             : "Notifications"
         }
-        className="relative flex h-10 w-10 items-center justify-center text-[#5F5E5E]"
+        className="relative flex h-10 w-10 items-center justify-center rounded-full text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100/80 transition-all active:scale-95"
       >
-        <Bell size={22} strokeWidth={2.2} />
+        <Bell size={20} strokeWidth={2.2} />
         {unreadCount > 0 && (
-          <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full border-2 border-white bg-[#D92D20]" />
+          <span className="absolute right-2 top-2 flex h-2.5 w-2.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full border-2 border-white bg-rose-500" />
+          </span>
         )}
       </Link>
     </header>

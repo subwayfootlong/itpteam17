@@ -37,52 +37,67 @@ export default function NextRegisteredEventCard({
 }) {
   if (!event) {
     return (
-      <section className="mt-8 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-        <h2 className="member-text-lg font-semibold text-[#151C27]">
-          No upcoming registrations
-        </h2>
-
-        <p className="member-text-sm mt-2 text-[#5F5E5E]">
-          Browse upcoming Pergas events and reserve your place.
-        </p>
-
-        <Link
-          href="/member/events"
-          className="member-text-base mt-5 block rounded-xl bg-[#0F6E00] px-4 py-3 text-center font-semibold text-white"
-        >
-          Browse Events
-        </Link>
+      <section className="mt-7 overflow-hidden rounded-2xl border border-neutral-100 bg-stone-50/70 p-4 shadow-2xs">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-neutral-200/60 bg-white text-[#0F6E00] shadow-2xs">
+            <CalendarDays size={20} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-sm font-bold leading-tight text-neutral-900">
+              No upcoming registrations
+            </h2>
+            <p className="mt-1 text-xs leading-relaxed text-neutral-500">
+              Browse upcoming Pergas gatherings, lectures, and community events.
+            </p>
+            <Link
+              href="/member/events"
+              className="mt-2.5 inline-flex items-center gap-1 text-xs font-semibold text-[#0F6E00] transition-colors hover:text-[#173F14]"
+            >
+              <span>Explore upcoming events</span>
+              <span aria-hidden="true">&rarr;</span>
+            </Link>
+          </div>
+        </div>
       </section>
     );
   }
 
   return (
-    <section className="mt-8 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-      <p className="member-text-xs font-semibold uppercase tracking-wide text-[#0F6E00]">
-        Your Next Event
-      </p>
+    <section className="mt-7 overflow-hidden rounded-2xl border border-neutral-100 bg-white p-4.5 shadow-sm transition-all hover:border-neutral-200 hover:shadow-md">
+      <div className="flex items-center justify-between gap-2">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-[#CDE5CA] bg-[#E8F4E6] px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#0F6E00]">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#0F6E00]" />
+          <span>Your Registered Pass</span>
+        </span>
 
-      <h2 className="member-text-lg mt-2 font-semibold text-[#151C27]">
+        {event.category && (
+          <span className="rounded-md bg-neutral-100 px-2 py-0.5 text-[11px] font-medium text-neutral-500">
+            {event.category}
+          </span>
+        )}
+      </div>
+
+      <h2 className="mt-2.5 text-base font-bold leading-snug text-neutral-900">
         {event.title}
       </h2>
 
-      <div className="member-text-sm mt-4 space-y-2 text-[#5F5E5E]">
-        <p className="flex items-center gap-2">
-          <CalendarDays size={18} className="text-[#0F6E00]" />
+      <div className="mt-3 space-y-1.5 text-xs text-neutral-600">
+        <p className="flex items-center gap-2 font-medium text-[#0F6E00]">
+          <CalendarDays size={14} className="shrink-0 text-[#0F6E00]" />
           <span>{formatEventSchedule(event.eventDate, event.startTime)}</span>
         </p>
 
         {event.venue && (
-          <p className="flex items-center gap-2">
-            <MapPin size={18} className="text-[#0F6E00]" />
-            <span>{event.venue}</span>
+          <p className="flex items-center gap-2 text-neutral-500">
+            <MapPin size={14} className="shrink-0 text-neutral-400" />
+            <span className="truncate">{event.venue}</span>
           </p>
         )}
       </div>
 
       <Link
         href={`/member/events/${event.id}`}
-        className="member-text-base mt-5 block rounded-xl bg-[#0F6E00] px-4 py-3 text-center font-semibold text-white"
+        className="mt-4 block w-full rounded-xl bg-neutral-900 px-3 py-2.5 text-center text-xs font-semibold text-white shadow-xs transition-all hover:bg-black active:scale-[0.98]"
       >
         View Registration
       </Link>

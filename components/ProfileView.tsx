@@ -10,17 +10,19 @@ import { formatMemberDate } from "@/lib/dates";
 import { LOGOUT_LOGIN_HINT_KEY } from "@/lib/session";
 import { useRouter } from "next/navigation";
 import {
-  BadgeCheck,
+  Award,
   BookOpen,
   CalendarCheck,
+  Check,
+  ChevronRight,
   Edit3,
   Handshake,
   Library,
   LogOut,
+  MapPin,
   Percent,
   Settings,
   ShieldCheck,
-  Star,
   Truck,
   Users,
   Vote,
@@ -57,17 +59,17 @@ const benefitsByTier: Record<string, Benefit[]> = {
   basic: [
     {
       title: "Member Portal",
-      subtitle: "Access to member resources",
+      subtitle: "Access to member resources & articles",
       icon: Library,
     },
     {
       title: "Event Discovery",
-      subtitle: "Browse upcoming Pergas events",
+      subtitle: "Browse and RSVP for Pergas community events",
       icon: CalendarCheck,
     },
     {
       title: "Announcements",
-      subtitle: "Official Pergas updates",
+      subtitle: "Direct access to official Pergas communications",
       icon: BookOpen,
     },
   ],
@@ -75,22 +77,22 @@ const benefitsByTier: Record<string, Benefit[]> = {
   student: [
     {
       title: "Digital Library",
-      subtitle: "Reference Library",
+      subtitle: "Curated reference and study material",
       icon: Library,
     },
     {
-      title: "Discounts",
-      subtitle: "10% off program fees",
+      title: "Course Discounts",
+      subtitle: "10% off selected program and workshop fees",
       icon: Percent,
     },
     {
       title: "Book Purchases",
-      subtitle: "15% off books",
+      subtitle: "15% off publications and Islamic literature",
       icon: BookOpen,
     },
     {
       title: "Friends of Pergas",
-      subtitle: "Partner discounts",
+      subtitle: "Exclusive community merchant partner perks",
       icon: Handshake,
     },
   ],
@@ -98,37 +100,37 @@ const benefitsByTier: Record<string, Benefit[]> = {
   associate: [
     {
       title: "Digital Library",
-      subtitle: "Reference Library",
+      subtitle: "Full reference repository access",
       icon: Library,
     },
     {
-      title: "Discounts",
-      subtitle: "10% off program fees",
+      title: "Program Discounts",
+      subtitle: "10% off Islamic education programs",
       icon: Percent,
     },
     {
       title: "Book Purchases",
-      subtitle: "15% off books",
+      subtitle: "15% discount on all bookstore publications",
       icon: BookOpen,
     },
     {
       title: "Friends of Pergas",
-      subtitle: "Partner discounts",
+      subtitle: "Partner perks across dining & lifestyle",
       icon: Handshake,
     },
     {
       title: "Priority Entry",
-      subtitle: "Early booking",
+      subtitle: "Early access reservations for premier events",
       icon: CalendarCheck,
     },
     {
-      title: "Exclusives",
-      subtitle: "Members-only programs",
-      icon: Star,
+      title: "Exclusive Events",
+      subtitle: "Invitations to closed-door roundtable dialogues",
+      icon: Award,
     },
     {
-      title: "Magazine Delivery",
-      subtitle: "Ar-Risalah quarterly",
+      title: "Ar-Risalah Delivery",
+      subtitle: "Quarterly printed magazine delivered to your home",
       icon: Truck,
     },
   ],
@@ -136,47 +138,47 @@ const benefitsByTier: Record<string, Benefit[]> = {
   ordinary: [
     {
       title: "Digital Library",
-      subtitle: "Reference Library",
+      subtitle: "Complete digital scholarly archive",
       icon: Library,
     },
     {
-      title: "Discounts",
-      subtitle: "10% off program fees",
+      title: "Course Discounts",
+      subtitle: "10% privilege on selected educational programs",
       icon: Percent,
     },
     {
       title: "Book Purchases",
-      subtitle: "15% off books",
+      subtitle: "15% discount across the bookstore catalog",
       icon: BookOpen,
     },
     {
       title: "Friends of Pergas",
-      subtitle: "Partner discounts",
+      subtitle: "Merchant lifestyle and retail savings",
       icon: Handshake,
     },
     {
       title: "Priority Entry",
-      subtitle: "Early booking",
+      subtitle: "Early RSVP window for major symposiums",
       icon: CalendarCheck,
     },
     {
-      title: "Exclusives",
-      subtitle: "Members-only programs",
-      icon: Star,
+      title: "Exclusive Programs",
+      subtitle: "Invitations to members-only scholarly sessions",
+      icon: Award,
     },
     {
-      title: "Magazine Delivery",
-      subtitle: "Ar-Risalah quarterly",
+      title: "Ar-Risalah Magazine",
+      subtitle: "Complimentary quarterly periodical delivery",
       icon: Truck,
     },
     {
       title: "Board Eligibility",
-      subtitle: "Run for board member",
+      subtitle: "Eligible to stand for council nomination",
       icon: Users,
     },
     {
       title: "Voting Rights",
-      subtitle: "Member voting privileges",
+      subtitle: "Full franchise at the Annual General Meeting",
       icon: Vote,
     },
   ],
@@ -216,285 +218,447 @@ export default function ProfileView({
   });
 
   return (
-    <div className="px-5 py-5">
-      {/* Digital E-Card */}
-      <section className="relative overflow-hidden rounded-2xl bg-[#149100] p-5 text-white shadow-sm">
+    <div className="space-y-6 px-4 py-5 font-helvetica">
+      {/* 1. Digital Membership Pass (Benchmark: Setel & Monzo) */}
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#173F14] via-[#245F1B] to-[#0F6E00] p-5 text-white shadow-xl">
+        {/* Subtle sheen and ambient glow */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full bg-white/10 blur-xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-[#3FAE2A]/20 blur-2xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/15 via-transparent to-black/20"
+        />
 
-        <div className="relative z-10 flex items-start justify-between gap-4">
-          <div>
-            <p className="member-text-sm text-sm uppercase tracking-[0.2em]">
-              {formatTierLabel(member.membership_tier)} Member
-            </p>
+        <div className="relative z-10 flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            {/* Top Tier Badge & Brand Tag */}
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center rounded-full border border-white/25 bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-md">
+                {formatTierLabel(member.membership_tier)}
+              </span>
+              <span className="text-xs font-bold uppercase tracking-widest text-[#E8F4E6]/80">
+                Pergas
+              </span>
+            </div>
 
-            <h2 className="member-text-lg mt-2 min-w-0 break-words text-lg font-medium">
+            {/* Member Name */}
+            <h2 className="mt-3.5 text-lg font-bold tracking-tight text-white line-clamp-1">
               {formatMemberName(member, "Member Name")}
             </h2>
-
             {member.arabic_name && (
-              <p className="member-text-sm mt-1 min-w-0 break-words text-sm text-white/80">{member.arabic_name}</p>
+              <p className="mt-0.5 text-xs text-white/80 line-clamp-1" dir="rtl">
+                {member.arabic_name}
+              </p>
             )}
 
-            <p className="member-text-sm mt-4 text-sm text-white/80">Member ID</p>
+            {/* Member ID */}
+            <div className="mt-4">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-[#BCE6B2]">
+                Member ID
+              </p>
+              <p className="font-mono text-sm font-bold tracking-widest text-[#E8F4E6]">
+                {member.member_id || "PGS-0000-0000"}
+              </p>
+            </div>
 
-            <p className="member-text-lg text-lg font-bold tracking-[0.15em]">
-              {member.member_id || "PGS-0000-0000"}
-            </p>
-
-            <p className="member-text-xs mt-4 text-xs uppercase text-white/70">
-              Valid thru: {formatMemberDate(member.expiry_date)}
+            {/* Validity */}
+            <p className="mt-3 text-[11px] font-medium text-white/80">
+              Valid thru:{" "}
+              <span className="font-semibold text-white">
+                {formatMemberDate(member.expiry_date)}
+              </span>
             </p>
           </div>
 
-          <div className="flex flex-col items-center gap-2">
-            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/20">
-              <BadgeCheck size={30} />
+          {/* QR Code Container */}
+          <div className="flex shrink-0 flex-col items-center">
+            <div className="rounded-2xl bg-white p-2.5 shadow-md">
+              <QRCodeCanvas value={qrValue} size={78} />
             </div>
-
-            <div className="rounded-lg bg-white p-2">
-              <QRCodeCanvas value={qrValue} size={74} />
-            </div>
+            <span className="mt-1.5 text-[10px] font-medium tracking-wide text-[#E8F4E6]/80">
+              Digital Pass
+            </span>
           </div>
         </div>
       </section>
 
-          {/* Account Details */}
-          <section className="mt-6">
-            <h2 className="member-text-2xl text-2xl font-bold text-[#0F6E00]">
+      {/* 2. Account Details Overhaul (Benchmark: Marriott Bonvoy & Zomato) */}
+      <section>
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-bold tracking-tight text-neutral-900">
               Account Details
             </h2>
+            <p className="text-xs text-neutral-500">
+              Personal & contact information
+            </p>
+          </div>
+          <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-[11px] font-medium text-neutral-600">
+            Verified
+          </span>
+        </div>
 
-            <div className="mt-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                <div>
-                  <p className="member-text-sm text-sm font-semibold uppercase text-[#5F5E5E]">
-                    Salutation
-                  </p>
-                  <p className="member-text-base mt-1 min-w-0 break-words text-[#151C27]">
-                    {formatSalutationLabel(member.salutation) || "Not available"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="member-text-sm text-sm font-semibold uppercase text-[#5F5E5E]">
-                    Arabic Name
-                  </p>
-                  <p className="member-text-base mt-1 min-w-0 break-words text-[#151C27]">
-                    {member.arabic_name || "Not available"}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 gap-5 sm:col-span-2 sm:grid-cols-2">
-                  <div>
-                    <p className="member-text-sm text-sm font-semibold uppercase text-[#5F5E5E]">
-                      First Name
-                    </p>
-                    <p className="member-text-base mt-1 min-w-0 break-words text-[#151C27]">
-                      {member.first_name || "Not available"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="member-text-sm text-sm font-semibold uppercase text-[#5F5E5E]">
-                      Last Name
-                    </p>
-                    <p className="member-text-base mt-1 min-w-0 break-words text-[#151C27]">
-                      {member.last_name || "Not available"}
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="member-text-sm text-sm font-semibold uppercase text-[#5F5E5E]">
-                    Organization
-                  </p>
-                  <p className="member-text-base mt-1 min-w-0 break-words text-[#151C27]">
-                    {member.organization || "Not available"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="member-text-sm text-sm font-semibold uppercase text-[#5F5E5E]">
-                    Designation
-                  </p>
-                  <p className="member-text-base mt-1 min-w-0 break-words text-[#151C27]">
-                    {member.designation || "Not available"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="member-text-sm text-sm font-semibold uppercase text-[#5F5E5E]">
-                    Email Address
-                  </p>
-                  <p className="member-text-base mt-1 min-w-0 break-words text-[#151C27]">{member.email}</p>
-                </div>
-
-                <div>
-                  <p className="member-text-sm text-sm font-semibold uppercase text-[#5F5E5E]">
-                    Phone Number
-                  </p>
-                  <p className="member-text-base mt-1 min-w-0 break-words text-[#151C27]">
-                    {member.phone || "Not available"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-5 grid grid-cols-1 gap-5 border-t border-gray-200 pt-4 sm:grid-cols-2">
-                  <div>
-                    <p className="member-text-sm text-sm font-semibold uppercase text-[#5F5E5E]">
-                      Member Since
-                    </p>
-                    <p className="member-text-base mt-1 min-w-0 break-words text-[#151C27]">
-                      {formatMemberDate(member.member_since)}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="member-text-sm text-sm font-semibold uppercase text-[#5F5E5E]">
-                      Renewal Date
-                    </p>
-                    <p className="member-text-base mt-1 min-w-0 break-words text-[#151C27]">
-                      {formatMemberDate(member.expiry_date)}
-                    </p>
-                  </div>
-              </div>
-
-              <Link
-                href="/member/profile/edit"
-                className="member-text-base mt-5 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#9B6500] px-4 py-3 font-medium text-[#9B6500]"
-              >
-                <Edit3 size={18} />
-                Edit Profile
-              </Link>
+        <div className="rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-xs">
+          {/* Structured 2-column detail grid */}
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3.5">
+            <div>
+              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+                Salutation
+              </span>
+              <span className="mt-0.5 block text-sm font-medium text-neutral-800">
+                {formatSalutationLabel(member.salutation) || "—"}
+              </span>
             </div>
-          </section>
 
-          {/* Active Privileges */}
-          <section className="mt-7">
-            <h2 className="member-text-2xl text-2xl font-bold text-[#0F6E00]">
+            <div>
+              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+                Arabic Name
+              </span>
+              <span
+                className="mt-0.5 block truncate text-sm font-medium text-neutral-800"
+                dir={member.arabic_name ? "rtl" : "ltr"}
+              >
+                {member.arabic_name || "—"}
+              </span>
+            </div>
+
+            <div>
+              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+                First Name
+              </span>
+              <span className="mt-0.5 block truncate text-sm font-medium text-neutral-800">
+                {member.first_name || "—"}
+              </span>
+            </div>
+
+            <div>
+              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+                Last Name
+              </span>
+              <span className="mt-0.5 block truncate text-sm font-medium text-neutral-800">
+                {member.last_name || "—"}
+              </span>
+            </div>
+
+            <div className="col-span-2 border-t border-neutral-100 pt-3">
+              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+                Email Address
+              </span>
+              <span className="mt-0.5 block truncate text-sm font-medium text-neutral-800">
+                {member.email}
+              </span>
+            </div>
+
+            <div>
+              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+                Phone Number
+              </span>
+              <span className="mt-0.5 block text-sm font-medium text-neutral-800">
+                {member.phone || "—"}
+              </span>
+            </div>
+
+            <div>
+              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+                Organization
+              </span>
+              <span className="mt-0.5 block truncate text-sm font-medium text-neutral-800">
+                {member.organization || "—"}
+              </span>
+            </div>
+
+            <div className="col-span-2">
+              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+                Designation
+              </span>
+              <span className="mt-0.5 block truncate text-sm font-medium text-neutral-800">
+                {member.designation || "—"}
+              </span>
+            </div>
+          </div>
+
+          {/* Validity & Dates Row with soft badge pills */}
+          <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-neutral-100 pt-3.5">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-xs font-medium text-neutral-700">
+              <span className="text-neutral-400">Member Since:</span>
+              <span className="font-semibold text-neutral-900">
+                {formatMemberDate(member.member_since)}
+              </span>
+            </div>
+
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-[#CDE5CA] bg-[#E8F4E6] px-3 py-1 text-xs font-medium text-[#0F6E00]">
+              <span>Renewal Date:</span>
+              <span className="font-bold">
+                {formatMemberDate(member.expiry_date)}
+              </span>
+            </div>
+          </div>
+
+          {/* Edit Profile CTA Button */}
+          <Link
+            href="/member/profile/edit"
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-[#0F6E00]/30 bg-[#E8F4E6]/50 px-4 py-2.5 text-center text-sm font-semibold text-[#0F6E00] shadow-2xs transition-all hover:bg-[#E8F4E6] active:scale-[0.99]"
+          >
+            <Edit3 size={16} />
+            <span>Edit Profile</span>
+          </Link>
+        </div>
+      </section>
+
+      {/* 3. Active Privileges -> Horizontal Sliding Carousel (Benchmark: Drop app) */}
+      <section>
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-bold tracking-tight text-neutral-900">
               Active Privileges
             </h2>
+            <p className="text-xs text-neutral-500">
+              Tier benefits & privileges
+            </p>
+          </div>
+          <span className="rounded-full bg-[#E8F4E6] px-2.5 py-0.5 text-xs font-bold text-[#0F6E00]">
+            {benefits.length} perks
+          </span>
+        </div>
 
-            <div className="mt-4 space-y-4">
-              {benefits.map((benefit, index) => {
-                const Icon = benefit.icon;
-                const isGreen = index % 2 === 1;
+        <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 no-scrollbar">
+          {benefits.map((benefit, index) => {
+            const Icon = benefit.icon;
+            const isTeal = index % 3 === 1;
+            const isGold = index % 3 === 2;
+
+            const iconClass = isTeal
+              ? "bg-[#E8F7F5] text-[#1E988A]"
+              : isGold
+                ? "bg-[#FFF0D9] text-[#7A4B00]"
+                : "bg-[#E8F4E6] text-[#0F6E00]";
+
+            return (
+              <div
+                key={benefit.title}
+                className="flex w-[240px] shrink-0 snap-start flex-col justify-between rounded-2xl border border-neutral-100 bg-white p-4 shadow-xs transition-all hover:border-neutral-200 hover:shadow-sm"
+              >
+                <div>
+                  <div
+                    className={`flex h-10 w-10 items-center justify-center rounded-xl ${iconClass} shadow-2xs`}
+                  >
+                    <Icon size={20} strokeWidth={2.2} />
+                  </div>
+
+                  <h3 className="mt-3 text-sm font-bold leading-snug text-neutral-900">
+                    {benefit.title}
+                  </h3>
+                  <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-neutral-500">
+                    {benefit.subtitle}
+                  </p>
+                </div>
+
+                <div className="mt-3 flex items-center justify-between border-t border-neutral-100 pt-3">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0F6E00]">
+                    <Check size={12} strokeWidth={3} />
+                    Active Benefit
+                  </span>
+                  <span className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">
+                    Included
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* 4. Participation History (Empty state & timeline polish) */}
+      <section>
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-bold tracking-tight text-neutral-900">
+              Participation History
+            </h2>
+            <p className="text-xs text-neutral-500">
+              Your registered events & activities
+            </p>
+          </div>
+          <Link
+            href="/member/events"
+            className="text-xs font-semibold text-[#0F6E00] transition-colors hover:text-[#173F14]"
+          >
+            Browse events
+          </Link>
+        </div>
+
+        {registrations.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-neutral-200 bg-neutral-50/50 p-6 text-center">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-neutral-100 bg-white text-[#0F6E00] shadow-2xs">
+              <CalendarCheck size={22} />
+            </div>
+            <h3 className="text-sm font-bold text-neutral-900">
+              No upcoming registrations
+            </h3>
+            <p className="mx-auto mt-1 max-w-xs text-xs leading-relaxed text-neutral-500">
+              Explore upcoming workshops, scholarly lectures, and community events!
+            </p>
+            <Link
+              href="/member/events"
+              className="mt-3.5 inline-flex items-center gap-1 rounded-xl border border-neutral-200 bg-white px-3.5 py-2 text-xs font-semibold text-[#0F6E00] shadow-2xs transition-all hover:bg-neutral-50 active:scale-95"
+            >
+              <span>Explore upcoming events</span>
+              <span aria-hidden="true">&rarr;</span>
+            </Link>
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-xs">
+            <div className="relative space-y-6 border-l-2 border-[#E8F4E6] pl-6">
+              {registrations.map((reg) => {
+                const event = Array.isArray(reg.events)
+                  ? reg.events[0]
+                  : reg.events;
+                if (!event) return null;
+
+                const dateLabel = event.event_date
+                  ? new Date(event.event_date).toLocaleDateString("en-SG", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })
+                  : "Date to be confirmed";
+
+                const isRejected = reg.status === "rejected";
 
                 return (
-                  <div
-                    key={benefit.title}
-                    className={`flex min-w-0 items-center gap-4 rounded-lg bg-[#EEF1FF] p-4 ${
-                      isGreen ? "border-l-4 border-[#0F6E00]" : "border-l-4 border-[#9B6500]"
-                    }`}
-                  >
-                    <div
-                      className={`flex h-11 w-11 items-center justify-center rounded-full ${
-                        isGreen ? "bg-green-100 text-[#0F6E00]" : "bg-gray-200 text-[#9B6500]"
+                  <div key={reg.id} className="relative">
+                    <span
+                      className={`absolute -left-[31px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-white shadow-xs ${
+                        isRejected ? "bg-rose-500" : "bg-[#0F6E00]"
                       }`}
-                    >
-                      <Icon size={21} />
+                    />
+
+                    <p className="text-sm font-bold leading-snug text-neutral-900">
+                      {event.title}
+                    </p>
+
+                    <p className="mt-1 flex items-center gap-1.5 text-xs text-neutral-500">
+                      <MapPin size={13} className="shrink-0 text-neutral-400" />
+                      <span className="truncate">
+                        {event.venue || "Venue to be confirmed"}
+                      </span>
+                    </p>
+
+                    <div className="mt-2.5 flex flex-wrap items-center gap-2">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+                          isRejected
+                            ? "border border-rose-200 bg-rose-50 text-rose-700"
+                            : "border border-[#CDE5CA] bg-[#E8F4E6] text-[#0F6E00]"
+                        }`}
+                      >
+                        {isRejected ? "Rejected" : "Registered"}
+                      </span>
+
+                      <span className="text-xs text-neutral-500">
+                        on{" "}
+                        {new Date(reg.registered_at).toLocaleDateString(
+                          "en-SG",
+                          {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          },
+                        )}
+                      </span>
                     </div>
 
-                    <div className="min-w-0 flex-1">
-                      <p className="member-text-base min-w-0 break-words font-semibold text-[#151C27]">
-                        {benefit.title}
-                      </p>
-                      <p className="member-text-sm min-w-0 break-words text-sm text-[#5F5E5E]">
-                        {benefit.subtitle}
-                      </p>
-                    </div>
+                    {isRejected && reg.rejection_message && (
+                      <div className="mt-2.5 max-w-md rounded-xl border border-rose-100 bg-rose-50/70 p-3 text-xs leading-relaxed text-rose-800">
+                        <span className="font-bold">Reason:</span> &ldquo;
+                        {reg.rejection_message}&rdquo;
+                      </div>
+                    )}
+
+                    <p className="mt-1.5 text-[11px] text-neutral-400">
+                      Scheduled: {dateLabel}
+                    </p>
                   </div>
                 );
               })}
             </div>
-          </section>
-
-          {/* Participation History */}
-          <section className="mt-7">
-            <h2 className="member-text-2xl text-2xl font-bold text-[#0F6E00]">
-              Participation History
-            </h2>
-
-            <div className="mt-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm font-helvetica">
-              {registrations.length === 0 ? (
-                <div className="member-text-sm py-8 text-center text-sm text-gray-400">
-                  You have not registered for any events yet.
-                </div>
-              ) : (
-                <div className="relative space-y-8 border-l-2 border-gray-200 pl-8">
-                  {registrations.map((reg) => {
-                    const event = Array.isArray(reg.events) ? reg.events[0] : reg.events;
-                    if (!event) return null;
-
-                    const dateLabel = event.event_date
-                      ? new Date(event.event_date).toLocaleDateString('en-SG', { day: 'numeric', month: 'long', year: 'numeric' })
-                      : 'Date to be confirmed';
-
-                    const isRejected = reg.status === 'rejected';
-
-                    return (
-                      <div key={reg.id} className="relative">
-                        <span className={`absolute -left-[42px] top-1.5 h-4 w-4 rounded-full border-2 border-white shadow-sm ${isRejected ? 'bg-red-500' : 'bg-[#0F6E00]'}`} />
-                        <p className="member-text-base min-w-0 break-words text-base font-bold leading-tight text-[#151C27]">
-                          {event.title}
-                        </p>
-                        <p className="member-text-sm mt-1 flex items-center gap-1 text-sm font-medium text-[#5F5E5E]">
-                          <svg className="w-3.5 h-3.5 shrink-0 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                          {event.venue || 'Venue to be confirmed'}
-                        </p>
-                        
-                        <div className="flex flex-wrap items-center gap-2 mt-2.5">
-                          <span className={`member-text-xs inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${isRejected ? 'bg-red-50 text-red-700 border border-red-100' : 'bg-green-50 text-green-700 border border-green-100'}`}>
-                            {isRejected ? 'Rejected' : 'Registered'}
-                          </span>
-                          <span className="member-text-xs text-xs font-medium text-[#5F5E5E]">
-                            on {new Date(reg.registered_at).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric' })}
-                          </span>
-                        </div>
-
-                        {isRejected && reg.rejection_message && (
-                          <div className="member-text-xs mt-2.5 max-w-md rounded-xl border border-red-100/50 bg-red-50/50 p-3 text-xs leading-normal text-red-800">
-                            <span className="font-bold">Reason:</span> &ldquo;{reg.rejection_message}&rdquo;
-                          </div>
-                        )}
-                        <p className="member-text-xs mt-2 text-xs font-normal text-gray-400">
-                          Scheduled: {dateLabel}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </section>
-
-          {/* Settings and Logout */}
-          <div className="mt-7 grid grid-cols-2 gap-4">
-            <Link
-              href="/member/settings"
-              className="member-text-base flex min-h-11 items-center justify-center gap-2 rounded-xl border border-gray-300 bg-[#EEF1FF] px-4 py-4 text-[#151C27]"
-            >
-              <Settings size={18} />
-              Settings
-            </Link>
-
-            <button type="button" onClick={handleLogout} className="member-text-base flex min-h-11 items-center justify-center gap-2 rounded-xl border border-red-200 bg-white px-4 py-4 text-red-600">
-              <LogOut size={18} />
-              Log Out
-            </button>
           </div>
+        )}
+      </section>
 
-          {member.role === "admin" ? (
-            <Link
-              href="/admin"
-              className="member-text-base mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#0F6E00] bg-[#0F6E00] px-4 py-4 font-medium text-white"
-            >
-              <ShieldCheck size={18} />
-              Admin Portal
-            </Link>
-          ) : null}
+      {/* 5. Action Hub: Admin Portal, Settings & Logout (Benchmark: Zomato / Marriott) */}
+      <section className="space-y-3">
+        {member.role === "admin" && (
+          <Link
+            href="/admin"
+            className="flex items-center justify-between rounded-2xl border border-[#CDE5CA] bg-gradient-to-r from-[#F3FAF2] to-white p-4 shadow-xs transition-all hover:shadow-sm active:scale-[0.99]"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#E8F4E6] text-[#0F6E00] shadow-2xs">
+                <ShieldCheck size={20} strokeWidth={2.2} />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-neutral-900 leading-tight">
+                  Admin Portal
+                </p>
+                <p className="mt-0.5 text-xs text-neutral-500 leading-tight">
+                  Manage members, events & content
+                </p>
+              </div>
+            </div>
+            <ChevronRight size={18} className="text-neutral-400" />
+          </Link>
+        )}
+
+        <div className="overflow-hidden rounded-2xl border border-neutral-200/70 bg-white shadow-xs divide-y divide-neutral-100">
+          <Link
+            href="/member/settings"
+            className="flex items-center justify-between p-4 transition-colors hover:bg-neutral-50 active:bg-neutral-100/60"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-100 text-neutral-700">
+                <Settings size={18} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-neutral-900 leading-tight">
+                  Settings
+                </p>
+                <p className="mt-0.5 text-xs text-neutral-400 leading-tight">
+                  Notifications, font size & preferences
+                </p>
+              </div>
+            </div>
+            <ChevronRight size={18} className="text-neutral-400" />
+          </Link>
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-rose-50/40 active:bg-rose-100/40"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-50 text-rose-600">
+                <LogOut size={18} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-rose-600 leading-tight">
+                  Log Out
+                </p>
+                <p className="mt-0.5 text-xs text-rose-400 leading-tight">
+                  Sign out of your session
+                </p>
+              </div>
+            </div>
+            <ChevronRight size={18} className="text-rose-300" />
+          </button>
+        </div>
+      </section>
     </div>
   );
 }

@@ -23,20 +23,23 @@ export default function HomeActionPrompt({ user }: { user: CurrentUser }) {
 
   if (hasIncompleteProfile) {
     return (
-      <section className="mt-8 rounded-xl border border-[#F5D9A8] bg-[#FFF8EE] p-5">
-        <h2 className="member-text-lg font-semibold text-[#151C27]">
+      <section className="mt-8 overflow-hidden rounded-2xl border border-[#F5C985] bg-[#FFF0D9]/70 p-4.5 shadow-2xs">
+        <h2 className="text-base font-bold text-neutral-900 leading-snug">
           Complete Your Profile
         </h2>
 
-        <p className="member-text-sm mt-2 text-[#5F5E5E]">
-          Add your contact and organisation details.
+        <p className="mt-1 text-xs leading-relaxed text-neutral-600">
+          Add your contact and organisation details to unlock all member privileges.
         </p>
 
         <Link
           href="/member/profile/edit"
-          className="member-text-base mt-5 block rounded-xl bg-[#0F6E00] px-4 py-3 text-center font-semibold text-white"
+          className="mt-4 block w-full rounded-xl bg-[#7A4B00] px-4 py-2.5 text-center text-xs font-bold shadow-xs transition-all hover:bg-[#5E3900] active:scale-[0.98]"
+          style={{ backgroundColor: "#7A4B00", color: "#ffffff" }}
         >
-          Update Profile
+          <span className="font-bold text-white" style={{ color: "#ffffff" }}>
+            Update Profile
+          </span>
         </Link>
       </section>
     );
@@ -44,20 +47,23 @@ export default function HomeActionPrompt({ user }: { user: CurrentUser }) {
 
   if (isExpirySoon(user.expiryDate)) {
     return (
-      <section className="mt-8 rounded-xl border border-[#F5D9A8] bg-[#FFF8EE] p-5">
-        <h2 className="member-text-lg font-semibold text-[#151C27]">
+      <section className="mt-8 overflow-hidden rounded-2xl border border-[#F5C985] bg-[#FFF0D9]/70 p-4.5 shadow-2xs">
+        <h2 className="text-base font-bold text-neutral-900 leading-snug">
           Membership Renewal Reminder
         </h2>
 
-        <p className="member-text-sm mt-2 text-[#5F5E5E]">
-          Your membership will expire soon.
+        <p className="mt-1 text-xs leading-relaxed text-neutral-600">
+          Your membership will expire soon. Renew now to maintain continuous access.
         </p>
 
         <Link
           href="/member/profile"
-          className="member-text-base mt-5 block rounded-xl border border-[#D9C08A] px-4 py-3 text-center font-semibold text-[#151C27]"
+          className="mt-4 block w-full rounded-xl border border-[#F5C985] bg-white px-4 py-2.5 text-center text-xs font-bold shadow-2xs transition-all hover:bg-[#FFF0D9] active:scale-[0.98]"
+          style={{ backgroundColor: "#ffffff", color: "#7A4B00" }}
         >
-          Review Membership
+          <span className="font-bold text-[#7A4B00]" style={{ color: "#7A4B00" }}>
+            Review Membership
+          </span>
         </Link>
       </section>
     );

@@ -26,6 +26,16 @@ export type MemberHomeData = {
     category: string | null;
     imageUrl: string | null;
   } | null;
+  featuredEvents: Array<{
+    id: string;
+    title: string;
+    description: string | null;
+    eventDate: string;
+    startTime: string | null;
+    venue: string | null;
+    category: string | null;
+    imageUrl: string | null;
+  }>;
   featuredBenefit: {
     id: string;
     title: string;
@@ -193,8 +203,8 @@ export async function getMemberHomeData(
       .eq("status", "published")
       .gte("event_date", today)
       .order("event_date", { ascending: true })
-      .limit(1)
-      .maybeSingle<EventRow>(),
+      .limit(6)
+      .returns<EventRow[]>(),
 
     supabaseAdmin
       .from("benefits")
@@ -260,6 +270,13 @@ export async function getMemberHomeData(
       .filter((event) => event.eventDate >= today)
       .sort(compareRegisteredEvents) ?? [];
 
+  const normalizedFeaturedEvents = (featuredEventResult.data ?? [])
+    .map(normalizeEvent)
+    .filter(
+      (event): event is NonNullable<ReturnType<typeof normalizeEvent>> =>
+        Boolean(event),
+    );
+
   return {
     latestAnnouncement: announcementResult.data
       ? {
@@ -270,7 +287,8 @@ export async function getMemberHomeData(
         }
       : null,
     nextRegisteredEvent: registeredEvents[0] ?? null,
-    featuredEvent: normalizeEvent(featuredEventResult.data),
+    featuredEvent: normalizedFeaturedEvents[0] ?? null,
+    featuredEvents: normalizedFeaturedEvents,
     featuredBenefit: normalizeBenefit(benefitResult.data),
   };
 }

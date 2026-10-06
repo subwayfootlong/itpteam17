@@ -17,11 +17,83 @@
   --font-arabic: "Traditional Arabic", "Scheherazade New", "Noto Naskh Arabic", serif;
   --font-sans: "Helvetica Neue", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-serif: "Playfair Display", Georgia, "Times New Roman", serif;
+
+  /* Brand Corporate Colors (Pergas Style Guide) */
+  --color-brand-primary: #3fae2a; /* Pantone 361C (R63 G174 B42) */
+  --color-brand-primary-900: #173f14;
+  --color-brand-primary-800: #245f1b;
+  --color-brand-primary-700: #318b22;
+  --color-brand-primary-600: #3fae2a;
+  --color-brand-primary-500: #52c23c;
+  --color-brand-primary-200: #bce6b2;
+  --color-brand-primary-100: #e4f5df;
+  --color-brand-primary-50: #f3fbf1;
+
+  /* Secondary Brand Palette (Pantone 7473C) */
+  --color-brand-secondary: #1e988a; /* Pantone 7473C (R30 G152 B138) */
+  --color-brand-secondary-dark: #166e64;
+  --color-brand-secondary-light: #2bc3b1;
+  --color-brand-secondary-soft: #e8f7f5;
+
+  /* Accent Palette (Pantone 1365C, 7636C, 631C) */
+  --color-brand-accent: #ffb547; /* Pantone 1365C (R255 G181 B71) */
+  --color-brand-accent-hover: #f0a330;
+  --color-brand-accent-soft: #fff6e8;
+  --color-brand-rose: #c51a4a; /* Pantone 7636C (R197 G26 B74) */
+  --color-brand-blue: #3bb0c9; /* Pantone 631C (R59 G176 B201) */
+
+  /* Corporate Neutrals from Style Guide */
+  --color-neutral-black: #000000;
+  --color-neutral-80: #58595b; /* 80% Black (R88 G89 B91) */
+  --color-neutral-50: #939598; /* 50% Black (R147 G149 B152) */
+
+  /* Warm Background Neutrals (replacing harsh pure #ffffff and cold #f5f5f5) */
+  --color-warm-bg: #fbfbf8;
+  --color-warm-surface: #fdfdfb;
+  --color-warm-surface-alt: #f6f7f3;
+  --color-warm-line: #dfe7dc;
+  --color-warm-ink: #202320;
+  --color-warm-muted: #666d65;
+
+  /* Card Elevation Tokens (Tailwind v4 shadow utility classes) */
+  --shadow-card-sm: 0 2px 8px -1px rgba(23, 63, 20, 0.04), 0 1px 3px 0 rgba(23, 63, 20, 0.02);
+  --shadow-card: 0 8px 24px -2px rgba(23, 63, 20, 0.05), 0 2px 6px -1px rgba(23, 63, 20, 0.03);
+  --shadow-card-hover: 0 14px 34px -4px rgba(23, 63, 20, 0.09), 0 4px 12px -2px rgba(23, 63, 20, 0.04);
+  --shadow-soft: 0 4px 20px -2px rgba(23, 63, 20, 0.06);
+
+  /* Card Border Radius (12-16px) */
+  --radius-card-sm: 12px;
+  --radius-card: 16px;
+  --radius-card-lg: 20px;
+
+  /* Micro-interaction ease timing */
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 :root {
-  --ink: #202320;
-  --muted: #666d65;
+  /* Brand corporate palette (Pergas Style Guide) */
+  --brand-primary: #3fae2a; /* Pantone 361C (R63 G174 B42) */
+  --brand-secondary: #1e988a; /* Pantone 7473C (R30 G152 B138) */
+  --brand-accent: #ffb547; /* Pantone 1365C (R255 G181 B71) */
+  --brand-rose: #c51a4a; /* Pantone 7636C (R197 G26 B74) */
+  --brand-blue: #3bb0c9; /* Pantone 631C (R59 G176 B201) */
+
+  /* Neutral tones from Style Guide */
+  --neutral-black: #000000;
+  --neutral-80: #58595b; /* 80% Black (R88 G89 B91) */
+  --neutral-50: #939598; /* 50% Black (R147 G149 B152) */
+
+  /* Warm background neutrals (replacing harsh pure #ffffff and cold #f5f5f5) */
+  --warm-bg: #fbfbf8; /* Canvas background */
+  --warm-surface: #fdfdfb; /* Elevated card & panel surface */
+  --warm-surface-alt: #f6f7f3; /* Secondary surface / inputs (replaces #f5f5f5) */
+  --warm-line: #dfe7dc; /* Subtle warm border */
+  --warm-ink: #202320; /* Primary warm dark text */
+  --warm-muted: #666d65; /* Muted warm body text */
+
+  /* Core brand aliases maintained for 100% backward compatibility */
+  --ink: var(--warm-ink);
+  --muted: var(--warm-muted);
   --green-900: #173f14;
   --green-800: #245f1b;
   --green-700: #318b22;
@@ -29,14 +101,28 @@
   --green-200: #bce6b2;
   --green-100: #e4f5df;
   --green-50: #f3fbf1;
-  --teal: #1e988a;
-  --gold: #ffb547;
-  --red: #c51a4a;
-  --blue: #3bb0c9;
-  --cream: #fbfcf9;
-  --line: #dfe7dc;
-  --white: #ffffff;
-  --shadow: 0 14px 40px rgba(33, 78, 27, 0.09);
+  --teal: var(--brand-secondary);
+  --gold: var(--brand-accent);
+  --red: var(--brand-rose);
+  --blue: var(--brand-blue);
+  --cream: var(--warm-bg);
+  --line: var(--warm-line);
+  --white: var(--warm-surface);
+
+  /* Card elevation tokens (soft shadows & 12-16px border-radius) */
+  --card-radius-sm: 12px;
+  --card-radius: 16px;
+  --card-radius-lg: 20px;
+  --card-shadow-sm: 0 2px 8px -1px rgba(23, 63, 20, 0.04), 0 1px 3px 0 rgba(23, 63, 20, 0.02);
+  --card-shadow: 0 8px 24px -2px rgba(23, 63, 20, 0.05), 0 2px 6px -1px rgba(23, 63, 20, 0.03);
+  --card-shadow-hover: 0 14px 34px -4px rgba(23, 63, 20, 0.09), 0 4px 12px -2px rgba(23, 63, 20, 0.04);
+  --shadow: var(--card-shadow);
+
+  /* Micro-interaction transition defaults */
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 150ms var(--ease-smooth);
+  --transition-normal: 200ms var(--ease-smooth);
+  --transition-slow: 300ms var(--ease-smooth);
 }
 
 * {
@@ -71,11 +157,48 @@ h1, h2, h3, h4, h5, h6, .font-butler {
   font-family: var(--font-arabic);
 }
 
+/* Baseline Card Elevation System (soft shadows, 12-16px border-radius) */
+.card-elevation,
+.portal-card {
+  background: var(--warm-surface);
+  border: 1px solid var(--warm-line);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  transition: transform var(--transition-normal),
+              box-shadow var(--transition-normal),
+              border-color var(--transition-normal);
+}
+
+.card-elevation-sm {
+  background: var(--warm-surface);
+  border: 1px solid var(--warm-line);
+  border-radius: var(--card-radius-sm);
+  box-shadow: var(--card-shadow-sm);
+  transition: transform var(--transition-normal),
+              box-shadow var(--transition-normal),
+              border-color var(--transition-normal);
+}
+
+.card-elevation:hover,
+.card-elevation-sm:hover,
+.portal-card:hover,
+.card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--card-shadow-hover);
+  border-color: rgba(63, 174, 42, 0.28);
+}
+
+/* Baseline Smooth Micro-Interactions on Interactive Elements */
 button,
+a,
 input,
 select,
-textarea {
+textarea,
+[role="button"] {
   font-family: var(--font-helvetica);
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform;
+  transition-duration: 180ms;
+  transition-timing-function: var(--ease-smooth);
 }
 
 button,
@@ -90,6 +213,38 @@ button {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+/* Accessible focus ring using primary brand color */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Utility to hide scrollbars on horizontal mobile rails */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .sr-only {
