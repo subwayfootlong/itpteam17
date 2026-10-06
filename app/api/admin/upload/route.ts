@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 
 // Define strict security limits
@@ -6,6 +7,9 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 export async function POST(req: Request) {
+  const admin = await getVerifiedAdmin();
+  if (!admin) return unauthorizedResponse();
+
   try {
     const formData = await req.formData();
     const file = formData.get('file') as File;

@@ -1,14 +1,13 @@
 import { NextResponse } from 'next/server';
-// AUTH: uncomment when ready
-// import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
+import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { announcements as mockAnnouncements } from '@/lib/data/announcements';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
-  // const admin = await getVerifiedAdmin();
-  // if (!admin) return unauthorizedResponse();
+  const admin = await getVerifiedAdmin();
+  if (!admin) return unauthorizedResponse();
 
   const url = new URL(req.url);
   const range = url.searchParams.get('range') ?? '30d';

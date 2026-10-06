@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-// import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
+import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 
 export async function GET(req: Request) {
-  // const admin = await getVerifiedAdmin();
-  // if (!admin) return unauthorizedResponse();
+  const admin = await getVerifiedAdmin();
+  if (!admin) return unauthorizedResponse();
 
   const url = new URL(req.url);
   const search = url.searchParams.get('search') ?? '';

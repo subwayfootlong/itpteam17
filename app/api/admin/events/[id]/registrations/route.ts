@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { formatMemberName } from '@/lib/memberName';
 
@@ -6,6 +7,9 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const admin = await getVerifiedAdmin();
+  if (!admin) return unauthorizedResponse();
+
   const { id } = await params;
 
   const { data, error } = await supabaseAdmin
@@ -48,6 +52,9 @@ export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const admin = await getVerifiedAdmin();
+  if (!admin) return unauthorizedResponse();
+
   const { id } = await params;
   const url = new URL(req.url);
   const registrationId = url.searchParams.get('registrationId');

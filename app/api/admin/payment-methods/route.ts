@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-// AUTH: uncomment when ready
-// import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
+import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { ADMIN_PAYMENT_METHOD_SELECT } from '@/lib/adminPaymentMethods';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 
@@ -11,8 +10,8 @@ function cleanText(value: unknown) {
 }
 
 export async function GET(req: Request) {
-  // const admin = await getVerifiedAdmin();
-  // if (!admin) return unauthorizedResponse();
+  const admin = await getVerifiedAdmin();
+  if (!admin) return unauthorizedResponse();
 
   const url = new URL(req.url);
   const active = url.searchParams.get('active');
@@ -31,8 +30,8 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  // const admin = await getVerifiedAdmin();
-  // if (!admin) return unauthorizedResponse();
+  const admin = await getVerifiedAdmin();
+  if (!admin) return unauthorizedResponse();
 
   let body: Record<string, unknown>;
   try {

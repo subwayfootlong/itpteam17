@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-// AUTH: uncomment when ready
-// import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
+import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { ADMIN_PAYMENT_METHOD_SELECT } from '@/lib/adminPaymentMethods';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 
@@ -16,8 +15,8 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  // const admin = await getVerifiedAdmin();
-  // if (!admin) return unauthorizedResponse();
+  const admin = await getVerifiedAdmin();
+  if (!admin) return unauthorizedResponse();
 
   const { id } = await params;
   const { data, error } = await supabaseAdmin
@@ -32,8 +31,8 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  // const admin = await getVerifiedAdmin();
-  // if (!admin) return unauthorizedResponse();
+  const admin = await getVerifiedAdmin();
+  if (!admin) return unauthorizedResponse();
 
   const { id } = await params;
   let body: Record<string, unknown>;
@@ -92,8 +91,8 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  // const admin = await getVerifiedAdmin();
-  // if (!admin) return unauthorizedResponse();
+  const admin = await getVerifiedAdmin();
+  if (!admin) return unauthorizedResponse();
 
   const { id } = await params;
   const { error } = await supabaseAdmin.from('payment_methods').delete().eq('id', id);
