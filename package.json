@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test:sfr05:phase1": "node tests/test-phase1-authorization.mjs",
     "test:sfr05:phase2": "node tests/test-phase2-rls-workflows.mjs",
-    "test:sfr05:phase3": "node tests/test-phase3-service-role-minimization.mjs"
+    "test:sfr05:phase3": "node tests/test-phase3-service-role-minimization.mjs",
+    "test:sfr05": "node tests/test-sfr05-master-suite.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.28.0",
