@@ -52,6 +52,15 @@ const NAV_ITEMS = [
     ),
   },
   {
+    label: 'Batch Onboarding',
+    href: '/admin/batch-onboarding',
+    icon: (
+      <svg className="w-[18px] h-[18px] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3M12.75 6.75a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM3 20.25a6 6 0 0112 0v.75H3v-.75z" />
+      </svg>
+    ),
+  },
+  {
     label: 'Events',
     href: '/admin/events',
     icon: (
