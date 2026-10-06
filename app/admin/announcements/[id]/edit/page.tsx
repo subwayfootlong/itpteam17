@@ -29,6 +29,9 @@ export default function EditAnnouncementPage() {
           status: a.status ?? 'draft',
           poll_enabled: Boolean(a.poll_enabled),
           poll_question: a.poll_question ?? '',
+          audience_type: a.audience_type === 'selected_tiers' ? 'selected_tiers' : 'all',
+          eligible_tiers: Array.isArray(a.eligible_tiers) ? a.eligible_tiers : [],
+          show_locked_preview: false,
         });
         
         // Extract metrics (assuming API returns these fields)

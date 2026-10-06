@@ -14,8 +14,13 @@ import {
 } from "@/components/admin/ui/Table";
 import { useToast } from "@/components/ui/Toast";
 import type { AdminBenefit } from "@/lib/adminBenefits";
+import AudienceAccessFields, {
+  DEFAULT_AUDIENCE_ACCESS,
+  type AudienceAccessValue,
+} from "@/components/admin/AudienceAccessFields";
+import { formatAudienceLabel, normalizeTierAudience } from "@/lib/tierAccess";
 
-type BenefitFormState = {
+type BenefitFormState = AudienceAccessValue & {
   merchant_name: string;
   category: string;
   discount_description: string;
@@ -41,6 +46,7 @@ const EMPTY_FORM: BenefitFormState = {
   logo_url: "",
   logo_initials: "",
   is_active: true,
+  ...DEFAULT_AUDIENCE_ACCESS,
 };
 
 const FILTER_OPTIONS: { label: string; value: FilterValue }[] = [
@@ -69,6 +75,9 @@ function formFromBenefit(benefit: AdminBenefit): BenefitFormState {
     logo_url: benefit.logo_url ?? "",
     logo_initials: benefit.logo_initials ?? "",
     is_active: Boolean(benefit.is_active),
+    audience_type: benefit.audience_type === "selected_tiers" ? "selected_tiers" : "all",
+    eligible_tiers: normalizeTierAudience(benefit).eligibleTiers,
+    show_locked_preview: Boolean(benefit.show_locked_preview),
   };
 }
 
@@ -95,6 +104,9 @@ function buildPayload(form: BenefitFormState) {
     logo_url: form.logo_url.trim() || null,
     logo_initials: form.logo_initials.trim() || null,
     is_active: form.is_active,
+    audience_type: form.audience_type,
+    eligible_tiers: form.eligible_tiers,
+    show_locked_preview: form.show_locked_preview,
   };
 }
 
@@ -227,6 +239,13 @@ export default function BenefitManagementPanel({
     const payload = buildPayload(form);
     if (!payload.merchant_name || !payload.category || !payload.discount_description) {
       toast.warning("Merchant, category, and offer details are required.");
+      return;
+    }
+    if (
+      payload.audience_type === "selected_tiers" &&
+      payload.eligible_tiers.length === 0
+    ) {
+      toast.warning("Select at least one eligible membership tier.");
       return;
     }
 
@@ -367,6 +386,11 @@ export default function BenefitManagementPanel({
           </div>
         </TableCell>
         <TableCell>
+          <span className="inline-flex rounded-full bg-[#eef5ec] px-2.5 py-1 text-[11px] font-bold text-[#27500A]">
+            {formatAudienceLabel(normalizeTierAudience(benefit))}
+          </span>
+        </TableCell>
+        <TableCell>
           <span
             className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium"
             style={{ background: status.bg, color: status.color }}
@@ -500,7 +524,7 @@ export default function BenefitManagementPanel({
       <TableWrapper
         data={sortedBenefits}
         renderRow={renderRow}
-        colCount={6}
+        colCount={7}
         emptyState={
           <div className="font-helvetica">
             <div className="text-[14px] font-bold text-gray-600">No benefits found</div>
@@ -520,6 +544,7 @@ export default function BenefitManagementPanel({
           <TableHeader sortKey="discount_description" sortState={sortState} onSort={handleSort}>
             Offer
           </TableHeader>
+          <TableHeader>Audience</TableHeader>
           <TableHeader sortKey="is_active" sortState={sortState} onSort={handleSort}>
             Status
           </TableHeader>
@@ -542,7 +567,7 @@ export default function BenefitManagementPanel({
                   {formMode === "edit" ? "Edit Benefit" : "New Benefit"}
                 </h3>
                 <p className="text-[12px] text-gray-500 mt-1 font-helvetica">
-                  Active benefits appear automatically on the member benefits page.
+                  Active benefits appear for the membership audience selected below.
                 </p>
               </div>
               <button
@@ -737,6 +762,16 @@ export default function BenefitManagementPanel({
                   className="h-5 w-5 accent-[#3FAE2A]"
                 />
               </label>
+
+              <div className="sm:col-span-2">
+                <AudienceAccessFields
+                  value={form}
+                  onChange={(audience) =>
+                    setForm((current) => ({ ...current, ...audience }))
+                  }
+                  allowLockedPreview
+                />
+              </div>
             </div>
 
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50/60">

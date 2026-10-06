@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarDays, ChevronLeft, ChevronRight, Clock, List, MapPin } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Clock, List, LockKeyhole, MapPin } from "lucide-react";
 import type { EventRow } from "@/app/member/events/page";
 
 type EventsViewMode = "list" | "calendar";
@@ -58,7 +58,7 @@ function formatTime(startTime: string | null, endTime: string | null) {
   return startTime || endTime;
 }
 
-function EventDescription({ description, eventId }: { description: string; eventId: string }) {
+function EventDescription({ description, eventId, isLocked = false }: { description: string; eventId: string; isLocked?: boolean }) {
   const descriptionRef = useRef<HTMLParagraphElement | null>(null);
   const [isTruncated, setIsTruncated] = useState(false);
 
@@ -88,7 +88,7 @@ function EventDescription({ description, eventId }: { description: string; event
       >
         {description}
       </p>
-      {isTruncated && (
+      {isTruncated && !isLocked && (
         <Link href={`/member/events/${eventId}`} className="member-text-sm mt-1 inline-block text-sm font-semibold text-[#0F6E00]">
           See more
         </Link>
@@ -224,18 +224,29 @@ export default function EventsView({ events, hasError, initialView }: EventsView
         className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-[#FFFFFF] shadow-sm"
       >
         <div className="relative bg-gray-200">
-          <Link
-            href={`/member/events/${event.id}`}
-            aria-label={`Open details for ${event.title}`}
-            className="block w-full"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={event.image_url || "/event-placeholder.jpg"}
-              alt={event.title}
-              className="block h-auto w-full"
-            />
-          </Link>
+          {event.isLocked ? (
+            <div className="block w-full" aria-label={`${event.title} is tier restricted`}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={event.image_url || "/event-placeholder.jpg"}
+                alt={event.title}
+                className="block h-auto w-full"
+              />
+            </div>
+          ) : (
+            <Link
+              href={`/member/events/${event.id}`}
+              aria-label={`Open details for ${event.title}`}
+              className="block w-full"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={event.image_url || "/event-placeholder.jpg"}
+                alt={event.title}
+                className="block h-auto w-full"
+              />
+            </Link>
+          )}
 
           {event.category && (
             <span className="member-text-sm absolute right-4 top-4 rounded-full bg-[#0F6E00] px-4 py-1 text-sm text-white">
@@ -246,16 +257,18 @@ export default function EventsView({ events, hasError, initialView }: EventsView
 
         <div className="flex flex-1 flex-col p-6">
           <h3 className="member-text-2xl text-2xl font-bold leading-snug text-[#151C27]">
-            <Link
-              href={`/member/events/${event.id}`}
-              className="inline-block min-w-0 break-words line-clamp-2"
-            >
-              {event.title}
-            </Link>
+            {event.isLocked ? event.title : (
+              <Link
+                href={`/member/events/${event.id}`}
+                className="inline-block min-w-0 break-words line-clamp-2"
+              >
+                {event.title}
+              </Link>
+            )}
           </h3>
 
           {event.description && (
-            <EventDescription description={event.description} eventId={event.id} />
+            <EventDescription description={event.description} eventId={event.id} isLocked={event.isLocked} />
           )}
 
           <div className="mt-4 space-y-3 text-[#151C27]">
@@ -270,7 +283,18 @@ export default function EventsView({ events, hasError, initialView }: EventsView
             </p>
           </div>
 
-          {hasRsvpLink ? (
+          {event.isLocked ? (
+            <button
+              type="button"
+              disabled
+              className="member-text-base mt-6 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-4 font-semibold text-amber-800"
+            >
+              <LockKeyhole size={17} />
+              {event.requiredTierLabels?.length
+                ? `${event.requiredTierLabels.join(" / ")} members only`
+                : "Active membership required"}
+            </button>
+          ) : hasRsvpLink ? (
             <a
               href={event.external_rsvp_url!.trim()}
               target="_blank"

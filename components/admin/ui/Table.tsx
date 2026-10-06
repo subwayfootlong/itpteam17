@@ -44,11 +44,6 @@ export function TableWrapper<T>({
     return data!.slice(start, start + pageSize);
   }, [data, safePage, pageSize, usePagination]);
 
-  // When data changes (e.g. filter), reset to page 1 if we overshoot
-  React.useEffect(() => {
-    if (page > totalPages) setPage(1);
-  }, [totalPages, page]);
-
   const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setPageSize(Number(e.target.value));
     setPage(1);

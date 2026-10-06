@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-// AUTH: uncomment when ready
-// import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
+import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { ADMIN_BENEFIT_SELECT } from '@/lib/adminBenefits';
 import { notifyBenefitAvailable } from '@/lib/notifications';
 import { supabaseAdmin } from '@/lib/supabaseServer';
+import { tierAudienceToDatabase, validateTierAudience } from '@/lib/tierAccess';
 
 function cleanText(value: unknown) {
   if (typeof value === 'string') return value.trim();
@@ -12,8 +12,8 @@ function cleanText(value: unknown) {
 }
 
 export async function GET(req: Request) {
-  // const admin = await getVerifiedAdmin();
-  // if (!admin) return unauthorizedResponse();
+  const admin = await getVerifiedAdmin();
+  if (!admin) return unauthorizedResponse();
 
   const url = new URL(req.url);
   const active = url.searchParams.get('active');
@@ -32,8 +32,8 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  // const admin = await getVerifiedAdmin();
-  // if (!admin) return unauthorizedResponse();
+  const admin = await getVerifiedAdmin();
+  if (!admin) return unauthorizedResponse();
 
   let body: Record<string, unknown>;
   try {
@@ -53,6 +53,11 @@ export async function POST(req: Request) {
     );
   }
 
+  const audience = validateTierAudience(body);
+  if (!audience.ok) {
+    return NextResponse.json({ error: audience.error }, { status: 400 });
+  }
+
   const { data, error } = await supabaseAdmin
     .from('benefits')
     .insert({
@@ -66,7 +71,8 @@ export async function POST(req: Request) {
       logo_url: cleanText(body.logo_url) || null,
       logo_initials: cleanText(body.logo_initials) || null,
       is_active: typeof body.is_active === 'boolean' ? body.is_active : true,
-      // created_by: admin.sub,
+      ...tierAudienceToDatabase(audience.value),
+      // Add created_by: admin.sub if the benefits table includes it.
     })
     .select(ADMIN_BENEFIT_SELECT)
     .single();
@@ -77,6 +83,7 @@ export async function POST(req: Request) {
       id: String(data.id),
       merchantName: data.merchant_name,
       offer: data.discount_description,
+      audience: audience.value,
     });
   }
 

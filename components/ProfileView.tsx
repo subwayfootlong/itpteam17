@@ -272,6 +272,16 @@ export default function ProfileView({
         </div>
       </section>
 
+      {tier !== "ordinary" && (
+        <Link
+          href="/member/tier-upgrade"
+          className="member-text-base mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-[#0F6E00] bg-white px-4 py-3 font-bold text-[#0F6E00]"
+        >
+          <Star size={18} />
+          Request Tier Upgrade
+        </Link>
+      )}
+
           {/* Account Details */}
           <section className="mt-6">
             <h2 className="member-text-2xl text-2xl font-bold text-[#0F6E00]">

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-// AUTH: uncomment when ready
-// import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
+import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { notifyAnnouncementPublished } from '@/lib/notifications';
 import { supabaseAdmin } from '@/lib/supabaseServer';
+import { tierAudienceToDatabase, validateTierAudience } from '@/lib/tierAccess';
 
 type AnnouncementWithCommentCount = {
   id: string;
@@ -12,19 +12,22 @@ type AnnouncementWithCommentCount = {
   created_at: string;
   updated_at: string;
   image_url: string | null;
+  audience_type: string | null;
+  eligible_tiers: string[] | null;
+  show_locked_preview: boolean | null;
   announcement_comments: { count: number }[] | null;
 };
 
 export async function GET(req: Request) {
-  // const admin = await getVerifiedAdmin();
-  // if (!admin) return unauthorizedResponse();
+  const admin = await getVerifiedAdmin();
+  if (!admin) return unauthorizedResponse();
 
   const url = new URL(req.url);
   const status = url.searchParams.get('status') ?? '';
 
   let query = supabaseAdmin
     .from('announcements')
-    .select('id, title, category, status, created_at, updated_at, image_url, announcement_comments(count)')
+    .select('id, title, category, status, created_at, updated_at, image_url, audience_type, eligible_tiers, show_locked_preview, announcement_comments(count)')
     .order('created_at', { ascending: false });
 
   if (status) query = query.eq('status', status);
@@ -70,8 +73,8 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  // const admin = await getVerifiedAdmin();
-  // if (!admin) return unauthorizedResponse();
+  const admin = await getVerifiedAdmin();
+  if (!admin) return unauthorizedResponse();
 
   let body;
   try {
@@ -87,6 +90,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Content is required and must be a string' }, { status: 400 });
   }
 
+  const audience = validateTierAudience(body);
+  if (!audience.ok) {
+    return NextResponse.json({ error: audience.error }, { status: 400 });
+  }
+
   const { data, error } = await supabaseAdmin
     .from('announcements')
     .insert({
@@ -97,7 +105,11 @@ export async function POST(req: Request) {
       status: body.status ?? 'draft',
       poll_enabled: Boolean(body.poll_enabled),
       poll_question: body.poll_enabled ? (body.poll_question || null) : null,
-      // created_by: admin.sub,
+      ...tierAudienceToDatabase({
+        ...audience.value,
+        showLockedPreview: false,
+      }),
+      // Add created_by: admin.sub if the announcements table includes it.
     })
     .select()
     .single();
@@ -110,6 +122,7 @@ export async function POST(req: Request) {
     await notifyAnnouncementPublished({
       id: String(data.id),
       title: data.title,
+      audience: { ...audience.value, showLockedPreview: false },
     });
   }
 

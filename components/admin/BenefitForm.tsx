@@ -3,8 +3,12 @@
 import { useState } from "react";
 import { ImageIcon, MapPin, Upload, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import AudienceAccessFields, {
+  DEFAULT_AUDIENCE_ACCESS,
+  type AudienceAccessValue,
+} from "@/components/admin/AudienceAccessFields";
 
-export type BenefitFormData = {
+export type BenefitFormData = AudienceAccessValue & {
   merchant_name: string;
   category: string;
   discount_description: string;
@@ -28,6 +32,7 @@ const EMPTY_FORM: BenefitFormData = {
   logo_url: "",
   logo_initials: "",
   is_active: true,
+  ...DEFAULT_AUDIENCE_ACCESS,
 };
 
 const CATEGORIES = [
@@ -197,7 +202,19 @@ export default function BenefitForm() {
       logo_url: form.logo_url.trim() || null,
       logo_initials: form.logo_initials.trim() || null,
       is_active: form.is_active,
+      audience_type: form.audience_type,
+      eligible_tiers: form.eligible_tiers,
+      show_locked_preview: form.show_locked_preview,
     };
+
+    if (
+      form.audience_type === "selected_tiers" &&
+      form.eligible_tiers.length === 0
+    ) {
+      setError("Select at least one eligible membership tier.");
+      setSaving(false);
+      return;
+    }
 
     try {
       const response = await fetch("/api/admin/engagement", {
@@ -403,12 +420,20 @@ export default function BenefitForm() {
               }
               className={`${inputClassName} cursor-pointer appearance-none`}
             >
-              <option value="active">Active - visible to members</option>
+              <option value="active">Active - visible to selected audience</option>
               <option value="inactive">
                 Inactive - hidden from members
               </option>
             </select>
           </div>
+
+          <AudienceAccessFields
+            value={form}
+            onChange={(audience) =>
+              setForm((current) => ({ ...current, ...audience }))
+            }
+            allowLockedPreview
+          />
         </div>
 
         <div
