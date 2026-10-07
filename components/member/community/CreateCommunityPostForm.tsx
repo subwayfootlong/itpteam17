@@ -3,7 +3,14 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, HelpCircle, MessageSquare, Send } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  Clock,
+  HelpCircle,
+  MessageSquare,
+  Send,
+} from "lucide-react";
 import type { DiscussionGroup } from "@/lib/communityTypes";
 
 type SubmitState = "idle" | "saving" | "done";
@@ -51,6 +58,7 @@ export default function CreateCommunityPostForm({
   const [body, setBody] = useState("");
   const [error, setError] = useState("");
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
+  const [submittedThreadId, setSubmittedThreadId] = useState<string | null>(null);
 
   const selectedGroup = useMemo(
     () => groups.find((group) => group.id === groupId),
@@ -61,7 +69,7 @@ export default function CreateCommunityPostForm({
     Boolean(groupId) &&
     title.trim().length >= MIN_TITLE_LENGTH &&
     body.trim().length >= MIN_BODY_LENGTH &&
-    submitState !== "saving";
+    submitState === "idle";
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -98,7 +106,7 @@ export default function CreateCommunityPostForm({
       }
 
       setSubmitState("done");
-      router.push(`/member/community/${encodeURIComponent(threadId)}`);
+      setSubmittedThreadId(threadId);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to create your post.");
@@ -147,7 +155,7 @@ export default function CreateCommunityPostForm({
             Write with care
           </h2>
           <p className="mt-1 text-sm text-neutral-600">
-            Your post will appear in its discussion space after moderator approval.
+            New posts are reviewed by the Pergas team (typically within 24 hours) before they appear to everyone.
           </p>
         </div>
 
@@ -227,6 +235,70 @@ export default function CreateCommunityPostForm({
           <Send size={16} aria-hidden="true" />
         </button>
       </form>
+
+      {submittedThreadId && (
+        <div
+          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50 sm:items-center"
+          role="presentation"
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="post-submitted-title"
+            className="w-full max-w-md rounded-t-3xl bg-white p-5 shadow-xl sm:rounded-3xl"
+          >
+            <div className="flex flex-col items-center text-center">
+              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-primary-100 text-brand-primary-800">
+                <CheckCircle2 size={30} aria-hidden="true" />
+              </span>
+              <h2
+                id="post-submitted-title"
+                className="mt-3 font-butler text-xl font-semibold text-neutral-950"
+              >
+                Post submitted
+              </h2>
+              <p className="mt-2 text-sm text-neutral-700">
+                Thank you! In line with community guidelines, new posts are
+                reviewed by the Pergas team (typically within 24 hours).
+              </p>
+            </div>
+
+            <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-brand-accent/60 bg-brand-accent-soft p-3 text-xs text-amber-900">
+              <Clock size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
+              <p>
+                You can see your post in your feed marked{" "}
+                <strong className="font-semibold">Pending Review</strong>. It
+                becomes visible to everyone once it is approved.
+              </p>
+            </div>
+
+            <div className="mt-4 space-y-2">
+              <button
+                type="button"
+                onClick={() =>
+                  router.push(
+                    `/member/community/${encodeURIComponent(submittedThreadId)}`,
+                  )
+                }
+                className="flex min-h-11 w-full items-center justify-center rounded-xl bg-brand-primary-800 px-4 py-2.5 text-sm font-semibold text-white transition-transform duration-100 hover:bg-brand-primary-900 active:scale-[0.98]"
+              >
+                View my post
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  router.push(
+                    `/member/community?tab=discussions&group=${encodeURIComponent(groupId)}`,
+                  )
+                }
+                className="min-h-11 w-full rounded-xl px-4 py-2.5 text-sm font-semibold text-neutral-600 transition-transform duration-100 hover:bg-neutral-100 active:scale-[0.98]"
+              >
+                Back to community
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }

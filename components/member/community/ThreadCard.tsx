@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Clock, Heart, ImageIcon, MessageSquare, Share2 } from "lucide-react";
+import { Heart, ImageIcon, MessageSquare, Share2 } from "lucide-react";
 import type { DiscussionThread } from "@/lib/communityTypes";
+import PendingReviewBadge from "./PendingReviewBadge";
 
 export default function ThreadCard({
   thread,
@@ -38,21 +39,6 @@ export default function ThreadCard({
 
   return (
     <article className="mb-3.5 rounded-2xl border border-neutral-200/80 bg-white p-4 shadow-xs">
-      {thread.status !== "approved" && (
-        <div
-          role="status"
-          className="mb-2 flex items-center gap-2 rounded-r-lg border-l-4 border-brand-accent bg-brand-accent-soft p-2.5 text-xs text-amber-900"
-        >
-          <Clock size={14} className="shrink-0" aria-hidden="true" />
-          <span>
-            <strong className="font-semibold">
-              {thread.status === "pending" ? "Pending review" : "Under review"}
-            </strong>
-            {" · "}Your post will appear publicly after moderator approval.
-          </span>
-        </div>
-      )}
-
       <header className="flex items-center gap-3">
         <span
           aria-hidden="true"
@@ -73,6 +59,11 @@ export default function ThreadCard({
             {groupTitle} · {thread.postedAt}
           </p>
         </div>
+        {thread.status !== "approved" && (
+          <PendingReviewBadge
+            label={thread.status === "pending" ? "Pending Review" : "Under Review"}
+          />
+        )}
       </header>
 
       <Link

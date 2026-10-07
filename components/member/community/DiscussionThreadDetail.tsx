@@ -12,6 +12,7 @@ import {
 import type { CommunityComment } from "@/lib/data/announcements";
 import type { DiscussionThread } from "@/lib/communityTypes";
 import type { CommentResponse } from "./types";
+import PendingReviewBadge from "./PendingReviewBadge";
 import { makePendingComment, postJson } from "./utils";
 
 type SortOrder = "oldest" | "newest";
@@ -264,15 +265,6 @@ export default function DiscussionThreadDetail({
       </nav>
 
       <article className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
-        {thread.status !== "approved" && (
-          <div className="mb-2 flex items-center gap-2 rounded-r-lg border-l-4 border-brand-accent bg-brand-accent-soft p-2.5 text-xs text-amber-900">
-            <Clock size={14} className="shrink-0" aria-hidden="true" />
-            <span>
-              <strong className="font-semibold">Pending review</strong> · Only
-              you can see this post until a moderator approves it.
-            </span>
-          </div>
-        )}
         <header className="flex items-center gap-3">
           <span
             aria-hidden="true"
@@ -293,6 +285,11 @@ export default function DiscussionThreadDetail({
               {groupTitle} · {thread.postedAt}
             </p>
           </div>
+          {thread.status !== "approved" && (
+            <PendingReviewBadge
+              label={thread.status === "pending" ? "Pending Review" : "Under Review"}
+            />
+          )}
         </header>
         <h1 className="mt-3 text-lg font-semibold leading-snug text-neutral-950">
           {thread.title}
