@@ -9,6 +9,7 @@ import { formatMemberDisplayName, formatMemberName } from '@/lib/memberName';
 import { formatArsStatusLabel, formatSalutationLabel } from '@/lib/memberProfileOptions';
 import { formatMemberDate } from '@/lib/dates';
 import { Badge } from '@/components/admin/ui/Badge';
+import { LoadingState } from '@/components/ui/LoadingSpinner';
 
 interface Member {
   id: string;
@@ -82,11 +83,7 @@ export default function MemberViewPage() {
   }, [id]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-2 border-[#3FAE2A] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+    return <LoadingState label="Loading member…" className="h-64" />;
   }
 
   if (!member) {

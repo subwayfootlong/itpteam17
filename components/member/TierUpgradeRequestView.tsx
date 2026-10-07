@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowUpCircle, CheckCircle2, Clock3, XCircle } from "lucide-react";
 import { formatTierLabel, type MembershipTier } from "@/lib/membershipTiers";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 type TierOption = { value: MembershipTier; label: string };
 type TierRequest = {
@@ -118,7 +119,9 @@ export default function TierUpgradeRequestView() {
       {success && <div role="status" className="mt-5 rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-800">{success}</div>}
 
       {loading ? (
-        <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 text-center text-sm text-gray-500">Loading membership requests…</div>
+        <div className="mt-6 flex min-h-32 items-center justify-center rounded-2xl border border-gray-200 bg-white p-6 text-gray-500">
+          <LoadingSpinner label="Loading membership requests…" />
+        </div>
       ) : pendingRequest ? (
         <section className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
           <div className="flex items-center gap-2 font-bold text-amber-800"><Clock3 size={19} /> Request under review</div>
@@ -163,7 +166,7 @@ export default function TierUpgradeRequestView() {
             disabled={submitting || !requestedTier || !reason.trim()}
             className="member-text-base min-h-12 w-full rounded-xl bg-[#0F7A00] px-5 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {submitting ? "Submitting…" : "Submit upgrade request"}
+            {submitting ? <LoadingSpinner label="Submitting…" size="sm" light /> : "Submit upgrade request"}
           </button>
         </form>
       ) : (

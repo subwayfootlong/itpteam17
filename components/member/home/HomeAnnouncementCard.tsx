@@ -128,7 +128,7 @@ export default function HomeAnnouncementCard({
 
   return (
     <section
-      className="relative mb-6 overflow-hidden rounded-2xl border border-[#DFE7DC] bg-[#FAFBF9] p-4.5 shadow-sm transition-all"
+      className="relative mt-4 overflow-hidden rounded-2xl border border-[#DFE7DC] bg-[#FAFBF9] p-4.5 shadow-sm transition-all"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={() => setIsPaused(true)}

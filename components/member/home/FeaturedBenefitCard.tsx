@@ -16,7 +16,7 @@ export default function FeaturedBenefitCard({
   benefit: FeaturedBenefit;
 }) {
   return (
-    <section className="mt-8 overflow-hidden rounded-2xl border border-neutral-100 bg-white p-4.5 shadow-sm transition-all hover:border-neutral-200 hover:shadow-md">
+    <section className="mt-4 overflow-hidden rounded-2xl border border-neutral-100 bg-white p-4.5 shadow-sm transition-all hover:border-neutral-200 hover:shadow-md">
       {/* Top Header Row with Category and Pill Badge */}
       <div className="flex items-center justify-between gap-2">
         <span className="rounded-full bg-[#E8F4E6] px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#0F6E00]">

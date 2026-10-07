@@ -13,6 +13,7 @@ import {
   useSortState,
 } from "@/components/admin/ui/Table";
 import { useToast } from "@/components/ui/Toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import type { AdminBenefit } from "@/lib/adminBenefits";
 import AudienceAccessFields, {
   DEFAULT_AUDIENCE_ACCESS,
@@ -694,7 +695,7 @@ export default function BenefitManagementPanel({
                     </div>
                   )}
                   <label className="mt-3 inline-flex cursor-pointer items-center justify-center rounded-lg bg-white border border-gray-200 px-3 py-2 text-[12px] font-bold text-gray-700 hover:bg-gray-50">
-                    {uploadingField === "image_url" ? "Uploading..." : "Upload Image"}
+                    {uploadingField === "image_url" ? <LoadingSpinner label="Uploading…" size="sm" /> : "Upload Image"}
                     <input
                       type="file"
                       accept="image/png,image/jpeg,image/webp"
@@ -736,7 +737,7 @@ export default function BenefitManagementPanel({
                     </div>
                   )}
                   <label className="mt-3 inline-flex cursor-pointer items-center justify-center rounded-lg bg-white border border-gray-200 px-3 py-2 text-[12px] font-bold text-gray-700 hover:bg-gray-50">
-                    {uploadingField === "logo_url" ? "Uploading..." : "Upload Logo"}
+                    {uploadingField === "logo_url" ? <LoadingSpinner label="Uploading…" size="sm" /> : "Upload Logo"}
                     <input
                       type="file"
                       accept="image/png,image/jpeg,image/webp"
@@ -787,7 +788,7 @@ export default function BenefitManagementPanel({
                 disabled={busy === "form"}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#3FAE2A] text-white text-[13px] font-bold hover:brightness-110 disabled:opacity-50 font-helvetica"
               >
-                {busy === "form" ? "Saving..." : formMode === "edit" ? "Save Changes" : "Create Benefit"}
+                {busy === "form" ? <LoadingSpinner label="Saving…" size="sm" light /> : formMode === "edit" ? "Save Changes" : "Create Benefit"}
               </button>
             </div>
           </form>

@@ -23,7 +23,7 @@ export default function HomeActionPrompt({ user }: { user: CurrentUser }) {
 
   if (hasIncompleteProfile) {
     return (
-      <section className="mt-8 overflow-hidden rounded-2xl border border-[#F5C985] bg-[#FFF0D9]/70 p-4.5 shadow-2xs">
+      <section className="mt-4 overflow-hidden rounded-2xl border border-[#F5C985] bg-[#FFF0D9]/70 p-4.5 shadow-2xs">
         <h2 className="text-base font-bold text-neutral-900 leading-snug">
           Complete Your Profile
         </h2>
@@ -47,7 +47,7 @@ export default function HomeActionPrompt({ user }: { user: CurrentUser }) {
 
   if (isExpirySoon(user.expiryDate)) {
     return (
-      <section className="mt-8 overflow-hidden rounded-2xl border border-[#F5C985] bg-[#FFF0D9]/70 p-4.5 shadow-2xs">
+      <section className="mt-4 overflow-hidden rounded-2xl border border-[#F5C985] bg-[#FFF0D9]/70 p-4.5 shadow-2xs">
         <h2 className="text-base font-bold text-neutral-900 leading-snug">
           Membership Renewal Reminder
         </h2>
@@ -57,8 +57,15 @@ export default function HomeActionPrompt({ user }: { user: CurrentUser }) {
         </p>
 
         <Link
+          href="/member/payment"
+          className="mt-4 block w-full rounded-xl bg-brand-primary-800 px-4 py-2.5 text-center text-xs font-bold text-white shadow-2xs transition-all hover:bg-brand-primary-900 active:scale-[0.98]"
+        >
+          Pay Now
+        </Link>
+
+        <Link
           href="/member/profile"
-          className="mt-4 block w-full rounded-xl border border-[#F5C985] bg-white px-4 py-2.5 text-center text-xs font-bold shadow-2xs transition-all hover:bg-[#FFF0D9] active:scale-[0.98]"
+          className="mt-2.5 block w-full rounded-xl border border-[#F5C985] bg-white px-4 py-2.5 text-center text-xs font-bold shadow-2xs transition-all hover:bg-[#FFF0D9] active:scale-[0.98]"
           style={{ backgroundColor: "#ffffff", color: "#7A4B00" }}
         >
           <span className="font-bold text-[#7A4B00]" style={{ color: "#7A4B00" }}>

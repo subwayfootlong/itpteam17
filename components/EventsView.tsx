@@ -16,10 +16,14 @@ import {
 } from "lucide-react";
 import type { EventRow } from "@/app/member/events/page";
 import { formatMemberDate } from "@/lib/dates";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+
+type EventsViewMode = "list" | "calendar";
 
 type EventsViewProps = {
   events: EventRow[];
   hasError: boolean;
+  initialView: EventsViewMode;
 };
 
 function toDateKey(date: Date) {
@@ -102,13 +106,13 @@ function EventPosterBanner({
   }
 
   return (
-    <div className="relative aspect-[16/9] w-full overflow-hidden bg-neutral-100">
+    <div className="relative w-full overflow-hidden bg-neutral-100">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={imageUrl}
         alt={title}
         onError={() => setImageFailed(true)}
-        className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+        className="block h-auto w-full"
       />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
 
@@ -315,7 +319,11 @@ function EventCard({
               style={{ backgroundColor: "#245F1B", color: "#ffffff" }}
             >
               <span className="text-white font-bold" style={{ color: "#ffffff" }}>
-                {isRegistering ? "Processing..." : "Reapply for Event"}
+                {isRegistering ? (
+                <LoadingSpinner label="Processing…" size="sm" light />
+              ) : (
+                "Reapply for Event"
+              )}
               </span>
             </button>
           ) : isFull ? (
@@ -386,14 +394,26 @@ function buildCalendarDays(currentMonth: Date) {
   return days;
 }
 
-export default function EventsView({ events, hasError }: EventsViewProps) {
+export default function EventsView({
+  events,
+  hasError,
+  initialView,
+}: EventsViewProps) {
   const today = new Date();
   const todayKey = getTodayDateKey();
   const router = useRouter();
   const [registeringId, setRegisteringId] = useState<string | null>(null);
 
   // 1. View Mode Switcher: Default to "list"
-  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+  const [viewMode, setViewModeState] = useState<EventsViewMode>(initialView);
+
+  const setViewMode = (nextView: EventsViewMode) => {
+    setViewModeState(nextView);
+    // Keep the choice in the URL so refresh / back navigation restores it
+    const url = new URL(window.location.href);
+    url.searchParams.set("view", nextView);
+    window.history.replaceState(null, "", url);
+  };
 
   // 2. Filter Pills
   const [selectedFilter, setSelectedFilter] = useState<string>("upcoming");

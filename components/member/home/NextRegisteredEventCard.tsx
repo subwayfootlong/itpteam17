@@ -37,7 +37,7 @@ export default function NextRegisteredEventCard({
 }) {
   if (!event) {
     return (
-      <section className="mt-7 overflow-hidden rounded-2xl border border-dashed border-stone-200 bg-stone-50/70 p-4 shadow-2xs">
+      <section className="mt-4 overflow-hidden rounded-2xl border border-dashed border-stone-200 bg-stone-50/70 p-4 shadow-2xs">
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-stone-200/80 bg-white text-[#0F6E00] shadow-2xs">
             <CalendarDays size={20} />
@@ -63,7 +63,7 @@ export default function NextRegisteredEventCard({
   }
 
   return (
-    <section className="mt-7 overflow-hidden rounded-2xl border border-stone-200/80 bg-white p-4.5 shadow-xs transition-all hover:border-neutral-300 hover:shadow-sm">
+    <section className="mt-4 overflow-hidden rounded-2xl border border-stone-200/80 bg-white p-4.5 shadow-xs transition-all hover:border-neutral-300 hover:shadow-sm">
       <div className="flex items-center justify-between gap-2">
         <span className="inline-flex items-center gap-1.5 rounded-full border border-[#CDE5CA] bg-[#E8F4E6] px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#0F6E00]">
           <span className="h-1.5 w-1.5 rounded-full bg-[#0F6E00]" />

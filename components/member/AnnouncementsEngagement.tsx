@@ -1,7 +1,12 @@
 "use client";
 
 import { useMemo, useState, useCallback } from "react";
-import type { Announcement, CommunityComment } from "@/lib/data/announcements";
+import type {
+  Announcement,
+  CommunityComment,
+  PollCounts,
+  PollResponseValue,
+} from "@/lib/data/announcements";
 import type {
   DiscussionGroup,
   DiscussionGroupId,
@@ -64,13 +69,30 @@ export default function AnnouncementsEngagement({
   const [announcementComments, setAnnouncementComments] = useState<
     Record<string, CommunityComment[]>
   >({});
+  const [pollOverrides, setPollOverrides] = useState<
+    Record<string, { response: PollResponseValue; counts: PollCounts }>
+  >({});
+
+  const announcementsWithPolls = useMemo(
+    () =>
+      announcements.map((announcement) => {
+        const override = pollOverrides[announcement.id];
+        if (!override) return announcement;
+        return {
+          ...announcement,
+          myPollResponse: override.response,
+          pollCounts: override.counts,
+        };
+      }),
+    [announcements, pollOverrides],
+  );
 
   const selectedAnnouncement = useMemo(
     () =>
-      announcements.find(
+      announcementsWithPolls.find(
         (announcement) => announcement.id === selectedAnnouncementId,
       ),
-    [announcements, selectedAnnouncementId],
+    [announcementsWithPolls, selectedAnnouncementId],
   );
 
   const selectedGroup = groups.find((group) => group.id === selectedGroupId);
@@ -126,6 +148,24 @@ export default function AnnouncementsEngagement({
     }));
   };
 
+  const handlePollVote = async (
+    announcementId: string,
+    response: PollResponseValue,
+  ) => {
+    try {
+      const result = await postJson<{ response: PollResponseValue; counts: PollCounts }>(
+        "/api/community/announcement-poll",
+        { announcementId, response },
+      );
+      setPollOverrides((current) => ({
+        ...current,
+        [announcementId]: { response: result.response, counts: result.counts },
+      }));
+    } catch (error) {
+      console.warn("Unable to record poll response:", error);
+    }
+  };
+
   return (
     <div className={shellClassName}>
       {showChrome && (
@@ -176,6 +216,7 @@ export default function AnnouncementsEngagement({
             announcement={selectedAnnouncement}
             localComments={announcementComments[selectedAnnouncement.id] ?? []}
             onComment={handleAnnouncementComment}
+            onVote={handlePollVote}
           />
         ) : selectedGroupId ? (
           <DiscussionFeed
@@ -185,7 +226,7 @@ export default function AnnouncementsEngagement({
           />
         ) : activeTab === "announcements" ? (
           <AnnouncementList
-            announcements={announcements}
+            announcements={announcementsWithPolls}
             onOpen={setSelectedAnnouncementId}
           />
         ) : (

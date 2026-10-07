@@ -29,7 +29,7 @@ export default function HomeMembershipCard({
   const ctaLabel = expirySoon ? "Review Membership" : "View Digital Card";
 
   return (
-    <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-primary-800 via-brand-primary-700 to-brand-primary-900 p-5 text-white shadow-md">
+    <section className="relative mt-4 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-primary-800 via-brand-primary-700 to-brand-primary-900 p-5 text-white shadow-md">
       {/* Ambient background glow and sheen accents */}
       <div
         aria-hidden="true"

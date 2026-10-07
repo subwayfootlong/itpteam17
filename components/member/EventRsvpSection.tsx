@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, AlertCircle } from "lucide-react";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface EventRsvpSectionProps {
   eventId: string;
@@ -111,11 +112,13 @@ export default function EventRsvpSection({
           disabled={loading}
           className="flex min-h-12 w-full items-center justify-center rounded-xl bg-[#0F6E00] px-4 py-3 text-center text-sm font-semibold text-white shadow-xs transition-all hover:bg-[#173F14] active:scale-[0.99] disabled:opacity-50"
         >
-          {loading
-            ? "Processing..."
-            : isRejected
-              ? "Reapply for Event"
-              : "Register for Event"}
+          {loading ? (
+            <LoadingSpinner label="Processing…" size="sm" light />
+          ) : isRejected ? (
+            "Reapply for Event"
+          ) : (
+            "Register for Event"
+          )}
         </button>
       )}
     </div>

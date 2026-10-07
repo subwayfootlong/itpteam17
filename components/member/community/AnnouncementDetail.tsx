@@ -2,8 +2,18 @@
 
 import { FormEvent, useState } from "react";
 import { Clock, Lock, MessageSquare, Send, ShieldCheck } from "lucide-react";
-import type { Announcement, CommunityComment } from "@/lib/data/announcements";
+import type {
+  Announcement,
+  CommunityComment,
+  PollResponseValue,
+} from "@/lib/data/announcements";
 import { pluralize } from "./utils";
+
+const POLL_OPTIONS: { value: PollResponseValue; label: string }[] = [
+  { value: "yes", label: "Yes, I'll attend" },
+  { value: "maybe", label: "Maybe" },
+  { value: "no", label: "No" },
+];
 
 function initials(name: string) {
   return (
@@ -21,12 +31,15 @@ export default function AnnouncementDetail({
   announcement,
   localComments,
   onComment,
+  onVote,
 }: {
   announcement: Announcement;
   localComments: CommunityComment[];
   onComment: (announcementId: string, body: string) => Promise<void>;
+  onVote: (announcementId: string, response: PollResponseValue) => Promise<void>;
 }) {
   const [draft, setDraft] = useState("");
+  const [voting, setVoting] = useState(false);
   const comments = [...announcement.comments, ...localComments];
   const approvedComments = comments.filter(
     (comment) => comment.status === "approved",
@@ -44,6 +57,21 @@ export default function AnnouncementDetail({
     await onComment(announcement.id, draft.trim());
     setDraft("");
   };
+
+  const handleVote = async (response: PollResponseValue) => {
+    if (voting || announcement.myPollResponse === response) return;
+    setVoting(true);
+    try {
+      await onVote(announcement.id, response);
+    } finally {
+      setVoting(false);
+    }
+  };
+
+  const pollCounts = announcement.pollCounts;
+  const pollTotal = pollCounts
+    ? pollCounts.yes + pollCounts.no + pollCounts.maybe
+    : 0;
 
   return (
     <section className="space-y-4 px-4 pb-28 pt-4">
@@ -80,6 +108,42 @@ export default function AnnouncementDetail({
           <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-neutral-700">
             {announcement.body}
           </p>
+
+          {announcement.pollEnabled && (
+            <div className="mt-4 rounded-xl border border-brand-primary-200 bg-brand-primary-50 p-3.5">
+              <p className="text-sm font-semibold text-neutral-900">
+                {announcement.pollQuestion || "Will you be attending?"}
+              </p>
+              <div className="mt-2.5 grid grid-cols-3 gap-2">
+                {POLL_OPTIONS.map((option) => {
+                  const isSelected = announcement.myPollResponse === option.value;
+
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      disabled={voting}
+                      aria-pressed={isSelected}
+                      onClick={() => handleVote(option.value)}
+                      className={`min-h-11 rounded-xl border px-2 py-2 text-xs font-semibold transition-all duration-100 active:scale-[0.98] disabled:opacity-60 ${
+                        isSelected
+                          ? "border-brand-primary-800 bg-brand-primary-800 text-white shadow-sm"
+                          : "border-neutral-300 bg-white text-neutral-700 hover:border-brand-primary-600"
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+              {pollCounts && pollTotal > 0 && (
+                <p className="mt-2.5 text-[11px] text-neutral-600">
+                  {pluralize(pollTotal, "response")} · {pollCounts.yes} yes,{" "}
+                  {pollCounts.maybe} maybe, {pollCounts.no} no
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </article>
 

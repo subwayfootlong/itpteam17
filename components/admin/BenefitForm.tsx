@@ -7,6 +7,7 @@ import AudienceAccessFields, {
   DEFAULT_AUDIENCE_ACCESS,
   type AudienceAccessValue,
 } from "@/components/admin/AudienceAccessFields";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export type BenefitFormData = AudienceAccessValue & {
   merchant_name: string;
@@ -452,7 +453,7 @@ export default function BenefitForm() {
             disabled={saving || Boolean(uploadingField)}
             className="rounded-xl bg-[#3FAE2A] px-8 py-2.5 text-sm font-bold text-white shadow-md shadow-[#3FAE2A]/20 transition-all hover:bg-[#35941f] disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {saving ? "Processing..." : "Create Benefit"}
+            {saving ? <LoadingSpinner label="Processing…" size="sm" light /> : "Create Benefit"}
           </button>
         </div>
       </div>

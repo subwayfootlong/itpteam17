@@ -6,7 +6,7 @@ import type { MemberProfile } from "@/app/member/profile/page";
 import { formatTierLabel } from "@/lib/membershipTiers";
 import { formatSalutationLabel } from "@/lib/memberProfileOptions";
 import { formatMemberName } from "@/lib/memberName";
-import { formatMemberDate } from "@/lib/dates";
+import { formatMemberDate, getExpiryInfo } from "@/lib/dates";
 import { LOGOUT_LOGIN_HINT_KEY } from "@/lib/session";
 import { useRouter } from "next/navigation";
 import {
@@ -268,12 +268,27 @@ export default function ProfileView({
             </div>
 
             {/* Validity */}
-            <p className="mt-3 text-[11px] font-medium text-white/80">
+            <p
+              className={`mt-3 text-[11px] font-medium ${
+                getExpiryInfo(member.expiry_date).urgency === "expired"
+                  ? "text-rose-200"
+                  : "text-white/80"
+              }`}
+            >
               Valid thru:{" "}
               <span className="font-semibold text-white">
                 {formatMemberDate(member.expiry_date)}
               </span>
             </p>
+
+            {getExpiryInfo(member.expiry_date).urgency !== "none" && (
+              <Link
+                href="/member/payment"
+                className="member-text-sm mt-4 inline-block rounded-xl bg-white px-5 py-2.5 text-center text-sm font-bold text-brand-primary-800! shadow-sm transition-transform duration-100 active:scale-[0.98]"
+              >
+                Pay Now
+              </Link>
+            )}
           </div>
 
           {/* QR Code Container */}
