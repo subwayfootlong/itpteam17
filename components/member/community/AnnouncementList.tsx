@@ -46,12 +46,12 @@ export function AnnouncementHeroCard({
   return (
     <article className="mb-5 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-md">
       {announcement.imageUrl && (
-        <div className="relative aspect-video w-full overflow-hidden bg-neutral-100">
+        <div className="relative w-full overflow-hidden bg-neutral-100">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={announcement.imageUrl}
             alt={announcement.title}
-            className="h-full w-full object-cover object-center"
+            className="block h-auto w-full"
           />
           <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-bold text-brand-primary-800 shadow-xs">
             <Pin size={12} aria-hidden="true" />

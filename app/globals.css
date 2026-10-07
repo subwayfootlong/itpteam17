@@ -6988,3 +6988,88 @@ body {
     padding: 0 11px;
   }
 }
+
+/* =====================================================
+   Tailwind text sizes follow the member font-size preference
+   Tailwind v4 reads font sizes from --text-* variables, so re-defining them
+   inside the scope scales text-xs ... text-3xl. Fixed pixel sizes
+   (text-[11px] etc.) are scaled by the attribute rules below.
+   ===================================================== */
+
+.member-font-scope {
+  --text-xs: calc(0.75rem * var(--member-font-scale));
+  --text-sm: calc(0.875rem * var(--member-font-scale));
+  --text-base: calc(1rem * var(--member-font-scale));
+  --text-lg: calc(1.125rem * var(--member-font-scale));
+  --text-xl: calc(1.25rem * var(--member-font-scale));
+  --text-2xl: calc(1.5rem * var(--member-font-scale));
+  --text-3xl: calc(1.875rem * var(--member-font-scale));
+}
+
+.member-font-scope [class*="text-[9px]"] {
+  font-size: calc(9px * var(--member-font-scale));
+}
+
+.member-font-scope [class*="text-[9.5px]"] {
+  font-size: calc(9.5px * var(--member-font-scale));
+}
+
+.member-font-scope [class*="text-[10px]"] {
+  font-size: calc(10px * var(--member-font-scale));
+}
+
+.member-font-scope [class*="text-[10.5px]"] {
+  font-size: calc(10.5px * var(--member-font-scale));
+}
+
+.member-font-scope [class*="text-[11px]"] {
+  font-size: calc(11px * var(--member-font-scale));
+}
+
+.member-font-scope [class*="text-[12px]"] {
+  font-size: calc(12px * var(--member-font-scale));
+}
+
+.member-font-scope [class*="text-[13px]"] {
+  font-size: calc(13px * var(--member-font-scale));
+}
+
+.member-font-scope [class*="text-[14px]"] {
+  font-size: calc(14px * var(--member-font-scale));
+}
+
+.member-font-scope [class*="text-[15px]"] {
+  font-size: calc(15px * var(--member-font-scale));
+}
+
+.member-font-scope [class*="text-[16px]"] {
+  font-size: calc(16px * var(--member-font-scale));
+}
+
+.member-font-scope [class*="text-[18px]"] {
+  font-size: calc(18px * var(--member-font-scale));
+}
+
+.member-font-scope [class*="text-[20px]"] {
+  font-size: calc(20px * var(--member-font-scale));
+}
+
+.member-font-scope [class*="text-[22px]"] {
+  font-size: calc(22px * var(--member-font-scale));
+}
+
+.member-font-scope [class*="text-[24px]"] {
+  font-size: calc(24px * var(--member-font-scale));
+}
+
+.member-font-scope [class*="text-[26px]"] {
+  font-size: calc(26px * var(--member-font-scale));
+}
+
+.member-font-scope [class*="text-[28px]"] {
+  font-size: calc(28px * var(--member-font-scale));
+}
+
+.member-font-scope [class*="text-[32px]"] {
+  font-size: calc(32px * var(--member-font-scale));
+}

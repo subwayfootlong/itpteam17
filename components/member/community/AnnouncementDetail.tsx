@@ -77,12 +77,12 @@ export default function AnnouncementDetail({
     <section className="space-y-4 px-4 pb-28 pt-4">
       <article className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
         {announcement.imageUrl && (
-          <div className="aspect-video w-full overflow-hidden bg-neutral-100">
+          <div className="w-full overflow-hidden bg-neutral-100">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={announcement.imageUrl}
               alt={announcement.title}
-              className="h-full w-full object-cover object-center"
+              className="block h-auto w-full"
             />
           </div>
         )}
