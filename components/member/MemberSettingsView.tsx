@@ -238,6 +238,17 @@ export default function MemberSettingsView({
       </header>
 
       <section className="mt-10">
+        <h2 className="member-text-base px-2 text-base font-bold text-[#3F473F]">Account security</h2>
+        <Link href="/member/settings/email" className="mt-4 flex items-center justify-between rounded-2xl bg-white p-5 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
+          <span className="flex items-center gap-4">
+            <Mail size={24} className="shrink-0 text-[#6F7B6F]" />
+            <span className="member-text-lg text-lg text-[#151C27]">Change Email</span>
+          </span>
+          <ChevronRight size={22} className="shrink-0 text-[#6F7B6F]" />
+        </Link>
+      </section>
+
+      <section className="mt-10">
         <h2 className="member-text-base px-2 text-base font-bold text-[#3F473F]">
           Appearance
         </h2>
