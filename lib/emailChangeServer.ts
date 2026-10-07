@@ -4,11 +4,19 @@ import { supabaseAdmin } from "@/lib/supabaseServer";
 import { verifyAccessToken, verifyPassword } from "@/lib/auth";
 import { clearSessionCookies, getLastActivityTimestamp, isSessionIdleExpired, LAST_ACTIVITY_COOKIE } from "@/lib/session";
 import { sendEmail } from "@/lib/email";
-import { EmailChangeError, requestEmailChange, verifyEmailChange, type EmailChangeDependencies, type EmailChangeUser } from "@/lib/emailChange";
+import { EmailChangeError, maskEmail, requestEmailChange, verifyEmailChange, type EmailChangeDependencies, type EmailChangeUser } from "@/lib/emailChange";
 
 async function rpc(name: string, args: Record<string, unknown>) {
   const { data, error } = await supabaseAdmin.rpc(name, args);
-  if (error) throw new Error("Email change database operation failed");
+  if (error) {
+    // Log only the operation and an error code, never RPC arguments or DB details.
+    const code = /^[A-Z0-9]{5,10}$/.test(error.code ?? "") ? error.code : "unknown";
+    console.error("[email-change] Database function failed", { operation: name, code });
+    if (code === "PGRST202") {
+      console.error("[email-change] Apply docs/supabase-email-change-migration.sql in the Supabase SQL editor; the migration also reloads the schema cache.");
+    }
+    throw new Error("Email change database operation failed");
+  }
   return data;
 }
 
@@ -18,7 +26,7 @@ export async function deliverEmailChangeNotification(id: string) {
   if (error) throw new Error("Unable to read notification");
   if (!data) return;
   await sendEmail(data.old_email, "Your Pergas email address was changed",
-    `The email address associated with your Pergas account has been changed.\n\nPrevious email: ${data.old_email}\nNew email: ${data.new_email}\n\nIf you made this change, no action is required. If you did not make this change, please contact Pergas.`,
+    `Your Pergas account email address has been changed to ${maskEmail(data.new_email)}.\n\nIf you made this change, no action is required.\n\nIf you did not make this change, please contact Pergas immediately.`,
     `email-change-notification-${id}`);
   const { error: updateError } = await supabaseAdmin.from("email_change_notifications")
     .update({ sent_at: new Date().toISOString() }).eq("id", id);

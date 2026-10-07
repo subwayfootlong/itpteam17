@@ -1,9 +1,10 @@
 -- Run before deploying email change. Resolve existing case-insensitive duplicates first.
+-- Safe to rerun after partial setup: existing tables and their rows are preserved.
 begin;
 create unique index if not exists users_email_normalized_unique
   on public.users (lower(btrim(email)));
 
-create table public.email_change_requests (
+create table if not exists public.email_change_requests (
   user_id uuid primary key references public.users(id) on delete cascade,
   id uuid not null unique,
   old_email text not null,
@@ -15,13 +16,13 @@ create table public.email_change_requests (
   last_sent_at timestamptz not null default now(),
   verified_at timestamptz
 );
-create table public.email_change_limits (
+create table if not exists public.email_change_limits (
   user_id uuid primary key references public.users(id) on delete cascade,
   window_start timestamptz not null default now(),
   request_count integer not null default 0,
   last_sent_at timestamptz
 );
-create table public.email_change_notifications (
+create table if not exists public.email_change_notifications (
   id uuid primary key,
   old_email text not null,
   new_email text not null,
@@ -35,7 +36,7 @@ revoke all on public.email_change_requests, public.email_change_limits, public.e
 grant all on public.email_change_requests, public.email_change_limits, public.email_change_notifications to service_role;
 
 -- Also limits wrong-password requests, across application instances.
-create function public.email_change_throttle(p_user_id uuid) returns boolean
+create or replace function public.email_change_throttle(p_user_id uuid) returns boolean
 language plpgsql security definer set search_path = public, pg_temp as $$
 declare v public.email_change_limits;
 begin
@@ -50,7 +51,7 @@ begin
   return true;
 end $$;
 
-create function public.email_change_start(p_user_id uuid, p_old_email text, p_new_email text,
+create or replace function public.email_change_start(p_user_id uuid, p_old_email text, p_new_email text,
   p_id uuid, p_otp_hash text, p_password_hash text) returns text
 language plpgsql security definer set search_path = public, pg_temp as $$
 declare v_email text; v_password text; v_sent timestamptz;
@@ -71,7 +72,7 @@ end $$;
 
 -- Row locks serialize verification, resend, and competing changes for this member.
 -- A unique normalized index also covers concurrent registrations of the new address.
-create function public.email_change_finish(p_user_id uuid, p_id uuid, p_matches boolean)
+create or replace function public.email_change_finish(p_user_id uuid, p_id uuid, p_matches boolean)
 returns text language plpgsql security definer set search_path = public, pg_temp as $$
 declare v public.email_change_requests; v_email text;
 begin
@@ -100,4 +101,6 @@ revoke all on function public.email_change_finish(uuid,uuid,boolean) from public
 grant execute on function public.email_change_throttle(uuid) to service_role;
 grant execute on function public.email_change_start(uuid,text,text,uuid,text,text) to service_role;
 grant execute on function public.email_change_finish(uuid,uuid,boolean) to service_role;
+-- Refresh Supabase/PostgREST's function cache once this transaction commits.
+notify pgrst, 'reload schema';
 commit;
