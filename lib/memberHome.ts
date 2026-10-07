@@ -8,6 +8,7 @@ export type MemberHomeData = {
     title: string;
     content: string;
     publishedAt: string | null;
+    imageUrl: string | null;
   } | null;
   nextRegisteredEvent: {
     id: string;
@@ -18,6 +19,15 @@ export type MemberHomeData = {
     category: string | null;
     imageUrl: string | null;
   } | null;
+  registeredEvents: Array<{
+    id: string;
+    title: string;
+    eventDate: string;
+    startTime: string | null;
+    venue: string | null;
+    category: string | null;
+    imageUrl: string | null;
+  }>;
   featuredEvent: {
     id: string;
     title: string;
@@ -53,6 +63,7 @@ type AnnouncementRow = {
   title: string | null;
   content: string | null;
   created_at: string | null;
+  image_url?: string | null;
   audience_type: string | null;
   eligible_tiers: string[] | null;
   show_locked_preview: boolean | null;
@@ -177,7 +188,7 @@ export async function getMemberHomeData(
   ] = await Promise.all([
     supabaseAdmin
       .from("announcements")
-      .select("id, title, content, created_at, audience_type, eligible_tiers, show_locked_preview")
+      .select("id, title, content, created_at, image_url, audience_type, eligible_tiers, show_locked_preview")
       .eq("status", "published")
       .order("created_at", { ascending: false })
       .limit(20)
@@ -315,9 +326,11 @@ export async function getMemberHomeData(
           title: latestAnnouncement.title?.trim() || "Latest announcement",
           content: latestAnnouncement.content?.trim() || "",
           publishedAt: latestAnnouncement.created_at,
+          imageUrl: latestAnnouncement.image_url?.trim() || null,
         }
       : null,
     nextRegisteredEvent: registeredEvents[0] ?? null,
+    registeredEvents: registeredEvents.slice(0, 4),
     featuredEvent: accessibleEvents[0] ?? null,
     featuredEvents: accessibleEvents.slice(0, 6),
     featuredBenefit: normalizeBenefit(featuredBenefit),

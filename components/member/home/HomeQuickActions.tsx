@@ -1,74 +1,61 @@
 import Link from "next/link";
 import { CalendarDays, CreditCard, Gift, Megaphone } from "lucide-react";
 
+// The Digital Card is the one thing the bottom nav does not cover, and the
+// action members need most at an event door, so it gets the solid primary tile.
 const actions = [
   {
     label: "Digital Card",
-    description: "Pass & details",
     href: "/member/profile",
     icon: CreditCard,
-    tint: "bg-brand-primary-100 text-brand-primary-800",
+    tile: "bg-brand-primary-800 text-white shadow-sm",
   },
   {
     label: "Events",
-    description: "Browse & RSVP",
     href: "/member/events",
     icon: CalendarDays,
-    tint: "bg-brand-secondary-soft text-brand-secondary-dark",
+    tile: "bg-brand-primary-100 text-brand-primary-800",
   },
   {
     label: "Benefits",
-    description: "Merchant perks",
     href: "/member/benefit",
     icon: Gift,
-    tint: "bg-brand-accent-soft text-[#7A4B00]",
+    tile: "bg-brand-accent-soft text-amber-900",
   },
   {
-    label: "Announcements",
-    description: "Latest news",
+    label: "Updates",
     href: "/member/community?tab=announcements",
     icon: Megaphone,
-    tint: "bg-brand-primary-50 text-brand-primary-800",
+    tile: "bg-brand-secondary-soft text-brand-secondary-dark",
   },
 ];
 
 export default function HomeQuickActions() {
   return (
-    <section className="mt-4">
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-base font-bold tracking-tight text-neutral-900">
-          Quick Actions
-        </h2>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
+    <nav aria-label="Quick actions" className="mt-4">
+      <ul className="grid grid-cols-4 gap-2">
         {actions.map((action) => {
           const Icon = action.icon;
 
           return (
-            <Link
-              key={action.label}
-              href={action.href}
-              className="group flex items-center gap-3 rounded-xl border border-neutral-100 bg-white p-3.5 shadow-xs transition-all hover:border-neutral-200 hover:shadow-sm active:scale-95"
-            >
-              <div
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${action.tint} transition-transform group-hover:scale-105`}
+            <li key={action.label}>
+              <Link
+                href={action.href}
+                className="group flex flex-col items-center gap-1.5 transition-transform duration-100 active:scale-95"
               >
-                <Icon size={20} strokeWidth={2.2} />
-              </div>
-
-              <div className="min-w-0 flex-1 text-left">
-                <span className="block text-sm font-semibold leading-tight text-neutral-800">
+                <span
+                  className={`flex h-14 w-14 items-center justify-center rounded-2xl transition-transform group-hover:scale-105 ${action.tile}`}
+                >
+                  <Icon size={24} strokeWidth={2.1} aria-hidden="true" />
+                </span>
+                <span className="text-xs font-semibold text-neutral-800">
                   {action.label}
                 </span>
-                <span className="mt-0.5 block truncate text-[11px] leading-tight text-neutral-400">
-                  {action.description}
-                </span>
-              </div>
-            </Link>
+              </Link>
+            </li>
           );
         })}
-      </div>
-    </section>
+      </ul>
+    </nav>
   );
 }

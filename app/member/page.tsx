@@ -1,12 +1,10 @@
 import MemberPageShell from "@/components/member/MemberPageShell";
-import FeaturedBenefitCard from "@/components/member/home/FeaturedBenefitCard";
 import HomeActionPrompt from "@/components/member/home/HomeActionPrompt";
 import HomeAnnouncementCard from "@/components/member/home/HomeAnnouncementCard";
 import HomeGreeting from "@/components/member/home/HomeGreeting";
 import HomeMembershipCard from "@/components/member/home/HomeMembershipCard";
 import HomeQuickActions from "@/components/member/home/HomeQuickActions";
-import NextRegisteredEventCard from "@/components/member/home/NextRegisteredEventCard";
-import UpcomingEventBanner from "@/components/member/home/UpcomingEventBanner";
+import HomeRegistrations from "@/components/member/home/HomeRegistrations";
 import { getCurrentUser } from "@/lib/currentUser";
 import { formatMemberDate } from "@/lib/dates";
 import { getMemberHomeData } from "@/lib/memberHome";
@@ -26,25 +24,29 @@ export default async function HomePage() {
   const displayLastName = user.lastName ?? "";
   const tierLabel = formatTierLabel(user.membershipTier);
   const expiryLabel = formatMemberDate(user.expiryDate ?? null);
-  const shouldShowFeaturedEvent =
-    homeData.featuredEvent &&
-    homeData.featuredEvent.id !== homeData.nextRegisteredEvent?.id;
 
   return (
     <MemberPageShell>
-      <div className="px-5 py-6">
-        <HomeGreeting
-          firstName={displayFirstName}
-          lastName={displayLastName}
-        />
+      <div className="px-5 pb-6">
+        {/* Soft tinted header: who you are, where to go, what is new */}
+        <div className="-mx-5 bg-gradient-to-b from-brand-primary-50 to-white px-5 pb-1 pt-6">
+          <HomeGreeting
+            firstName={displayFirstName}
+            lastName={displayLastName}
+          />
 
-        {homeData.latestAnnouncement && (
-          <HomeAnnouncementCard announcement={homeData.latestAnnouncement} />
-        )}
+          <HomeQuickActions />
 
-        {shouldShowFeaturedEvent && homeData.featuredEvent && (
-          <UpcomingEventBanner event={homeData.featuredEvent} />
-        )}
+          {/* Time-sensitive prompts (profile, renewal) come before promotion */}
+          <HomeActionPrompt user={user} />
+
+          <HomeAnnouncementCard
+            announcement={homeData.latestAnnouncement}
+            nextRegisteredEvent={homeData.nextRegisteredEvent}
+            featuredEvents={homeData.featuredEvents}
+            featuredBenefit={homeData.featuredBenefit}
+          />
+        </div>
 
         <HomeMembershipCard
           tierLabel={tierLabel}
@@ -52,15 +54,7 @@ export default async function HomePage() {
           expiryDate={user.expiryDate}
         />
 
-        <HomeQuickActions />
-
-        <NextRegisteredEventCard event={homeData.nextRegisteredEvent} />
-
-        {homeData.featuredBenefit && (
-          <FeaturedBenefitCard benefit={homeData.featuredBenefit} />
-        )}
-
-        <HomeActionPrompt user={user} />
+        <HomeRegistrations events={homeData.registeredEvents} />
       </div>
     </MemberPageShell>
   );
