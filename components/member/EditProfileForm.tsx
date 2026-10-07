@@ -98,6 +98,10 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
       </section>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+        <div className="space-y-3">
+          <Input label="Registered email" type="email" value={initial.email ?? ""} readOnly />
+          <Link href="/member/settings/email" className="member-text-sm block text-sm font-semibold text-[#0F6E00]">Change Email</Link>
+        </div>
         <Select
           label="Salutation"
           value={salutation}
