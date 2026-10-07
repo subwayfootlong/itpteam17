@@ -10,7 +10,7 @@ const MEMBER_CREDENTIALS = {
 };
 
 const ADMIN_CREDENTIALS = {
-  email: 'admin1@uat.pergas.org',
+  email: 'admin2@uat.pergas.org',
   password: 'Testing123!',
 };
 
@@ -168,7 +168,7 @@ async function runTests() {
 
     console.log(`Logging in admin: ${ADMIN_CREDENTIALS.email}...`);
     const adminCookie = await login(ADMIN_CREDENTIALS.email, ADMIN_CREDENTIALS.password);
-    record('Admin Login', 'Authenticate admin1@uat.pergas.org', true);
+    record('Admin Login', 'Authenticate admin2@uat.pergas.org', true);
 
     const adminReadEndpoints = [
       { name: 'Dashboard stats & feed', url: '/api/admin/dashboard', check: (d) => Boolean(d.stats) },

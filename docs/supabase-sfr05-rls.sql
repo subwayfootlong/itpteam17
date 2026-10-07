@@ -67,6 +67,22 @@ CREATE POLICY "Admins have full access on users"
   USING (public.is_admin())
   WITH CHECK (public.is_admin());
 
+-- Column-level hardening (belt and braces on top of the row policies above):
+--   * anon gets no access to users at all
+--   * authenticated can never read password_hash
+--   * authenticated can only update harmless profile columns, so a member can never
+--     change their own role / membership_tier / status / expiry via the Data API.
+-- The Next.js server uses the service-role key, which is unaffected by these grants.
+REVOKE ALL ON public.users FROM anon;
+REVOKE ALL ON public.users FROM authenticated;
+GRANT SELECT (id, email, created_at, role, member_id, membership_tier, membership_status,
+              expiry_date, phone, arabic_name, member_since, first_name, last_name,
+              organization, designation, salutation, ars_status, profile_image_url)
+  ON public.users TO authenticated;
+GRANT UPDATE (phone, arabic_name, first_name, last_name, organization, designation,
+              salutation, ars_status, profile_image_url)
+  ON public.users TO authenticated;
+
 
 -- ==============================================================================
 -- 2. Table: public.events
@@ -76,12 +92,13 @@ ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Anyone can view published active events" ON public.events;
 DROP POLICY IF EXISTS "Admins have full access on events" ON public.events;
 
--- Public and authenticated users can view active published events
+-- Public/anon can only see published events open to everyone (tier-gated events are
+-- served by the server after a tier check). events has no is_active column.
 CREATE POLICY "Anyone can view published active events"
   ON public.events
   FOR SELECT
   TO anon, authenticated
-  USING (is_active = true OR status = 'published');
+  USING (status = 'published' AND audience_type = 'all');
 
 -- Admins can create, update, and delete events
 CREATE POLICY "Admins have full access on events"
@@ -109,18 +126,13 @@ CREATE POLICY "Members can view own event registrations"
   TO authenticated
   USING (auth.uid() = user_id);
 
+-- Members can register themselves (status must be 'registered') and cancel (DELETE),
+-- but cannot update a registration, so a rejected one cannot be flipped back.
 CREATE POLICY "Members can insert own event registrations"
   ON public.event_registrations
   FOR INSERT
   TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Members can update own event registrations"
-  ON public.event_registrations
-  FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK (auth.uid() = user_id AND (status IS NULL OR status = 'registered'));
 
 CREATE POLICY "Members can delete own event registrations"
   ON public.event_registrations
@@ -148,7 +160,7 @@ CREATE POLICY "Members can view active benefits"
   ON public.benefits
   FOR SELECT
   TO anon, authenticated
-  USING (is_active = true);
+  USING (is_active = true AND audience_type = 'all');
 
 CREATE POLICY "Admins have full access on benefits"
   ON public.benefits
@@ -170,7 +182,7 @@ CREATE POLICY "Members can view published announcements"
   ON public.announcements
   FOR SELECT
   TO anon, authenticated
-  USING (status = 'published');
+  USING (status = 'published' AND audience_type = 'all');
 
 CREATE POLICY "Admins have full access on announcements"
   ON public.announcements
@@ -200,7 +212,7 @@ CREATE POLICY "Members can create own announcement comments"
   ON public.announcement_comments
   FOR INSERT
   TO authenticated
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK (auth.uid() = user_id AND status = 'pending');
 
 CREATE POLICY "Members can delete own announcement comments"
   ON public.announcement_comments
@@ -230,7 +242,7 @@ CREATE POLICY "Members can view announcement poll responses"
   ON public.announcement_poll_responses
   FOR SELECT
   TO authenticated
-  USING (true);
+  USING (auth.uid() = user_id);
 
 CREATE POLICY "Members can insert own poll responses"
   ON public.announcement_poll_responses
@@ -291,18 +303,13 @@ CREATE POLICY "Members can view approved discussions or own"
   TO authenticated
   USING (status = 'approved' OR auth.uid() = user_id);
 
+-- New threads always start as pending moderation; members cannot edit them afterwards
+-- (an UPDATE policy would let a member self-approve by changing status).
 CREATE POLICY "Members can create own discussions"
   ON public.discussion
   FOR INSERT
   TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Members can update own discussions"
-  ON public.discussion
-  FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK (auth.uid() = user_id AND status = 'pending');
 
 CREATE POLICY "Admins have full access on discussion"
   ON public.discussion
@@ -332,14 +339,7 @@ CREATE POLICY "Members can create own discussion comments"
   ON public.discussion_comments
   FOR INSERT
   TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Members can update own discussion comments"
-  ON public.discussion_comments
-  FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK (auth.uid() = user_id AND status = 'pending');
 
 CREATE POLICY "Admins have full access on discussion_comments"
   ON public.discussion_comments
@@ -456,7 +456,7 @@ CREATE POLICY "Allow insertions from authenticated members"
   ON public.analytics_events
   FOR INSERT
   TO authenticated
-  WITH CHECK (true);
+  WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Allow select for admin role only"
   ON public.analytics_events
@@ -505,7 +505,7 @@ BEGIN
     EXECUTE 'DROP POLICY IF EXISTS "Members can read uc6 comments" ON public.uc6_announcement_comments;';
     EXECUTE 'CREATE POLICY "Members can read uc6 comments" ON public.uc6_announcement_comments FOR SELECT TO authenticated USING (status = ''approved'' OR auth.uid() = user_id);';
     EXECUTE 'DROP POLICY IF EXISTS "Members can insert uc6 comments" ON public.uc6_announcement_comments;';
-    EXECUTE 'CREATE POLICY "Members can insert uc6 comments" ON public.uc6_announcement_comments FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);';
+    EXECUTE 'CREATE POLICY "Members can insert uc6 comments" ON public.uc6_announcement_comments FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id AND status = ''pending'');';
     EXECUTE 'DROP POLICY IF EXISTS "Admins full access uc6 comments" ON public.uc6_announcement_comments;';
     EXECUTE 'CREATE POLICY "Admins full access uc6 comments" ON public.uc6_announcement_comments FOR ALL TO authenticated USING (public.is_admin()) WITH CHECK (public.is_admin());';
   END IF;
@@ -523,7 +523,7 @@ BEGIN
     EXECUTE 'DROP POLICY IF EXISTS "Members can read uc6 discussion threads" ON public.uc6_discussion_threads;';
     EXECUTE 'CREATE POLICY "Members can read uc6 discussion threads" ON public.uc6_discussion_threads FOR SELECT TO authenticated USING (status = ''approved'' OR auth.uid() = user_id);';
     EXECUTE 'DROP POLICY IF EXISTS "Members can insert uc6 discussion threads" ON public.uc6_discussion_threads;';
-    EXECUTE 'CREATE POLICY "Members can insert uc6 discussion threads" ON public.uc6_discussion_threads FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);';
+    EXECUTE 'CREATE POLICY "Members can insert uc6 discussion threads" ON public.uc6_discussion_threads FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id AND status = ''pending'');';
     EXECUTE 'DROP POLICY IF EXISTS "Admins full access uc6 discussion threads" ON public.uc6_discussion_threads;';
     EXECUTE 'CREATE POLICY "Admins full access uc6 discussion threads" ON public.uc6_discussion_threads FOR ALL TO authenticated USING (public.is_admin()) WITH CHECK (public.is_admin());';
   END IF;
@@ -533,7 +533,7 @@ BEGIN
     EXECUTE 'DROP POLICY IF EXISTS "Members can read uc6 thread comments" ON public.uc6_thread_comments;';
     EXECUTE 'CREATE POLICY "Members can read uc6 thread comments" ON public.uc6_thread_comments FOR SELECT TO authenticated USING (status = ''approved'' OR auth.uid() = user_id);';
     EXECUTE 'DROP POLICY IF EXISTS "Members can insert uc6 thread comments" ON public.uc6_thread_comments;';
-    EXECUTE 'CREATE POLICY "Members can insert uc6 thread comments" ON public.uc6_thread_comments FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);';
+    EXECUTE 'CREATE POLICY "Members can insert uc6 thread comments" ON public.uc6_thread_comments FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id AND status = ''pending'');';
     EXECUTE 'DROP POLICY IF EXISTS "Admins full access uc6 thread comments" ON public.uc6_thread_comments;';
     EXECUTE 'CREATE POLICY "Admins full access uc6 thread comments" ON public.uc6_thread_comments FOR ALL TO authenticated USING (public.is_admin()) WITH CHECK (public.is_admin());';
   END IF;

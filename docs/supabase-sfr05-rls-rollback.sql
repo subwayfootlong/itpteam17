@@ -22,6 +22,8 @@ DROP POLICY IF EXISTS "Users can read own record" ON public.users;
 DROP POLICY IF EXISTS "Admins have full access on users" ON public.users;
 DROP POLICY IF EXISTS "Users can update own record" ON public.users;
 ALTER TABLE public.users DISABLE ROW LEVEL SECURITY;
+-- Restore the default Supabase grants removed by the SFR-05 column-level hardening
+GRANT ALL ON public.users TO anon, authenticated;
 
 -- Table: public.events
 DROP POLICY IF EXISTS "Anyone can view published active events" ON public.events;

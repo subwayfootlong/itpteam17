@@ -7,10 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:sfr05:phase1": "node tests/test-phase1-authorization.mjs",
-    "test:sfr05:phase2": "node tests/test-phase2-rls-workflows.mjs",
-    "test:sfr05:phase3": "node tests/test-phase3-service-role-minimization.mjs",
-    "test:sfr05": "node tests/test-sfr05-master-suite.mjs"
+    "test:sfr05:authz": "node tests/test-server-authorization.mjs",
+    "test:sfr05:workflows": "node tests/test-workflow-regression.mjs",
+    "test:sfr05:rls": "node --env-file=.env.local tests/test-sfr05-db-rls.mjs",
+    "test:sfr05": "npm run test:sfr05:rls && npm run test:sfr05:authz && npm run test:sfr05:workflows"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.28.0",

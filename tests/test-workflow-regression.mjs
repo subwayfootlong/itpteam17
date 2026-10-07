@@ -1,6 +1,4 @@
 import { spawn } from 'child_process';
-import fs from 'fs';
-import path from 'path';
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 let serverProcess = null;
@@ -16,7 +14,7 @@ const MEMBER2_CREDENTIALS = {
 };
 
 const ADMIN_CREDENTIALS = {
-  email: 'admin1@uat.pergas.org',
+  email: 'admin2@uat.pergas.org',
   password: 'Testing123!',
 };
 
@@ -95,68 +93,6 @@ async function loginUser(email, password) {
   }
 
   return `token=${tokenMatch[1]}`;
-}
-
-// -----------------------------------------------------------------------------
-// Suite 1: Master SQL RLS Schema Validation
-// -----------------------------------------------------------------------------
-function testSqlRlsSchema() {
-  console.log('\n--- SUITE 1: Master SQL RLS Schema & Policy Coverage ---');
-  const sqlPath = path.join(process.cwd(), 'docs', 'supabase-sfr05-rls.sql');
-  const exists = fs.existsSync(sqlPath);
-  record('SQL-RLS', 'Master migration file docs/supabase-sfr05-rls.sql exists', exists);
-
-  if (!exists) return;
-
-  const content = fs.readFileSync(sqlPath, 'utf8');
-
-  // Verify helper function
-  const hasAdminFunc = content.includes('CREATE OR REPLACE FUNCTION public.is_admin()') &&
-                       content.includes('SECURITY DEFINER') &&
-                       content.includes('STABLE');
-  record('SQL-RLS', 'public.is_admin() SECURITY DEFINER helper defined', hasAdminFunc);
-
-  // 15 target application tables
-  const requiredTables = [
-    'users',
-    'events',
-    'event_registrations',
-    'benefits',
-    'announcements',
-    'announcement_comments',
-    'announcement_poll_responses',
-    'discussion_groups',
-    'discussion',
-    'discussion_comments',
-    'notifications',
-    'notification_preferences',
-    'tier_upgrade_requests',
-    'analytics_events',
-    'payment_methods',
-  ];
-
-  for (const table of requiredTables) {
-    const rlsRegex = new RegExp(`ALTER\\s+TABLE\\s+public\\.${table}\\s+ENABLE\\s+ROW\\s+LEVEL\\s+SECURITY`, 'i');
-    const hasRls = rlsRegex.test(content);
-    record('SQL-RLS', `Table public.${table} has ENABLE ROW LEVEL SECURITY`, hasRls);
-
-    const policyRegex = new RegExp(`CREATE\\s+POLICY\\s+[^;]+ON\\s+public\\.${table}`, 'i');
-    const hasPolicy = policyRegex.test(content);
-    record('SQL-RLS', `Table public.${table} has explicit RLS policies`, hasPolicy);
-  }
-
-  // Legacy fallback tables check
-  const legacyTables = [
-    'uc6_announcements',
-    'uc6_announcement_comments',
-    'uc6_discussion_groups',
-    'uc6_discussion_threads',
-    'uc6_thread_comments',
-  ];
-  for (const table of legacyTables) {
-    const hasLegacy = content.includes(`ALTER TABLE public.${table} ENABLE ROW LEVEL SECURITY`);
-    record('SQL-RLS', `Legacy table public.${table} covered with ENABLE RLS`, hasLegacy);
-  }
 }
 
 // -----------------------------------------------------------------------------
@@ -306,7 +242,6 @@ async function testSecurityBoundaries() {
 // -----------------------------------------------------------------------------
 async function run() {
   try {
-    testSqlRlsSchema();
 
     await startServerIfNeeded();
     await testPortalWorkflows();
