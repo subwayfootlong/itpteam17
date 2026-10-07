@@ -228,6 +228,14 @@ export default async function EventDetailsPage({
             initialRegistration={registration}
             externalRsvpUrl={eventRecord.external_rsvp_url}
             isFull={isFull}
+            attendeeName={currentUser.fullName}
+            event={{
+              title: eventRecord.title,
+              eventDate: eventRecord.event_date,
+              startTime: eventRecord.start_time,
+              endTime: eventRecord.end_time,
+              venue: eventRecord.venue,
+            }}
           />
         </section>
       </div>

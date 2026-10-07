@@ -17,6 +17,7 @@ import {
 import type { EventRow } from "@/app/member/events/page";
 import { formatMemberDate } from "@/lib/dates";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import RsvpConfirmationModal from "@/components/member/RsvpConfirmationModal";
 
 type EventsViewMode = "list" | "calendar";
 
@@ -24,6 +25,7 @@ type EventsViewProps = {
   events: EventRow[];
   hasError: boolean;
   initialView: EventsViewMode;
+  attendeeName?: string;
 };
 
 function toDateKey(date: Date) {
@@ -398,11 +400,13 @@ export default function EventsView({
   events,
   hasError,
   initialView,
+  attendeeName = "Member",
 }: EventsViewProps) {
   const today = new Date();
   const todayKey = getTodayDateKey();
   const router = useRouter();
   const [registeringId, setRegisteringId] = useState<string | null>(null);
+  const [confirmedEvent, setConfirmedEvent] = useState<EventRow | null>(null);
 
   // 1. View Mode Switcher: Default to "list"
   const [viewMode, setViewModeState] = useState<EventsViewMode>(initialView);
@@ -433,6 +437,7 @@ export default function EventsView({
         body: JSON.stringify({ eventId }),
       });
       if (res.ok) {
+        setConfirmedEvent(events.find((item) => item.id === eventId) ?? null);
         router.refresh();
       } else {
         const d = await res.json();
@@ -769,6 +774,22 @@ export default function EventsView({
             </div>
           )}
         </div>
+      )}
+
+      {confirmedEvent && (
+        <RsvpConfirmationModal
+          open
+          onClose={() => setConfirmedEvent(null)}
+          attendeeName={attendeeName}
+          eventId={confirmedEvent.id}
+          event={{
+            title: confirmedEvent.title,
+            eventDate: confirmedEvent.event_date,
+            startTime: confirmedEvent.start_time,
+            endTime: confirmedEvent.end_time,
+            venue: confirmedEvent.venue,
+          }}
+        />
       )}
     </div>
   );
