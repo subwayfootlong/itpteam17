@@ -45,10 +45,10 @@ export default function MemberBottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-1/2 z-40 w-full max-w-md -translate-x-1/2 border-t border-gray-200 bg-white px-2 py-2"
+      className="fixed bottom-0 left-1/2 z-50 w-full max-w-md -translate-x-1/2 border-t border-neutral-200 bg-white/95 px-2 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-md"
       aria-label="Member navigation"
     >
-      <div className="grid grid-cols-5 gap-1 text-center font-helvetica">
+      <div className="grid grid-cols-5 gap-1 text-center">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = isActiveRoute(item.href);
@@ -58,21 +58,31 @@ export default function MemberBottomNav() {
               key={item.label}
               href={item.href}
               aria-current={isActive ? "page" : undefined}
-              className={`min-w-0 rounded-xl px-1 py-1 transition-colors ${
+              className={`group flex min-w-0 flex-col items-center justify-center rounded-xl px-1 py-1 transition-transform duration-100 active:scale-95 ${
                 isActive
-                  ? "bg-[#E8F4E6] font-semibold text-[#0F6E00]"
-                  : "text-[#5F5E5E]"
+                  ? "font-semibold text-brand-primary-800"
+                  : "font-normal text-neutral-400 hover:text-neutral-600"
               }`}
             >
               <Icon
                 size={22}
-                strokeWidth={2.4}
-                className="mx-auto mb-1"
+                strokeWidth={isActive ? 2.5 : 2}
+                fill={isActive ? "currentColor" : "none"}
+                fillOpacity={isActive ? 0.15 : 0}
                 aria-hidden="true"
               />
-              <span className="block whitespace-nowrap text-[15px] leading-tight">
+
+              <span className="mt-1 block truncate text-[11px] leading-tight tracking-tight">
                 {item.label}
               </span>
+
+              {/* Active indicator dot (space is reserved so tabs never shift) */}
+              <span
+                aria-hidden="true"
+                className={`mx-auto mt-0.5 h-1 w-1 rounded-full ${
+                  isActive ? "bg-brand-primary-800" : "bg-transparent"
+                }`}
+              />
             </Link>
           );
         })}

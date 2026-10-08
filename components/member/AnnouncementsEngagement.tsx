@@ -176,19 +176,33 @@ export default function AnnouncementsEngagement({
         />
       )}
       {!showChrome && (
-        <div className="community-inline-heading">
+        <div className="flex items-center gap-3 px-4 pt-5">
           {canGoBack ? (
-            <button type="button" onClick={handleBack} aria-label="Go back">
-              <MemberIcon name="back" size={22} />
+            <button
+              type="button"
+              onClick={handleBack}
+              aria-label="Go back"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-neutral-200 bg-white text-brand-primary-800 shadow-xs transition-transform duration-100 active:scale-95"
+            >
+              <MemberIcon name="back" size={20} />
             </button>
           ) : (
-            <span aria-hidden="true">
-              <MemberIcon name="message" size={22} />
+            <span
+              aria-hidden="true"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-primary-100 text-brand-primary-800"
+            >
+              <MemberIcon name="message" size={20} />
             </span>
           )}
-          <div>
-            <h2>{pageTitle === "Pergas" ? "Community" : pageTitle}</h2>
-            {!canGoBack && <p>Announcements and member discussions</p>}
+          <div className="min-w-0">
+            <h2 className="truncate font-butler text-xl font-semibold leading-tight text-neutral-900">
+              {pageTitle === "Pergas" ? "Community" : pageTitle}
+            </h2>
+            {!canGoBack && (
+              <p className="text-xs text-neutral-500">
+                Announcements and member discussions
+              </p>
+            )}
           </div>
         </div>
       )}

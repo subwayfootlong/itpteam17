@@ -37,17 +37,17 @@ const preferenceCopy: {
   {
     key: "benefit",
     title: "Benefit updates",
-    description: "New and updated member rewards",
+    description: "New and updated member perks & discounts",
   },
   {
     key: "announcement",
     title: "Announcements",
-    description: "Official Pergas updates",
+    description: "Official Pergas communications & news",
   },
   {
     key: "event",
     title: "Event updates",
-    description: "Registration windows and event reminders",
+    description: "Registration reminders and schedules",
   },
 ];
 
@@ -71,18 +71,18 @@ function SettingsSwitch({
       aria-pressed={enabled}
       onClick={onClick}
       disabled={disabled}
-      className={`relative h-7 w-14 rounded-full transition-colors ${
-        enabled ? "bg-[#2EAE23]" : "bg-[#E6EDF2]"
-      } ${disabled ? "cursor-not-allowed opacity-60" : ""}`}
+      className={`relative h-7 w-12 rounded-full transition-colors ${
+        enabled ? "bg-brand-primary-800" : "bg-neutral-200"
+      } ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
     >
       <span
-        className={`absolute top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full transition-all ${
+        className={`absolute top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-xs transition-all ${
           enabled
-            ? "left-[calc(100%-1.75rem)] bg-[#2F6EEB] text-white"
-            : "left-1 bg-white text-transparent"
+            ? "left-[calc(100%-1.5rem)] text-brand-primary-800"
+            : "left-1 text-transparent"
         }`}
       >
-        {enabled && <Check size={16} strokeWidth={3} />}
+        {enabled && <Check size={12} strokeWidth={3} />}
       </span>
     </button>
   );
@@ -110,7 +110,7 @@ function SegmentedControl({
     <div
       role="group"
       aria-label={label}
-      className="mb-2 mt-3 grid grid-cols-4 rounded-2xl bg-[#F4F7F4] p-1"
+      className="mb-2 mt-3 grid grid-cols-4 rounded-xl bg-neutral-100 p-1"
     >
       {options.map((option, index) => {
         const isSelected = selectedIndex === index;
@@ -121,10 +121,10 @@ function SegmentedControl({
             type="button"
             aria-pressed={isSelected}
             onClick={() => onChange(index)}
-            className={`member-text-sm rounded-[14px] px-2 py-3 text-center text-sm font-medium transition-colors ${
+            className={`rounded-lg px-2 py-2 text-center text-xs font-semibold transition-all ${
               isSelected
-                ? "bg-[#0F6E00] text-white shadow-[0_6px_18px_rgba(15,110,0,0.2)]"
-                : "text-[#6F7B6F]"
+                ? "bg-white text-brand-primary-800 shadow-xs"
+                : "text-neutral-500 hover:text-neutral-800"
             }`}
           >
             {option}
@@ -229,37 +229,46 @@ export default function MemberSettingsView({
   }
 
   return (
-    <div className="px-5 py-6">
+    <div className="space-y-6 px-4 py-5 font-helvetica">
+      {/* Header */}
       <header className="flex items-center gap-3">
-        <Link href="/member/profile" aria-label="Back to profile">
-          <ArrowLeft size={24} className="text-[#0F6E00]" />
+        <Link
+          href="/member/profile"
+          aria-label="Back to profile"
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700 transition-colors hover:bg-neutral-200/70 active:scale-95"
+        >
+          <ArrowLeft size={20} className="text-brand-primary-800" />
         </Link>
 
-        <h1 className="member-text-2xl text-2xl font-bold text-[#0F6E00]">Settings</h1>
+        <div>
+          <h1 className="text-xl font-bold tracking-tight text-neutral-900">
+            Settings
+          </h1>
+          <p className="text-xs text-neutral-500">
+            App preferences & notifications
+          </p>
+        </div>
       </header>
 
-      <section className="mt-10">
-        <h2 className="member-text-base px-2 text-base font-bold text-[#3F473F]">Account security</h2>
-        <Link href="/member/settings/email" className="mt-4 flex items-center justify-between rounded-2xl bg-white p-5 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
-          <span className="flex items-center gap-4">
-            <Mail size={24} className="shrink-0 text-[#6F7B6F]" />
-            <span className="member-text-lg text-lg text-[#151C27]">Change Email</span>
-          </span>
-          <ChevronRight size={22} className="shrink-0 text-[#6F7B6F]" />
-        </Link>
-      </section>
-
-      <section className="mt-10">
-        <h2 className="member-text-base px-2 text-base font-bold text-[#3F473F]">
+      {/* 1. Appearance */}
+      <section>
+        <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-neutral-400">
           Appearance
         </h2>
 
-        <div className="mt-4 rounded-2xl bg-white p-5 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
-          <div className="flex items-start gap-4">
-            <Type size={24} className="mt-1 text-[#6F7B6F]" />
+        <div className="mb-4 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
+          <div className="flex items-start gap-3.5 p-4">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+              <Type size={18} />
+            </div>
 
-            <div className="flex-1">
-              <p className="member-text-lg text-lg text-[#151C27]">Font Size</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-neutral-900">
+                Font Size
+              </p>
+              <p className="text-xs text-neutral-500">
+                Adjust reader scale across portal views
+              </p>
 
               <SegmentedControl
                 label="Font Size"
@@ -277,57 +286,88 @@ export default function MemberSettingsView({
             </div>
           </div>
 
-          <Link href="#" className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Palette size={24} className="text-[#6F7B6F]" />
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+                <Palette size={18} />
+              </div>
 
               <div>
-                <p className="member-text-lg text-lg text-[#151C27]">App Theme</p>
-                <p className="member-text-sm text-sm text-[#3F473F]">System Default</p>
-              </div>
-            </div>
-
-            <ChevronRight size={22} className="text-[#6F7B6F]" />
-          </Link>
-        </div>
-      </section>
-
-      <section className="mt-10">
-        <h2 className="member-text-base px-2 text-base font-bold text-[#3F473F]">
-          Account
-        </h2>
-
-        <div className="mt-4 rounded-2xl bg-white p-5 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
-          <Link
-            href="/member/settings/password"
-            className="flex items-center justify-between gap-4"
-          >
-            <div className="flex min-w-0 items-center gap-4">
-              <KeyRound size={24} className="shrink-0 text-[#6F7B6F]" />
-
-              <div className="min-w-0">
-                <p className="member-text-lg text-lg text-[#151C27]">Password</p>
-                <p className="member-text-sm text-sm text-[#3F473F]">
-                  Change your account password
+                <p className="text-sm font-semibold text-neutral-900">
+                  App Theme
+                </p>
+                <p className="text-xs text-neutral-400">
+                  System Default (Warm Light)
                 </p>
               </div>
             </div>
 
-            <ChevronRight size={22} className="shrink-0 text-[#6F7B6F]" />
+            <ChevronRight size={18} className="text-neutral-300" />
+          </div>
+        </div>
+      </section>
+
+      {/* 2. Account */}
+      <section>
+        <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-neutral-400">
+          Account
+        </h2>
+
+        <div className="mb-4 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
+          <Link
+            href="/member/settings/password"
+            className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 active:scale-[0.98]"
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+              <KeyRound size={18} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-neutral-900">Password</p>
+              <p className="text-xs text-neutral-500">
+                Change your account password
+              </p>
+            </div>
+            <ChevronRight size={18} className="shrink-0 text-neutral-300" />
+          </Link>
+
+          <Link
+            href="/member/settings/email"
+            className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 active:scale-[0.98]"
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+              <Mail size={18} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-neutral-900">Change Email</p>
+              <p className="text-xs text-neutral-500">
+                Update the email linked to your account
+              </p>
+            </div>
+            <ChevronRight size={18} className="shrink-0 text-neutral-300" />
           </Link>
         </div>
       </section>
 
-      <section className="mt-10">
-        <h2 className="member-text-base px-2 text-base font-bold text-[#3F473F]">
+      {/* 3. Notifications */}
+      <section>
+        <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-neutral-400">
           Notifications
         </h2>
 
-        <div className="mt-4 rounded-2xl bg-white p-5 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Bell size={24} className="text-[#6F7B6F]" />
-              <p className="member-text-lg text-lg text-[#151C27]">Push Notifications</p>
+        <div className="mb-4 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-primary-100 text-brand-primary-800">
+                <Bell size={18} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-neutral-900">
+                  Push Notifications
+                </p>
+                <p className="text-xs text-neutral-500">
+                  Master alert control
+                </p>
+              </div>
             </div>
 
             <SettingsSwitch
@@ -342,21 +382,17 @@ export default function MemberSettingsView({
             />
           </div>
 
-          <p className="member-text-sm mt-3 text-sm text-[#5F5E5E]">
-            Push notifications control benefit, announcement, and event alerts.
-          </p>
-
-          <div className="mt-5 space-y-3">
+          <div className="space-y-2.5 p-4">
             {preferenceCopy.map((preference) => (
               <div
                 key={preference.key}
-                className="flex items-center justify-between gap-4 rounded-2xl border border-gray-100 bg-[#F8FAF8] px-4 py-3"
+                className="flex items-center justify-between gap-3 rounded-xl border border-neutral-100 bg-neutral-50/70 px-3.5 py-2.5"
               >
                 <div>
-                  <p className="member-text-base text-base font-semibold text-[#151C27]">
+                  <p className="text-xs font-semibold text-neutral-800">
                     {preference.title}
                   </p>
-                  <p className="member-text-sm mt-1 text-sm text-[#5F5E5E]">
+                  <p className="text-[11px] text-neutral-500">
                     {preference.description}
                   </p>
                 </div>
@@ -364,9 +400,7 @@ export default function MemberSettingsView({
                 <SettingsSwitch
                   enabled={preferences[preference.key]}
                   onClick={() => handlePreferenceToggle(preference.key)}
-                  disabled={
-                    loadingPreferences || savingPush || !pushEnabled
-                  }
+                  disabled={loadingPreferences || savingPush || !pushEnabled}
                   label={
                     preferences[preference.key]
                       ? `${preference.title} enabled`
@@ -377,10 +411,19 @@ export default function MemberSettingsView({
             ))}
           </div>
 
-          <div className="mt-8 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Mail size={24} className="text-[#6F7B6F]" />
-              <p className="member-text-lg text-lg text-[#151C27]">Email Notifications</p>
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+                <Mail size={18} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-neutral-900">
+                  Email Notifications
+                </p>
+                <p className="text-xs text-neutral-400">
+                  Coming soon in next release
+                </p>
+              </div>
             </div>
 
             <SettingsSwitch
@@ -394,84 +437,102 @@ export default function MemberSettingsView({
               }
             />
           </div>
-
-          <p className="member-text-sm mt-3 text-sm text-[#5F5E5E]">
-            Email notifications are not connected yet.
-          </p>
         </div>
       </section>
 
-      <section className="mt-10">
-        <h2 className="member-text-base px-2 text-base font-bold text-[#3F473F]">
+      {/* 3. Preferences */}
+      <section>
+        <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-neutral-400">
           Preferences
         </h2>
 
-        <div className="mt-4 rounded-2xl bg-white p-5 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
-          <Link href="#" className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Globe size={24} className="text-[#6F7B6F]" />
+        <div className="mb-4 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+                <Globe size={18} />
+              </div>
 
               <div>
-                <p className="member-text-lg text-lg text-[#151C27]">Language</p>
-                <p className="member-text-sm text-sm text-[#3F473F]">English</p>
+                <p className="text-sm font-semibold text-neutral-900">
+                  Language
+                </p>
+                <p className="text-xs text-neutral-500">
+                  English (Singapore)
+                </p>
               </div>
             </div>
 
-            <ChevronRight size={22} className="text-[#6F7B6F]" />
-          </Link>
-        </div>
-      </section>
-
-      <section className="mt-10">
-        <h2 className="member-text-base px-2 text-base font-bold text-[#3F473F]">
-          About & Support
-        </h2>
-
-        <div className="mt-4 rounded-2xl bg-white p-5 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
-          <Link href="#" className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Info size={24} className="text-[#6F7B6F]" />
-              <p className="member-text-lg text-lg text-[#151C27]">Help & Support</p>
-            </div>
-
-            <ChevronRight size={22} className="text-[#6F7B6F]" />
-          </Link>
-
-          <Link href="#" className="mt-8 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <ShieldCheck size={24} className="text-[#6F7B6F]" />
-              <p className="member-text-lg text-lg text-[#151C27]">Privacy Policy</p>
-            </div>
-
-            <ExternalLink size={22} className="text-[#6F7B6F]" />
-          </Link>
-
-          <Link href="#" className="mt-8 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <FileText size={24} className="text-[#6F7B6F]" />
-              <p className="member-text-lg text-lg text-[#151C27]">Terms of Service</p>
-            </div>
-
-            <ExternalLink size={22} className="text-[#6F7B6F]" />
-          </Link>
-
-          <div className="mt-8 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Info size={24} className="text-[#6F7B6F]" />
-              <p className="member-text-lg text-lg text-[#151C27]">Version 2.4.0 (Build 108)</p>
-            </div>
+            <span className="rounded-md bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-600">
+              Default
+            </span>
           </div>
         </div>
       </section>
 
-      <button
-        type="button"
-        onClick={handleLogout}
-        className="member-text-base mx-auto mt-14 flex items-center justify-center gap-2 font-bold text-red-600"
-      >
-        <LogOut size={20} />
-        Log Out
-      </button>
+      {/* 4. About & Support */}
+      <section>
+        <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-neutral-400">
+          About & Support
+        </h2>
+
+        <div className="mb-4 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+                <Info size={18} />
+              </div>
+              <p className="text-sm font-semibold text-neutral-900">
+                Help & Support
+              </p>
+            </div>
+            <ChevronRight size={18} className="text-neutral-300" />
+          </div>
+
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+                <ShieldCheck size={18} />
+              </div>
+              <p className="text-sm font-semibold text-neutral-900">
+                Privacy Policy
+              </p>
+            </div>
+            <ExternalLink size={16} className="text-neutral-300" />
+          </div>
+
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-3.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+                <FileText size={18} />
+              </div>
+              <p className="text-sm font-semibold text-neutral-900">
+                Terms of Service
+              </p>
+            </div>
+            <ExternalLink size={16} className="text-neutral-300" />
+          </div>
+
+          <div className="flex items-center justify-between p-4 bg-neutral-50/50">
+            <p className="text-xs text-neutral-500">Pergas Member Portal</p>
+            <span className="font-mono text-xs font-medium text-neutral-400">
+              v2.4.0 (Build 108)
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* Log out button */}
+      <div className="pt-2">
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-white px-4 py-3 text-sm font-semibold text-brand-rose shadow-2xs transition-transform duration-100 hover:bg-rose-50 active:scale-[0.98]"
+        >
+          <LogOut size={18} />
+          <span>Log Out</span>
+        </button>
+      </div>
     </div>
   );
 }

@@ -91,6 +91,7 @@ export default async function EventsPage({
         events={eventsWithRegStatus as EventRow[]}
         hasError={Boolean(error)}
         initialView={initialView}
+        attendeeName={currentUser?.fullName}
       />
     </MemberPageShell>
   );

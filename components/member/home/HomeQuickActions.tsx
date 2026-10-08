@@ -1,55 +1,61 @@
 import Link from "next/link";
 import { CalendarDays, CreditCard, Gift, Megaphone } from "lucide-react";
 
+// The Digital Card is the one thing the bottom nav does not cover, and the
+// action members need most at an event door, so it gets the solid primary tile.
 const actions = [
   {
     label: "Digital Card",
     href: "/member/profile",
     icon: CreditCard,
+    tile: "bg-brand-primary-800 text-white shadow-sm",
   },
   {
     label: "Events",
     href: "/member/events",
     icon: CalendarDays,
+    tile: "bg-brand-primary-100 text-brand-primary-800",
   },
   {
     label: "Benefits",
     href: "/member/benefit",
     icon: Gift,
+    tile: "bg-brand-accent-soft text-amber-900",
   },
   {
-    label: "Announcements",
+    label: "Updates",
     href: "/member/community?tab=announcements",
     icon: Megaphone,
+    tile: "bg-brand-secondary-soft text-brand-secondary-dark",
   },
 ];
 
 export default function HomeQuickActions() {
   return (
-    <section className="mt-4">
-      <h2 className="member-text-xl font-semibold text-[#0F6E00]">
-        Quick Actions
-      </h2>
-
-      <div className="mt-4 grid grid-cols-2 gap-3">
+    <nav aria-label="Quick actions" className="mt-4">
+      <ul className="grid grid-cols-4 gap-2">
         {actions.map((action) => {
           const Icon = action.icon;
 
           return (
-            <Link
-              key={action.label}
-              href={action.href}
-              className="flex min-h-24 flex-col items-center justify-center rounded-xl border border-gray-200 bg-white p-4 text-center shadow-sm"
-            >
-              <Icon size={24} className="text-[#0F6E00]" />
-
-              <span className="member-text-sm mt-2 font-semibold text-[#151C27]">
-                {action.label}
-              </span>
-            </Link>
+            <li key={action.label}>
+              <Link
+                href={action.href}
+                className="group flex flex-col items-center gap-1.5 transition-transform duration-100 active:scale-95"
+              >
+                <span
+                  className={`flex h-14 w-14 items-center justify-center rounded-2xl transition-transform group-hover:scale-105 ${action.tile}`}
+                >
+                  <Icon size={24} strokeWidth={2.1} aria-hidden="true" />
+                </span>
+                <span className="text-xs font-semibold text-neutral-800">
+                  {action.label}
+                </span>
+              </Link>
+            </li>
           );
         })}
-      </div>
-    </section>
+      </ul>
+    </nav>
   );
 }
