@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import type { MemberProfile } from "@/app/member/profile/page";
 import { formatTierLabel } from "@/lib/membershipTiers";
@@ -26,6 +27,7 @@ import {
   Truck,
   Users,
   Vote,
+  X,
 } from "lucide-react";
 
 type Benefit = {
@@ -192,6 +194,49 @@ export default function ProfileView({
   registrations?: EventRegistration[];
 }) {
   const router = useRouter();
+  const [qrValue, setQrValue] = useState<string | null>(null);
+  const [qrError, setQrError] = useState<string | null>(null);
+  const qrDialogRef = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    let timer: ReturnType<typeof setTimeout>;
+    let expiryTimer: ReturnType<typeof setTimeout>;
+    async function refreshQr() {
+      const started = Date.now();
+      let errorMessage = "Unable to connect. Retrying automatically...";
+      try {
+        const response = await fetch("/api/member/qr-token", { cache: "no-store", signal: controller.signal });
+        if (!response.ok) {
+          const failure = await response.json().catch(() => null);
+          errorMessage = response.status === 401
+            ? "Your session has expired. Please log out and log in again."
+            : response.status === 404
+              ? failure?.code === "member_not_found"
+                ? "Your membership record is unavailable. Please log in again."
+                : "The QR service could not be found. Please restart the app server and refresh this page."
+              : "The server could not generate your QR. Retrying automatically...";
+          throw new Error("QR unavailable");
+        }
+        errorMessage = "Unable to load a valid QR. Retrying automatically...";
+        const data = await response.json();
+        const remaining = data.expiresIn * 1000 - (Date.now() - started) - 1000;
+        if (typeof data.verificationUrl !== "string" || !Number.isFinite(remaining) || remaining <= 0) throw new Error("QR unavailable");
+        if (controller.signal.aborted) return;
+        setQrValue(data.verificationUrl);
+        setQrError(null);
+        clearTimeout(expiryTimer);
+        expiryTimer = setTimeout(() => { setQrValue(null); setQrError("QR expired. Waiting for a new QR..."); }, remaining);
+        timer = setTimeout(refreshQr, Math.min(240_000, remaining));
+      } catch {
+        if (controller.signal.aborted) return;
+        setQrValue(null);
+        setQrError(errorMessage);
+        timer = setTimeout(refreshQr, 30_000);
+      }
+    }
+    void refreshQr();
+    return () => { controller.abort(); clearTimeout(timer); clearTimeout(expiryTimer); };
+  }, []);
   const tier = member.membership_tier || "basic";
   const benefits = benefitsByTier[tier] || benefitsByTier.basic;
 
@@ -209,13 +254,6 @@ export default function ProfileView({
     window.sessionStorage.setItem(LOGOUT_LOGIN_HINT_KEY, "1");
     router.replace("/");
   }
-
-  const qrValue = JSON.stringify({
-    memberId: member.member_id,
-    name: formatMemberName(member, "Member Name"),
-    status: member.membership_status,
-    tier: member.membership_tier,
-  });
 
   return (
     <div className="space-y-6 px-4 py-5 font-helvetica">
@@ -291,17 +329,67 @@ export default function ProfileView({
             )}
           </div>
 
-          {/* QR Code Container */}
+          {/* QR Code Container (tap to enlarge: main's secure rotating QR) */}
           <div className="flex shrink-0 flex-col items-center">
-            <div className="inline-block rounded-xl bg-white p-2.5">
-              <QRCodeCanvas value={qrValue} size={78} />
-            </div>
+            <button
+              type="button"
+              onClick={() => qrDialogRef.current?.showModal()}
+              aria-label="Enlarge membership QR code"
+              aria-haspopup="dialog"
+              aria-controls="membership-qr-dialog"
+              className="inline-block cursor-pointer rounded-xl bg-white p-2.5 transition-transform duration-100 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+            >
+              {qrValue ? (
+                <QRCodeCanvas
+                  value={qrValue}
+                  size={74}
+                  marginSize={4}
+                  title="Tap to enlarge membership QR"
+                />
+              ) : (
+                <p
+                  role="status"
+                  className="flex h-[74px] w-[74px] items-center justify-center text-center text-xs text-gray-700"
+                >
+                  {qrError ? "QR unavailable. Tap for details." : "Loading QR..."}
+                </p>
+              )}
+            </button>
             <span className="mt-1.5 text-[10px] font-medium tracking-wide text-brand-primary-100/80">
               Digital Pass
             </span>
           </div>
         </div>
       </section>
+
+      <dialog
+        ref={qrDialogRef}
+        id="membership-qr-dialog"
+        aria-labelledby="membership-qr-title"
+        aria-describedby="membership-qr-description"
+        className="fixed inset-0 m-auto max-h-[90dvh] w-[calc(100%_-_2rem)] max-w-sm overflow-y-auto rounded-2xl bg-white p-0 text-gray-900 shadow-xl backdrop:bg-black/60"
+        onClick={(event) => {
+          if (event.target === event.currentTarget) qrDialogRef.current?.close();
+        }}
+      >
+        <div className="p-6">
+          <div className="flex items-center justify-between gap-3">
+            <h2 id="membership-qr-title" className="text-lg font-bold text-[#0F6E00]">Membership QR</h2>
+            <form method="dialog">
+              <button type="submit" aria-label="Close QR overlay" className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-[#0F6E00]">
+                <X size={22} />
+              </button>
+            </form>
+          </div>
+          <div className="my-5 flex justify-center">
+            {qrValue ? <QRCodeCanvas value={qrValue} size={280} marginSize={4} title="Scan to verify membership" className="h-auto! max-w-full" /> :
+              <p role="status" className="flex min-h-64 items-center text-center text-sm text-gray-600">
+                {qrError || "Loading secure QR..."}
+              </p>}
+          </div>
+          <p id="membership-qr-description" className="text-center text-sm text-gray-600">Scan to verify membership. QR refreshes automatically for security.</p>
+        </div>
+      </dialog>
 
       {tier !== "ordinary" && (
         <Link

@@ -111,6 +111,11 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
       {/* Form Fields Card */}
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-xs space-y-4">
+          <div className="space-y-2">
+            <Input label="Registered email" type="email" value={initial.email ?? ""} readOnly />
+            <Link href="/member/settings/email" className="member-text-sm block text-sm font-semibold text-brand-primary-800">Change Email</Link>
+          </div>
+
           <Select
             label="Salutation"
             value={salutation}

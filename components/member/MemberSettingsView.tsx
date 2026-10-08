@@ -329,6 +329,22 @@ export default function MemberSettingsView({
             </div>
             <ChevronRight size={18} className="shrink-0 text-neutral-300" />
           </Link>
+
+          <Link
+            href="/member/settings/email"
+            className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 active:scale-[0.98]"
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+              <Mail size={18} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-neutral-900">Change Email</p>
+              <p className="text-xs text-neutral-500">
+                Update the email linked to your account
+              </p>
+            </div>
+            <ChevronRight size={18} className="shrink-0 text-neutral-300" />
+          </Link>
         </div>
       </section>
 
