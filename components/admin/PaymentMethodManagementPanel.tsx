@@ -15,11 +15,12 @@ import {
 import { useToast } from "@/components/ui/Toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import type { AdminPaymentMethod } from "@/lib/adminPaymentMethods";
+import { normalizePaymentUrl } from "@/lib/paymentUrl";
 
 type PaymentMethodFormState = {
   name: string;
   description: string;
-  paynow_uen: string;
+  payment_url: string;
   qr_code_url: string;
   is_active: boolean;
 };
@@ -29,7 +30,7 @@ type FilterValue = "all" | "active" | "inactive";
 const EMPTY_FORM: PaymentMethodFormState = {
   name: "",
   description: "",
-  paynow_uen: "",
+  payment_url: "",
   qr_code_url: "",
   is_active: true,
 };
@@ -49,7 +50,7 @@ function formFromPaymentMethod(method: AdminPaymentMethod): PaymentMethodFormSta
   return {
     name: method.name ?? "",
     description: method.description ?? "",
-    paynow_uen: method.paynow_uen ?? "",
+    payment_url: method.payment_url ?? "",
     qr_code_url: method.qr_code_url ?? "",
     is_active: Boolean(method.is_active),
   };
@@ -80,7 +81,7 @@ function buildPayload(form: PaymentMethodFormState) {
   return {
     name: form.name.trim(),
     description: form.description.trim() || null,
-    paynow_uen: form.paynow_uen.trim() || null,
+    payment_url: form.payment_url.trim(),
     qr_code_url: form.qr_code_url.trim() || null,
     is_active: form.is_active,
   };
@@ -128,7 +129,7 @@ export default function PaymentMethodManagementPanel({
       if (!statusMatch) return false;
       if (!query) return true;
 
-      return [method.name, method.paynow_uen ?? "", method.description ?? ""]
+      return [method.name, method.payment_url ?? "", method.description ?? ""]
         .join(" ")
         .toLowerCase()
         .includes(query);
@@ -137,7 +138,7 @@ export default function PaymentMethodManagementPanel({
 
   const sortedMethods = sortData(filteredMethods, (method, key) => {
     if (key === "name") return method.name;
-    if (key === "paynow_uen") return method.paynow_uen ?? "";
+    if (key === "payment_url") return method.payment_url ?? "";
     if (key === "is_active") return method.is_active ? "active" : "inactive";
     if (key === "created_at") return method.created_at ?? "";
     return "";
@@ -204,8 +205,12 @@ export default function PaymentMethodManagementPanel({
       toast.warning("Name is required.");
       return;
     }
-    if (!payload.paynow_uen && !payload.qr_code_url) {
-      toast.warning("Provide a PayNow UEN, a QR code image, or both.");
+    if (!payload.payment_url) {
+      toast.warning("Payment link is required.");
+      return;
+    }
+    if (!normalizePaymentUrl(payload.payment_url)) {
+      toast.warning("Enter a valid payment link, e.g. https://pay.example.com/pergas");
       return;
     }
 
@@ -339,10 +344,16 @@ export default function PaymentMethodManagementPanel({
           </div>
         </TableCell>
         <TableCell>
-          {method.paynow_uen ? (
-            <span className="inline-block px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-[#e3f6fb] text-[#1a7a8f]">
-              {method.paynow_uen}
-            </span>
+          {method.payment_url ? (
+            <a
+              href={method.payment_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block max-w-[260px] truncate align-middle px-2 py-0.5 rounded text-[11px] font-medium bg-[#e3f6fb] text-[#1a7a8f] hover:underline"
+              title={method.payment_url}
+            >
+              {method.payment_url.replace(/^https?:\/\//, "")}
+            </a>
           ) : (
             <span className="text-[12px] text-gray-400">—</span>
           )}
@@ -421,8 +432,9 @@ export default function PaymentMethodManagementPanel({
             Payment Methods
           </h2>
           <p className="text-[13px] text-gray-500 mt-1 font-helvetica">
-            Manage the PayNow UEN and QR codes members use to pay. Payments are handled
-            externally — this just publishes where members should send payment. Only one
+            Manage the payment link (and optional QR code) members use to pay. Payments are
+            handled externally on your preferred platform — this just publishes where members
+            should send payment. Only one
             payment method can be active at a time; activating one deactivates the rest.
           </p>
         </div>
@@ -482,7 +494,7 @@ export default function PaymentMethodManagementPanel({
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search name, UEN, description..."
+              placeholder="Search name, link, description..."
               className="w-full h-10 rounded-lg border border-gray-200 bg-gray-50 pl-9 pr-3 text-[13px] text-gray-700 outline-none focus:border-[#3FAE2A] focus:bg-white font-helvetica"
             />
           </label>
@@ -506,8 +518,8 @@ export default function PaymentMethodManagementPanel({
           <TableHeader sortKey="name" sortState={sortState} onSort={handleSort}>
             Name
           </TableHeader>
-          <TableHeader sortKey="paynow_uen" sortState={sortState} onSort={handleSort}>
-            PayNow UEN
+          <TableHeader sortKey="payment_url" sortState={sortState} onSort={handleSort}>
+            Payment Link
           </TableHeader>
           <TableHeader>QR Code</TableHeader>
           <TableHeader sortKey="is_active" sortState={sortState} onSort={handleSort}>
@@ -554,19 +566,25 @@ export default function PaymentMethodManagementPanel({
                   value={form.name}
                   onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
                   className="w-full h-10 rounded-lg border border-gray-200 px-3 text-[13px] outline-none focus:border-[#3FAE2A]"
-                  placeholder="e.g. Membership Renewal (PayNow)"
+                  placeholder="e.g. Membership Renewal"
                   required
                 />
               </label>
 
-              <label className="space-y-1.5">
-                <span className="text-[12px] font-bold text-gray-600">PayNow UEN</span>
+              <label className="sm:col-span-2 space-y-1.5">
+                <span className="text-[12px] font-bold text-gray-600">Payment link</span>
                 <input
-                  value={form.paynow_uen}
-                  onChange={(event) => setForm((prev) => ({ ...prev, paynow_uen: event.target.value }))}
-                  className="w-full h-10 rounded-lg border border-gray-200 px-3 text-[13px] font-mono outline-none focus:border-[#3FAE2A]"
-                  placeholder="e.g. 201234567A"
+                  type="text"
+                  inputMode="url"
+                  value={form.payment_url}
+                  onChange={(event) => setForm((prev) => ({ ...prev, payment_url: event.target.value }))}
+                  className="w-full h-10 rounded-lg border border-gray-200 px-3 text-[13px] outline-none focus:border-[#3FAE2A]"
+                  placeholder="e.g. https://pay.example.com/pergas"
+                  required
                 />
+                <span className="block text-[11px] text-gray-400">
+                  Link to your preferred payment platform. Members will get a button that opens it.
+                </span>
               </label>
 
               <label className="sm:col-span-2 flex items-center justify-between gap-4 rounded-xl border border-[#c3e6b3] bg-[#f0faf0] px-4 py-3">
@@ -599,9 +617,9 @@ export default function PaymentMethodManagementPanel({
                 <div className="rounded-xl border border-gray-200 bg-gray-50/60 p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <span className="block text-[12px] font-bold text-gray-600">QR code</span>
+                      <span className="block text-[12px] font-bold text-gray-600">QR code (optional)</span>
                       <p className="mt-1 text-[12px] text-gray-500">
-                        Upload the QR code from your bank / PayNow app for members to scan.
+                        Optionally upload a QR code from your payment platform for members to scan.
                       </p>
                     </div>
                     {form.qr_code_url && (
