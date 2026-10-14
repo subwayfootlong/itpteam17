@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { ArrowLeft, KeyRound } from "lucide-react";
 import Input from "@/components/ui/Input";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
@@ -79,9 +79,9 @@ export default function ChangePasswordForm() {
   return (
     <div className="px-5 py-6">
       <header className="flex items-center gap-3">
-        <Link href="/member/settings" aria-label="Back to settings">
+        <NavLink href="/member/settings" aria-label="Back to settings">
           <ArrowLeft size={24} className="text-[#0F6E00]" />
-        </Link>
+        </NavLink>
 
         <h1
           id="change-password-title"

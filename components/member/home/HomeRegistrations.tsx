@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { CalendarCheck, CalendarDays, ChevronRight, MapPin } from "lucide-react";
 import { formatMemberDate } from "@/lib/dates";
 
@@ -39,12 +39,12 @@ export default function HomeRegistrations({
         >
           My registrations
         </h2>
-        <Link
+        <NavLink
           href="/member/events"
           className="text-xs font-semibold text-brand-primary-800 underline-offset-2 hover:underline"
         >
           See all
-        </Link>
+        </NavLink>
       </div>
 
       {events.length === 0 ? (
@@ -60,18 +60,18 @@ export default function HomeRegistrations({
               Browse Pergas events and reserve your place.
             </p>
           </div>
-          <Link
+          <NavLink
             href="/member/events"
             className="shrink-0 rounded-full bg-brand-primary-800 px-3.5 py-2 text-xs font-semibold text-white transition-transform duration-100 hover:bg-brand-primary-900 active:scale-95"
           >
             Browse
-          </Link>
+          </NavLink>
         </div>
       ) : (
         <ul className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
           {events.map((event) => (
             <li key={event.id}>
-              <Link
+              <NavLink
                 href={`/member/events/${event.id}`}
                 className="flex items-center gap-3.5 p-3.5 transition-transform duration-100 hover:bg-neutral-50 active:scale-[0.98]"
               >
@@ -114,7 +114,7 @@ export default function HomeRegistrations({
                     aria-hidden="true"
                   />
                 </span>
-              </Link>
+              </NavLink>
             </li>
           ))}
         </ul>

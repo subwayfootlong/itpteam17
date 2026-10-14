@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { useMemo, useState, useCallback } from "react";
 import { Lock, Search, X } from "lucide-react";
 import type { Partner } from "@/lib/data/partners";
@@ -51,9 +51,9 @@ function BenefitsHeader({ initials }: { initials: string }) {
         <span className="benefits-member-avatar">{initials}</span>
         <h1>Pergas</h1>
       </div>
-      <Link href="/member/notifications" aria-label="Notifications">
+      <NavLink href="/member/notifications" aria-label="Notifications">
         <MemberIcon name="bell" size={22} />
-      </Link>
+      </NavLink>
     </header>
   );
 }

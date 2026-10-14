@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -166,12 +166,12 @@ function EventDescription({
         {description}
       </p>
       {isTruncated && !isLocked && (
-        <Link
+        <NavLink
           href={`/member/events/${eventId}`}
           className="mt-1 inline-block text-xs font-semibold text-brand-primary-800 hover:underline"
         >
           See more
-        </Link>
+        </NavLink>
       )}
     </div>
   );
@@ -200,7 +200,7 @@ function EventCard({
             category={event.category}
           />
         ) : (
-          <Link
+          <NavLink
             href={`/member/events/${event.id}`}
             aria-label={`View details for ${event.title}`}
             className="block"
@@ -210,7 +210,7 @@ function EventCard({
               title={event.title}
               category={event.category}
             />
-          </Link>
+          </NavLink>
         )}
 
         {/* Floating status pill on top right */}
@@ -254,7 +254,7 @@ function EventCard({
             {event.isLocked ? (
               event.title
             ) : (
-              <Link href={`/member/events/${event.id}`}>{event.title}</Link>
+              <NavLink href={`/member/events/${event.id}`}>{event.title}</NavLink>
             )}
           </h3>
 
@@ -305,13 +305,13 @@ function EventCard({
               </span>
             </button>
           ) : event.isRegistered ? (
-            <Link
+            <NavLink
               href={`/member/events/${event.id}`}
               className="flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-brand-primary-200 bg-brand-primary-100 px-4 py-2.5 text-xs font-bold text-brand-primary-800 transition-all hover:bg-brand-primary-200 active:scale-[0.99]"
             >
               <Check size={14} strokeWidth={3} />
               <span>You&apos;re Registered • View Details</span>
-            </Link>
+            </NavLink>
           ) : event.isRejected ? (
             <button
               type="button"
@@ -345,7 +345,7 @@ function EventCard({
               </span>
             </a>
           ) : (
-            <Link
+            <NavLink
               href={`/member/events/${event.id}`}
               className="flex min-h-11 w-full items-center justify-center rounded-xl bg-brand-primary-800 px-4 py-2.5 text-xs font-bold text-white shadow-2xs transition-all hover:bg-brand-primary-900 active:scale-[0.99]"
               style={{ backgroundColor: "#245F1B", color: "#ffffff" }}
@@ -353,7 +353,7 @@ function EventCard({
               <span className="text-white font-bold" style={{ color: "#ffffff" }}>
                 View Details & RSVP
               </span>
-            </Link>
+            </NavLink>
           )}
         </div>
       </div>

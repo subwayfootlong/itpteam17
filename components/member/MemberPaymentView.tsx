@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { ArrowLeft, Check, Copy, ExternalLink, QrCode } from "lucide-react";
 import { formatMemberDate, getExpiryInfo } from "@/lib/dates";
 import type { PublicPaymentMethod } from "@/lib/paymentMethods";
@@ -100,9 +100,9 @@ export default function MemberPaymentView({
   return (
     <div className="px-5 py-6">
       <header className="flex items-center gap-3">
-        <Link href="/member/profile" aria-label="Back to profile">
+        <NavLink href="/member/profile" aria-label="Back to profile">
           <ArrowLeft size={24} className="text-[#0F6E00]" />
-        </Link>
+        </NavLink>
         <h1 className="member-text-2xl text-2xl font-bold text-[#0F6E00]">Make Payment</h1>
       </header>
 

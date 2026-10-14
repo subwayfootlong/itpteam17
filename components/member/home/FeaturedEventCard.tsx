@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { CalendarDays, MapPin } from "lucide-react";
 import { formatMemberDate } from "@/lib/dates";
 
@@ -87,7 +87,7 @@ export default function FeaturedEventCard({
         </div>
 
         {/* Full-width View Event Button with Pergas Green and guaranteed high-contrast white text */}
-        <Link
+        <NavLink
           href={`/member/events/${event.id}`}
           className="mt-4 block w-full rounded-xl bg-brand-primary-800 px-3 py-2.5 text-center text-xs font-bold shadow-xs transition-all hover:bg-brand-primary-900 active:scale-[0.98]"
           style={{ backgroundColor: "#245F1B", color: "#ffffff" }}
@@ -95,7 +95,7 @@ export default function FeaturedEventCard({
           <span className="font-bold text-white" style={{ color: "#ffffff" }}>
             View Event
           </span>
-        </Link>
+        </NavLink>
       </div>
     </article>
   );

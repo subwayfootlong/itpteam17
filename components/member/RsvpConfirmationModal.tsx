@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { useEffect, useRef } from "react";
 import {
   CalendarPlus,
@@ -173,12 +173,12 @@ export default function RsvpConfirmationModal({
         </div>
 
         <div className="mt-4 space-y-2">
-          <Link
+          <NavLink
             href="/member/profile"
             className="flex min-h-11 w-full items-center justify-center rounded-xl bg-brand-primary-800 px-4 py-2.5 text-sm font-semibold text-white transition-transform duration-100 hover:bg-brand-primary-900 active:scale-[0.98]"
           >
             View my digital card
-          </Link>
+          </NavLink>
           <button
             ref={doneRef}
             type="button"

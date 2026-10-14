@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { CalendarDays, CreditCard, Gift, Megaphone } from "lucide-react";
 
 // The Digital Card is the one thing the bottom nav does not cover, and the
@@ -39,7 +39,7 @@ export default function HomeQuickActions() {
 
           return (
             <li key={action.label}>
-              <Link
+              <NavLink
                 href={action.href}
                 className="group flex flex-col items-center gap-1.5 transition-transform duration-100 active:scale-95"
               >
@@ -51,7 +51,7 @@ export default function HomeQuickActions() {
                 <span className="text-xs font-semibold text-neutral-800">
                   {action.label}
                 </span>
-              </Link>
+              </NavLink>
             </li>
           );
         })}

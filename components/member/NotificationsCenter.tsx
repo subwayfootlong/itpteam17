@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { useEffect, useMemo, useState } from "react";
 import {
   Bell,
@@ -68,7 +68,7 @@ function NotificationHeader({ unreadCount }: { unreadCount: number }) {
       <h1 className="text-lg font-bold tracking-tight text-neutral-900">
         Pergas
       </h1>
-      <Link
+      <NavLink
         href="/member/notifications"
         aria-label={`${unreadCount} unread notifications`}
         aria-current="page"
@@ -78,7 +78,7 @@ function NotificationHeader({ unreadCount }: { unreadCount: number }) {
         {unreadCount > 0 && (
           <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full border-2 border-white bg-brand-rose" />
         )}
-      </Link>
+      </NavLink>
     </header>
   );
 }
@@ -349,13 +349,13 @@ export default function NotificationsCenter({
                           {notification.message}
                         </p>
                         <div className="mt-3 flex items-center justify-between gap-2 border-t border-neutral-200/70 pt-2.5">
-                          <a
+                          <NavLink
                             href={notification.actionHref}
                             className="inline-flex items-center gap-0.5 text-xs font-semibold text-brand-primary-800 transition-transform duration-100 active:scale-95"
                           >
                             {notification.actionLabel}
                             <ChevronRight size={14} aria-hidden="true" />
-                          </a>
+                          </NavLink>
                           <button
                             type="button"
                             onClick={() => toggleRead(notification.id)}

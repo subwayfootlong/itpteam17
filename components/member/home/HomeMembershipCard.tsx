@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { CalendarDays, CreditCard } from "lucide-react";
 
 type HomeMembershipCardProps = {
@@ -78,7 +78,7 @@ export default function HomeMembershipCard({
 
         {/* Action Button: High contrast white card with deep Pergas green text */}
         <div className="mt-6">
-          <Link
+          <NavLink
             href="/member/profile"
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-center text-sm font-bold text-brand-primary-800 shadow-md transition-transform duration-100 hover:bg-neutral-50 active:scale-[0.98]"
             aria-label={ctaLabel}
@@ -87,7 +87,7 @@ export default function HomeMembershipCard({
             <span className="font-bold text-brand-primary-800">
               {ctaLabel}
             </span>
-          </Link>
+          </NavLink>
         </div>
       </div>
     </section>
