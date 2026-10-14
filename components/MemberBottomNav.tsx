@@ -1,8 +1,37 @@
 "use client";
 
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, CalendarDays, Gift, MessageSquare, User } from "lucide-react";
+import {
+  Home,
+  CalendarDays,
+  Gift,
+  MessageSquare,
+  User,
+  type LucideIcon,
+} from "lucide-react";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+
+/** Tab icon that turns into a spinner the moment the tab is tapped. */
+function TabIcon({ icon: Icon, isActive }: { icon: LucideIcon; isActive: boolean }) {
+  const { pending } = useLinkStatus();
+
+  return (
+    <span className="flex h-[22px] w-[22px] items-center justify-center">
+      {pending ? (
+        <LoadingSpinner label="" size="sm" />
+      ) : (
+        <Icon
+          size={22}
+          strokeWidth={isActive ? 2.5 : 2}
+          fill={isActive ? "currentColor" : "none"}
+          fillOpacity={isActive ? 0.15 : 0}
+          aria-hidden="true"
+        />
+      )}
+    </span>
+  );
+}
 
 const navItems = [
   {
@@ -50,7 +79,6 @@ export default function MemberBottomNav() {
     >
       <div className="grid grid-cols-5 gap-1 text-center">
         {navItems.map((item) => {
-          const Icon = item.icon;
           const isActive = isActiveRoute(item.href);
 
           return (
@@ -64,13 +92,7 @@ export default function MemberBottomNav() {
                   : "font-normal text-neutral-400 hover:text-neutral-600"
               }`}
             >
-              <Icon
-                size={22}
-                strokeWidth={isActive ? 2.5 : 2}
-                fill={isActive ? "currentColor" : "none"}
-                fillOpacity={isActive ? 0.15 : 0}
-                aria-hidden="true"
-              />
+              <TabIcon icon={item.icon} isActive={isActive} />
 
               <span className="mt-1 block truncate text-[11px] leading-tight tracking-tight">
                 {item.label}

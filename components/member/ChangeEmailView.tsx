@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import Input from "@/components/ui/Input";
@@ -48,9 +48,9 @@ export default function ChangeEmailView() {
   return (
     <div className="px-5 py-6">
       <header className="flex items-center gap-3">
-        <Link href="/member/settings" aria-label="Back to settings" className="shrink-0">
+        <NavLink href="/member/settings" aria-label="Back to settings" className="shrink-0">
           <ArrowLeft size={24} className="text-[#0F6E00]" />
-        </Link>
+        </NavLink>
         <h1 className="member-text-2xl text-2xl font-bold text-[#0F6E00]">{maskedEmail ? "Verify New Email" : "Change Email"}</h1>
       </header>
       {success ? <p role="status" className="member-text-sm mt-8 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">Email changed successfully. Please log in again with your new email and existing password.</p> : (

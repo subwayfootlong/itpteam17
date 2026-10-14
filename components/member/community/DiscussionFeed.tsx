@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { MessageSquare, PenLine } from "lucide-react";
 import type {
   DiscussionGroup,
@@ -55,24 +55,24 @@ export default function DiscussionFeed({
           <p className="mt-1 text-sm text-neutral-600">
             Be the first member to start a discussion in this space.
           </p>
-          <Link
+          <NavLink
             href={composeHref}
             className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-brand-primary-800 px-5 py-2.5 text-sm font-semibold text-white transition-transform duration-100 hover:bg-brand-primary-900 active:scale-[0.98]"
           >
             Create First Post
-          </Link>
+          </NavLink>
         </div>
       )}
 
       {/* Floating action button, kept inside the 28rem app column on wide screens */}
-      <Link
+      <NavLink
         href={composeHref}
         aria-label="Create post"
         className="fixed bottom-20 right-[max(1rem,calc((100vw-28rem)/2+1rem))] z-40 flex items-center gap-2 rounded-full bg-brand-primary-800 px-4 py-3 font-medium text-white shadow-lg transition-transform duration-100 hover:bg-brand-primary-900 active:scale-95"
       >
         <PenLine size={18} aria-hidden="true" />
         <span className="text-sm">Create Post</span>
-      </Link>
+      </NavLink>
     </section>
   );
 }

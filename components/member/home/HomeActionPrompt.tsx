@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import type { CurrentUser } from "@/lib/currentUser";
 
 function isExpirySoon(expiryDate: string | null) {
@@ -32,7 +32,7 @@ export default function HomeActionPrompt({ user }: { user: CurrentUser }) {
           Add your contact and organisation details to unlock all member privileges.
         </p>
 
-        <Link
+        <NavLink
           href="/member/profile/edit"
           className="mt-4 block w-full rounded-xl bg-[#7A4B00] px-4 py-2.5 text-center text-xs font-bold shadow-xs transition-all hover:bg-[#5E3900] active:scale-[0.98]"
           style={{ backgroundColor: "#7A4B00", color: "#ffffff" }}
@@ -40,7 +40,7 @@ export default function HomeActionPrompt({ user }: { user: CurrentUser }) {
           <span className="font-bold text-white" style={{ color: "#ffffff" }}>
             Update Profile
           </span>
-        </Link>
+        </NavLink>
       </section>
     );
   }
@@ -56,14 +56,14 @@ export default function HomeActionPrompt({ user }: { user: CurrentUser }) {
           Your membership will expire soon. Renew now to maintain continuous access.
         </p>
 
-        <Link
+        <NavLink
           href="/member/payment"
           className="mt-4 block w-full rounded-xl bg-brand-primary-800 px-4 py-2.5 text-center text-xs font-bold text-white shadow-2xs transition-all hover:bg-brand-primary-900 active:scale-[0.98]"
         >
           Pay Now
-        </Link>
+        </NavLink>
 
-        <Link
+        <NavLink
           href="/member/profile"
           className="mt-2.5 block w-full rounded-xl border border-[#F5C985] bg-white px-4 py-2.5 text-center text-xs font-bold shadow-2xs transition-all hover:bg-[#FFF0D9] active:scale-[0.98]"
           style={{ backgroundColor: "#ffffff", color: "#7A4B00" }}
@@ -71,7 +71,7 @@ export default function HomeActionPrompt({ user }: { user: CurrentUser }) {
           <span className="font-bold text-[#7A4B00]" style={{ color: "#7A4B00" }}>
             Review Membership
           </span>
-        </Link>
+        </NavLink>
       </section>
     );
   }

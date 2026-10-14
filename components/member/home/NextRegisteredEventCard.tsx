@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { CalendarDays, MapPin } from "lucide-react";
 import { formatMemberDate } from "@/lib/dates";
 
@@ -49,13 +49,13 @@ export default function NextRegisteredEventCard({
             <p className="mt-1 text-xs leading-relaxed text-neutral-600">
               Browse upcoming Pergas gatherings, lectures, and community events.
             </p>
-            <Link
+            <NavLink
               href="/member/events"
               className="mt-2.5 inline-flex items-center gap-1 text-xs font-semibold text-[#0F6E00] transition-colors hover:text-[#173F14]"
             >
               <span>Explore upcoming events</span>
               <span aria-hidden="true">&rarr;</span>
-            </Link>
+            </NavLink>
           </div>
         </div>
       </section>
@@ -96,7 +96,7 @@ export default function NextRegisteredEventCard({
       </div>
 
       {/* High-contrast brand green CTA button */}
-      <Link
+      <NavLink
         href={`/member/events/${event.id}`}
         className="mt-4 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl bg-[#0F6E00] px-4 py-2.5 text-center text-xs font-bold text-white shadow-2xs transition-all hover:bg-[#173F14] active:scale-[0.98]"
         style={{ backgroundColor: "#0F6E00", color: "#ffffff" }}
@@ -105,7 +105,7 @@ export default function NextRegisteredEventCard({
           View Registration Pass
         </span>
         <span aria-hidden="true">&rarr;</span>
-      </Link>
+      </NavLink>
     </section>
   );
 }

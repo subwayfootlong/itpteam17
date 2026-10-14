@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Suspense } from "react";
 import { ToastProvider } from '@/components/ui/Toast';
+import NavigationProgress from '@/components/ui/NavigationProgress';
 
 export const metadata: Metadata = {
   title: "Partner Benefits | Pergas Member Portal",
@@ -21,6 +23,9 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
         <ToastProvider>
           {children}
         </ToastProvider>

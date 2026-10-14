@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { ArrowLeft, CalendarDays, Clock, MapPin, Users } from "lucide-react";
 import { notFound } from "next/navigation";
 import MemberPageShell from "@/components/member/MemberPageShell";
@@ -95,13 +95,13 @@ export default async function EventDetailsPage({
       <div className="px-4 py-5 font-helvetica pb-8">
         {/* Top Navigation Header */}
         <header className="flex items-center gap-3">
-          <Link
+          <NavLink
             href="/member/events"
             aria-label="Back to events directory"
             className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-neutral-200/80 bg-white text-neutral-700 shadow-2xs transition-all hover:bg-neutral-50 active:scale-95"
           >
             <ArrowLeft size={18} />
-          </Link>
+          </NavLink>
           <h1 className="text-base font-bold font-sans text-neutral-900 line-clamp-1">
             Event Details
           </h1>

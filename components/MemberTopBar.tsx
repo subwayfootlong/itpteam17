@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
 import MemberAvatar from "@/components/member/MemberAvatar";
@@ -51,7 +51,7 @@ export default function MemberTopBar({ user }: MemberTopBarProps) {
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between border-b border-neutral-100 bg-white/80 backdrop-blur-md px-5 py-3.5 transition-colors">
       <div className="flex items-center gap-3">
-        <Link
+        <NavLink
           href="/member/profile"
           aria-label="Open profile"
           className="rounded-full ring-2 ring-transparent transition-all hover:ring-brand-primary-600/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary-800 focus-visible:ring-offset-2 active:scale-95"
@@ -63,7 +63,7 @@ export default function MemberTopBar({ user }: MemberTopBarProps) {
             profileImageUrl={user?.profileImageUrl}
             size={40}
           />
-        </Link>
+        </NavLink>
 
         <div>
           <span className="block text-[11px] font-semibold uppercase tracking-wider text-brand-primary-800 leading-tight">
@@ -75,7 +75,7 @@ export default function MemberTopBar({ user }: MemberTopBarProps) {
         </div>
       </div>
 
-      <Link
+      <NavLink
         href="/member/notifications"
         aria-label={
           unreadCount > 0
@@ -91,7 +91,7 @@ export default function MemberTopBar({ user }: MemberTopBarProps) {
             <span className="relative inline-flex h-2.5 w-2.5 rounded-full border-2 border-white bg-rose-500" />
           </span>
         )}
-      </Link>
+      </NavLink>
     </header>
   );
 }

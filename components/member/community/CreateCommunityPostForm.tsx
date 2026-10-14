@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -12,6 +12,8 @@ import {
   Send,
 } from "lucide-react";
 import type { DiscussionGroup } from "@/lib/communityTypes";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { startNavigationProgress } from "@/components/ui/NavigationProgress";
 
 type SubmitState = "idle" | "saving" | "done";
 const MIN_TITLE_LENGTH = 3;
@@ -25,13 +27,13 @@ const labelClassName =
 function CreateHeader({ kicker }: { kicker: string }) {
   return (
     <div className="mb-4 flex items-center gap-3">
-      <Link
+      <NavLink
         href="/member/community?tab=discussions"
         aria-label="Back to community"
         className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100 text-brand-primary-800 transition-transform duration-100 hover:bg-neutral-200 active:scale-95"
       >
         <ArrowLeft size={20} aria-hidden="true" />
-      </Link>
+      </NavLink>
       <div>
         <span className="text-[11px] font-bold uppercase tracking-wider text-brand-primary-800">
           {kicker}
@@ -59,6 +61,7 @@ export default function CreateCommunityPostForm({
   const [error, setError] = useState("");
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [submittedThreadId, setSubmittedThreadId] = useState<string | null>(null);
+  const [navigatingTo, setNavigatingTo] = useState<"post" | "community" | null>(null);
 
   const selectedGroup = useMemo(
     () => groups.find((group) => group.id === groupId),
@@ -128,12 +131,12 @@ export default function CreateCommunityPostForm({
           <p className="mt-1 text-sm text-neutral-600">
             Discussion groups need to be created before members can publish posts.
           </p>
-          <Link
+          <NavLink
             href="/member/community?tab=discussions"
             className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-brand-primary-800 px-5 py-2.5 text-sm font-semibold text-white transition-transform duration-100 hover:bg-brand-primary-900 active:scale-[0.98]"
           >
             Back to Community
-          </Link>
+          </NavLink>
         </section>
       </div>
     );
@@ -275,25 +278,39 @@ export default function CreateCommunityPostForm({
             <div className="mt-4 space-y-2">
               <button
                 type="button"
-                onClick={() =>
+                disabled={navigatingTo !== null}
+                onClick={() => {
+                  setNavigatingTo("post");
+                  startNavigationProgress();
                   router.push(
                     `/member/community/${encodeURIComponent(submittedThreadId)}`,
-                  )
-                }
-                className="flex min-h-11 w-full items-center justify-center rounded-xl bg-brand-primary-800 px-4 py-2.5 text-sm font-semibold text-white transition-transform duration-100 hover:bg-brand-primary-900 active:scale-[0.98]"
+                  );
+                }}
+                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-primary-800 px-4 py-2.5 text-sm font-semibold text-white transition-transform duration-100 hover:bg-brand-primary-900 active:scale-[0.98] disabled:opacity-70"
               >
-                View my post
+                {navigatingTo === "post" ? (
+                  <LoadingSpinner label="Opening your post…" size="sm" light />
+                ) : (
+                  "View my post"
+                )}
               </button>
               <button
                 type="button"
-                onClick={() =>
+                disabled={navigatingTo !== null}
+                onClick={() => {
+                  setNavigatingTo("community");
+                  startNavigationProgress();
                   router.push(
                     `/member/community?tab=discussions&group=${encodeURIComponent(groupId)}`,
-                  )
-                }
-                className="min-h-11 w-full rounded-xl px-4 py-2.5 text-sm font-semibold text-neutral-600 transition-transform duration-100 hover:bg-neutral-100 active:scale-[0.98]"
+                  );
+                }}
+                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-neutral-600 transition-transform duration-100 hover:bg-neutral-100 active:scale-[0.98] disabled:opacity-70"
               >
-                Back to community
+                {navigatingTo === "community" ? (
+                  <LoadingSpinner label="Going back…" size="sm" />
+                ) : (
+                  "Back to community"
+                )}
               </button>
             </div>
           </section>

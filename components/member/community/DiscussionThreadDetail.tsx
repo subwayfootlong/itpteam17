@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { FormEvent, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
@@ -255,13 +255,13 @@ export default function DiscussionThreadDetail({
   return (
     <div className="space-y-3 px-4 pb-28 pt-4">
       <nav aria-label="Discussion navigation">
-        <Link
+        <NavLink
           href={`/member/community?tab=discussions&group=${encodeURIComponent(thread.groupId)}`}
           className="inline-flex items-center gap-1.5 rounded-full py-1 pr-3 text-xs font-semibold text-brand-primary-800 transition-transform duration-100 active:scale-95"
         >
           <ArrowLeft size={16} aria-hidden="true" />
           Back to {groupTitle}
-        </Link>
+        </NavLink>
       </nav>
 
       <article className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">

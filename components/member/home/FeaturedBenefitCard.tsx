@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { Gift, Tag, ChevronRight } from "lucide-react";
 
 type FeaturedBenefit = {
@@ -60,13 +60,13 @@ export default function FeaturedBenefitCard({
       </div>
 
       {/* CTA Button */}
-      <Link
+      <NavLink
         href="/member/benefit"
         className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-xl border border-neutral-200/80 bg-stone-50/50 px-4 py-2.5 text-center text-xs font-semibold text-neutral-800 shadow-2xs transition-all hover:border-neutral-300 hover:bg-stone-100/80 active:scale-[0.98]"
       >
         <span>Explore Member Benefits</span>
         <ChevronRight size={14} className="text-neutral-500" />
-      </Link>
+      </NavLink>
     </section>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { Heart, ImageIcon, MessageSquare, Share2 } from "lucide-react";
 import type { DiscussionThread } from "@/lib/communityTypes";
 import PendingReviewBadge from "./PendingReviewBadge";
@@ -66,7 +66,7 @@ export default function ThreadCard({
         )}
       </header>
 
-      <Link
+      <NavLink
         href={threadHref}
         className="mt-2 block transition-transform duration-100 active:scale-[0.99]"
       >
@@ -74,7 +74,7 @@ export default function ThreadCard({
           {thread.title}
         </h2>
         <p className="mt-1 line-clamp-3 text-sm text-neutral-600">{thread.body}</p>
-      </Link>
+      </NavLink>
 
       {thread.hasImage && (
         <div
@@ -93,14 +93,14 @@ export default function ThreadCard({
           <Heart size={18} aria-hidden="true" />
           {thread.votes}
         </span>
-        <Link
+        <NavLink
           href={threadHref}
           aria-label={`${comments.length} ${comments.length === 1 ? "comment" : "comments"}`}
           className="flex items-center gap-1.5 transition-transform duration-100 hover:text-brand-primary-800 active:scale-90"
         >
           <MessageSquare size={18} aria-hidden="true" />
           {comments.length}
-        </Link>
+        </NavLink>
         <button
           type="button"
           onClick={handleShare}

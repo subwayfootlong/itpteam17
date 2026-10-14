@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   CalendarCheck,
@@ -329,12 +329,12 @@ export default function HomeAnnouncementCard({
                 )}
 
                 <div className="mt-auto pt-4">
-                  <Link
+                  <NavLink
                     href={slide.href}
                     className="flex min-h-12 w-full items-center justify-center rounded-full bg-brand-primary-800 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-transform duration-100 hover:bg-brand-primary-900 active:scale-[0.98]"
                   >
                     {slide.cta}
-                  </Link>
+                  </NavLink>
                 </div>
               </div>
             </article>

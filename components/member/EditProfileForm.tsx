@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ArrowLeft, Save } from "lucide-react";
@@ -8,6 +8,9 @@ import MemberAvatar from "@/components/member/MemberAvatar";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import PhoneInputField from "@/components/ui/PhoneInput";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import FullScreenLoader from "@/components/ui/FullScreenLoader";
+import { startNavigationProgress } from "@/components/ui/NavigationProgress";
 import { formatMemberName } from "@/lib/memberName";
 import { SALUTATIONS } from "@/lib/memberProfileOptions";
 
@@ -35,6 +38,7 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
   const [designation, setDesignation] = useState(initial.designation ?? "");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -64,6 +68,9 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
         );
       }
 
+      // Confirm the save straight away; the overlay stays until the profile page is ready
+      setSaved(true);
+      startNavigationProgress();
       router.push("/member/profile");
       router.refresh();
     } catch (err) {
@@ -76,13 +83,13 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
     <div className="space-y-6 px-4 py-5 font-helvetica">
       {/* Header */}
       <header className="flex items-center gap-3">
-        <Link
+        <NavLink
           href="/member/profile"
           aria-label="Back to profile"
           className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-100 text-neutral-700 transition-colors hover:bg-neutral-200/70 active:scale-95"
         >
           <ArrowLeft size={20} className="text-[#0F6E00]" />
-        </Link>
+        </NavLink>
         <div>
           <h1 className="text-xl font-bold tracking-tight text-neutral-900">Edit Profile</h1>
           <p className="text-xs text-neutral-500">Update your details and organization info</p>
@@ -113,7 +120,7 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
         <div className="rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-xs space-y-4">
           <div className="space-y-2">
             <Input label="Registered email" type="email" value={initial.email ?? ""} readOnly />
-            <Link href="/member/settings/email" className="member-text-sm block text-sm font-semibold text-brand-primary-800">Change Email</Link>
+            <NavLink href="/member/settings/email" className="member-text-sm block text-sm font-semibold text-brand-primary-800">Change Email</NavLink>
           </div>
 
           <Select
@@ -180,23 +187,34 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
         ) : null}
 
         <div className="grid grid-cols-2 gap-3 pt-1">
-          <Link
+          <NavLink
             href="/member/profile"
             className="flex min-h-11 items-center justify-center rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm font-semibold text-neutral-700 shadow-2xs transition-all hover:bg-neutral-50 active:scale-[0.98]"
           >
             Cancel
-          </Link>
+          </NavLink>
           <button
             type="submit"
             disabled={saving}
             className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-[#0F6E00] px-4 py-2.5 text-sm font-bold text-white shadow-xs transition-all hover:bg-[#173F14] active:scale-[0.98] disabled:opacity-60"
             style={{ backgroundColor: "#0F6E00", color: "#ffffff" }}
           >
-            <Save size={16} className="text-white" />
+            {saving ? (
+              <LoadingSpinner label="" size="sm" light />
+            ) : (
+              <Save size={16} className="text-white" />
+            )}
             <span>{saving ? "Saving..." : "Save Changes"}</span>
           </button>
         </div>
       </form>
+
+      {saved && (
+        <FullScreenLoader
+          title="Profile saved"
+          message="Taking you back to your profile…"
+        />
+      )}
     </div>
   );
 }
