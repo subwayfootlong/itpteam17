@@ -538,3 +538,23 @@ BEGIN
     EXECUTE 'CREATE POLICY "Admins full access uc6 thread comments" ON public.uc6_thread_comments FOR ALL TO authenticated USING (public.is_admin()) WITH CHECK (public.is_admin());';
   END IF;
 END $$;
+
+
+-- ==============================================================================
+-- 17. Email-change tables (created by docs/supabase-email-change-migration.sql)
+--     Server-only: accessed exclusively through the service-role key and the
+--     SECURITY DEFINER email_change_* functions. RLS enabled with no policies, and
+--     all anon/authenticated privileges revoked, so the Data API can never read them.
+--     Re-asserted here so this script alone leaves every table protected.
+-- ==============================================================================
+DO $$
+DECLARE t text;
+BEGIN
+  FOREACH t IN ARRAY ARRAY['email_change_requests', 'email_change_limits', 'email_change_notifications']
+  LOOP
+    IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = t) THEN
+      EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t);
+      EXECUTE format('REVOKE ALL ON public.%I FROM anon, authenticated', t);
+    END IF;
+  END LOOP;
+END $$;

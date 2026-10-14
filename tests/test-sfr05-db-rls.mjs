@@ -70,9 +70,11 @@ async function testAnon() {
     'users', 'event_registrations', 'announcement_comments', 'announcement_poll_responses',
     'discussion_groups', 'discussion', 'discussion_comments', 'notifications',
     'notification_preferences', 'tier_upgrade_requests', 'analytics_events', 'payment_methods',
+    'email_change_requests', 'email_change_limits', 'email_change_notifications',
   ];
   for (const t of privateTables) {
     const real = await service.from(t).select('*', { count: 'exact', head: true });
+    if (real.error && /does not exist|schema cache/i.test(real.error.message)) { skip(`anon cannot read ${t}`, 'table not created in this project'); continue; }
     if (real.error) { check(`service-role can read ${t}`, false, real.error.message); continue; }
     if (!real.count) { skip(`anon cannot read ${t}`, 'table is empty, nothing to leak'); continue; }
     const res = await anon.from(t).select('*').limit(5);
