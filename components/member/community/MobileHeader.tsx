@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import MemberIcon from "@/components/member/MemberIcon";
 
 export default function MobileHeader({
@@ -29,13 +29,13 @@ export default function MobileHeader({
         )}
         <h1>{title}</h1>
       </div>
-      <Link
+      <NavLink
         className="community-icon-button"
         href="/member/notifications"
         aria-label="Notifications"
       >
         <MemberIcon name={canGoBack ? "search" : "bell"} size={23} />
-      </Link>
+      </NavLink>
     </header>
   );
 }

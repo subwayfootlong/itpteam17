@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 // AUTH: uncomment when ready
 // import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { ADMIN_PAYMENT_METHOD_SELECT } from '@/lib/adminPaymentMethods';
+import { normalizePaymentUrl } from '@/lib/paymentUrl';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 
 function cleanText(value: unknown) {
@@ -42,15 +43,19 @@ export async function POST(req: Request) {
   }
 
   const name = cleanText(body.name);
-  const paynowUen = cleanText(body.paynow_uen);
+  const rawPaymentUrl = cleanText(body.payment_url);
   const qrCodeUrl = cleanText(body.qr_code_url);
 
   if (!name) {
     return NextResponse.json({ error: 'Name is required.' }, { status: 400 });
   }
-  if (!paynowUen && !qrCodeUrl) {
+  if (!rawPaymentUrl) {
+    return NextResponse.json({ error: 'Payment link is required.' }, { status: 400 });
+  }
+  const paymentUrl = normalizePaymentUrl(rawPaymentUrl);
+  if (!paymentUrl) {
     return NextResponse.json(
-      { error: 'Provide a PayNow UEN, a QR code image, or both.' },
+      { error: 'Payment link must be a valid web address (http or https).' },
       { status: 400 },
     );
   }
@@ -71,7 +76,7 @@ export async function POST(req: Request) {
     .insert({
       name,
       description: cleanText(body.description) || null,
-      paynow_uen: paynowUen || null,
+      payment_url: paymentUrl,
       qr_code_url: qrCodeUrl || null,
       is_active: isActive,
     })

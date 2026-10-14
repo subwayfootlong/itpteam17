@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { ArrowLeft, ArrowUpCircle, CheckCircle2, Clock3, XCircle } from "lucide-react";
 import { formatTierLabel, type MembershipTier } from "@/lib/membershipTiers";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
@@ -101,9 +101,9 @@ export default function TierUpgradeRequestView() {
 
   return (
     <div className="px-5 py-5">
-      <Link href="/member/profile" className="member-text-sm inline-flex items-center gap-2 text-sm font-semibold text-[#0F6E00]">
+      <NavLink href="/member/profile" className="member-text-sm inline-flex items-center gap-2 text-sm font-semibold text-[#0F6E00]">
         <ArrowLeft size={17} /> Back to profile
-      </Link>
+      </NavLink>
 
       <header className="mt-5">
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#E8F5E3] text-[#0F6E00]">

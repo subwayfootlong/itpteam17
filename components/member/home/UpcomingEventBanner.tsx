@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { CalendarDays, MapPin } from "lucide-react";
 import { formatMemberDate } from "@/lib/dates";
 
@@ -60,12 +60,12 @@ export default function UpcomingEventBanner({
             </p>
           )}
 
-          <Link
+          <NavLink
             href={`/member/events/${event.id}`}
             className="member-text-sm mt-4 inline-block font-semibold text-[#0F6E00]"
           >
             View event
-          </Link>
+          </NavLink>
         </div>
       </div>
     </section>

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
+import FullScreenLoader from '@/components/ui/FullScreenLoader';
 import { useToast } from '@/components/ui/Toast';
 import { postJson } from '@/lib/api';
 import PhoneInputField from '@/components/ui/PhoneInput';
@@ -38,6 +39,7 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegisterSuccess, onBa
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
 
   const toast = useToast();
 
@@ -136,6 +138,7 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegisterSuccess, onBa
         password,
       });
       toast.push({ type: 'success', message: 'Account created' });
+      setRedirecting(true);
       if (onRegisterSuccess) onRegisterSuccess();
     } catch (error: unknown) {
       console.error(error);
@@ -430,6 +433,13 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ onRegisterSuccess, onBa
           <span className="underline cursor-pointer">Terms of Service</span> and <span className="underline cursor-pointer">Privacy Policy</span>.
         </p>
       </div>
+
+      {redirecting && (
+        <FullScreenLoader
+          title="Account created"
+          message="Setting up your member dashboard…"
+        />
+      )}
     </div>
   );
 };

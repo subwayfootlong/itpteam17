@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 // AUTH: uncomment when ready
 // import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { ADMIN_PAYMENT_METHOD_SELECT } from '@/lib/adminPaymentMethods';
+import { normalizePaymentUrl } from '@/lib/paymentUrl';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 
 function cleanPatchValue(value: unknown) {
@@ -43,7 +44,7 @@ export async function PATCH(
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const allowed = ['name', 'description', 'paynow_uen', 'qr_code_url', 'is_active'];
+  const allowed = ['name', 'description', 'payment_url', 'qr_code_url', 'is_active'];
   const updates: Record<string, unknown> = {};
   for (const key of allowed) {
     if (key in body) updates[key] = cleanPatchValue(body[key]);
@@ -53,21 +54,16 @@ export async function PATCH(
     return NextResponse.json({ error: 'No payment method fields provided.' }, { status: 400 });
   }
 
-  if ('paynow_uen' in updates || 'qr_code_url' in updates) {
-    const { data: existing } = await supabaseAdmin
-      .from('payment_methods')
-      .select('paynow_uen, qr_code_url')
-      .eq('id', id)
-      .maybeSingle<{ paynow_uen: string | null; qr_code_url: string | null }>();
-
-    const nextUen = 'paynow_uen' in updates ? updates.paynow_uen : existing?.paynow_uen ?? null;
-    const nextQr = 'qr_code_url' in updates ? updates.qr_code_url : existing?.qr_code_url ?? null;
-    if (!nextUen && !nextQr) {
+  if ('payment_url' in updates) {
+    const paymentUrl =
+      typeof updates.payment_url === 'string' ? normalizePaymentUrl(updates.payment_url) : null;
+    if (!paymentUrl) {
       return NextResponse.json(
-        { error: 'A payment method needs a PayNow UEN, a QR code image, or both.' },
+        { error: 'Payment link must be a valid web address (http or https).' },
         { status: 400 },
       );
     }
+    updates.payment_url = paymentUrl;
   }
 
   // Only one payment method can be active at a time.
