@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { ArrowLeft, Check, Copy, QrCode } from "lucide-react";
+import NavLink from "@/components/ui/NavLink";
+import { ArrowLeft, Check, Copy, ExternalLink, QrCode } from "lucide-react";
 import { formatMemberDate, getExpiryInfo } from "@/lib/dates";
 import type { PublicPaymentMethod } from "@/lib/paymentMethods";
 
@@ -29,9 +29,9 @@ function PaymentMethodCard({ method }: { method: PublicPaymentMethod }) {
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
-    if (!method.paynowUen) return;
+    if (!method.paymentUrl) return;
     try {
-      await navigator.clipboard.writeText(method.paynowUen);
+      await navigator.clipboard.writeText(method.paymentUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -55,14 +55,20 @@ function PaymentMethodCard({ method }: { method: PublicPaymentMethod }) {
         />
       )}
 
-      {method.paynowUen && (
+      {method.paymentUrl && (
         <div className="mt-5">
-          <p className="member-text-sm text-sm font-semibold uppercase text-[#5F5E5E]">
-            PayNow UEN
-          </p>
-          <div className="mt-2 flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-[#EEF1FF] px-4 py-3">
-            <span className="member-text-base font-mono text-base font-semibold text-[#151C27]">
-              {method.paynowUen}
+          <a
+            href={method.paymentUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="member-text-base flex w-full items-center justify-center gap-2 rounded-xl bg-[#0F6E00] px-4 py-3 text-base font-semibold text-white shadow-sm"
+          >
+            Pay now
+            <ExternalLink size={18} />
+          </a>
+          <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-[#EEF1FF] px-4 py-3">
+            <span className="member-text-sm min-w-0 truncate text-sm text-[#151C27]">
+              {method.paymentUrl.replace(/^https?:\/\//, "")}
             </span>
             <button
               type="button"
@@ -70,7 +76,7 @@ function PaymentMethodCard({ method }: { method: PublicPaymentMethod }) {
               className="flex shrink-0 items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-[#0F6E00] shadow-sm"
             >
               {copied ? <Check size={16} /> : <Copy size={16} />}
-              {copied ? "Copied" : "Copy"}
+              {copied ? "Copied" : "Copy link"}
             </button>
           </div>
         </div>
@@ -94,9 +100,9 @@ export default function MemberPaymentView({
   return (
     <div className="px-5 py-6">
       <header className="flex items-center gap-3">
-        <Link href="/member/profile" aria-label="Back to profile">
+        <NavLink href="/member/profile" aria-label="Back to profile">
           <ArrowLeft size={24} className="text-[#0F6E00]" />
-        </Link>
+        </NavLink>
         <h1 className="member-text-2xl text-2xl font-bold text-[#0F6E00]">Make Payment</h1>
       </header>
 

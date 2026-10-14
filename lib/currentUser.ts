@@ -41,23 +41,8 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
       .eq("id", payload.sub)
       .maybeSingle();
 
-    if (!data) {
-      const email = payload.email ?? null;
-      return {
-        id: payload.sub,
-        email,
-        firstName: "",
-        lastName: "",
-        fullName: email ?? "Member",
-        initials: email?.charAt(0).toUpperCase() ?? "M",
-        phone: null,
-        organization: null,
-        membershipTier: null,
-        membershipStatus: null,
-        expiryDate: null,
-        profileImageUrl: null,
-      };
-    }
+    // Reject deleted users and JWTs issued before an email change.
+    if (!data || payload.email !== data.email) return null;
 
     const firstName = data.first_name?.trim() ?? "";
     const lastName = data.last_name?.trim() ?? "";

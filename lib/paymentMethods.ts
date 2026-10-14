@@ -1,10 +1,11 @@
+import { normalizePaymentUrl } from "./paymentUrl";
 import { supabaseAdmin } from "./supabaseServer";
 
 export type PublicPaymentMethod = {
   id: string;
   name: string;
   description: string | null;
-  paynowUen: string | null;
+  paymentUrl: string | null;
   qrCodeUrl: string | null;
 };
 
@@ -12,7 +13,7 @@ type PaymentMethodRow = {
   id: string;
   name: string | null;
   description: string | null;
-  paynow_uen: string | null;
+  payment_url: string | null;
   qr_code_url: string | null;
 };
 
@@ -21,7 +22,7 @@ function mapPaymentMethod(row: PaymentMethodRow): PublicPaymentMethod {
     id: String(row.id),
     name: row.name?.trim() || "Pergas Payment",
     description: row.description?.trim() || null,
-    paynowUen: row.paynow_uen?.trim() || null,
+    paymentUrl: normalizePaymentUrl(row.payment_url ?? ""),
     qrCodeUrl: row.qr_code_url?.trim() || null,
   };
 }
@@ -29,7 +30,7 @@ function mapPaymentMethod(row: PaymentMethodRow): PublicPaymentMethod {
 export async function getActivePaymentMethods(): Promise<PublicPaymentMethod[]> {
   const { data, error } = await supabaseAdmin
     .from("payment_methods")
-    .select("id, name, description, paynow_uen, qr_code_url")
+    .select("id, name, description, payment_url, qr_code_url")
     .eq("is_active", true)
     .order("created_at", { ascending: false });
 

@@ -21,6 +21,71 @@ You still need to set up these manually:
 - the Supabase `users` table in your database
 - any files in `public/` such as the logos used by the UI
 
+## Email delivery for development/demo
+
+Before requesting OTPs, run the complete
+[`supabase-email-change-migration.sql`](./supabase-email-change-migration.sql)
+in your Supabase project's SQL editor. It installs the tables **and** the
+`email_change_throttle`, `email_change_start`, and `email_change_finish` functions.
+The script can be rerun without deleting existing rows and refreshes the API
+schema cache. Creating just the tables is insufficient: missing functions produce
+`PGRST202` and a 503 response. The server terminal records the function name and
+error code without exposing passwords, OTPs or database records.
+
+Set `APP_URL` to the browser's exact origin (scheme, hostname and port), without
+the page path. For `http://localhost:3000/member/settings/email`, use
+`APP_URL=http://localhost:3000` in `.env.local`. Restart the dev server after
+changing it. OTP requests validate this origin; `localhost`, `127.0.0.1` and a
+network IP are different origins. In deployment, use the public application origin.
+
+SMTP through Nodemailer is used temporarily for ITP2 development/demo. Configure
+these server-side variables in `.env.local` or the deployment environment:
+
+```dotenv
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=itpteam17@gmail.com
+SMTP_PASSWORD=
+EMAIL_FROM=itpteam17@gmail.com
+```
+
+Use the team-controlled mailbox `itpteam17@gmail.com` as `SMTP_USER`
+and an authorized sender address as `EMAIL_FROM`. Port 587 requires STARTTLS;
+port 465 uses TLS from connection start. Certificate validation remains enabled.
+Never commit real SMTP credentials or mailbox passwords to Git. They must remain
+only in `.env.local` or deployment environment variables, never `NEXT_PUBLIC_*`.
+`lib/email.ts` has a `server-only` import guard to prevent client-side imports.
+
+**Gmail setup:** Sign in to the team Google account, enable 2-Step Verification,
+then create an [app password](https://myaccount.google.com/apppasswords) for this
+application. Put the generated 16-character app password (without display spaces)
+in `SMTP_PASSWORD` in `.env.local` or deployment environment variables. Do not use
+the regular Google account password or paste the app password into chat or Git.
+Restart the development server after updating the environment. If app passwords
+are unavailable due to account security settings or policy, OAuth2 is required
+instead; this transport currently uses app-password authentication.
+See [Google's app-password instructions](https://support.google.com/accounts/answer/185833)
+and [Gmail SMTP settings](https://support.google.com/a/answer/176600).
+
+Keep existing `EMAIL_CHANGE_SECRET` and `EMAIL_NOTIFICATION_CRON_SECRET` values
+unchanged. Both OTP messages and old-email security notifications use this SMTP
+transport. The email-change flow, expiry, resend limits and durable notification
+retry logic are unchanged. Continue scheduling authenticated POST requests to
+`/api/internal/email-change-notifications` using the existing cron secret.
+An SMTP error is reported as delivery failure so the existing cancellation/retry
+logic still applies. SMTP has no Resend-style idempotency guarantee: a retry
+after an ambiguous delivery failure can deliver a duplicate message, even though
+the same Message-ID is reused. Check inbox delivery using team-owned test accounts.
+
+Production should use Pergas-provided email credentials or a verified transactional
+email provider. The original Resend implementation is preserved as a clearly
+marked comment in `lib/email.ts`, and `EMAIL_API_KEY` remains a commented option
+in `.env.local.example`. To restore it, replace the active SMTP function with the
+preserved Resend function and configure the production key and verified sender.
+
+Validation commands: `npm run test:email`, `node --test tests/emailSmtp.test.mjs`,
+`npx tsc --noEmit`, `npm run lint`, and `npm run build`.
+
 ## Start the Web App
 
 Run the development server:

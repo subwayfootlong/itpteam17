@@ -170,3 +170,80 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ ok: true });
 }
+
+export async function DELETE(req: Request) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
+
+  const { eventId } = body;
+  if (!eventId) {
+    return NextResponse.json({ error: 'eventId is required' }, { status: 400 });
+  }
+
+  const { data: event, error: eventError } = await supabaseAdmin
+    .from('events')
+    .select('id, capacity, spots_available, event_date')
+    .eq('id', eventId)
+    .single();
+
+  if (eventError || !event) {
+    return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+  }
+
+  // Only the member's own active registration can be cancelled
+  const { data: registration } = await supabaseAdmin
+    .from('event_registrations')
+    .select('id, status')
+    .eq('event_id', eventId)
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (!registration || registration.status !== 'registered') {
+    return NextResponse.json({ error: 'You are not registered for this event' }, { status: 400 });
+  }
+
+  const today = new Date().toISOString().slice(0, 10);
+  if (event.event_date && event.event_date < today) {
+    return NextResponse.json({ error: 'This event has already taken place' }, { status: 400 });
+  }
+
+  const { error: deleteError } = await supabaseAdmin
+    .from('event_registrations')
+    .delete()
+    .eq('id', registration.id)
+    .eq('user_id', user.id);
+
+  if (deleteError) {
+    return NextResponse.json({ error: deleteError.message }, { status: 500 });
+  }
+
+  // Give the seat back, never exceeding the event capacity
+  if (event.spots_available !== null) {
+    const restored = event.spots_available + 1;
+    await supabaseAdmin
+      .from('events')
+      .update({
+        spots_available: event.capacity !== null ? Math.min(event.capacity, restored) : restored,
+      })
+      .eq('id', eventId);
+  }
+
+  // Remove the RSVP click so analytics don't double count if they register again
+  await supabaseAdmin
+    .from('analytics_events')
+    .delete()
+    .eq('user_id', user.id)
+    .eq('target_id', eventId)
+    .eq('event_type', 'event_rsvp_click');
+
+  return NextResponse.json({ ok: true });
+}

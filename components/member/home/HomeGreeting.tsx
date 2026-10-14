@@ -7,20 +7,17 @@ export default function HomeGreeting({
   firstName,
   lastName = "",
 }: HomeGreetingProps) {
+  const displayName = [firstName, lastName].filter(Boolean).join(" ");
+
   return (
     <section>
-      <h1 className="member-text-2xl text-3xl font-bold leading-tight text-[#151C27]">
-        Assalamualaikum,
-        <br />
-        <span className="text-[#2EAE23]">
-          {firstName}
-          {lastName ? ` ${lastName}` : ""}
-        </span>
-      </h1>
-
-      <p className="member-text-lg mt-3 text-lg leading-relaxed text-[#3F473F]">
-        Welcome back to your community dashboard.
+      <p className="text-xs font-semibold uppercase tracking-wider text-brand-primary-800">
+        Assalamualaikum
       </p>
+      <h1 className="mt-1 text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
+        Welcome back,{" "}
+        <span className="text-brand-primary-800">{displayName || "Member"}</span>
+      </h1>
     </section>
   );
 }
