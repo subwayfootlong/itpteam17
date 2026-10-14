@@ -1,7 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { useEffect, useRef, useState } from "react";
+import FullScreenLoader from "@/components/ui/FullScreenLoader";
+import { startNavigationProgress } from "@/components/ui/NavigationProgress";
 import { QRCodeCanvas } from "qrcode.react";
 import type { MemberProfile } from "@/app/member/profile/page";
 import { formatTierLabel } from "@/lib/membershipTiers";
@@ -194,6 +196,7 @@ export default function ProfileView({
   registrations?: EventRegistration[];
 }) {
   const router = useRouter();
+  const [loggingOut, setLoggingOut] = useState(false);
   const [qrValue, setQrValue] = useState<string | null>(null);
   const [qrError, setQrError] = useState<string | null>(null);
   const qrDialogRef = useRef<HTMLDialogElement>(null);
@@ -247,12 +250,19 @@ export default function ProfileView({
       return;
     }
 
-    await fetch("/api/auth/logout", {
-      method: "POST",
-    });
+    setLoggingOut(true);
+    startNavigationProgress();
 
-    window.sessionStorage.setItem(LOGOUT_LOGIN_HINT_KEY, "1");
-    router.replace("/");
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+
+      window.sessionStorage.setItem(LOGOUT_LOGIN_HINT_KEY, "1");
+      router.replace("/");
+    } catch {
+      setLoggingOut(false);
+    }
   }
 
   return (
@@ -320,12 +330,12 @@ export default function ProfileView({
             </p>
 
             {getExpiryInfo(member.expiry_date).urgency !== "none" && (
-              <Link
+              <NavLink
                 href="/member/payment"
                 className="member-text-sm mt-4 inline-block rounded-xl bg-white px-5 py-2.5 text-center text-sm font-bold text-brand-primary-800! shadow-sm transition-transform duration-100 active:scale-[0.98]"
               >
                 Pay Now
-              </Link>
+              </NavLink>
             )}
           </div>
 
@@ -392,13 +402,13 @@ export default function ProfileView({
       </dialog>
 
       {tier !== "ordinary" && (
-        <Link
+        <NavLink
           href="/member/tier-upgrade"
           className="flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-brand-primary-800/30 bg-brand-primary-100/60 px-4 py-3 text-sm font-semibold text-brand-primary-800 shadow-2xs transition-all hover:bg-brand-primary-100 active:scale-[0.99]"
         >
           <Award size={18} />
           <span>Request Tier Upgrade</span>
-        </Link>
+        </NavLink>
       )}
 
       {/* 2. Account Details Overhaul (Benchmark: Marriott Bonvoy & Zomato) */}
@@ -514,13 +524,13 @@ export default function ProfileView({
           </div>
 
           {/* Edit Profile CTA Button */}
-          <Link
+          <NavLink
             href="/member/profile/edit"
             className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-brand-primary-800/30 bg-brand-primary-100/50 px-4 py-2.5 text-center text-sm font-semibold text-brand-primary-800 shadow-2xs transition-all hover:bg-brand-primary-100 active:scale-[0.99]"
           >
             <Edit3 size={16} />
             <span>Edit Profile</span>
-          </Link>
+          </NavLink>
         </div>
       </section>
 
@@ -598,12 +608,12 @@ export default function ProfileView({
               Your registered events & activities
             </p>
           </div>
-          <Link
+          <NavLink
             href="/member/events"
             className="text-xs font-semibold text-brand-primary-800 transition-colors hover:text-brand-primary-900"
           >
             Browse events
-          </Link>
+          </NavLink>
         </div>
 
         {registrations.length === 0 ? (
@@ -617,13 +627,13 @@ export default function ProfileView({
             <p className="mx-auto mt-1 max-w-xs text-xs leading-relaxed text-neutral-600">
               Explore upcoming workshops, scholarly lectures, and community events!
             </p>
-            <Link
+            <NavLink
               href="/member/events"
               className="mt-3.5 inline-flex items-center gap-1 rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-brand-primary-800 shadow-2xs transition-all hover:bg-stone-50 active:scale-95"
             >
               <span>Explore upcoming events</span>
               <span aria-hidden="true">&rarr;</span>
-            </Link>
+            </NavLink>
           </div>
         ) : (
           <div className="rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-xs">
@@ -709,7 +719,7 @@ export default function ProfileView({
       <section>
         <div className="mb-4 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
           {member.role === "admin" && (
-            <Link
+            <NavLink
               href="/admin"
               className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 active:scale-[0.98]"
             >
@@ -728,10 +738,10 @@ export default function ProfileView({
                 Admin
               </span>
               <ChevronRight size={18} className="shrink-0 text-neutral-300" />
-            </Link>
+            </NavLink>
           )}
 
-          <Link
+          <NavLink
             href="/member/settings"
             className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 active:scale-[0.98]"
           >
@@ -747,7 +757,7 @@ export default function ProfileView({
               </p>
             </div>
             <ChevronRight size={18} className="shrink-0 text-neutral-300" />
-          </Link>
+          </NavLink>
 
           <button
             type="button"
@@ -769,6 +779,13 @@ export default function ProfileView({
           </button>
         </div>
       </section>
+
+      {loggingOut && (
+        <FullScreenLoader
+          title="Signing you out"
+          message="Securely ending your session…"
+        />
+      )}
     </div>
   );
 }

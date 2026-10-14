@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
+import FullScreenLoader from '@/components/ui/FullScreenLoader';
 import { useToast } from '@/components/ui/Toast';
 import { postJson } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errors';
@@ -26,6 +27,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [redirecting, setRedirecting] = useState(false);
+    const [slowRedirect, setSlowRedirect] = useState(false);
+    const [formError, setFormError] = useState('');
 
     // Enforcing the strict branding guidelines
     // Primary Logo Minimum authorized width is 85mm -> ~320px
@@ -34,15 +39,42 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
 
     const toast = useToast();
 
+    // After a successful sign-in the dashboard still has to load. Keep a clear
+    // full-screen state up, reassure if it is slow, and give up gracefully.
+    useEffect(() => {
+        if (!redirecting) return;
+
+        const slowTimer = setTimeout(() => setSlowRedirect(true), 5000);
+        const failTimer = setTimeout(() => {
+            setRedirecting(false);
+            setSlowRedirect(false);
+            setFormError('You are signed in, but your dashboard is taking too long to open. Please press Login again.');
+        }, 25000);
+
+        return () => {
+            clearTimeout(slowTimer);
+            clearTimeout(failTimer);
+        };
+    }, [redirecting]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (submitting || redirecting) return;
+
+        setFormError('');
+        setSubmitting(true);
+
         try {
             await postJson('/api/auth/login', { email, password });
-            toast.push({ type: 'success', message: 'Login successful' });
+            setRedirecting(true);
             if (onLoginSuccess) onLoginSuccess();
         } catch (err: unknown) {
             console.error(err);
-            toast.push({ type: 'error', message: getErrorMessage(err, 'Login error') });
+            const message = getErrorMessage(err, 'Login error');
+            setFormError(message);
+            toast.push({ type: 'error', message });
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -78,7 +110,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
                 </div>
 
                 {/* 2. Form Input Fields Framework */}
-                <form onSubmit={handleSubmit} className="w-full flex flex-col gap-5">
+                <form onSubmit={handleSubmit} className="w-full flex flex-col gap-5" aria-busy={submitting || redirecting}>
+                  <fieldset disabled={submitting || redirecting} className="contents">
 
                     {/* Email Inputs Entry Card (reusable Input) */}
                     <Input
@@ -136,12 +169,21 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
 
                     {/* 4. Action Access Controls Block */}
                     <div className="w-full flex flex-col gap-3 pt-2">
+                        {/* Inline, persistent error (the toast alone disappears) */}
+                        {formError && (
+                            <div role="alert" className="w-full rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-[#C51A4A]">
+                                {formError}
+                            </div>
+                        )}
+
                         {/* Primary Secure Form Submitter */}
-                        <Button type="submit" variant="primary">
-                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
-                            </svg>
-                            <span>Login</span>
+                        <Button type="submit" variant="primary" loading={submitting}>
+                            {!submitting && (
+                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                                </svg>
+                            )}
+                            <span>{submitting ? 'Signing in…' : 'Login'}</span>
                         </Button>
 
                         {/* Secondary Option Action Interface link */}
@@ -149,6 +191,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
                             Create account
                         </Button>
                     </div>
+                  </fieldset>
                 </form>
 
                 {/* 5. Support Assistance Row Footer */}
@@ -165,6 +208,15 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
                 </div>
 
             </div>
+
+            {redirecting && (
+                <FullScreenLoader
+                    title="Welcome back"
+                    message="You're signed in. Preparing your dashboard…"
+                    slowMessage="This is taking a little longer than usual. Please keep this page open."
+                    showSlowMessage={slowRedirect}
+                />
+            )}
         </div>
     );
 };

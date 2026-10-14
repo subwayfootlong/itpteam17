@@ -1,8 +1,10 @@
 "use client";
 
-import Link from "next/link";
+import NavLink from "@/components/ui/NavLink";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import FullScreenLoader from "@/components/ui/FullScreenLoader";
+import { startNavigationProgress } from "@/components/ui/NavigationProgress";
 import {
   ArrowLeft,
   Bell,
@@ -152,6 +154,7 @@ export default function MemberSettingsView({
   );
   const [loadingPreferences] = useState(false);
   const [savingPush, setSavingPush] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const fontSizeIndex = MEMBER_FONT_SIZES.indexOf(fontSize);
 
   async function handlePushToggle() {
@@ -212,12 +215,19 @@ export default function MemberSettingsView({
       return;
     }
 
-    await fetch("/api/auth/logout", {
-      method: "POST",
-    });
+    setLoggingOut(true);
+    startNavigationProgress();
 
-    window.sessionStorage.setItem(LOGOUT_LOGIN_HINT_KEY, "1");
-    router.replace("/");
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+
+      window.sessionStorage.setItem(LOGOUT_LOGIN_HINT_KEY, "1");
+      router.replace("/");
+    } catch {
+      setLoggingOut(false);
+    }
   }
 
   function handleFontSizeChange(index: number) {
@@ -232,13 +242,13 @@ export default function MemberSettingsView({
     <div className="space-y-6 px-4 py-5 font-helvetica">
       {/* Header */}
       <header className="flex items-center gap-3">
-        <Link
+        <NavLink
           href="/member/profile"
           aria-label="Back to profile"
           className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700 transition-colors hover:bg-neutral-200/70 active:scale-95"
         >
           <ArrowLeft size={20} className="text-brand-primary-800" />
-        </Link>
+        </NavLink>
 
         <div>
           <h1 className="text-xl font-bold tracking-tight text-neutral-900">
@@ -314,7 +324,7 @@ export default function MemberSettingsView({
         </h2>
 
         <div className="mb-4 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
-          <Link
+          <NavLink
             href="/member/settings/password"
             className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 active:scale-[0.98]"
           >
@@ -328,9 +338,9 @@ export default function MemberSettingsView({
               </p>
             </div>
             <ChevronRight size={18} className="shrink-0 text-neutral-300" />
-          </Link>
+          </NavLink>
 
-          <Link
+          <NavLink
             href="/member/settings/email"
             className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 active:scale-[0.98]"
           >
@@ -344,7 +354,7 @@ export default function MemberSettingsView({
               </p>
             </div>
             <ChevronRight size={18} className="shrink-0 text-neutral-300" />
-          </Link>
+          </NavLink>
         </div>
       </section>
 
@@ -533,6 +543,13 @@ export default function MemberSettingsView({
           <span>Log Out</span>
         </button>
       </div>
+
+      {loggingOut && (
+        <FullScreenLoader
+          title="Signing you out"
+          message="Securely ending your session…"
+        />
+      )}
     </div>
   );
 }
