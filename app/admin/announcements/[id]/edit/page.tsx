@@ -7,6 +7,7 @@ import { LoadingState } from '@/components/ui/LoadingSpinner';
 import AnnouncementForm, { AnnouncementFormData } from '@/components/admin/AnnouncementForm';
 import AnnouncementMetricsCard from '@/components/admin/AnnouncementMetricsCard';
 import AnnouncementPollCard from '@/components/admin/AnnouncementPollCard';
+import AdminBreadcrumbs from '@/components/admin/AdminBreadcrumbs';
 
 export default function EditAnnouncementPage() {
   const { id } = useParams<{ id: string }>();
@@ -61,11 +62,7 @@ export default function EditAnnouncementPage() {
 
   return (
     <div className="space-y-5 pb-12">
-      <nav className="text-sm text-gray-400">
-        <Link href="/admin/announcements" className="hover:text-[#3FAE2A]">Announcements</Link>
-        <span className="mx-2">›</span>
-        <span className="text-gray-700">Edit</span>
-      </nav>
+      <AdminBreadcrumbs items={[{ label: 'Announcements', href: '/admin/announcements' }, { label: 'Edit' }]} />
       <div>
         <h2 className="text-2xl font-bold text-gray-800">Edit Announcement</h2>
         <p className="text-gray-500 text-sm mt-0.5">Update the announcement content or change its publish status.</p>

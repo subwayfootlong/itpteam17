@@ -13,7 +13,21 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/engagement':        'Benefit Management',
   '/admin/comment-moderation':'Community Moderation',
   '/admin/settings':          'Settings',
+  '/admin/analytics':         'Analytics',
+  '/admin/team':              'Admin Team',
+  '/admin/tier-requests':     'Tier Requests',
+  '/admin/batch-onboarding':  'Batch Onboarding',
+  '/admin/payment-methods':   'Payment Methods',
+  '/admin/engagement/new':    'Create New Benefit',
 };
+
+// Titles for dynamic sub-routes, matched in order.
+const PATTERN_TITLES: [RegExp, string][] = [
+  [/^\/admin\/members\/[^/]+\/edit$/,       'Edit Member'],
+  [/^\/admin\/members\/[^/]+$/,             'Member Profile'],
+  [/^\/admin\/events\/[^/]+\/edit$/,        'Edit Event'],
+  [/^\/admin\/announcements\/[^/]+\/edit$/, 'Edit Announcement'],
+];
 
 interface AdminTopbarProps {
   adminName: string;
@@ -25,7 +39,8 @@ export default function AdminTopbar({ adminName, adminEmail }: AdminTopbarProps)
 
   const title =
     PAGE_TITLES[pathname] ??
-    (pathname.includes('/edit') ? 'Edit Record' : 'Admin Portal');
+    PATTERN_TITLES.find(([re]) => re.test(pathname))?.[1] ??
+    'Admin Portal';
 
   const initials = adminName
     .split(' ')
