@@ -1,3 +1,4 @@
+import { isOneOf, invalidInput } from "@/lib/inputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
@@ -11,6 +12,7 @@ export async function GET(req: Request) {
 
   const url = new URL(req.url);
   const range = url.searchParams.get('range') ?? '30d';
+  if (!isOneOf(range, ['7d', '30d', '90d', 'all'])) return invalidInput('Invalid analytics range');
 
   const today = new Date();
   today.setHours(23, 59, 59, 999);
@@ -46,7 +48,7 @@ export async function GET(req: Request) {
   const { data: logs, error: logsError } = await query;
   if (logsError) {
     console.error('Analytics GET Logs Error:', logsError);
-    return NextResponse.json({ error: logsError.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
   const allLogs = logs ?? [];

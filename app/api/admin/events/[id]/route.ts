@@ -1,3 +1,5 @@
+import { readJsonObject, invalidInput, InputValidationError, isUuid } from "@/lib/inputValidation";
+import { validateEventInput } from "@/lib/apiInputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
 import { notifyEventPublished } from '@/lib/notifications';
@@ -12,6 +14,7 @@ export async function GET(
   if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
   const { data, error } = await supabaseAdmin
     .from('events')
     .select('*')
@@ -20,7 +23,7 @@ export async function GET(
 
   if (error) {
     console.error('Events GET by ID Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   if (!data) return NextResponse.json({ error: 'Event not found' }, { status: 404 });
   return NextResponse.json({ event: data });
@@ -34,11 +37,12 @@ export async function PATCH(
   if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
   let body;
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+    body = await readJsonObject(req, validateEventInput);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
   }
 
   const allowed = [
@@ -62,6 +66,8 @@ export async function PATCH(
     Object.assign(updates, tierAudienceToDatabase(audience.value));
   }
 
+  if (Object.keys(updates).length === 0) return invalidInput("No fields to update");
+
   const { data: existing } = await supabaseAdmin
     .from('events')
     .select('status')
@@ -77,7 +83,7 @@ export async function PATCH(
 
   if (error) {
     console.error('Events PATCH Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   if (data?.status === 'published' && (existing?.status !== 'published' || audienceChanged)) {
     await notifyEventPublished({
@@ -103,10 +109,11 @@ export async function DELETE(
   if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
   const { error } = await supabaseAdmin.from('events').delete().eq('id', id);
   if (error) {
     console.error('Events DELETE Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   return NextResponse.json({ ok: true });
 }

@@ -1,6 +1,6 @@
+import { InputValidationError, invalidInput, readJsonObject, requirePlainText } from "@/lib/inputValidation";
 import { NextResponse } from "next/server";
 import { requireMember } from "@/lib/currentUser";
-import { getErrorMessage } from "@/lib/errors";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 import { moderationStatus } from "@/lib/community";
 import { formatTierLabel } from "@/lib/membershipTiers";
@@ -34,8 +34,13 @@ export async function POST(req: Request) {
     const { user, response: authResponse } = await requireMember();
     if (authResponse) return authResponse;
 
-    const { groupId, title, body } = await req.json();
-    const trimmedBody = typeof body === "string" ? body.trim() : "";
+    const { groupId, title, body } = await readJsonObject(req);
+    const trimmedBody = requirePlainText(body, "Post", 800);
+    // discussion_groups uses text IDs (for example general and spiritual).
+    if (typeof groupId !== "string" || !/^[a-zA-Z0-9_-]{1,100}$/.test(groupId)) {
+      throw new InputValidationError("Invalid discussion group ID");
+    }
+    if (title !== undefined) requirePlainText(title, "Title", 80, 0);
     const threadTitle = cleanTitle(title, trimmedBody);
 
     if (typeof groupId !== "string" || !trimmedBody) {
@@ -81,7 +86,7 @@ export async function POST(req: Request) {
       .single<ThreadRow>();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Unable to save community content" }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -100,8 +105,9 @@ export async function POST(req: Request) {
       },
     });
   } catch (err: unknown) {
+    if (err instanceof InputValidationError) return invalidInput(err.message);
     return NextResponse.json(
-      { error: getErrorMessage(err, "Unable to create discussion") },
+      { error: "Unable to create discussion" },
       { status: 500 },
     );
   }

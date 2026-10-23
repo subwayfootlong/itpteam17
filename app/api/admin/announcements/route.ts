@@ -1,3 +1,5 @@
+import { readJsonObject, invalidInput, InputValidationError, isOneOf } from "@/lib/inputValidation";
+import { validateAnnouncementInput } from "@/lib/apiInputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
 import { notifyAnnouncementPublished } from '@/lib/notifications';
@@ -24,6 +26,7 @@ export async function GET(req: Request) {
 
   const url = new URL(req.url);
   const status = url.searchParams.get('status') ?? '';
+  if (status && !isOneOf(status, ['draft', 'published', 'archived'])) return invalidInput('Invalid status filter');
 
   let query = supabaseAdmin
     .from('announcements')
@@ -35,7 +38,7 @@ export async function GET(req: Request) {
   const { data, error } = await query;
   if (error) {
     console.error('Announcements GET Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
   const announcements = (data ?? []) as AnnouncementWithCommentCount[];
@@ -78,9 +81,9 @@ export async function POST(req: Request) {
 
   let body;
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+    body = await readJsonObject(req, validateAnnouncementInput);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
   }
 
   if (!body.title || typeof body.title !== 'string') {
@@ -116,7 +119,7 @@ export async function POST(req: Request) {
 
   if (error) {
     console.error('Announcements POST Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   if (data?.status === 'published') {
     await notifyAnnouncementPublished({

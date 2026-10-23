@@ -1,3 +1,4 @@
+import { readJsonObject, invalidInput } from "@/lib/inputValidation";
 import { NextResponse } from "next/server";
 import { hashPassword, verifyPassword } from "@/lib/auth";
 import { requireMember } from "@/lib/currentUser";
@@ -19,7 +20,7 @@ export async function PATCH(request: Request) {
 
     let body: ChangePasswordBody;
     try {
-      body = (await request.json()) as ChangePasswordBody;
+      body = (await readJsonObject(request)) as ChangePasswordBody;
     } catch {
       return NextResponse.json(
         { error: "Please complete all password fields and try again." },
@@ -41,6 +42,8 @@ export async function PATCH(request: Request) {
         { status: 400 },
       );
     }
+
+    if (currentPassword.length > 1024 || confirmPassword.length > 1024) return invalidInput("Password is too long");
 
     if (newPassword.length < MIN_PASSWORD_LENGTH) {
       return NextResponse.json(

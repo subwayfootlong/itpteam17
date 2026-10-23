@@ -1,6 +1,6 @@
+import { readJsonObject, InputValidationError, invalidInput, requireUuid } from "@/lib/inputValidation";
 import { NextResponse } from "next/server";
 import { requireMember } from "@/lib/currentUser";
-import { getErrorMessage } from "@/lib/errors";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 import type { PollCounts, PollResponseValue } from "@/lib/data/announcements";
 import {
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     const { user, response: authResponse } = await requireMember();
     if (authResponse) return authResponse;
 
-    const { announcementId, response } = await req.json();
+    const { announcementId, response } = await readJsonObject(req);
 
     if (typeof announcementId !== "string" || !announcementId.startsWith("admin:")) {
       return NextResponse.json(
@@ -28,11 +28,12 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     }
-    if (!VALID_RESPONSES.includes(response)) {
+    if (typeof response !== "string" || !VALID_RESPONSES.includes(response as PollResponseValue)) {
       return NextResponse.json({ error: "Invalid response" }, { status: 400 });
     }
 
     const id = announcementId.replace(/^admin:/, "");
+    requireUuid(id, "Announcement ID");
 
     const { data: announcement, error: announcementError } = await supabaseAdmin
       .from("announcements")
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
       >();
 
     if (announcementError) {
-      return NextResponse.json({ error: announcementError.message }, { status: 500 });
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
     if (!announcement || announcement.status !== "published" || !announcement.poll_enabled) {
       return NextResponse.json({ error: "This announcement has no active poll" }, { status: 400 });
@@ -77,7 +78,7 @@ export async function POST(req: Request) {
       );
 
     if (upsertError) {
-      return NextResponse.json({ error: upsertError.message }, { status: 500 });
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
 
     const { data: allResponses, error: tallyError } = await supabaseAdmin
@@ -86,7 +87,7 @@ export async function POST(req: Request) {
       .eq("announcement_id", id);
 
     if (tallyError) {
-      return NextResponse.json({ error: tallyError.message }, { status: 500 });
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
 
     const counts: PollCounts = { yes: 0, no: 0, maybe: 0 };
@@ -96,8 +97,9 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ response, counts });
   } catch (err: unknown) {
+    if (err instanceof InputValidationError) return invalidInput(err.message);
     return NextResponse.json(
-      { error: getErrorMessage(err, "Unable to record your response") },
+      { error: "Unable to record your response" },
       { status: 500 },
     );
   }

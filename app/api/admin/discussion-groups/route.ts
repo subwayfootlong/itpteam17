@@ -1,3 +1,4 @@
+import { readJsonObject, invalidInput, InputValidationError } from "@/lib/inputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseServer";
@@ -18,7 +19,7 @@ export async function GET() {
     .order("sort_order", { ascending: true });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
   return NextResponse.json({ groups: data ?? [] });
@@ -30,13 +31,13 @@ export async function PATCH(req: Request) {
 
   let body: Record<string, unknown>;
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+    body = await readJsonObject(req);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
   }
 
   const id = typeof body.id === "string" ? body.id.trim() : "";
-  if (!id) {
+  if (!/^[a-zA-Z0-9_-]{1,100}$/.test(id)) {
     return NextResponse.json({ error: "Discussion group ID is required." }, { status: 400 });
   }
 
@@ -57,7 +58,7 @@ export async function PATCH(req: Request) {
     .maybeSingle();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   if (!data) {
     return NextResponse.json({ error: "Discussion group not found." }, { status: 404 });

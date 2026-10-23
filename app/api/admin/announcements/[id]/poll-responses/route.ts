@@ -1,3 +1,4 @@
+import { isUuid, invalidInput } from "@/lib/inputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
@@ -19,6 +20,7 @@ export async function GET(
   if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
 
   const { data, error } = await supabaseAdmin
     .from('announcement_poll_responses')
@@ -38,7 +40,7 @@ export async function GET(
 
   if (error) {
     console.error('Announcement Poll Responses GET Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
   const rows = (data ?? []) as PollResponseRow[];

@@ -1,3 +1,5 @@
+import { readJsonObject, invalidInput, InputValidationError, isUuid } from "@/lib/inputValidation";
+import { validateAnnouncementInput } from "@/lib/apiInputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
 import { notifyAnnouncementPublished } from '@/lib/notifications';
@@ -12,6 +14,7 @@ export async function GET(
   if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
   const { data, error } = await supabaseAdmin
     .from('announcements')
     .select('*, announcement_comments(count)')
@@ -20,7 +23,7 @@ export async function GET(
 
   if (error) {
     console.error('Announcements GET by ID Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json({ announcement: data });
@@ -34,11 +37,12 @@ export async function PATCH(
   if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
   let body;
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+    body = await readJsonObject(req, validateAnnouncementInput);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
   }
 
   const allowed = ['title', 'content', 'category', 'image_url', 'status', 'poll_enabled', 'poll_question'];
@@ -66,6 +70,8 @@ export async function PATCH(
     );
   }
 
+  if (Object.keys(updates).length === 0) return invalidInput("No fields to update");
+
   const { data: existing } = await supabaseAdmin
     .from('announcements')
     .select('status')
@@ -81,7 +87,7 @@ export async function PATCH(
 
   if (error) {
     console.error('Announcements PATCH Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   if (data?.status === 'published' && (existing?.status !== 'published' || audienceChanged)) {
     await notifyAnnouncementPublished({
@@ -106,10 +112,11 @@ export async function DELETE(
   if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
   const { error } = await supabaseAdmin.from('announcements').delete().eq('id', id);
   if (error) {
     console.error('Announcements DELETE Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   return NextResponse.json({ ok: true });
 }

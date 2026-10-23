@@ -1,3 +1,5 @@
+import { readJsonObject, invalidInput, InputValidationError, isOneOf } from "@/lib/inputValidation";
+import { validateBenefitInput } from "@/lib/apiInputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
 import { ADMIN_BENEFIT_SELECT } from '@/lib/adminBenefits';
@@ -17,6 +19,7 @@ export async function GET(req: Request) {
 
   const url = new URL(req.url);
   const active = url.searchParams.get('active');
+  if (active !== null && !isOneOf(active, ['true', 'false'])) return invalidInput('Active must be true or false');
 
   let query = supabaseAdmin
     .from('benefits')
@@ -27,7 +30,7 @@ export async function GET(req: Request) {
   if (active === 'false') query = query.eq('is_active', false);
 
   const { data, error } = await query;
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   return NextResponse.json({ benefits: data ?? [] });
 }
 
@@ -37,9 +40,9 @@ export async function POST(req: Request) {
 
   let body: Record<string, unknown>;
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    body = await readJsonObject(req, validateBenefitInput);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
   }
 
   const merchantName = cleanText(body.merchant_name);
@@ -77,7 +80,7 @@ export async function POST(req: Request) {
     .select(ADMIN_BENEFIT_SELECT)
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   if (data?.is_active) {
     await notifyBenefitAvailable({
       id: String(data.id),

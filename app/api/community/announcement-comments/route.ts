@@ -1,6 +1,6 @@
+import { InputValidationError, invalidInput, readJsonObject, requireUuid, requirePlainText } from "@/lib/inputValidation";
 import { NextResponse } from "next/server";
 import { requireMember } from "@/lib/currentUser";
-import { getErrorMessage } from "@/lib/errors";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 import { moderationStatus } from "@/lib/community";
 import { evaluateTierAccess, isActiveMembership, normalizeTierAudience } from "@/lib/tierAccess";
@@ -26,8 +26,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "An active membership is required." }, { status: 403 });
     }
 
-    const { announcementId, body } = await req.json();
-    const trimmedBody = typeof body === "string" ? body.trim() : "";
+    const { announcementId, body } = await readJsonObject(req);
+    requireUuid(typeof announcementId === "string" ? announcementId.replace(/^admin:/, "") : announcementId, "Announcement ID");
+    const trimmedBody = requirePlainText(body, "Comment", 500);
 
     if (typeof announcementId !== "string" || !trimmedBody) {
       return NextResponse.json(
@@ -75,7 +76,7 @@ export async function POST(req: Request) {
         .single<CommentRow>();
 
       if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ error: "Unable to save community content" }, { status: 500 });
       }
 
       return NextResponse.json({
@@ -89,6 +90,15 @@ export async function POST(req: Request) {
           isOwn: true,
         },
       });
+    }
+
+    const { data: announcement, error: announcementError } = await supabaseAdmin
+      .from("uc6_announcements")
+      .select("status, comments_enabled")
+      .eq("id", announcementId)
+      .maybeSingle();
+    if (announcementError || !announcement || announcement.status !== "published" || announcement.comments_enabled === false) {
+      return NextResponse.json({ error: "Announcement not found" }, { status: 404 });
     }
 
     const { data, error } = await supabaseAdmin
@@ -105,7 +115,7 @@ export async function POST(req: Request) {
       .single<CommentRow>();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Unable to save community content" }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -120,8 +130,9 @@ export async function POST(req: Request) {
       },
     });
   } catch (err: unknown) {
+    if (err instanceof InputValidationError) return invalidInput(err.message);
     return NextResponse.json(
-      { error: getErrorMessage(err, "Unable to post comment") },
+      { error: "Unable to post comment" },
       { status: 500 },
     );
   }

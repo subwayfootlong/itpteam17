@@ -1,3 +1,4 @@
+import { readJsonObject, invalidInput, InputValidationError } from "@/lib/inputValidation";
 import { NextResponse } from "next/server";
 import { requireMember } from "@/lib/currentUser";
 import {
@@ -28,7 +29,7 @@ export async function GET() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
   return NextResponse.json({
@@ -44,9 +45,9 @@ export async function POST(req: Request) {
 
   let body: unknown;
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+    body = await readJsonObject(req);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
   }
 
   const payload = body as { requestedTier?: unknown; reason?: unknown };
@@ -116,7 +117,7 @@ export async function POST(req: Request) {
   if (error) {
     const message = error.code === "23505"
       ? "You already have a pending tier upgrade request"
-      : error.message;
+      : "Unable to submit tier upgrade request";
     return NextResponse.json({ error: message }, { status: error.code === "23505" ? 409 : 500 });
   }
 
