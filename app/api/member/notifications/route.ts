@@ -1,25 +1,19 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/currentUser";
+import { requireMember } from "@/lib/currentUser";
 import { getUnreadNotificationCount } from "@/lib/notifications";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 
 export async function GET() {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Please log in first" }, { status: 401 });
-  }
+  const { user, response: authResponse } = await requireMember();
+  if (authResponse) return authResponse;
 
   const unreadCount = await getUnreadNotificationCount(user.id);
   return NextResponse.json({ unreadCount });
 }
 
 export async function PATCH(req: Request) {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Please log in first" }, { status: 401 });
-  }
+  const { user, response: authResponse } = await requireMember();
+  if (authResponse) return authResponse;
 
   let body: unknown;
   try {
@@ -71,11 +65,8 @@ export async function PATCH(req: Request) {
 }
 
 export async function DELETE() {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Please log in first" }, { status: 401 });
-  }
+  const { user, response: authResponse } = await requireMember();
+  if (authResponse) return authResponse;
 
   const { error } = await supabaseAdmin
     .from("notifications")

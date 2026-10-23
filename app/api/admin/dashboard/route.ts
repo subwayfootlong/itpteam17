@@ -1,5 +1,5 @@
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
-// import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { formatMemberName } from '@/lib/memberName';
 import { timeAgo } from '@/lib/dates';
@@ -44,6 +44,9 @@ function generateSparkline(dataDates: Date[], totalCurrentCount: number): string
 }
 
 export async function GET() {
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
+
   const [members, events, announcements, benefits, discussionPosts, discussionComments] = await Promise.all([
     supabaseAdmin.from('users').select('id, first_name, last_name, email, membership_status, created_at').neq('role', 'admin'),
     supabaseAdmin.from('events').select('id, title, status, event_date, created_at'),

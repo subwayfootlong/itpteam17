@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { hashPassword, verifyPassword } from "@/lib/auth";
-import { getCurrentUser } from "@/lib/currentUser";
+import { requireMember } from "@/lib/currentUser";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 
 const MIN_PASSWORD_LENGTH = 8;
@@ -14,13 +14,8 @@ type ChangePasswordBody = {
 
 export async function PATCH(request: Request) {
   try {
-    const currentUser = await getCurrentUser();
-    if (!currentUser) {
-      return NextResponse.json(
-        { error: "Your session has expired. Please log in again." },
-        { status: 401 },
-      );
-    }
+    const { user: currentUser, response: authResponse } = await requireMember();
+    if (authResponse) return authResponse;
 
     let body: ChangePasswordBody;
     try {

@@ -1,5 +1,5 @@
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
-import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { notifyEventPublished } from '@/lib/notifications';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { tierAudienceToDatabase, validateTierAudience } from '@/lib/tierAccess';
@@ -8,8 +8,8 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const { id } = await params;
   const { data, error } = await supabaseAdmin
@@ -30,8 +30,8 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const { id } = await params;
   let body;
@@ -99,8 +99,8 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const { id } = await params;
   const { error } = await supabaseAdmin.from('events').delete().eq('id', id);

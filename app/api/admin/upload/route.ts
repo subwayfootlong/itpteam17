@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 
@@ -6,6 +7,9 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 export async function POST(req: Request) {
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
+
   try {
     const formData = await req.formData();
     const file = formData.get('file') as File;

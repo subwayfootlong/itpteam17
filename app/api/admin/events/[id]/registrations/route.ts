@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { formatMemberName } from '@/lib/memberName';
@@ -6,6 +7,9 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
+
   const { id } = await params;
 
   const { data, error } = await supabaseAdmin
@@ -48,6 +52,9 @@ export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
+
   const { id } = await params;
   const url = new URL(req.url);
   const registrationId = url.searchParams.get('registrationId');

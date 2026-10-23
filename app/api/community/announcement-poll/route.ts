@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/currentUser";
+import { requireMember } from "@/lib/currentUser";
 import { getErrorMessage } from "@/lib/errors";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 import type { PollCounts, PollResponseValue } from "@/lib/data/announcements";
@@ -17,10 +17,8 @@ type PollResponseRow = {
 
 export async function POST(req: Request) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "Please log in first" }, { status: 401 });
-    }
+    const { user, response: authResponse } = await requireMember();
+    if (authResponse) return authResponse;
 
     const { announcementId, response } = await req.json();
 

@@ -1,10 +1,10 @@
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from "next/server";
 import {
   getModerationTable,
   type ModerationSource,
   type ModerationStatus,
 } from "@/lib/commentModeration";
-import { getVerifiedAdmin, unauthorizedResponse } from "@/lib/adminAuth";
 
 const SOURCES: ModerationSource[] = [
   "admin-announcement",
@@ -19,8 +19,8 @@ const ACTION_STATUS: Record<string, ModerationStatus> = {
 };
 
 export async function PATCH(req: Request) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   let body: unknown;
 

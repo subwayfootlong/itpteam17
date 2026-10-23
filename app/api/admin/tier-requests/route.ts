@@ -1,5 +1,5 @@
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from "next/server";
-import { getVerifiedAdmin, unauthorizedResponse } from "@/lib/adminAuth";
 import {
   formatTierLabel,
   getAvailableTierUpgrades,
@@ -21,8 +21,8 @@ type TierRequestRow = {
 };
 
 export async function GET(req: Request) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const status = new URL(req.url).searchParams.get("status");
   let query = supabaseAdmin
@@ -74,8 +74,8 @@ export async function GET(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { user: admin, response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   let body: unknown;
   try {

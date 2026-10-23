@@ -64,11 +64,12 @@ async function authenticatedMember(): Promise<EmailChangeUser | null> {
   if (!token || (activity !== null && isSessionIdleExpired(activity))) return null;
   let payload;
   try { payload = verifyAccessToken(token); } catch { return null; }
-  if (typeof payload === "string" || !payload.sub || typeof payload.email !== "string") return null;
+  if (typeof payload === "string" || typeof payload.sub !== "string" || !payload.sub || typeof payload.email !== "string") return null;
   const { data, error } = await supabaseAdmin.from("users").select("id,email,password_hash,role")
     .eq("id", payload.sub).maybeSingle();
   if (error) throw new Error("Unable to authenticate");
-  if (!data || data.role !== "member" || data.email !== payload.email) return null;
+  if (!data || data.email !== payload.email) return null;
+  if (data.role !== "member") throw new EmailChangeError("Forbidden", 403);
   return data;
 }
 

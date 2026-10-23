@@ -1,6 +1,6 @@
+import { requireAdmin } from "@/lib/adminAuth";
 import { randomBytes } from 'node:crypto';
 import { NextResponse } from 'next/server';
-import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { hashPassword } from '@/lib/auth';
 import type { BatchOnboardingResult, BatchOnboardingRow } from '@/lib/batchOnboarding';
 import { DEFAULT_TIER } from '@/lib/membershipTiers';
@@ -97,8 +97,8 @@ function friendlyInsertError(message: string): string {
 }
 
 export async function POST(request: Request) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   let body: { rows?: BatchOnboardingRow[] };
   try {

@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
-import { getCurrentUser } from '@/lib/currentUser';
+import { requireMember } from '@/lib/currentUser';
 import { evaluateTierAccess, normalizeTierAudience } from '@/lib/tierAccess';
 
 export async function GET(req: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return new Response('Unauthorized', { status: 401 });
-  }
+  const { user, response: authResponse } = await requireMember();
+  if (authResponse) return authResponse;
 
   const { searchParams } = new URL(req.url);
   const eventId = searchParams.get('eventId');
@@ -52,10 +50,8 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const { user, response: authResponse } = await requireMember();
+  if (authResponse) return authResponse;
 
   let body;
   try {
@@ -172,10 +168,8 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const { user, response: authResponse } = await requireMember();
+  if (authResponse) return authResponse;
 
   let body;
   try {
