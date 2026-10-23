@@ -1,3 +1,4 @@
+import { InputValidationError, invalidInput, readJsonObject, requireUuid, requirePlainText } from "@/lib/inputValidation";
 import { NextResponse } from "next/server";
 import { requireMember } from "@/lib/currentUser";
 import { getErrorMessage } from "@/lib/errors";
@@ -34,8 +35,10 @@ export async function POST(req: Request) {
     const { user, response: authResponse } = await requireMember();
     if (authResponse) return authResponse;
 
-    const { groupId, title, body } = await req.json();
-    const trimmedBody = typeof body === "string" ? body.trim() : "";
+    const { groupId, title, body } = await readJsonObject(req);
+    const trimmedBody = requirePlainText(body, "Post", 800);
+    requireUuid(groupId, "Group ID");
+    if (title !== undefined) requirePlainText(title, "Title", 80, 0);
     const threadTitle = cleanTitle(title, trimmedBody);
 
     if (typeof groupId !== "string" || !trimmedBody) {
@@ -81,7 +84,7 @@ export async function POST(req: Request) {
       .single<ThreadRow>();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Unable to save community content" }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -100,6 +103,7 @@ export async function POST(req: Request) {
       },
     });
   } catch (err: unknown) {
+    if (err instanceof InputValidationError) return invalidInput(err.message);
     return NextResponse.json(
       { error: getErrorMessage(err, "Unable to create discussion") },
       { status: 500 },

@@ -1,3 +1,4 @@
+import { InputValidationError, invalidInput, readJsonObject, requireUuid, requirePlainText } from "@/lib/inputValidation";
 import { NextResponse } from "next/server";
 import { requireMember } from "@/lib/currentUser";
 import { getErrorMessage } from "@/lib/errors";
@@ -21,8 +22,10 @@ export async function POST(req: Request) {
     const { user, response: authResponse } = await requireMember();
     if (authResponse) return authResponse;
 
-    const { threadId, body, parentCommentId } = await req.json();
-    const trimmedBody = typeof body === "string" ? body.trim() : "";
+    const { threadId, body, parentCommentId } = await readJsonObject(req);
+    requireUuid(threadId, "Thread ID");
+    if (parentCommentId != null) requireUuid(parentCommentId, "Parent comment ID");
+    const trimmedBody = requirePlainText(body, "Comment", 500);
 
     if (typeof threadId !== "string" || !trimmedBody) {
       return NextResponse.json(
@@ -117,7 +120,7 @@ export async function POST(req: Request) {
       .single<CommentRow>();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Unable to save community content" }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -133,6 +136,7 @@ export async function POST(req: Request) {
       },
     });
   } catch (err: unknown) {
+    if (err instanceof InputValidationError) return invalidInput(err.message);
     return NextResponse.json(
       { error: getErrorMessage(err, "Unable to post comment") },
       { status: 500 },

@@ -1,3 +1,4 @@
+import { InputValidationError, invalidInput, readJsonObject, requireUuid, requirePlainText } from "@/lib/inputValidation";
 import { NextResponse } from "next/server";
 import { requireMember } from "@/lib/currentUser";
 import { getErrorMessage } from "@/lib/errors";
@@ -26,8 +27,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "An active membership is required." }, { status: 403 });
     }
 
-    const { announcementId, body } = await req.json();
-    const trimmedBody = typeof body === "string" ? body.trim() : "";
+    const { announcementId, body } = await readJsonObject(req);
+    requireUuid(typeof announcementId === "string" ? announcementId.replace(/^admin:/, "") : announcementId, "Announcement ID");
+    const trimmedBody = requirePlainText(body, "Comment", 500);
 
     if (typeof announcementId !== "string" || !trimmedBody) {
       return NextResponse.json(
@@ -75,7 +77,7 @@ export async function POST(req: Request) {
         .single<CommentRow>();
 
       if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ error: "Unable to save community content" }, { status: 500 });
       }
 
       return NextResponse.json({
@@ -105,7 +107,7 @@ export async function POST(req: Request) {
       .single<CommentRow>();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Unable to save community content" }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -120,6 +122,7 @@ export async function POST(req: Request) {
       },
     });
   } catch (err: unknown) {
+    if (err instanceof InputValidationError) return invalidInput(err.message);
     return NextResponse.json(
       { error: getErrorMessage(err, "Unable to post comment") },
       { status: 500 },
