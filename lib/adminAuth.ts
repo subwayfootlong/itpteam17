@@ -1,8 +1,6 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { verifyAccessToken } from "./auth";
+import { getAuthorizedUser, type AuthorizationResult } from "./currentUser";
 import { formatMemberName } from "./memberName";
-import { supabaseAdmin } from "./supabaseServer";
 
 export type VerifiedAdmin = {
   sub: string;
@@ -10,32 +8,22 @@ export type VerifiedAdmin = {
   fullName: string;
 };
 
+export async function requireAdmin(): Promise<AuthorizationResult<VerifiedAdmin>> {
+  const result = await getAuthorizedUser("admin");
+  if (result.response) return { response: result.response };
+  return {
+    user: {
+      sub: result.user.id,
+      email: result.user.email,
+      fullName: formatMemberName({ first_name: result.user.firstName, last_name: result.user.lastName, email: result.user.email }, "Admin"),
+    },
+  };
+}
+
+// Preserve the nullable helper for existing page/layout consumers.
 export async function getVerifiedAdmin(): Promise<VerifiedAdmin | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
-
-  if (!token) return null;
-
-  try {
-    const payload = verifyAccessToken(token) as { sub?: string; email?: string };
-    if (!payload.sub) return null;
-
-    const { data } = await supabaseAdmin
-      .from("users")
-      .select("id, email, first_name, last_name, role")
-      .eq("id", payload.sub)
-      .maybeSingle();
-
-    if (!data || data.role !== "admin") return null;
-
-    return {
-      sub: String(data.id),
-      email: data.email ?? null,
-      fullName: formatMemberName(data, "Admin"),
-    };
-  } catch {
-    return null;
-  }
+  const result = await requireAdmin();
+  return result.user ?? null;
 }
 
 export function unauthorizedResponse() {
