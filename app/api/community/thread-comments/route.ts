@@ -1,7 +1,6 @@
 import { InputValidationError, invalidInput, readJsonObject, requireUuid, requirePlainText } from "@/lib/inputValidation";
 import { NextResponse } from "next/server";
 import { requireMember } from "@/lib/currentUser";
-import { getErrorMessage } from "@/lib/errors";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 import { moderationStatus } from "@/lib/community";
 import { formatTierLabel } from "@/lib/membershipTiers";
@@ -138,7 +137,7 @@ export async function POST(req: Request) {
   } catch (err: unknown) {
     if (err instanceof InputValidationError) return invalidInput(err.message);
     return NextResponse.json(
-      { error: getErrorMessage(err, "Unable to post comment") },
+      { error: "Unable to post comment" },
       { status: 500 },
     );
   }

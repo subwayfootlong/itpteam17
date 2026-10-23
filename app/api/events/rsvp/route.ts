@@ -1,3 +1,4 @@
+import { readJsonObject, invalidInput, InputValidationError, isUuid } from "@/lib/inputValidation";
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { requireMember } from '@/lib/currentUser';
@@ -10,7 +11,7 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const eventId = searchParams.get('eventId');
 
-  if (!eventId) {
+  if (!isUuid(eventId)) {
     return new Response('Event ID is required', { status: 400 });
   }
 
@@ -55,13 +56,13 @@ export async function POST(req: Request) {
 
   let body;
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    body = await readJsonObject(req);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
   }
 
   const { eventId } = body;
-  if (!eventId) {
+  if (!isUuid(eventId)) {
     return NextResponse.json({ error: 'eventId is required' }, { status: 400 });
   }
 
@@ -116,7 +117,7 @@ export async function POST(req: Request) {
       .eq('id', existingReg.id);
 
     if (updateError) {
-      return NextResponse.json({ error: updateError.message }, { status: 500 });
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
 
     // Decrement spots_available
@@ -143,7 +144,7 @@ export async function POST(req: Request) {
       });
 
     if (insertError) {
-      return NextResponse.json({ error: insertError.message }, { status: 500 });
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
 
     // Decrement spots_available
@@ -173,13 +174,13 @@ export async function DELETE(req: Request) {
 
   let body;
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    body = await readJsonObject(req);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
   }
 
   const { eventId } = body;
-  if (!eventId) {
+  if (!isUuid(eventId)) {
     return NextResponse.json({ error: 'eventId is required' }, { status: 400 });
   }
 
@@ -217,7 +218,7 @@ export async function DELETE(req: Request) {
     .eq('user_id', user.id);
 
   if (deleteError) {
-    return NextResponse.json({ error: deleteError.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
   // Give the seat back, never exceeding the event capacity

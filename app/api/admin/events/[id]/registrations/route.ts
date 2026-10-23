@@ -1,3 +1,4 @@
+import { isUuid, invalidInput } from "@/lib/inputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
@@ -11,6 +12,7 @@ export async function GET(
   if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
 
   const { data, error } = await supabaseAdmin
     .from('event_registrations')
@@ -30,7 +32,7 @@ export async function GET(
 
   if (error) {
     console.error('Events Registrations GET Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
   const formattedData = data.map((reg) => {
@@ -56,11 +58,13 @@ export async function DELETE(
   if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
   const url = new URL(req.url);
   const registrationId = url.searchParams.get('registrationId');
   const rejectionMessage = url.searchParams.get('rejectionMessage') || 'Registration cancelled by administrator.';
 
-  if (!registrationId) {
+  if (rejectionMessage.length > 1000 || rejectionMessage.includes("\u0000")) return invalidInput("Rejection message cannot exceed 1000 characters or contain null characters");
+  if (!isUuid(registrationId)) {
     return NextResponse.json({ error: 'registrationId is required' }, { status: 400 });
   }
 
@@ -92,7 +96,7 @@ export async function DELETE(
 
   if (error) {
     console.error('Events Registrations DELETE Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
   const { data: eventData } = await supabaseAdmin

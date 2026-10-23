@@ -1,3 +1,5 @@
+import { inputError } from "@/lib/inputValidation";
+import { validateMemberFilters } from "@/lib/apiInputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
@@ -10,6 +12,8 @@ export async function GET(req: Request) {
   const search = url.searchParams.get('search') ?? '';
   const tier = url.searchParams.get('tier') ?? '';
   const status = url.searchParams.get('status') ?? '';
+  const validation = inputError(() => validateMemberFilters(search, tier, status));
+  if (validation) return validation;
 
   let query = supabaseAdmin
     .from('users')
@@ -27,6 +31,6 @@ export async function GET(req: Request) {
 
   const { data, error } = await query;
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   return NextResponse.json({ members: data ?? [] });
 }

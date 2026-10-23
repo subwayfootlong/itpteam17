@@ -1,3 +1,5 @@
+import { readJsonObject, isUuid, invalidInput, InputValidationError } from "@/lib/inputValidation";
+import { validateMemberInput } from "@/lib/apiInputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
@@ -37,13 +39,14 @@ export async function GET(
   if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
   const { data, error } = await supabaseAdmin
     .from('users')
     .select(MEMBER_SELECT)
     .eq('id', id)
     .maybeSingle();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   if (!data) return NextResponse.json({ error: 'Member not found' }, { status: 404 });
 
   const { data: registrations } = await supabaseAdmin
@@ -74,7 +77,11 @@ export async function PATCH(
   if (authResponse) return authResponse;
 
   const { id } = await params;
-  const body = await req.json();
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
+  let body: Record<string, unknown>;
+  try { body = await readJsonObject(req, validateMemberInput); } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
+  }
 
   const updates: Record<string, unknown> = {};
   for (const key of ALLOWED_PATCH_FIELDS) {
@@ -170,7 +177,7 @@ export async function PATCH(
     .select(MEMBER_SELECT)
     .maybeSingle();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   if (!data) return NextResponse.json({ error: 'Member not found' }, { status: 404 });
 
   return NextResponse.json({ member: data });
