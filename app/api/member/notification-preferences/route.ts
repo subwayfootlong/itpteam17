@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/currentUser";
+import { requireMember } from "@/lib/currentUser";
 import {
   getNotificationPreferences,
   updateNotificationPreferences,
@@ -9,22 +9,16 @@ import {
 const preferenceKeys = ["benefit", "announcement", "event"] as const;
 
 export async function GET() {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Please log in first" }, { status: 401 });
-  }
+  const { user, response: authResponse } = await requireMember();
+  if (authResponse) return authResponse;
 
   const preferences = await getNotificationPreferences(user.id);
   return NextResponse.json({ preferences });
 }
 
 export async function PATCH(req: Request) {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Please log in first" }, { status: 401 });
-  }
+  const { user, response: authResponse } = await requireMember();
+  if (authResponse) return authResponse;
 
   let body: unknown;
   try {

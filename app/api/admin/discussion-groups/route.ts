@@ -1,7 +1,7 @@
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 import { tierAudienceToDatabase, validateTierAudience } from "@/lib/tierAccess";
-import { getVerifiedAdmin, unauthorizedResponse } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
@@ -9,8 +9,9 @@ const GROUP_SELECT =
   "id, title, icon, tone, sort_order, audience_type, eligible_tiers, show_locked_preview";
 
 export async function GET() {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
+
   const { data, error } = await supabaseAdmin
     .from("discussion_groups")
     .select(GROUP_SELECT)
@@ -24,8 +25,9 @@ export async function GET() {
 }
 
 export async function PATCH(req: Request) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
+
   let body: Record<string, unknown>;
   try {
     body = await req.json();

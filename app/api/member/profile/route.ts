@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/currentUser";
+import { requireMember } from "@/lib/currentUser";
 import { getErrorMessage } from "@/lib/errors";
 import { isValidSalutation } from "@/lib/memberProfileOptions";
 import {
@@ -21,10 +21,8 @@ type ProfileUpdatePayload = {
 
 export async function PATCH(req: Request) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "Please log in first" }, { status: 401 });
-    }
+    const { user, response: authResponse } = await requireMember();
+    if (authResponse) return authResponse;
 
     const body = (await req.json()) as ProfileUpdatePayload;
     const salutation = body.salutation?.trim() ?? "";

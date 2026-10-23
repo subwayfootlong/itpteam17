@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/currentUser";
+import { requireMember } from "@/lib/currentUser";
 import {
   formatTierLabel,
   getAvailableTierUpgrades,
@@ -8,10 +8,8 @@ import {
 import { supabaseAdmin } from "@/lib/supabaseServer";
 
 export async function GET() {
-  const currentUser = await getCurrentUser();
-  if (!currentUser) {
-    return NextResponse.json({ error: "Please log in first" }, { status: 401 });
-  }
+  const { user: currentUser, response: authResponse } = await requireMember();
+  if (authResponse) return authResponse;
 
   const { data: member, error: memberError } = await supabaseAdmin
     .from("users")
@@ -41,10 +39,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const currentUser = await getCurrentUser();
-  if (!currentUser) {
-    return NextResponse.json({ error: "Please log in first" }, { status: 401 });
-  }
+  const { user: currentUser, response: authResponse } = await requireMember();
+  if (authResponse) return authResponse;
 
   let body: unknown;
   try {
