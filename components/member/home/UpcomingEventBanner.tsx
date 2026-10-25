@@ -34,9 +34,9 @@ export default function UpcomingEventBanner({
   event: UpcomingEvent;
 }) {
   return (
-    <section className="mt-4 rounded-xl border border-[#D9E8D7] member-dark:border-neutral-700 bg-[#F3FAF2] member-dark:bg-neutral-800 p-5">
+    <section className="mt-4 rounded-xl border border-[#D9E8D7] member-dark:border-member-border bg-[#F3FAF2] member-dark:bg-member-raised p-5">
       <div className="flex items-start gap-3">
-        <div className="rounded-full bg-[#DDF3D9] member-dark:bg-neutral-800 p-2 text-[#0F6E00] member-dark:text-brand-primary-200">
+        <div className="rounded-full bg-[#DDF3D9] member-dark:bg-member-raised p-2 text-[#0F6E00] member-dark:text-brand-primary-200">
           <CalendarDays size={20} />
         </div>
 

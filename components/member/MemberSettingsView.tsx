@@ -75,7 +75,7 @@ function SettingsSwitch({
       onClick={onClick}
       disabled={disabled}
       className={`relative h-7 w-12 rounded-full transition-colors ${
-        enabled ? "bg-brand-primary-800" : "bg-neutral-200 member-dark:bg-neutral-800"
+        enabled ? "bg-brand-primary-800" : "bg-neutral-200 member-dark:bg-member-raised"
       } ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
     >
       <span
@@ -113,7 +113,7 @@ function SegmentedControl({
     <div
       role="group"
       aria-label={label}
-      className="mb-2 mt-3 grid grid-cols-4 rounded-xl bg-neutral-100 member-dark:bg-neutral-800 p-1"
+      className="mb-2 mt-3 grid grid-cols-4 rounded-xl bg-neutral-100 member-dark:bg-member-raised p-1"
     >
       {options.map((option, index) => {
         const isSelected = selectedIndex === index;
@@ -126,7 +126,7 @@ function SegmentedControl({
             onClick={() => onChange(index)}
             className={`rounded-lg px-2 py-2 text-center text-xs font-semibold transition-all ${
               isSelected
-                ? "bg-white member-dark:bg-neutral-900 text-brand-primary-800 member-dark:text-brand-primary-200 shadow-xs"
+                ? "bg-white member-dark:bg-member-surface text-brand-primary-800 member-dark:text-brand-primary-200 shadow-xs"
                 : "text-neutral-500 member-dark:text-neutral-400 hover:text-neutral-800 member-dark:hover:text-neutral-100"
             }`}
           >
@@ -249,7 +249,7 @@ export default function MemberSettingsView({
         <NavLink
           href="/member/profile"
           aria-label="Back to profile"
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300 transition-colors hover:bg-neutral-200/70 member-dark:hover:bg-neutral-800/70 active:scale-95"
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-member-raised text-neutral-700 member-dark:text-neutral-300 transition-colors hover:bg-neutral-200/70 member-dark:hover:bg-member-raised/70 active:scale-95"
         >
           <ArrowLeft size={20} className="text-brand-primary-800 member-dark:text-brand-primary-200" />
         </NavLink>
@@ -270,9 +270,9 @@ export default function MemberSettingsView({
           Appearance
         </h2>
 
-        <div className="mb-4 divide-y divide-neutral-100 member-dark:divide-neutral-700 overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 shadow-xs">
+        <div className="mb-4 divide-y divide-neutral-100 member-dark:divide-member-border overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-member-border/80 bg-white member-dark:bg-member-surface shadow-xs">
           <div className="flex items-start gap-3.5 p-4">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-member-raised text-neutral-700 member-dark:text-neutral-300">
               <Type size={18} />
             </div>
 
@@ -302,7 +302,7 @@ export default function MemberSettingsView({
 
           <div className="space-y-3 p-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-member-raised text-neutral-700 member-dark:text-neutral-300">
                 <Palette size={18} />
               </div>
 
@@ -321,7 +321,7 @@ export default function MemberSettingsView({
               value={mounted ? theme : ""}
               disabled={!mounted}
               onChange={(event) => setTheme(event.target.value)}
-              className="w-full rounded-xl border border-neutral-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 px-3 py-2 text-sm text-neutral-900 member-dark:text-neutral-100"
+              className="w-full rounded-xl border border-neutral-200 member-dark:border-member-border bg-white member-dark:bg-member-raised px-3 py-2 font-helvetica text-xs font-semibold text-neutral-900 member-dark:text-neutral-100 [&>option]:font-helvetica [&>option]:font-semibold"
             >
               {!mounted && <option value="">Loading appearance...</option>}
               <option value="light">Light Mode</option>
@@ -338,12 +338,12 @@ export default function MemberSettingsView({
           Account
         </h2>
 
-        <div className="mb-4 divide-y divide-neutral-100 member-dark:divide-neutral-700 overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 shadow-xs">
+        <div className="mb-4 divide-y divide-neutral-100 member-dark:divide-member-border overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-member-border/80 bg-white member-dark:bg-member-surface shadow-xs">
           <NavLink
             href="/member/settings/password"
-            className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 member-dark:hover:bg-neutral-900 active:scale-[0.98]"
+            className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 member-dark:hover:bg-member-surface active:scale-[0.98]"
           >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-member-raised text-neutral-700 member-dark:text-neutral-300">
               <KeyRound size={18} />
             </div>
             <div className="min-w-0 flex-1">
@@ -357,9 +357,9 @@ export default function MemberSettingsView({
 
           <NavLink
             href="/member/settings/email"
-            className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 member-dark:hover:bg-neutral-900 active:scale-[0.98]"
+            className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 member-dark:hover:bg-member-surface active:scale-[0.98]"
           >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-member-raised text-neutral-700 member-dark:text-neutral-300">
               <Mail size={18} />
             </div>
             <div className="min-w-0 flex-1">
@@ -379,7 +379,7 @@ export default function MemberSettingsView({
           Notifications
         </h2>
 
-        <div className="mb-4 divide-y divide-neutral-100 member-dark:divide-neutral-700 overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 shadow-xs">
+        <div className="mb-4 divide-y divide-neutral-100 member-dark:divide-member-border overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-member-border/80 bg-white member-dark:bg-member-surface shadow-xs">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200">
@@ -411,7 +411,7 @@ export default function MemberSettingsView({
             {preferenceCopy.map((preference) => (
               <div
                 key={preference.key}
-                className="flex items-center justify-between gap-3 rounded-xl border border-neutral-100 member-dark:border-neutral-700 bg-neutral-50/70 member-dark:bg-neutral-900/70 px-3.5 py-2.5"
+                className="flex items-center justify-between gap-3 rounded-xl border border-neutral-100 member-dark:border-member-border bg-neutral-50/70 member-dark:bg-member-surface/70 px-3.5 py-2.5"
               >
                 <div>
                   <p className="text-xs font-semibold text-neutral-800 member-dark:text-neutral-100">
@@ -438,7 +438,7 @@ export default function MemberSettingsView({
 
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-member-raised text-neutral-700 member-dark:text-neutral-300">
                 <Mail size={18} />
               </div>
               <div>
@@ -471,10 +471,10 @@ export default function MemberSettingsView({
           Preferences
         </h2>
 
-        <div className="mb-4 divide-y divide-neutral-100 member-dark:divide-neutral-700 overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 shadow-xs">
+        <div className="mb-4 divide-y divide-neutral-100 member-dark:divide-member-border overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-member-border/80 bg-white member-dark:bg-member-surface shadow-xs">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-member-raised text-neutral-700 member-dark:text-neutral-300">
                 <Globe size={18} />
               </div>
 
@@ -488,7 +488,7 @@ export default function MemberSettingsView({
               </div>
             </div>
 
-            <span className="rounded-md bg-neutral-100 member-dark:bg-neutral-800 px-2 py-0.5 text-xs font-medium text-neutral-600 member-dark:text-neutral-300">
+            <span className="rounded-md bg-neutral-100 member-dark:bg-member-raised px-2 py-0.5 text-xs font-medium text-neutral-600 member-dark:text-neutral-300">
               Default
             </span>
           </div>
@@ -501,10 +501,10 @@ export default function MemberSettingsView({
           About & Support
         </h2>
 
-        <div className="mb-4 divide-y divide-neutral-100 member-dark:divide-neutral-700 overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 shadow-xs">
+        <div className="mb-4 divide-y divide-neutral-100 member-dark:divide-member-border overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-member-border/80 bg-white member-dark:bg-member-surface shadow-xs">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-member-raised text-neutral-700 member-dark:text-neutral-300">
                 <Info size={18} />
               </div>
               <p className="text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
@@ -516,7 +516,7 @@ export default function MemberSettingsView({
 
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-member-raised text-neutral-700 member-dark:text-neutral-300">
                 <ShieldCheck size={18} />
               </div>
               <p className="text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
@@ -528,7 +528,7 @@ export default function MemberSettingsView({
 
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-member-raised text-neutral-700 member-dark:text-neutral-300">
                 <FileText size={18} />
               </div>
               <p className="text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
@@ -538,7 +538,7 @@ export default function MemberSettingsView({
             <ExternalLink size={16} className="text-neutral-300 member-dark:text-neutral-400" />
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-neutral-50/50 member-dark:bg-neutral-900/50">
+          <div className="flex items-center justify-between p-4 bg-neutral-50/50 member-dark:bg-member-surface/50">
             <p className="text-xs text-neutral-500 member-dark:text-neutral-400">Pergas Member Portal</p>
             <span className="font-mono text-xs font-medium text-neutral-400 member-dark:text-neutral-400">
               v2.4.0 (Build 108)
@@ -552,7 +552,7 @@ export default function MemberSettingsView({
         <button
           type="button"
           onClick={handleLogout}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 member-dark:border-rose-800 bg-white member-dark:bg-neutral-900 px-4 py-3 text-sm font-semibold text-brand-rose member-dark:text-rose-300 shadow-2xs transition-transform duration-100 hover:bg-rose-50 member-dark:hover:bg-rose-950 active:scale-[0.98]"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 member-dark:border-rose-800 bg-white member-dark:bg-member-surface px-4 py-3 text-sm font-semibold text-brand-rose member-dark:text-rose-300 shadow-2xs transition-transform duration-100 hover:bg-rose-50 member-dark:hover:bg-rose-950 active:scale-[0.98]"
         >
           <LogOut size={18} />
           <span>Log Out</span>

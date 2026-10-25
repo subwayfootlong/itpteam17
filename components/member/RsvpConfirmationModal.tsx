@@ -34,7 +34,7 @@ export function CalendarButtons({
         href={googleUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-brand-primary-800 member-dark:border-brand-primary-700 bg-white member-dark:bg-neutral-900 px-3 py-2.5 text-center text-xs font-semibold text-brand-primary-800 member-dark:text-brand-primary-200 transition-transform duration-100 hover:bg-brand-primary-50 member-dark:hover:bg-brand-primary-900 active:scale-[0.98]"
+        className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-brand-primary-800 member-dark:border-brand-primary-700 bg-white member-dark:bg-member-surface px-3 py-2.5 text-center text-xs font-semibold text-brand-primary-800 member-dark:text-brand-primary-200 transition-transform duration-100 hover:bg-brand-primary-50 member-dark:hover:bg-brand-primary-900 active:scale-[0.98]"
       >
         <CalendarPlus size={15} aria-hidden="true" />
         Google Calendar
@@ -42,7 +42,7 @@ export function CalendarButtons({
       <button
         type="button"
         onClick={() => downloadIcs(event, eventId)}
-        className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-brand-primary-800 member-dark:border-brand-primary-700 bg-white member-dark:bg-neutral-900 px-3 py-2.5 text-center text-xs font-semibold text-brand-primary-800 member-dark:text-brand-primary-200 transition-transform duration-100 hover:bg-brand-primary-50 member-dark:hover:bg-brand-primary-900 active:scale-[0.98]"
+        className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-brand-primary-800 member-dark:border-brand-primary-700 bg-white member-dark:bg-member-surface px-3 py-2.5 text-center text-xs font-semibold text-brand-primary-800 member-dark:text-brand-primary-200 transition-transform duration-100 hover:bg-brand-primary-50 member-dark:hover:bg-brand-primary-900 active:scale-[0.98]"
       >
         <Download size={15} aria-hidden="true" />
         Apple / Outlook (.ics)
@@ -128,7 +128,7 @@ export default function RsvpConfirmationModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="rsvp-confirmation-title"
-        className="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white member-dark:bg-neutral-900 p-5 shadow-xl sm:rounded-3xl"
+        className="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white member-dark:bg-member-surface p-5 shadow-xl sm:rounded-3xl"
       >
         <div className="flex flex-col items-center text-center">
           <span className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200">
@@ -145,7 +145,7 @@ export default function RsvpConfirmationModal({
           </p>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-neutral-200 member-dark:border-neutral-700 bg-neutral-50 member-dark:bg-neutral-900 p-3.5">
+        <div className="mt-4 rounded-2xl border border-neutral-200 member-dark:border-member-border bg-neutral-50 member-dark:bg-member-surface p-3.5">
           <p className="text-sm font-semibold text-neutral-950 member-dark:text-neutral-100">{event.title}</p>
           <p className="mt-1 text-xs text-neutral-600 member-dark:text-neutral-300">
             {formatMemberDate(event.eventDate)}
@@ -183,7 +183,7 @@ export default function RsvpConfirmationModal({
             ref={doneRef}
             type="button"
             onClick={onClose}
-            className="min-h-11 w-full rounded-xl px-4 py-2.5 text-sm font-semibold text-neutral-600 member-dark:text-neutral-300 transition-transform duration-100 hover:bg-neutral-100 member-dark:hover:bg-neutral-800 active:scale-[0.98]"
+            className="min-h-11 w-full rounded-xl px-4 py-2.5 text-sm font-semibold text-neutral-600 member-dark:text-neutral-300 transition-transform duration-100 hover:bg-neutral-100 member-dark:hover:bg-member-raised active:scale-[0.98]"
           >
             Done
           </button>

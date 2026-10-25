@@ -20,13 +20,13 @@ const actions = [
     label: "Benefits",
     href: "/member/benefit",
     icon: Gift,
-    tile: "bg-brand-accent-soft member-dark:bg-neutral-800 text-amber-900 member-dark:text-amber-300",
+    tile: "bg-brand-accent-soft member-dark:bg-member-raised text-amber-900 member-dark:text-amber-300",
   },
   {
     label: "Updates",
     href: "/member/community?tab=announcements",
     icon: Megaphone,
-    tile: "bg-brand-secondary-soft text-brand-secondary-dark",
+    tile: "bg-brand-secondary-soft text-brand-secondary-dark member-dark:bg-teal-950 member-dark:text-teal-200",
   },
 ];
 

@@ -37,9 +37,9 @@ export default function FeaturedEventCard({
   event: FeaturedEvent;
 }) {
   return (
-    <article className="flex w-[280px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-neutral-100 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 shadow-sm transition-all hover:border-neutral-200 member-dark:hover:border-neutral-700 hover:shadow-md">
+    <article className="flex w-[280px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-neutral-100 member-dark:border-member-border bg-white member-dark:bg-member-surface shadow-sm transition-all hover:border-neutral-200 member-dark:hover:border-member-border hover:shadow-md">
       {/* 16:9 Banner Container */}
-      <div className="relative aspect-[16/9] w-full overflow-hidden bg-neutral-100 member-dark:bg-neutral-800">
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-neutral-100 member-dark:bg-member-raised">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={event.imageUrl || "/event-placeholder.png"}
@@ -49,7 +49,7 @@ export default function FeaturedEventCard({
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
 
         {/* Floating Category Chip */}
-        <span className="absolute left-3 top-3 rounded-md border border-white/50 bg-white/90 member-dark:bg-neutral-900/90 px-2.5 py-0.5 text-xs font-semibold text-neutral-800 member-dark:text-neutral-100 shadow-xs backdrop-blur-md">
+        <span className="absolute left-3 top-3 rounded-md border border-white/50 bg-white/90 member-dark:bg-member-surface/90 px-2.5 py-0.5 text-xs font-semibold text-neutral-800 member-dark:text-neutral-100 shadow-xs backdrop-blur-md">
           {event.category || "Featured Event"}
         </span>
       </div>

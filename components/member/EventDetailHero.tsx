@@ -41,7 +41,7 @@ export default function EventDetailHero({
         </div>
 
         {category && (
-          <span className="absolute left-3.5 top-3.5 z-10 rounded-full border border-white/30 bg-white/95 member-dark:bg-neutral-900/95 px-3 py-1 text-xs font-bold text-[#0F6E00] member-dark:text-brand-primary-200 shadow-xs backdrop-blur-md">
+          <span className="absolute left-3.5 top-3.5 z-10 rounded-full border border-white/30 bg-white/95 member-dark:bg-member-surface/95 px-3 py-1 text-xs font-bold text-[#0F6E00] member-dark:text-brand-primary-200 shadow-xs backdrop-blur-md">
             {category}
           </span>
         )}
@@ -50,7 +50,7 @@ export default function EventDetailHero({
   }
 
   return (
-    <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-neutral-100 member-dark:bg-neutral-800 shadow-xs">
+    <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-neutral-100 member-dark:bg-member-raised shadow-xs">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={imageUrl}
@@ -61,7 +61,7 @@ export default function EventDetailHero({
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
       {category && (
-        <span className="absolute left-3.5 top-3.5 rounded-full border border-white/40 bg-white/95 member-dark:bg-neutral-900/95 px-3 py-1 text-xs font-bold text-[#0F6E00] member-dark:text-brand-primary-200 shadow-xs backdrop-blur-md">
+        <span className="absolute left-3.5 top-3.5 rounded-full border border-white/40 bg-white/95 member-dark:bg-member-surface/95 px-3 py-1 text-xs font-bold text-[#0F6E00] member-dark:text-brand-primary-200 shadow-xs backdrop-blur-md">
           {category}
         </span>
       )}

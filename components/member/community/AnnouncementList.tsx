@@ -21,7 +21,7 @@ const categoryStyles: Record<
     bar: "bg-brand-rose",
   },
   Community: {
-    chip: "bg-brand-accent-soft member-dark:bg-neutral-800 text-amber-900 member-dark:text-amber-300",
+    chip: "bg-brand-accent-soft member-dark:bg-member-raised text-amber-900 member-dark:text-amber-300",
     bar: "bg-brand-accent",
   },
 };
@@ -44,16 +44,16 @@ export function AnnouncementHeroCard({
   onOpen: (announcementId: string) => void;
 }) {
   return (
-    <article className="mb-5 overflow-hidden rounded-2xl border border-neutral-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 shadow-md">
+    <article className="mb-5 overflow-hidden rounded-2xl border border-neutral-200 member-dark:border-member-border bg-white member-dark:bg-member-surface shadow-md">
       {announcement.imageUrl && (
-        <div className="relative w-full overflow-hidden bg-neutral-100 member-dark:bg-neutral-800">
+        <div className="relative w-full overflow-hidden bg-neutral-100 member-dark:bg-member-raised">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={announcement.imageUrl}
             alt={announcement.title}
             className="block h-auto w-full"
           />
-          <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 member-dark:bg-neutral-900/95 px-2.5 py-1 text-[11px] font-bold text-brand-primary-800 member-dark:text-brand-primary-200 shadow-xs">
+          <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 member-dark:bg-member-surface/95 px-2.5 py-1 text-[11px] font-bold text-brand-primary-800 member-dark:text-brand-primary-200 shadow-xs">
             <Pin size={12} aria-hidden="true" />
             Featured
           </span>
@@ -117,7 +117,7 @@ export default function AnnouncementList({
             key={announcement.id}
             type="button"
             onClick={() => onOpen(announcement.id)}
-            className="relative block w-full overflow-hidden rounded-2xl border border-neutral-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 py-3.5 pl-5 pr-4 text-left shadow-sm transition-transform duration-100 hover:border-neutral-300 member-dark:hover:border-neutral-700 active:scale-[0.98]"
+            className="relative block w-full overflow-hidden rounded-2xl border border-neutral-200 member-dark:border-member-border bg-white member-dark:bg-member-surface py-3.5 pl-5 pr-4 text-left shadow-sm transition-transform duration-100 hover:border-neutral-300 member-dark:hover:border-member-border active:scale-[0.98]"
           >
             <span
               aria-hidden="true"

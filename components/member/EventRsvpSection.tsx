@@ -157,7 +157,7 @@ export default function EventRsvpSection({
                       type="button"
                       onClick={() => setConfirmingCancel(false)}
                       disabled={cancelling}
-                      className="min-h-10 rounded-xl border border-neutral-300 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 px-3 py-2 text-xs font-semibold text-neutral-700 member-dark:text-neutral-300 transition-transform duration-100 active:scale-[0.98] disabled:opacity-50"
+                      className="min-h-10 rounded-xl border border-neutral-300 member-dark:border-member-border bg-white member-dark:bg-member-surface px-3 py-2 text-xs font-semibold text-neutral-700 member-dark:text-neutral-300 transition-transform duration-100 active:scale-[0.98] disabled:opacity-50"
                     >
                       Keep my place
                     </button>
@@ -191,7 +191,7 @@ export default function EventRsvpSection({
         <button
           type="button"
           disabled
-          className="flex min-h-12 w-full items-center justify-center rounded-xl border border-neutral-200 member-dark:border-neutral-700 bg-neutral-100 member-dark:bg-neutral-800 px-4 py-3 text-sm font-medium text-neutral-400 member-dark:text-neutral-400 cursor-not-allowed"
+          className="flex min-h-12 w-full items-center justify-center rounded-xl border border-neutral-200 member-dark:border-member-border bg-neutral-100 member-dark:bg-member-raised px-4 py-3 text-sm font-medium text-neutral-400 member-dark:text-neutral-400 cursor-not-allowed"
         >
           Event is Full
         </button>

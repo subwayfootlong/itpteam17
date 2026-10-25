@@ -106,7 +106,7 @@ export default function TierUpgradeRequestView() {
       </NavLink>
 
       <header className="mt-5">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#E8F5E3] member-dark:bg-neutral-800 text-[#0F6E00] member-dark:text-brand-primary-200">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#E8F5E3] member-dark:bg-member-raised text-[#0F6E00] member-dark:text-brand-primary-200">
           <ArrowUpCircle size={27} />
         </div>
         <h1 className="member-text-2xl mt-4 text-2xl font-bold text-[#151C27] member-dark:text-neutral-100">Request a tier upgrade</h1>
@@ -119,7 +119,7 @@ export default function TierUpgradeRequestView() {
       {success && <div role="status" className="mt-5 rounded-xl border border-green-200 member-dark:border-green-800 bg-green-50 member-dark:bg-green-950 p-4 text-sm text-green-800 member-dark:text-green-300">{success}</div>}
 
       {loading ? (
-        <div className="mt-6 flex min-h-32 items-center justify-center rounded-2xl border border-gray-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 p-6 text-gray-500 member-dark:text-neutral-400">
+        <div className="mt-6 flex min-h-32 items-center justify-center rounded-2xl border border-gray-200 member-dark:border-member-border bg-white member-dark:bg-member-surface p-6 text-gray-500 member-dark:text-neutral-400">
           <LoadingSpinner label="Loading membership requests…" />
         </div>
       ) : pendingRequest ? (
@@ -132,7 +132,7 @@ export default function TierUpgradeRequestView() {
           <p className="mt-3 text-xs text-amber-700 member-dark:text-amber-300">Submitted {new Date(pendingRequest.created_at).toLocaleString("en-SG")}</p>
         </section>
       ) : availableTiers.length > 0 ? (
-        <form onSubmit={submitRequest} className="mt-6 space-y-5 rounded-2xl border border-gray-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 p-5 shadow-sm">
+        <form onSubmit={submitRequest} className="mt-6 space-y-5 rounded-2xl border border-gray-200 member-dark:border-member-border bg-white member-dark:bg-member-surface p-5 shadow-sm">
           <div>
             <label htmlFor="requested-tier" className="member-text-sm block text-sm font-bold text-[#151C27] member-dark:text-neutral-100">Requested tier</label>
             <select
@@ -140,7 +140,7 @@ export default function TierUpgradeRequestView() {
               required
               value={requestedTier}
               onChange={(event) => setRequestedTier(event.target.value)}
-              className="member-text-base mt-2 min-h-12 w-full rounded-xl border border-gray-300 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 px-4 text-[#151C27] member-dark:text-neutral-100 outline-none focus:border-[#0F6E00] focus:ring-4 focus:ring-green-100 member-dark:focus:ring-green-800"
+              className="member-text-base mt-2 min-h-12 w-full rounded-xl border border-gray-300 member-dark:border-member-border bg-white member-dark:bg-member-surface px-4 text-[#151C27] member-dark:text-neutral-100 outline-none focus:border-[#0F6E00] focus:ring-4 focus:ring-green-100 member-dark:focus:ring-green-800"
             >
               {availableTiers.map((tier) => <option key={tier.value} value={tier.value}>{tier.label}</option>)}
             </select>
@@ -156,7 +156,7 @@ export default function TierUpgradeRequestView() {
               value={reason}
               onChange={(event) => setReason(event.target.value)}
               placeholder="Explain your eligibility or provide any information the administrator should review."
-              className="member-text-base mt-2 w-full resize-y rounded-xl border border-gray-300 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 p-4 text-[#151C27] member-dark:text-neutral-100 outline-none focus:border-[#0F6E00] focus:ring-4 focus:ring-green-100 member-dark:focus:ring-green-800"
+              className="member-text-base mt-2 w-full resize-y rounded-xl border border-gray-300 member-dark:border-member-border bg-white member-dark:bg-member-surface p-4 text-[#151C27] member-dark:text-neutral-100 outline-none focus:border-[#0F6E00] focus:ring-4 focus:ring-green-100 member-dark:focus:ring-green-800"
             />
             <p className="member-text-xs mt-1 text-right text-xs text-gray-500 member-dark:text-neutral-400">{reason.length}/1000</p>
           </div>
@@ -181,7 +181,7 @@ export default function TierUpgradeRequestView() {
           <h2 className="member-text-xl text-xl font-bold text-[#151C27] member-dark:text-neutral-100">Request history</h2>
           <div className="mt-4 space-y-3">
             {requests.filter((request) => request.status !== "pending").map((request) => (
-              <article key={request.id} className="rounded-2xl border border-gray-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 p-4">
+              <article key={request.id} className="rounded-2xl border border-gray-200 member-dark:border-member-border bg-white member-dark:bg-member-surface p-4">
                 <div className="flex items-center justify-between gap-3">
                   <p className="font-bold text-[#151C27] member-dark:text-neutral-100">{formatTierLabel(request.current_tier)} → {formatTierLabel(request.requested_tier)}</p>
                   <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${request.status === "approved" ? "bg-green-100 member-dark:bg-green-950 text-green-800 member-dark:text-green-300" : "bg-red-100 member-dark:bg-red-950 text-red-700 member-dark:text-red-300"}`}>

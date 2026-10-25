@@ -25,7 +25,7 @@ const Input: React.FC<InputProps> = ({ label, id, iconLeft, iconRight, showPassw
         </label>
       ) : null}
 
-      <div className="relative w-full rounded-xl border border-stone-300 member-dark:border-neutral-700 bg-slate-50 member-dark:bg-neutral-900 transition-all focus-within:border-[#53A63E]">
+      <div className="relative w-full rounded-xl border border-stone-300 member-dark:border-member-border bg-slate-50 member-dark:bg-member-raised transition-all focus-within:border-[#53A63E]">
         {iconLeft ? (
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500 member-dark:text-neutral-400">{iconLeft}</span>
         ) : null}

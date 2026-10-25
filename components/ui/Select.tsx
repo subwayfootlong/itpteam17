@@ -34,7 +34,7 @@ const Select: React.FC<SelectProps> = ({
         </label>
       ) : null}
 
-      <div className="relative w-full rounded-xl border border-stone-300 member-dark:border-neutral-700 bg-slate-50 member-dark:bg-neutral-900 transition-all focus-within:border-[#53A63E]">
+      <div className="relative w-full rounded-xl border border-stone-300 member-dark:border-member-border bg-slate-50 member-dark:bg-member-raised transition-all focus-within:border-[#53A63E]">
         <select
           id={selectId}
           {...rest}

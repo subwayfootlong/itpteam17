@@ -98,7 +98,7 @@ export default async function EventDetailsPage({
           <NavLink
             href="/member/events"
             aria-label="Back to events directory"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-neutral-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 text-neutral-700 member-dark:text-neutral-300 shadow-2xs transition-all hover:bg-neutral-50 member-dark:hover:bg-neutral-900 active:scale-95"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-neutral-200/80 member-dark:border-member-border/80 bg-white member-dark:bg-member-surface text-neutral-700 member-dark:text-neutral-300 shadow-2xs transition-all hover:bg-neutral-50 member-dark:hover:bg-member-surface active:scale-95"
           >
             <ArrowLeft size={18} />
           </NavLink>
@@ -120,22 +120,22 @@ export default async function EventDetailsPage({
         <div className="mt-5">
           <div className="flex flex-wrap items-center gap-2">
             {isRegistered ? (
-              <span className="inline-flex items-center gap-1 rounded-full border border-[#CDE5CA] bg-[#E8F4E6] member-dark:bg-neutral-800 px-3 py-1 text-xs font-bold text-[#0F6E00] member-dark:text-brand-primary-200">
+              <span className="inline-flex items-center gap-1 rounded-full border border-[#CDE5CA] bg-[#E8F4E6] member-dark:bg-member-raised px-3 py-1 text-xs font-bold text-[#0F6E00] member-dark:text-brand-primary-200">
                 ✓ You&apos;re Registered
               </span>
             ) : isFull ? (
-              <span className="rounded-full border border-neutral-200 member-dark:border-neutral-700 bg-stone-100 member-dark:bg-neutral-800 px-3 py-1 text-xs font-semibold text-neutral-600 member-dark:text-neutral-300">
+              <span className="rounded-full border border-neutral-200 member-dark:border-member-border bg-stone-100 member-dark:bg-member-raised px-3 py-1 text-xs font-semibold text-neutral-600 member-dark:text-neutral-300">
                 Event Full
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#CDE5CA] bg-[#E8F4E6] member-dark:bg-neutral-800 px-3 py-1 text-xs font-bold text-[#0F6E00] member-dark:text-brand-primary-200">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#CDE5CA] bg-[#E8F4E6] member-dark:bg-member-raised px-3 py-1 text-xs font-bold text-[#0F6E00] member-dark:text-brand-primary-200">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#0F6E00]" />
                 Open for Registration
               </span>
             )}
 
             {eventRecord.category && (
-              <span className="rounded-full border border-neutral-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 px-3 py-1 text-xs font-medium text-neutral-600 member-dark:text-neutral-300">
+              <span className="rounded-full border border-neutral-200 member-dark:border-member-border bg-white member-dark:bg-member-surface px-3 py-1 text-xs font-medium text-neutral-600 member-dark:text-neutral-300">
                 {eventRecord.category}
               </span>
             )}
@@ -147,10 +147,10 @@ export default async function EventDetailsPage({
         </div>
 
         {/* 3. Unified Meta Details Card (Merging the 4 isolated cards) */}
-        <section className="mt-5 overflow-hidden rounded-2xl border border-neutral-200/70 member-dark:border-neutral-700/70 bg-white member-dark:bg-neutral-900 shadow-xs divide-y divide-neutral-100 member-dark:divide-neutral-700">
+        <section className="mt-5 overflow-hidden rounded-2xl border border-neutral-200/70 member-dark:border-member-border/70 bg-white member-dark:bg-member-surface shadow-xs divide-y divide-neutral-100 member-dark:divide-member-border">
           {/* Row 1: DATE */}
           <div className="flex items-center gap-3.5 p-3.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] member-dark:bg-neutral-800 text-[#0F6E00] member-dark:text-brand-primary-200">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] member-dark:bg-member-raised text-[#0F6E00] member-dark:text-brand-primary-200">
               <CalendarDays size={20} strokeWidth={2.2} />
             </div>
             <div>
@@ -165,7 +165,7 @@ export default async function EventDetailsPage({
 
           {/* Row 2: TIME */}
           <div className="flex items-center gap-3.5 p-3.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] member-dark:bg-neutral-800 text-[#0F6E00] member-dark:text-brand-primary-200">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] member-dark:bg-member-raised text-[#0F6E00] member-dark:text-brand-primary-200">
               <Clock size={20} strokeWidth={2.2} />
             </div>
             <div>
@@ -180,7 +180,7 @@ export default async function EventDetailsPage({
 
           {/* Row 3: VENUE */}
           <div className="flex items-center gap-3.5 p-3.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] member-dark:bg-neutral-800 text-[#0F6E00] member-dark:text-brand-primary-200">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] member-dark:bg-member-raised text-[#0F6E00] member-dark:text-brand-primary-200">
               <MapPin size={20} strokeWidth={2.2} />
             </div>
             <div>
@@ -195,7 +195,7 @@ export default async function EventDetailsPage({
 
           {/* Row 4: AVAILABILITY */}
           <div className="flex items-center gap-3.5 p-3.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] member-dark:bg-neutral-800 text-[#0F6E00] member-dark:text-brand-primary-200">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] member-dark:bg-member-raised text-[#0F6E00] member-dark:text-brand-primary-200">
               <Users size={20} strokeWidth={2.2} />
             </div>
             <div>
@@ -211,7 +211,7 @@ export default async function EventDetailsPage({
 
         {/* 4. Description Section */}
         {eventRecord.description && (
-          <section className="mt-5 rounded-2xl border border-neutral-200/70 member-dark:border-neutral-700/70 bg-white member-dark:bg-neutral-900 p-5 shadow-xs">
+          <section className="mt-5 rounded-2xl border border-neutral-200/70 member-dark:border-member-border/70 bg-white member-dark:bg-member-surface p-5 shadow-xs">
             <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
               About This Event
             </h3>

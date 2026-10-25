@@ -67,9 +67,9 @@ export default function ChangeEmailView() {
           <div className="pt-2">
             <Button type="submit" loading={busy} disabled={busy}>{maskedEmail ? "Verify Email" : "Send verification code"}</Button>
           </div>
-          {maskedEmail && <div className="space-y-5 border-t border-gray-200 member-dark:border-neutral-700 pt-5">
+          {maskedEmail && <div className="space-y-5 border-t border-gray-200 member-dark:border-member-border pt-5">
             <Input label="Current password (required to resend)" type="password" autoComplete="current-password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} disabled={busy} />
-            <button type="button" className="member-text-base flex min-h-12 w-full items-center justify-center rounded-xl border border-gray-300 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 px-4 py-3 font-semibold text-[#151C27] member-dark:text-neutral-100 disabled:cursor-not-allowed disabled:opacity-50" disabled={busy || cooldown > 0 || !currentPassword} onClick={() => void submit("request")}>{cooldown > 0 ? `Resend code in ${cooldown}s` : "Resend code"}</button>
+            <button type="button" className="member-text-base flex min-h-12 w-full items-center justify-center rounded-xl border border-gray-300 member-dark:border-member-border bg-white member-dark:bg-member-surface px-4 py-3 font-semibold text-[#151C27] member-dark:text-neutral-100 disabled:cursor-not-allowed disabled:opacity-50" disabled={busy || cooldown > 0 || !currentPassword} onClick={() => void submit("request")}>{cooldown > 0 ? `Resend code in ${cooldown}s` : "Resend code"}</button>
             <button type="button" className="member-text-sm block text-sm font-semibold text-[#0F6E00] member-dark:text-brand-primary-200 disabled:opacity-50" disabled={busy} onClick={() => { setMaskedEmail(""); setOtp(""); setError(""); setCurrentPassword(""); }}>Use a different email address</button>
           </div>}
         </form>

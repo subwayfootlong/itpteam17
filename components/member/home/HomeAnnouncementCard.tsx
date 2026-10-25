@@ -63,16 +63,16 @@ const kindStyles: Record<SlideKind, { chip: string; tile: string }> = {
     tile: "bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200",
   },
   announcement: {
-    chip: "bg-brand-secondary-soft text-brand-secondary-dark",
-    tile: "bg-brand-secondary-soft text-brand-secondary-dark",
+    chip: "bg-brand-secondary-soft text-brand-secondary-dark member-dark:bg-teal-950 member-dark:text-teal-200",
+    tile: "bg-brand-secondary-soft text-brand-secondary-dark member-dark:bg-teal-950 member-dark:text-teal-200",
   },
   event: {
-    chip: "bg-sky-50 text-sky-900",
-    tile: "bg-sky-50 text-sky-800",
+    chip: "bg-sky-50 text-sky-900 member-dark:bg-sky-950 member-dark:text-sky-200",
+    tile: "bg-sky-50 text-sky-800 member-dark:bg-sky-950 member-dark:text-sky-200",
   },
   benefit: {
-    chip: "bg-brand-accent-soft member-dark:bg-neutral-800 text-amber-900 member-dark:text-amber-300",
-    tile: "bg-brand-accent-soft member-dark:bg-neutral-800 text-amber-900 member-dark:text-amber-300",
+    chip: "bg-brand-accent-soft member-dark:bg-member-raised text-amber-900 member-dark:text-amber-300",
+    tile: "bg-brand-accent-soft member-dark:bg-member-raised text-amber-900 member-dark:text-amber-300",
   },
 };
 
@@ -122,7 +122,7 @@ function SlideThumb({ slide }: { slide: Slide }) {
   return (
     <div
       className={`flex h-[76px] w-[76px] shrink-0 items-center justify-center overflow-hidden rounded-2xl ${
-        showImage ? "bg-neutral-100 member-dark:bg-neutral-800" : kindStyles[slide.kind].tile
+        showImage ? "bg-neutral-100 member-dark:bg-member-raised" : kindStyles[slide.kind].tile
       }`}
     >
       {showImage ? (
@@ -283,7 +283,7 @@ export default function HomeAnnouncementCard({
               aria-label={`${slideIndex + 1} of ${slides.length}`}
               className="w-full shrink-0 snap-center px-0.5"
             >
-              <div className="flex h-full min-h-[236px] flex-col rounded-3xl border border-neutral-100 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 p-5 shadow-[0_6px_16px_-10px_rgba(23,63,20,0.35)]">
+              <div className="flex h-full min-h-[236px] flex-col rounded-3xl border border-neutral-100 member-dark:border-member-border bg-white member-dark:bg-member-surface p-5 shadow-[0_6px_16px_-10px_rgba(23,63,20,0.35)]">
                 <div className="flex items-start gap-3.5">
                   <div className="min-w-0 flex-1">
                     <span
@@ -359,7 +359,7 @@ export default function HomeAnnouncementCard({
               className={`h-2 rounded-full transition-all duration-200 ${
                 dotIndex === index
                   ? "w-5 bg-brand-primary-800"
-                  : "w-2 bg-neutral-300 member-dark:bg-neutral-800 hover:bg-neutral-400"
+                  : "w-2 bg-neutral-300 member-dark:bg-member-raised hover:bg-neutral-400"
               }`}
             />
           ))}

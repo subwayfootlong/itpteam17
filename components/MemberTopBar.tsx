@@ -64,7 +64,7 @@ export default function MemberTopBar({ user }: MemberTopBarProps) {
   if (hasPageHeader) return null;
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between border-b border-neutral-100 member-dark:border-neutral-700 bg-white/80 member-dark:bg-neutral-900/80 backdrop-blur-md px-5 py-3.5 transition-colors">
+    <header className="sticky top-0 z-40 flex items-center justify-between border-b border-neutral-100 member-dark:border-member-border bg-white/80 member-dark:bg-member-surface/80 backdrop-blur-md px-5 py-3.5 transition-colors">
       <div className="flex items-center gap-3">
         <NavLink
           href="/member/profile"
@@ -97,7 +97,7 @@ export default function MemberTopBar({ user }: MemberTopBarProps) {
             ? `${unreadCount} unread notifications`
             : "Notifications"
         }
-        className="relative flex h-10 w-10 items-center justify-center rounded-full text-neutral-600 member-dark:text-neutral-300 hover:text-neutral-900 member-dark:hover:text-neutral-100 hover:bg-neutral-100/80 member-dark:hover:bg-neutral-800/80 transition-all active:scale-95"
+        className="relative flex h-10 w-10 items-center justify-center rounded-full text-neutral-600 member-dark:text-neutral-300 hover:text-neutral-900 member-dark:hover:text-neutral-100 hover:bg-neutral-100/80 member-dark:hover:bg-member-raised/80 transition-all active:scale-95"
       >
         <Bell size={20} strokeWidth={2.2} />
         {unreadCount > 0 && (

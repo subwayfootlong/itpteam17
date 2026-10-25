@@ -8,7 +8,7 @@
 
 /* Toasts are rendered by the root provider, outside the member layout. */
 [data-theme="dark"] body:has(.member-theme) .portal-toast {
-  --toast-surface: #262626;
+  --toast-surface: var(--color-member-raised);
   --toast-ink: #f5f5f5;
   color: var(--toast-ink);
 }
@@ -16,11 +16,12 @@
 [data-theme="dark"] .member-theme {
   color-scheme: dark;
   color: #f5f5f5;
-  --member-surface: #171717;
-  --member-surface-alt: #262626;
+  --member-canvas: var(--color-member-canvas);
+  --member-surface: var(--color-member-surface);
+  --member-surface-alt: var(--color-member-raised);
   --member-ink: #f5f5f5;
   --member-muted: #d4d4d4;
-  --member-line: #404040;
+  --member-line: var(--color-member-border);
   --member-accent: #bce6b2;
 }
 
@@ -32,6 +33,12 @@
  *   Arabic:               Traditional Arabic → system Arabic stack
  */
 @theme {
+  /* Layered charcoal surfaces, used only by member-dark utilities. */
+  --color-member-canvas: #202124;
+  --color-member-surface: #292a2d;
+  --color-member-raised: #35363a;
+  --color-member-border: #505157;
+
   --font-butler: "Playfair Display", Georgia, "Times New Roman", serif;
   --font-minion: "Lora", Georgia, serif;
   --font-helvetica: "Helvetica Neue", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -1888,7 +1895,7 @@ body {
 .benefits-mobile-shell {
   min-height: 100vh;
   padding-bottom: 88px;
-  background: var(--member-surface, #f6f7f6);
+  background: var(--member-canvas, #f6f7f6);
   color: var(--member-ink, #171c26);
   font-family: var(--font-helvetica);
 }
@@ -2863,7 +2870,7 @@ body {
 .community-app-shell {
   min-height: 100vh;
   padding-bottom: 86px;
-  background: var(--member-surface, #fbfcf9);
+  background: var(--member-canvas, #fbfcf9);
   color: var(--member-ink, #171c26);
   font-family: var(--font-helvetica);
 }
@@ -4972,7 +4979,7 @@ body {
 .community-app-shell {
   min-height: 100vh;
   padding-bottom: 86px;
-  background: var(--member-surface, #f6f7f6);
+  background: var(--member-canvas, #f6f7f6);
   color: var(--member-ink, #171c26);
   font-family: var(--font-helvetica);
 }
@@ -5828,7 +5835,7 @@ body {
   width: min(100%, 390px);
   margin: 0 auto;
   overflow-x: hidden;
-  background: var(--member-surface, #f6f7f6);
+  background: var(--member-canvas, #f6f7f6);
   box-shadow: 0 0 0 1px rgba(223, 231, 220, 0.65);
 }
 
@@ -5936,7 +5943,7 @@ body {
   margin: 0;
   padding-bottom: 0;
   overflow: visible;
-  background: var(--member-surface, #ffffff);
+  background: var(--member-canvas, #ffffff);
   box-shadow: none;
 }
 
@@ -5946,13 +5953,13 @@ body {
   margin: 0;
   padding-bottom: 0;
   overflow: visible;
-  background: var(--member-surface, #ffffff);
+  background: var(--member-canvas, #ffffff);
   box-shadow: none;
 }
 
 .benefits-mobile-shell.is-member-embedded .benefits-mobile-main {
   width: 100%;
-  background: var(--member-surface, #ffffff);
+  background: var(--member-canvas, #ffffff);
 }
 
 .community-app-shell.is-member-embedded .community-main {

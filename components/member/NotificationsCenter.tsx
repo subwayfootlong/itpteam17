@@ -37,8 +37,8 @@ const typeStyles: Record<
 > = {
   Benefit: {
     icon: Gift,
-    circle: "bg-brand-accent-soft member-dark:bg-neutral-800 text-amber-900 member-dark:text-amber-300",
-    chip: "bg-brand-accent-soft member-dark:bg-neutral-800 text-amber-900 member-dark:text-amber-300",
+    circle: "bg-brand-accent-soft member-dark:bg-member-raised text-amber-900 member-dark:text-amber-300",
+    chip: "bg-brand-accent-soft member-dark:bg-member-raised text-amber-900 member-dark:text-amber-300",
   },
   Announcement: {
     icon: Megaphone,
@@ -57,14 +57,14 @@ const typeStyles: Record<
   },
   System: {
     icon: ShieldCheck,
-    circle: "bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300",
-    chip: "bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300",
+    circle: "bg-neutral-100 member-dark:bg-member-raised text-neutral-700 member-dark:text-neutral-300",
+    chip: "bg-neutral-100 member-dark:bg-member-raised text-neutral-700 member-dark:text-neutral-300",
   },
 };
 
 function NotificationHeader({ unreadCount }: { unreadCount: number }) {
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between border-b border-neutral-100 member-dark:border-neutral-700 bg-white/90 member-dark:bg-neutral-900/90 px-5 py-3.5 backdrop-blur-md">
+    <header className="sticky top-0 z-40 flex items-center justify-between border-b border-neutral-100 member-dark:border-member-border bg-white/90 member-dark:bg-member-surface/90 px-5 py-3.5 backdrop-blur-md">
       <h1 className="text-lg font-bold tracking-tight text-neutral-900 member-dark:text-neutral-100">
         Pergas
       </h1>
@@ -235,7 +235,7 @@ export default function NotificationsCenter({
             type="button"
             onClick={clearRead}
             disabled={readCount === 0}
-            className="inline-flex min-h-9 items-center rounded-full border border-neutral-300 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 px-3.5 py-1.5 text-xs font-semibold text-neutral-700 member-dark:text-neutral-300 transition-transform duration-100 hover:border-neutral-400 member-dark:hover:border-neutral-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex min-h-9 items-center rounded-full border border-neutral-300 member-dark:border-member-border bg-white member-dark:bg-member-surface px-3.5 py-1.5 text-xs font-semibold text-neutral-700 member-dark:text-neutral-300 transition-transform duration-100 hover:border-neutral-400 member-dark:hover:border-member-border active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
           >
             Delete read
           </button>
@@ -253,14 +253,14 @@ export default function NotificationsCenter({
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search notifications..."
-            className="h-12 w-full rounded-full border border-neutral-300 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 pl-11 pr-11 text-sm text-neutral-900 member-dark:text-neutral-100 shadow-sm placeholder:text-neutral-500 member-dark:placeholder:text-neutral-400 focus:border-brand-primary-700 member-dark:focus:border-brand-primary-700 focus:outline-none focus:ring-4 focus:ring-brand-primary-600/15 member-dark:focus:ring-brand-primary-700/15"
+            className="h-12 w-full rounded-full border border-neutral-300 member-dark:border-member-border bg-white member-dark:bg-member-surface pl-11 pr-11 text-sm text-neutral-900 member-dark:text-neutral-100 shadow-sm placeholder:text-neutral-500 member-dark:placeholder:text-neutral-400 focus:border-brand-primary-700 member-dark:focus:border-brand-primary-700 focus:outline-none focus:ring-4 focus:ring-brand-primary-600/15 member-dark:focus:ring-brand-primary-700/15"
           />
           {query && (
             <button
               type="button"
               onClick={() => setQuery("")}
               aria-label="Clear search"
-              className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-neutral-500 member-dark:text-neutral-400 transition-transform duration-100 hover:bg-neutral-200 member-dark:hover:bg-neutral-800 active:scale-95"
+              className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-neutral-500 member-dark:text-neutral-400 transition-transform duration-100 hover:bg-neutral-200 member-dark:hover:bg-member-raised active:scale-95"
             >
               <X size={16} aria-hidden="true" />
             </button>
@@ -284,7 +284,7 @@ export default function NotificationsCenter({
                 className={`shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-100 active:scale-95 ${
                   isActive
                     ? "bg-brand-primary-800 text-white shadow-sm"
-                    : "border border-neutral-300 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 text-neutral-700 member-dark:text-neutral-300 shadow-xs hover:border-brand-primary-600 member-dark:hover:border-brand-primary-700 hover:text-brand-primary-800 member-dark:hover:text-brand-primary-200"
+                    : "border border-neutral-300 member-dark:border-member-border bg-white member-dark:bg-member-surface text-neutral-700 member-dark:text-neutral-300 shadow-xs hover:border-brand-primary-600 member-dark:hover:border-brand-primary-700 hover:text-brand-primary-800 member-dark:hover:text-brand-primary-200"
                 }`}
               >
                 {item}
@@ -315,7 +315,7 @@ export default function NotificationsCenter({
                     key={notification.id}
                     className={`relative overflow-hidden rounded-2xl border p-4 shadow-sm ${
                       notification.isRead
-                        ? "border-neutral-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900"
+                        ? "border-neutral-200 member-dark:border-member-border bg-white member-dark:bg-member-surface"
                         : "border-brand-primary-200 member-dark:border-brand-primary-700 bg-brand-primary-50 member-dark:bg-brand-primary-900"
                     }`}
                   >
@@ -348,7 +348,7 @@ export default function NotificationsCenter({
                         <p className="mt-1 line-clamp-3 text-xs leading-relaxed text-neutral-600 member-dark:text-neutral-300">
                           {notification.message}
                         </p>
-                        <div className="mt-3 flex items-center justify-between gap-2 border-t border-neutral-200/70 member-dark:border-neutral-700/70 pt-2.5">
+                        <div className="mt-3 flex items-center justify-between gap-2 border-t border-neutral-200/70 member-dark:border-member-border/70 pt-2.5">
                           <NavLink
                             href={notification.actionHref}
                             className="inline-flex items-center gap-0.5 text-xs font-semibold text-brand-primary-800 member-dark:text-brand-primary-200 transition-transform duration-100 active:scale-95"
@@ -359,7 +359,7 @@ export default function NotificationsCenter({
                           <button
                             type="button"
                             onClick={() => toggleRead(notification.id)}
-                            className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold text-neutral-600 member-dark:text-neutral-300 transition-transform duration-100 hover:bg-neutral-100 member-dark:hover:bg-neutral-800 active:scale-95"
+                            className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold text-neutral-600 member-dark:text-neutral-300 transition-transform duration-100 hover:bg-neutral-100 member-dark:hover:bg-member-raised active:scale-95"
                           >
                             <Check size={13} aria-hidden="true" />
                             {notification.isRead ? "Mark unread" : "Mark read"}
@@ -372,7 +372,7 @@ export default function NotificationsCenter({
               })}
             </div>
           ) : (
-            <div className="flex flex-col items-center rounded-2xl border border-dashed border-neutral-300 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 p-8 text-center">
+            <div className="flex flex-col items-center rounded-2xl border border-dashed border-neutral-300 member-dark:border-member-border bg-white member-dark:bg-member-surface p-8 text-center">
               <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200">
                 <Bell size={22} aria-hidden="true" />
               </span>

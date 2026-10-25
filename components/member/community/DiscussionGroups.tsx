@@ -26,12 +26,12 @@ export default function DiscussionGroups({
               key={group.id}
               type="button"
               onClick={() => onOpenGroup(group.id)}
-              className="flex w-full items-center gap-3 rounded-2xl border border-neutral-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 p-3.5 text-left shadow-sm transition-transform duration-100 hover:border-neutral-300 member-dark:hover:border-neutral-700 active:scale-[0.98]"
+              className="flex w-full items-center gap-3 rounded-2xl border border-neutral-200 member-dark:border-member-border bg-white member-dark:bg-member-surface p-3.5 text-left shadow-sm transition-transform duration-100 hover:border-neutral-300 member-dark:hover:border-member-border active:scale-[0.98]"
             >
               <span
                 className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${
                   group.tone === "gold"
-                    ? "bg-brand-accent-soft member-dark:bg-neutral-800 text-amber-900 member-dark:text-amber-300"
+                    ? "bg-brand-accent-soft member-dark:bg-member-raised text-amber-900 member-dark:text-amber-300"
                     : "bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200"
                 }`}
               >
@@ -55,7 +55,7 @@ export default function DiscussionGroups({
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center rounded-2xl border border-dashed border-neutral-300 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 p-8 text-center">
+        <div className="flex flex-col items-center rounded-2xl border border-dashed border-neutral-300 member-dark:border-member-border bg-white member-dark:bg-member-surface p-8 text-center">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200">
             <MessageSquare size={22} aria-hidden="true" />
           </span>
@@ -70,7 +70,7 @@ export default function DiscussionGroups({
 
       <article className="mt-5 rounded-2xl border border-brand-primary-200 member-dark:border-brand-primary-700 bg-brand-primary-50 member-dark:bg-brand-primary-900 p-4">
         <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white member-dark:bg-neutral-900 text-brand-primary-800 member-dark:text-brand-primary-200 shadow-xs">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white member-dark:bg-member-surface text-brand-primary-800 member-dark:text-brand-primary-200 shadow-xs">
             <HelpCircle size={20} aria-hidden="true" />
           </span>
           <div className="min-w-0">
@@ -84,7 +84,7 @@ export default function DiscussionGroups({
         <button
           type="button"
           onClick={onContactModerator}
-          className="mt-3 min-h-11 w-full rounded-xl border border-brand-primary-800 member-dark:border-brand-primary-700 bg-white member-dark:bg-neutral-900 px-4 py-2.5 text-sm font-semibold text-brand-primary-800 member-dark:text-brand-primary-200 transition-transform duration-100 hover:bg-brand-primary-100 member-dark:hover:bg-brand-primary-900 active:scale-[0.98]"
+          className="mt-3 min-h-11 w-full rounded-xl border border-brand-primary-800 member-dark:border-brand-primary-700 bg-white member-dark:bg-member-surface px-4 py-2.5 text-sm font-semibold text-brand-primary-800 member-dark:text-brand-primary-200 transition-transform duration-100 hover:bg-brand-primary-100 member-dark:hover:bg-brand-primary-900 active:scale-[0.98]"
         >
           Contact Moderator
         </button>

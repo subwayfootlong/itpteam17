@@ -48,8 +48,8 @@ export default function HomeRegistrations({
       </div>
 
       {events.length === 0 ? (
-        <div className="flex items-center gap-3.5 rounded-2xl border border-dashed border-neutral-300 member-dark:border-neutral-700 bg-neutral-50 member-dark:bg-neutral-900 p-4">
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white member-dark:bg-neutral-900 text-brand-primary-800 member-dark:text-brand-primary-200 shadow-xs">
+        <div className="flex items-center gap-3.5 rounded-2xl border border-dashed border-neutral-300 member-dark:border-member-border bg-neutral-50 member-dark:bg-member-surface p-4">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white member-dark:bg-member-surface text-brand-primary-800 member-dark:text-brand-primary-200 shadow-xs">
             <CalendarDays size={22} aria-hidden="true" />
           </span>
           <div className="min-w-0 flex-1">
@@ -68,12 +68,12 @@ export default function HomeRegistrations({
           </NavLink>
         </div>
       ) : (
-        <ul className="divide-y divide-neutral-100 member-dark:divide-neutral-700 overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 shadow-xs">
+        <ul className="divide-y divide-neutral-100 member-dark:divide-member-border overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-member-border/80 bg-white member-dark:bg-member-surface shadow-xs">
           {events.map((event) => (
             <li key={event.id}>
               <NavLink
                 href={`/member/events/${event.id}`}
-                className="flex items-center gap-3.5 p-3.5 transition-transform duration-100 hover:bg-neutral-50 member-dark:hover:bg-neutral-900 active:scale-[0.98]"
+                className="flex items-center gap-3.5 p-3.5 transition-transform duration-100 hover:bg-neutral-50 member-dark:hover:bg-member-surface active:scale-[0.98]"
               >
                 <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200">
                   {event.imageUrl ? (

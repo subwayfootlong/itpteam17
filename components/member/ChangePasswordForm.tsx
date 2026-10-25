@@ -94,9 +94,9 @@ export default function ChangePasswordForm() {
       <form
         onSubmit={handleSubmit}
         aria-labelledby="change-password-title"
-        className="mt-8 rounded-2xl border border-gray-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 p-6 shadow-sm"
+        className="mt-8 rounded-2xl border border-gray-200 member-dark:border-member-border bg-white member-dark:bg-member-surface p-6 shadow-sm"
       >
-        <div className="flex items-start gap-3 border-b border-gray-100 member-dark:border-neutral-700 pb-4">
+        <div className="flex items-start gap-3 border-b border-gray-100 member-dark:border-member-border pb-4">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-50 member-dark:bg-green-950 text-[#0F6E00] member-dark:text-brand-primary-200">
             <KeyRound size={20} aria-hidden="true" />
           </span>

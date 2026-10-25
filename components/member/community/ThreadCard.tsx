@@ -38,7 +38,7 @@ export default function ThreadCard({
   }
 
   return (
-    <article className="mb-3.5 rounded-2xl border border-neutral-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 p-4 shadow-xs">
+    <article className="mb-3.5 rounded-2xl border border-neutral-200/80 member-dark:border-member-border/80 bg-white member-dark:bg-member-surface p-4 shadow-xs">
       <header className="flex items-center gap-3">
         <span
           aria-hidden="true"
@@ -79,13 +79,13 @@ export default function ThreadCard({
       {thread.hasImage && (
         <div
           aria-hidden="true"
-          className="mt-2.5 flex aspect-video items-center justify-center overflow-hidden rounded-xl border border-neutral-100 member-dark:border-neutral-700 bg-neutral-100 member-dark:bg-neutral-800 text-neutral-300 member-dark:text-neutral-400"
+          className="mt-2.5 flex aspect-video items-center justify-center overflow-hidden rounded-xl border border-neutral-100 member-dark:border-member-border bg-neutral-100 member-dark:bg-member-raised text-neutral-300 member-dark:text-neutral-400"
         >
           <ImageIcon size={28} />
         </div>
       )}
 
-      <footer className="mt-3 flex items-center gap-6 border-t border-neutral-100 member-dark:border-neutral-700 pt-3 text-xs text-neutral-500 member-dark:text-neutral-400">
+      <footer className="mt-3 flex items-center gap-6 border-t border-neutral-100 member-dark:border-member-border pt-3 text-xs text-neutral-500 member-dark:text-neutral-400">
         <span
           className="flex items-center gap-1.5"
           aria-label={`${thread.votes} ${thread.votes === 1 ? "like" : "likes"}`}

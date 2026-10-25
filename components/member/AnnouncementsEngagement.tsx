@@ -182,7 +182,7 @@ export default function AnnouncementsEngagement({
               type="button"
               onClick={handleBack}
               aria-label="Go back"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-neutral-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 text-brand-primary-800 member-dark:text-brand-primary-200 shadow-xs transition-transform duration-100 active:scale-95"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-neutral-200 member-dark:border-member-border bg-white member-dark:bg-member-surface text-brand-primary-800 member-dark:text-brand-primary-200 shadow-xs transition-transform duration-100 active:scale-95"
             >
               <MemberIcon name="back" size={20} />
             </button>

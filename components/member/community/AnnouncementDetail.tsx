@@ -75,9 +75,9 @@ export default function AnnouncementDetail({
 
   return (
     <section className="space-y-4 px-4 pb-28 pt-4">
-      <article className="overflow-hidden rounded-2xl border border-neutral-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 shadow-sm">
+      <article className="overflow-hidden rounded-2xl border border-neutral-200 member-dark:border-member-border bg-white member-dark:bg-member-surface shadow-sm">
         {announcement.imageUrl && (
-          <div className="w-full overflow-hidden bg-neutral-100 member-dark:bg-neutral-800">
+          <div className="w-full overflow-hidden bg-neutral-100 member-dark:bg-member-raised">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={announcement.imageUrl}
@@ -128,7 +128,7 @@ export default function AnnouncementDetail({
                       className={`min-h-11 rounded-xl border px-2 py-2 text-xs font-semibold transition-all duration-100 active:scale-[0.98] disabled:opacity-60 ${
                         isSelected
                           ? "border-brand-primary-800 member-dark:border-brand-primary-700 bg-brand-primary-800 text-white shadow-sm"
-                          : "border-neutral-300 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 text-neutral-700 member-dark:text-neutral-300 hover:border-brand-primary-600 member-dark:hover:border-brand-primary-700"
+                          : "border-neutral-300 member-dark:border-member-border bg-white member-dark:bg-member-surface text-neutral-700 member-dark:text-neutral-300 hover:border-brand-primary-600 member-dark:hover:border-brand-primary-700"
                       }`}
                     >
                       {option.label}
@@ -148,10 +148,10 @@ export default function AnnouncementDetail({
       </article>
 
       <section
-        className="overflow-hidden rounded-2xl border border-neutral-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 shadow-sm"
+        className="overflow-hidden rounded-2xl border border-neutral-200 member-dark:border-member-border bg-white member-dark:bg-member-surface shadow-sm"
         aria-labelledby="announcement-comments-heading"
       >
-        <div className="flex items-center justify-between gap-3 border-b border-neutral-100 member-dark:border-neutral-700 px-4 py-3.5">
+        <div className="flex items-center justify-between gap-3 border-b border-neutral-100 member-dark:border-member-border px-4 py-3.5">
           <div className="flex items-center gap-2.5">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200">
               <MessageSquare size={16} aria-hidden="true" />
@@ -169,7 +169,7 @@ export default function AnnouncementDetail({
         </div>
 
         {approvedComments.length > 0 ? (
-          <ul className="divide-y divide-neutral-100 member-dark:divide-neutral-700">
+          <ul className="divide-y divide-neutral-100 member-dark:divide-member-border">
             {approvedComments.map((comment) => (
               <li key={comment.id} className="flex gap-3 px-4 py-3.5">
                 <span
@@ -210,7 +210,7 @@ export default function AnnouncementDetail({
 
         {reviewComments.length > 0 && (
           <div
-            className="mx-4 mb-3 flex items-start gap-2 rounded-r-lg border-l-4 border-brand-accent bg-brand-accent-soft member-dark:bg-neutral-800 p-2.5 text-xs text-amber-900 member-dark:text-amber-300"
+            className="mx-4 mb-3 flex items-start gap-2 rounded-r-lg border-l-4 border-brand-accent bg-brand-accent-soft member-dark:bg-member-raised p-2.5 text-xs text-amber-900 member-dark:text-amber-300"
             aria-live="polite"
           >
             <Clock size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
@@ -226,7 +226,7 @@ export default function AnnouncementDetail({
           </div>
         )}
 
-        <div className="border-t border-neutral-100 member-dark:border-neutral-700 bg-neutral-50 member-dark:bg-neutral-900 p-4">
+        <div className="border-t border-neutral-100 member-dark:border-member-border bg-neutral-50 member-dark:bg-member-surface p-4">
           {announcement.commentsEnabled ? (
             <form onSubmit={handleSubmit}>
               <label
@@ -242,7 +242,7 @@ export default function AnnouncementDetail({
                 maxLength={280}
                 rows={3}
                 placeholder="Share a respectful question or response..."
-                className="w-full resize-none rounded-xl border border-neutral-300 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 px-3.5 py-2.5 text-sm text-neutral-900 member-dark:text-neutral-100 placeholder:text-neutral-500 member-dark:placeholder:text-neutral-400 focus:border-brand-primary-700 member-dark:focus:border-brand-primary-700 focus:outline-none focus:ring-4 focus:ring-brand-primary-600/15 member-dark:focus:ring-brand-primary-700/15"
+                className="w-full resize-none rounded-xl border border-neutral-300 member-dark:border-member-border bg-white member-dark:bg-member-surface px-3.5 py-2.5 text-sm text-neutral-900 member-dark:text-neutral-100 placeholder:text-neutral-500 member-dark:placeholder:text-neutral-400 focus:border-brand-primary-700 member-dark:focus:border-brand-primary-700 focus:outline-none focus:ring-4 focus:ring-brand-primary-600/15 member-dark:focus:ring-brand-primary-700/15"
               />
               <div className="mt-2.5 flex items-center justify-between gap-3">
                 <small className="text-[11px] text-neutral-500 member-dark:text-neutral-400">

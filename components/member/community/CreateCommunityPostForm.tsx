@@ -20,7 +20,7 @@ const MIN_TITLE_LENGTH = 3;
 const MIN_BODY_LENGTH = 5;
 
 const fieldClassName =
-  "w-full rounded-xl border border-neutral-200/60 member-dark:border-neutral-700/60 bg-neutral-100 member-dark:bg-neutral-800 px-3.5 py-2.5 text-sm text-neutral-800 member-dark:text-neutral-100 placeholder:text-neutral-500 member-dark:placeholder:text-neutral-400 focus:bg-white member-dark:focus:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-brand-primary-600/20 member-dark:focus:ring-brand-primary-700/20";
+  "w-full rounded-xl border border-neutral-200/60 member-dark:border-member-border/60 bg-neutral-100 member-dark:bg-member-raised px-3.5 py-2.5 text-sm text-neutral-800 member-dark:text-neutral-100 placeholder:text-neutral-500 member-dark:placeholder:text-neutral-400 focus:bg-white member-dark:focus:bg-member-surface focus:outline-none focus:ring-2 focus:ring-brand-primary-600/20 member-dark:focus:ring-brand-primary-700/20";
 const labelClassName =
   "mb-1.5 block text-xs font-semibold uppercase tracking-wide text-neutral-600 member-dark:text-neutral-300";
 
@@ -30,7 +30,7 @@ function CreateHeader({ kicker }: { kicker: string }) {
       <NavLink
         href="/member/community?tab=discussions"
         aria-label="Back to community"
-        className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-brand-primary-800 member-dark:text-brand-primary-200 transition-transform duration-100 hover:bg-neutral-200 member-dark:hover:bg-neutral-800 active:scale-95"
+        className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-member-raised text-brand-primary-800 member-dark:text-brand-primary-200 transition-transform duration-100 hover:bg-neutral-200 member-dark:hover:bg-member-raised active:scale-95"
       >
         <ArrowLeft size={20} aria-hidden="true" />
       </NavLink>
@@ -121,7 +121,7 @@ export default function CreateCommunityPostForm({
     return (
       <div className="px-4 py-5">
         <CreateHeader kicker="Community" />
-        <section className="flex flex-col items-center rounded-2xl border border-dashed border-neutral-200 member-dark:border-neutral-700 bg-neutral-50 member-dark:bg-neutral-900 p-8 text-center">
+        <section className="flex flex-col items-center rounded-2xl border border-dashed border-neutral-200 member-dark:border-member-border bg-neutral-50 member-dark:bg-member-surface p-8 text-center">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200">
             <MessageSquare size={22} aria-hidden="true" />
           </span>
@@ -147,7 +147,7 @@ export default function CreateCommunityPostForm({
       <CreateHeader kicker={selectedGroup?.title ?? "Community"} />
 
       <form
-        className="space-y-4 rounded-2xl border border-neutral-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 p-5 shadow-xl"
+        className="space-y-4 rounded-2xl border border-neutral-200/80 member-dark:border-member-border/80 bg-white member-dark:bg-member-surface p-5 shadow-xl"
         onSubmit={handleSubmit}
       >
         <div>
@@ -248,7 +248,7 @@ export default function CreateCommunityPostForm({
             role="dialog"
             aria-modal="true"
             aria-labelledby="post-submitted-title"
-            className="w-full max-w-md rounded-t-3xl bg-white member-dark:bg-neutral-900 p-5 shadow-xl sm:rounded-3xl"
+            className="w-full max-w-md rounded-t-3xl bg-white member-dark:bg-member-surface p-5 shadow-xl sm:rounded-3xl"
           >
             <div className="flex flex-col items-center text-center">
               <span className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200">
@@ -266,7 +266,7 @@ export default function CreateCommunityPostForm({
               </p>
             </div>
 
-            <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-brand-accent/60 bg-brand-accent-soft member-dark:bg-neutral-800 p-3 text-xs text-amber-900 member-dark:text-amber-300">
+            <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-brand-accent/60 bg-brand-accent-soft member-dark:bg-member-raised p-3 text-xs text-amber-900 member-dark:text-amber-300">
               <Clock size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
               <p>
                 You can see your post in your feed marked{" "}
@@ -304,7 +304,7 @@ export default function CreateCommunityPostForm({
                     `/member/community?tab=discussions&group=${encodeURIComponent(groupId)}`,
                   );
                 }}
-                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-neutral-600 member-dark:text-neutral-300 transition-transform duration-100 hover:bg-neutral-100 member-dark:hover:bg-neutral-800 active:scale-[0.98] disabled:opacity-70"
+                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-neutral-600 member-dark:text-neutral-300 transition-transform duration-100 hover:bg-neutral-100 member-dark:hover:bg-member-raised active:scale-[0.98] disabled:opacity-70"
               >
                 {navigatingTo === "community" ? (
                   <LoadingSpinner label="Going back…" size="sm" />

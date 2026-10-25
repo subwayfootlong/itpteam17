@@ -332,7 +332,7 @@ export default function ProfileView({
             {getExpiryInfo(member.expiry_date).urgency !== "none" && (
               <NavLink
                 href="/member/payment"
-                className="member-text-sm mt-4 inline-block rounded-xl bg-white member-dark:bg-neutral-900 px-5 py-2.5 text-center text-sm font-bold text-brand-primary-800! member-dark:text-brand-primary-200! shadow-sm transition-transform duration-100 active:scale-[0.98]"
+                className="member-text-sm mt-4 inline-block rounded-xl bg-white member-dark:bg-member-surface px-5 py-2.5 text-center text-sm font-bold text-brand-primary-800! member-dark:text-brand-primary-200! shadow-sm transition-transform duration-100 active:scale-[0.98]"
               >
                 Pay Now
               </NavLink>
@@ -377,7 +377,7 @@ export default function ProfileView({
         id="membership-qr-dialog"
         aria-labelledby="membership-qr-title"
         aria-describedby="membership-qr-description"
-        className="fixed inset-0 m-auto max-h-[90dvh] w-[calc(100%_-_2rem)] max-w-sm overflow-y-auto rounded-2xl bg-white member-dark:bg-neutral-900 p-0 text-gray-900 member-dark:text-neutral-100 shadow-xl backdrop:bg-black/60"
+        className="fixed inset-0 m-auto max-h-[90dvh] w-[calc(100%_-_2rem)] max-w-sm overflow-y-auto rounded-2xl bg-white member-dark:bg-member-surface p-0 text-gray-900 member-dark:text-neutral-100 shadow-xl backdrop:bg-black/60"
         onClick={(event) => {
           if (event.target === event.currentTarget) qrDialogRef.current?.close();
         }}
@@ -386,7 +386,7 @@ export default function ProfileView({
           <div className="flex items-center justify-between gap-3">
             <h2 id="membership-qr-title" className="text-lg font-bold text-[#0F6E00] member-dark:text-brand-primary-200">Membership QR</h2>
             <form method="dialog">
-              <button type="submit" aria-label="Close QR overlay" className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-gray-600 member-dark:text-neutral-300 hover:bg-gray-100 member-dark:hover:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-[#0F6E00]">
+              <button type="submit" aria-label="Close QR overlay" className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-gray-600 member-dark:text-neutral-300 hover:bg-gray-100 member-dark:hover:bg-member-raised focus-visible:outline-2 focus-visible:outline-[#0F6E00]">
                 <X size={22} />
               </button>
             </form>
@@ -422,12 +422,12 @@ export default function ProfileView({
               Personal & contact information
             </p>
           </div>
-          <span className="rounded-full bg-neutral-100 member-dark:bg-neutral-800 px-2.5 py-0.5 text-[11px] font-medium text-neutral-600 member-dark:text-neutral-300">
+          <span className="rounded-full bg-neutral-100 member-dark:bg-member-raised px-2.5 py-0.5 text-[11px] font-medium text-neutral-600 member-dark:text-neutral-300">
             Verified
           </span>
         </div>
 
-        <div className="rounded-2xl border border-neutral-200/70 member-dark:border-neutral-700/70 bg-white member-dark:bg-neutral-900 p-5 shadow-xs">
+        <div className="rounded-2xl border border-neutral-200/70 member-dark:border-member-border/70 bg-white member-dark:bg-member-surface p-5 shadow-xs">
           {/* Structured 2-column detail grid */}
           <div className="grid grid-cols-2 gap-x-4 gap-y-3.5">
             <div>
@@ -469,7 +469,7 @@ export default function ProfileView({
               </span>
             </div>
 
-            <div className="col-span-2 border-t border-neutral-100 member-dark:border-neutral-700 pt-3">
+            <div className="col-span-2 border-t border-neutral-100 member-dark:border-member-border pt-3">
               <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
                 Email Address
               </span>
@@ -507,8 +507,8 @@ export default function ProfileView({
           </div>
 
           {/* Validity & Dates Row with soft badge pills */}
-          <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-neutral-100 member-dark:border-neutral-700 pt-3.5">
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-stone-200/80 member-dark:border-neutral-700/80 bg-stone-100/80 member-dark:bg-neutral-800/80 px-3 py-1 text-xs font-medium text-stone-700 member-dark:text-neutral-300">
+          <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-neutral-100 member-dark:border-member-border pt-3.5">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-stone-200/80 member-dark:border-member-border/80 bg-stone-100/80 member-dark:bg-member-raised/80 px-3 py-1 text-xs font-medium text-stone-700 member-dark:text-neutral-300">
               <span className="text-stone-500 member-dark:text-neutral-400">Member Since:</span>
               <span className="font-bold text-stone-900 member-dark:text-neutral-100">
                 {formatMemberDate(member.member_since)}
@@ -559,13 +559,13 @@ export default function ProfileView({
             const iconClass = isTeal
               ? "bg-brand-secondary-soft text-brand-secondary-dark"
               : isGold
-                ? "bg-brand-accent-soft member-dark:bg-neutral-800 text-[#7A4B00] member-dark:text-amber-200"
+                ? "bg-brand-accent-soft member-dark:bg-member-raised text-[#7A4B00] member-dark:text-amber-200"
                 : "bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200";
 
             return (
               <div
                 key={benefit.title}
-                className="flex w-[240px] shrink-0 snap-start flex-col justify-between rounded-2xl border border-neutral-100 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 p-4 shadow-xs transition-all hover:border-neutral-200 member-dark:hover:border-neutral-700 hover:shadow-sm"
+                className="flex w-[240px] shrink-0 snap-start flex-col justify-between rounded-2xl border border-neutral-100 member-dark:border-member-border bg-white member-dark:bg-member-surface p-4 shadow-xs transition-all hover:border-neutral-200 member-dark:hover:border-member-border hover:shadow-sm"
               >
                 <div>
                   <div
@@ -582,7 +582,7 @@ export default function ProfileView({
                   </p>
                 </div>
 
-                <div className="mt-3 flex items-center justify-between border-t border-neutral-100 member-dark:border-neutral-700 pt-3">
+                <div className="mt-3 flex items-center justify-between border-t border-neutral-100 member-dark:border-member-border pt-3">
                   <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-brand-primary-800 member-dark:text-brand-primary-200">
                     <Check size={12} strokeWidth={3} />
                     Active Benefit
@@ -617,8 +617,8 @@ export default function ProfileView({
         </div>
 
         {registrations.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-stone-200 member-dark:border-neutral-700 bg-stone-50/70 member-dark:bg-neutral-900/70 p-6 text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-stone-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 text-brand-primary-800 member-dark:text-brand-primary-200 shadow-2xs">
+          <div className="rounded-2xl border border-dashed border-stone-200 member-dark:border-member-border bg-stone-50/70 member-dark:bg-member-surface/70 p-6 text-center">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-stone-200/80 member-dark:border-member-border/80 bg-white member-dark:bg-member-surface text-brand-primary-800 member-dark:text-brand-primary-200 shadow-2xs">
               <CalendarCheck size={22} />
             </div>
             <h3 className="text-sm font-bold font-sans text-neutral-900 member-dark:text-neutral-100">
@@ -629,14 +629,14 @@ export default function ProfileView({
             </p>
             <NavLink
               href="/member/events"
-              className="mt-3.5 inline-flex items-center gap-1 rounded-xl border border-stone-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 px-3.5 py-2 text-xs font-semibold text-brand-primary-800 member-dark:text-brand-primary-200 shadow-2xs transition-all hover:bg-stone-50 member-dark:hover:bg-neutral-900 active:scale-95"
+              className="mt-3.5 inline-flex items-center gap-1 rounded-xl border border-stone-200 member-dark:border-member-border bg-white member-dark:bg-member-surface px-3.5 py-2 text-xs font-semibold text-brand-primary-800 member-dark:text-brand-primary-200 shadow-2xs transition-all hover:bg-stone-50 member-dark:hover:bg-member-surface active:scale-95"
             >
               <span>Explore upcoming events</span>
               <span aria-hidden="true">&rarr;</span>
             </NavLink>
           </div>
         ) : (
-          <div className="rounded-2xl border border-neutral-200/70 member-dark:border-neutral-700/70 bg-white member-dark:bg-neutral-900 p-5 shadow-xs">
+          <div className="rounded-2xl border border-neutral-200/70 member-dark:border-member-border/70 bg-white member-dark:bg-member-surface p-5 shadow-xs">
             <div className="relative space-y-6 border-l-2 border-brand-primary-100 member-dark:border-brand-primary-700 pl-6">
               {registrations.map((reg) => {
                 const event = Array.isArray(reg.events)
@@ -717,11 +717,11 @@ export default function ProfileView({
 
       {/* 5. Action Hub: Admin Portal, Settings & Logout (Benchmark: Zomato / Marriott) */}
       <section>
-        <div className="mb-4 divide-y divide-neutral-100 member-dark:divide-neutral-700 overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 shadow-xs">
+        <div className="mb-4 divide-y divide-neutral-100 member-dark:divide-member-border overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-member-border/80 bg-white member-dark:bg-member-surface shadow-xs">
           {member.role === "admin" && (
             <NavLink
               href="/admin"
-              className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 member-dark:hover:bg-neutral-900 active:scale-[0.98]"
+              className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 member-dark:hover:bg-member-surface active:scale-[0.98]"
             >
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200">
                 <ShieldCheck size={20} strokeWidth={2.2} />
@@ -743,9 +743,9 @@ export default function ProfileView({
 
           <NavLink
             href="/member/settings"
-            className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 member-dark:hover:bg-neutral-900 active:scale-[0.98]"
+            className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 member-dark:hover:bg-member-surface active:scale-[0.98]"
           >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-member-raised text-neutral-700 member-dark:text-neutral-300">
               <Settings size={18} />
             </div>
             <div className="min-w-0 flex-1">

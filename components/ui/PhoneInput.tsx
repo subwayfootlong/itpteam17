@@ -9,7 +9,7 @@ import type { Country } from "react-phone-number-input";
 import { digitsOnly } from "@/lib/phone";
 
 const fieldBubble =
-  "relative rounded-xl bg-slate-50 member-dark:bg-neutral-900 border border-stone-300 member-dark:border-neutral-700 focus-within:border-[#53A63E] transition-all";
+  "relative rounded-xl bg-slate-50 member-dark:bg-member-raised border border-stone-300 member-dark:border-member-border focus-within:border-[#53A63E] transition-all";
 
 interface PhoneInputFieldProps {
   label?: string;

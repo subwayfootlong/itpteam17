@@ -74,7 +74,7 @@ export default function MemberBottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-1/2 z-50 w-full max-w-md -translate-x-1/2 border-t border-neutral-200 member-dark:border-neutral-700 bg-white/95 member-dark:bg-neutral-900/95 px-2 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-md"
+      className="fixed bottom-0 left-1/2 z-50 w-full max-w-md -translate-x-1/2 border-t border-neutral-200 member-dark:border-member-border bg-white/95 member-dark:bg-member-surface/95 px-2 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-md"
       aria-label="Member navigation"
     >
       <div className="grid grid-cols-5 gap-1 text-center">

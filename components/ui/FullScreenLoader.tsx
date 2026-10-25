@@ -23,7 +23,7 @@ export default function FullScreenLoader({
       aria-modal="true"
       aria-busy="true"
       aria-label={title}
-      className="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-white/95 member-dark:bg-neutral-900/95 px-8 text-center backdrop-blur-sm"
+      className="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-white/95 member-dark:bg-member-surface/95 px-8 text-center backdrop-blur-sm"
     >
       <span className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-primary-50 member-dark:bg-brand-primary-900 ring-1 ring-brand-primary-100 member-dark:ring-brand-primary-700">
         <LoadingSpinner label="" size="lg" />

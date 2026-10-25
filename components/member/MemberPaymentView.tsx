@@ -40,7 +40,7 @@ function PaymentMethodCard({ method }: { method: PublicPaymentMethod }) {
   }
 
   return (
-    <div className="mt-4 rounded-2xl border border-gray-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 p-6 shadow-sm">
+    <div className="mt-4 rounded-2xl border border-gray-200 member-dark:border-member-border bg-white member-dark:bg-member-surface p-6 shadow-sm">
       <p className="member-text-base text-base font-bold text-[#151C27] member-dark:text-neutral-100">{method.name}</p>
       {method.description && (
         <p className="member-text-sm mt-1 text-sm text-[#5F5E5E] member-dark:text-neutral-300">{method.description}</p>
@@ -51,7 +51,7 @@ function PaymentMethodCard({ method }: { method: PublicPaymentMethod }) {
         <img
           src={method.qrCodeUrl}
           alt={`${method.name} QR code`}
-          className="mx-auto mt-5 h-56 w-56 rounded-xl border border-gray-100 member-dark:border-neutral-700 bg-white object-contain p-3"
+          className="mx-auto mt-5 h-56 w-56 rounded-xl border border-gray-100 member-dark:border-member-border bg-white object-contain p-3"
         />
       )}
 
@@ -66,14 +66,14 @@ function PaymentMethodCard({ method }: { method: PublicPaymentMethod }) {
             Pay now
             <ExternalLink size={18} />
           </a>
-          <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-gray-200 member-dark:border-neutral-700 bg-[#EEF1FF] member-dark:bg-neutral-800 px-4 py-3">
+          <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-gray-200 member-dark:border-member-border bg-[#EEF1FF] member-dark:bg-member-raised px-4 py-3">
             <span className="member-text-sm min-w-0 truncate text-sm text-[#151C27] member-dark:text-neutral-100">
               {method.paymentUrl.replace(/^https?:\/\//, "")}
             </span>
             <button
               type="button"
               onClick={handleCopy}
-              className="flex shrink-0 items-center gap-1.5 rounded-lg bg-white member-dark:bg-neutral-900 px-3 py-1.5 text-sm font-semibold text-[#0F6E00] member-dark:text-brand-primary-200 shadow-sm"
+              className="flex shrink-0 items-center gap-1.5 rounded-lg bg-white member-dark:bg-member-surface px-3 py-1.5 text-sm font-semibold text-[#0F6E00] member-dark:text-brand-primary-200 shadow-sm"
             >
               {copied ? <Check size={16} /> : <Copy size={16} />}
               {copied ? "Copied" : "Copy link"}
@@ -109,8 +109,8 @@ export default function MemberPaymentView({
       <section
         className={`mt-6 rounded-2xl border p-5 ${
           expiryInfo.urgency === "none"
-            ? "border-gray-200 member-dark:border-neutral-700 bg-[#EEF1FF] member-dark:bg-neutral-800"
-            : "border-[#F5D9A8] bg-[#FFF8EE] member-dark:bg-neutral-800"
+            ? "border-gray-200 member-dark:border-member-border bg-[#EEF1FF] member-dark:bg-member-raised"
+            : "border-[#F5D9A8] bg-[#FFF8EE] member-dark:bg-member-raised"
         }`}
       >
         <h2 className="member-text-lg font-semibold text-[#151C27] member-dark:text-neutral-100">{copy.title}</h2>
@@ -130,7 +130,7 @@ export default function MemberPaymentView({
       )}
 
       {!loadError && paymentMethods.length === 0 && (
-        <div className="mt-6 flex flex-col items-center rounded-2xl border border-dashed border-gray-300 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 px-6 py-12 text-center">
+        <div className="mt-6 flex flex-col items-center rounded-2xl border border-dashed border-gray-300 member-dark:border-member-border bg-white member-dark:bg-member-surface px-6 py-12 text-center">
           <QrCode size={32} className="text-gray-300 member-dark:text-neutral-400" />
           <p className="member-text-base mt-3 font-semibold text-[#151C27] member-dark:text-neutral-100">
             Payment details are not available yet

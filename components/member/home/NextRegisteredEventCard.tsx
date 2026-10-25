@@ -37,9 +37,9 @@ export default function NextRegisteredEventCard({
 }) {
   if (!event) {
     return (
-      <section className="mt-4 overflow-hidden rounded-2xl border border-dashed border-stone-200 member-dark:border-neutral-700 bg-stone-50/70 member-dark:bg-neutral-900/70 p-4 shadow-2xs">
+      <section className="mt-4 overflow-hidden rounded-2xl border border-dashed border-stone-200 member-dark:border-member-border bg-stone-50/70 member-dark:bg-member-surface/70 p-4 shadow-2xs">
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-stone-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 text-[#0F6E00] member-dark:text-brand-primary-200 shadow-2xs">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-stone-200/80 member-dark:border-member-border/80 bg-white member-dark:bg-member-surface text-[#0F6E00] member-dark:text-brand-primary-200 shadow-2xs">
             <CalendarDays size={20} />
           </div>
           <div className="min-w-0 flex-1">
@@ -63,15 +63,15 @@ export default function NextRegisteredEventCard({
   }
 
   return (
-    <section className="mt-4 overflow-hidden rounded-2xl border border-stone-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 p-4.5 shadow-xs transition-all hover:border-neutral-300 member-dark:hover:border-neutral-700 hover:shadow-sm">
+    <section className="mt-4 overflow-hidden rounded-2xl border border-stone-200/80 member-dark:border-member-border/80 bg-white member-dark:bg-member-surface p-4.5 shadow-xs transition-all hover:border-neutral-300 member-dark:hover:border-member-border hover:shadow-sm">
       <div className="flex items-center justify-between gap-2">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-[#CDE5CA] member-dark:border-neutral-700 bg-[#E8F4E6] member-dark:bg-neutral-800 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#0F6E00] member-dark:text-brand-primary-200">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-[#CDE5CA] member-dark:border-member-border bg-[#E8F4E6] member-dark:bg-member-raised px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#0F6E00] member-dark:text-brand-primary-200">
           <span className="h-1.5 w-1.5 rounded-full bg-[#0F6E00]" />
           <span>Your Registered Pass</span>
         </span>
 
         {event.category && (
-          <span className="rounded-md border border-stone-200/70 member-dark:border-neutral-700/70 bg-stone-100 member-dark:bg-neutral-800 px-2 py-0.5 text-[11px] font-medium text-stone-600 member-dark:text-neutral-300">
+          <span className="rounded-md border border-stone-200/70 member-dark:border-member-border/70 bg-stone-100 member-dark:bg-member-raised px-2 py-0.5 text-[11px] font-medium text-stone-600 member-dark:text-neutral-300">
             {event.category}
           </span>
         )}

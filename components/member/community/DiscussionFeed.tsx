@@ -45,7 +45,7 @@ export default function DiscussionFeed({
           />
         ))
       ) : (
-        <div className="flex flex-col items-center rounded-2xl border border-dashed border-neutral-200 member-dark:border-neutral-700 bg-neutral-50 member-dark:bg-neutral-900 p-8 text-center">
+        <div className="flex flex-col items-center rounded-2xl border border-dashed border-neutral-200 member-dark:border-member-border bg-neutral-50 member-dark:bg-member-surface p-8 text-center">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200">
             <MessageSquare size={22} aria-hidden="true" />
           </span>

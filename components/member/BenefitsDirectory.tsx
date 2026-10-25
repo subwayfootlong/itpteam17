@@ -143,7 +143,7 @@ function FeaturedMerchantBanner({
               className="pointer-events-none h-full w-full border-0"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-primary-100 member-dark:from-brand-primary-900 to-brand-primary-200 member-dark:to-neutral-800 text-brand-primary-800 member-dark:text-brand-primary-200">
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-primary-100 member-dark:from-brand-primary-900 to-brand-primary-200 member-dark:to-member-raised text-brand-primary-800 member-dark:text-brand-primary-200">
               <MemberIcon name="pin" size={28} />
             </div>
           )}
@@ -180,7 +180,7 @@ function CategoryChips({
             className={`shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-100 active:scale-95 ${
               isActive
                 ? "bg-brand-primary-800 text-white shadow-sm"
-                : "border border-neutral-300 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 text-neutral-700 member-dark:text-neutral-300 shadow-xs hover:border-brand-primary-600 member-dark:hover:border-brand-primary-700 hover:text-brand-primary-800 member-dark:hover:text-brand-primary-200"
+                : "border border-neutral-300 member-dark:border-member-border bg-white member-dark:bg-member-surface text-neutral-700 member-dark:text-neutral-300 shadow-xs hover:border-brand-primary-600 member-dark:hover:border-brand-primary-700 hover:text-brand-primary-800 member-dark:hover:text-brand-primary-200"
             }`}
           >
             {category}
@@ -242,8 +242,8 @@ function RewardCard({
     : "Tier-restricted reward";
 
   return (
-    <article className="mb-4 flex flex-col overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 shadow-xs">
-      <div className="relative aspect-video w-full overflow-hidden bg-neutral-100 member-dark:bg-neutral-800">
+    <article className="mb-4 flex flex-col overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-member-border/80 bg-white member-dark:bg-member-surface shadow-xs">
+      <div className="relative aspect-video w-full overflow-hidden bg-neutral-100 member-dark:bg-member-raised">
         {partner.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -264,7 +264,7 @@ function RewardCard({
           </div>
         )}
         {discount && (
-          <span className="absolute right-3 top-3 rounded-full border border-brand-accent/60 bg-brand-accent-soft member-dark:bg-neutral-800 px-2.5 py-1 text-xs font-bold text-amber-900 member-dark:text-amber-300 shadow-xs">
+          <span className="absolute right-3 top-3 rounded-full border border-brand-accent/60 bg-brand-accent-soft member-dark:bg-member-raised px-2.5 py-1 text-xs font-bold text-amber-900 member-dark:text-amber-300 shadow-xs">
             {discount}
           </span>
         )}
@@ -290,7 +290,7 @@ function RewardCard({
             <p className="truncate text-xs font-semibold text-neutral-700 member-dark:text-neutral-300">
               {partner.name}
             </p>
-            <span className="mt-0.5 inline-block rounded-md bg-neutral-100 member-dark:bg-neutral-800 px-1.5 py-0.5 text-[10px] font-semibold text-neutral-600 member-dark:text-neutral-300">
+            <span className="mt-0.5 inline-block rounded-md bg-neutral-100 member-dark:bg-member-raised px-1.5 py-0.5 text-[10px] font-semibold text-neutral-600 member-dark:text-neutral-300">
               {partner.category}
             </span>
           </div>
@@ -309,7 +309,7 @@ function RewardCard({
         </p>
 
         {partner.isLocked ? (
-          <span className="mt-3 inline-flex items-center gap-1.5 self-start rounded-lg border border-neutral-200 member-dark:border-neutral-700 bg-neutral-100 member-dark:bg-neutral-800 px-2.5 py-1 text-xs text-neutral-500 member-dark:text-neutral-400">
+          <span className="mt-3 inline-flex items-center gap-1.5 self-start rounded-lg border border-neutral-200 member-dark:border-member-border bg-neutral-100 member-dark:bg-member-raised px-2.5 py-1 text-xs text-neutral-500 member-dark:text-neutral-400">
             <Lock size={13} aria-hidden="true" />
             {lockedLabel}
           </span>
@@ -346,7 +346,7 @@ function PartnerMap({
 
   if (mappedPartners.length === 0) {
     return (
-      <section className="flex flex-col items-center rounded-2xl border border-dashed border-neutral-300 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 p-8 text-center">
+      <section className="flex flex-col items-center rounded-2xl border border-dashed border-neutral-300 member-dark:border-member-border bg-white member-dark:bg-member-surface p-8 text-center">
         <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200">
           <MemberIcon name="map" size={24} />
         </span>
@@ -363,7 +363,7 @@ function PartnerMap({
   return (
     <section>
       {activePartner && (
-        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-neutral-200 member-dark:border-neutral-700 bg-brand-primary-50 member-dark:bg-brand-primary-900 shadow-md">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-neutral-200 member-dark:border-member-border bg-brand-primary-50 member-dark:bg-brand-primary-900 shadow-md">
           <iframe
             className="absolute inset-0 h-full w-full border-0"
             title={`${activePartner.name} location map`}
@@ -411,7 +411,7 @@ function PartnerMap({
                 className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-left shadow-xs transition-all duration-100 active:scale-[0.98] ${
                   isActive
                     ? "border-brand-primary-700 member-dark:border-brand-primary-700 bg-brand-primary-50 member-dark:bg-brand-primary-900 ring-2 ring-brand-primary-600/20 member-dark:ring-brand-primary-700/20"
-                    : "border-neutral-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 hover:border-brand-primary-600/50 member-dark:hover:border-brand-primary-700/50"
+                    : "border-neutral-200 member-dark:border-member-border bg-white member-dark:bg-member-surface hover:border-brand-primary-600/50 member-dark:hover:border-brand-primary-700/50"
                 }`}
               >
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-xs font-bold text-brand-primary-800 member-dark:text-brand-primary-200">
@@ -441,7 +441,7 @@ function PartnerMap({
                   </small>
                 </span>
                 {partner.distance && (
-                  <span className="shrink-0 rounded-full bg-neutral-100 member-dark:bg-neutral-800 px-2 py-0.5 text-[11px] font-medium text-neutral-600 member-dark:text-neutral-300">
+                  <span className="shrink-0 rounded-full bg-neutral-100 member-dark:bg-member-raised px-2 py-0.5 text-[11px] font-medium text-neutral-600 member-dark:text-neutral-300">
                     {partner.distance}
                   </span>
                 )}
@@ -627,14 +627,14 @@ export default function BenefitsDirectory({
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search rewards or partners..."
-                className="h-12 w-full rounded-full border border-neutral-300 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 pl-11 pr-11 text-sm text-neutral-900 member-dark:text-neutral-100 shadow-sm placeholder:text-neutral-500 member-dark:placeholder:text-neutral-400 focus:border-brand-primary-700 member-dark:focus:border-brand-primary-700 focus:outline-none focus:ring-4 focus:ring-brand-primary-600/15 member-dark:focus:ring-brand-primary-700/15"
+                className="h-12 w-full rounded-full border border-neutral-300 member-dark:border-member-border bg-white member-dark:bg-member-surface pl-11 pr-11 text-sm text-neutral-900 member-dark:text-neutral-100 shadow-sm placeholder:text-neutral-500 member-dark:placeholder:text-neutral-400 focus:border-brand-primary-700 member-dark:focus:border-brand-primary-700 focus:outline-none focus:ring-4 focus:ring-brand-primary-600/15 member-dark:focus:ring-brand-primary-700/15"
               />
               {query && (
                 <button
                   type="button"
                   onClick={() => setQuery("")}
                   aria-label="Clear search"
-                  className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-neutral-500 member-dark:text-neutral-400 transition-transform duration-100 hover:bg-neutral-200 member-dark:hover:bg-neutral-800 active:scale-95"
+                  className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-neutral-500 member-dark:text-neutral-400 transition-transform duration-100 hover:bg-neutral-200 member-dark:hover:bg-member-raised active:scale-95"
                 >
                   <X size={16} aria-hidden="true" />
                 </button>
@@ -655,7 +655,7 @@ export default function BenefitsDirectory({
             </div>
 
             <div
-              className="mb-4 grid grid-cols-2 rounded-xl bg-neutral-100 member-dark:bg-neutral-800 p-1"
+              className="mb-4 grid grid-cols-2 rounded-xl bg-neutral-100 member-dark:bg-member-raised p-1"
               role="group"
               aria-label="Benefit view"
             >
@@ -667,7 +667,7 @@ export default function BenefitsDirectory({
                   onClick={() => setView(option)}
                   className={`rounded-lg py-2 text-xs font-semibold transition-transform duration-100 active:scale-[0.98] ${
                     view === option
-                      ? "bg-white member-dark:bg-neutral-900 text-brand-primary-800 member-dark:text-brand-primary-200 shadow-xs"
+                      ? "bg-white member-dark:bg-member-surface text-brand-primary-800 member-dark:text-brand-primary-200 shadow-xs"
                       : "text-neutral-500 member-dark:text-neutral-400 hover:text-neutral-800 member-dark:hover:text-neutral-100"
                   }`}
                 >

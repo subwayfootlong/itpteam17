@@ -86,7 +86,7 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
         <NavLink
           href="/member/profile"
           aria-label="Back to profile"
-          className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300 transition-colors hover:bg-neutral-200/70 member-dark:hover:bg-neutral-800/70 active:scale-95"
+          className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-100 member-dark:bg-member-raised text-neutral-700 member-dark:text-neutral-300 transition-colors hover:bg-neutral-200/70 member-dark:hover:bg-member-raised/70 active:scale-95"
         >
           <ArrowLeft size={20} className="text-[#0F6E00] member-dark:text-brand-primary-200" />
         </NavLink>
@@ -97,7 +97,7 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
       </header>
 
       {/* Avatar Card */}
-      <section className="flex flex-col items-center rounded-2xl border border-neutral-200/70 member-dark:border-neutral-700/70 bg-white member-dark:bg-neutral-900 p-5 text-center shadow-xs">
+      <section className="flex flex-col items-center rounded-2xl border border-neutral-200/70 member-dark:border-member-border/70 bg-white member-dark:bg-member-surface p-5 text-center shadow-xs">
         <div className="relative">
           <MemberAvatar
             firstName={initial.first_name}
@@ -105,7 +105,7 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
             email={initial.email}
             profileImageUrl={initial.profile_image_url}
             size={88}
-            className="ring-4 ring-[#E8F4E6] member-dark:ring-neutral-700 shadow-sm"
+            className="ring-4 ring-[#E8F4E6] member-dark:ring-member-border shadow-sm"
           />
         </div>
 
@@ -117,7 +117,7 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
 
       {/* Form Fields Card */}
       <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="rounded-2xl border border-neutral-200/70 member-dark:border-neutral-700/70 bg-white member-dark:bg-neutral-900 p-5 shadow-xs space-y-4">
+        <div className="rounded-2xl border border-neutral-200/70 member-dark:border-member-border/70 bg-white member-dark:bg-member-surface p-5 shadow-xs space-y-4">
           <div className="space-y-2">
             <Input label="Registered email" type="email" value={initial.email ?? ""} readOnly />
             <NavLink href="/member/settings/email" className="member-text-sm block text-sm font-semibold text-brand-primary-800 member-dark:text-brand-primary-200">Change Email</NavLink>
@@ -189,7 +189,7 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
         <div className="grid grid-cols-2 gap-3 pt-1">
           <NavLink
             href="/member/profile"
-            className="flex min-h-11 items-center justify-center rounded-xl border border-neutral-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 px-4 py-2.5 text-sm font-semibold text-neutral-700 member-dark:text-neutral-300 shadow-2xs transition-all hover:bg-neutral-50 member-dark:hover:bg-neutral-900 active:scale-[0.98]"
+            className="flex min-h-11 items-center justify-center rounded-xl border border-neutral-200 member-dark:border-member-border bg-white member-dark:bg-member-surface px-4 py-2.5 text-sm font-semibold text-neutral-700 member-dark:text-neutral-300 shadow-2xs transition-all hover:bg-neutral-50 member-dark:hover:bg-member-surface active:scale-[0.98]"
           >
             Cancel
           </NavLink>
