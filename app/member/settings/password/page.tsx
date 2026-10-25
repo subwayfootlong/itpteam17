@@ -13,7 +13,7 @@ export default async function ChangePasswordPage() {
   }
 
   return (
-    <MemberPageShell showTopBar={false}>
+    <MemberPageShell>
       <ChangePasswordForm />
     </MemberPageShell>
   );

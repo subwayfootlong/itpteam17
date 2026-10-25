@@ -91,7 +91,7 @@ export default async function EventDetailsPage({
         : "Open RSVP";
 
   return (
-    <MemberPageShell showTopBar={false} showBottomNav={true}>
+    <MemberPageShell>
       <div className="px-4 py-5 font-helvetica pb-8">
         {/* Top Navigation Header */}
         <header className="flex items-center gap-3">
