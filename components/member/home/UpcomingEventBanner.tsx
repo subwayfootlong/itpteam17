@@ -34,35 +34,35 @@ export default function UpcomingEventBanner({
   event: UpcomingEvent;
 }) {
   return (
-    <section className="mt-4 rounded-xl border border-[#D9E8D7] bg-[#F3FAF2] p-5">
+    <section className="mt-4 rounded-xl border border-[#D9E8D7] member-dark:border-neutral-700 bg-[#F3FAF2] member-dark:bg-neutral-800 p-5">
       <div className="flex items-start gap-3">
-        <div className="rounded-full bg-[#DDF3D9] p-2 text-[#0F6E00]">
+        <div className="rounded-full bg-[#DDF3D9] member-dark:bg-neutral-800 p-2 text-[#0F6E00] member-dark:text-brand-primary-200">
           <CalendarDays size={20} />
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="member-text-xs font-semibold uppercase tracking-wide text-[#0F6E00]">
+          <p className="member-text-xs font-semibold uppercase tracking-wide text-[#0F6E00] member-dark:text-brand-primary-200">
             Next upcoming event
           </p>
 
-          <h2 className="member-text-lg mt-2 font-semibold text-[#151C27]">
+          <h2 className="member-text-lg mt-2 font-semibold text-[#151C27] member-dark:text-neutral-100">
             {event.title}
           </h2>
 
-          <p className="member-text-sm mt-2 text-[#5F5E5E]">
+          <p className="member-text-sm mt-2 text-[#5F5E5E] member-dark:text-neutral-300">
             {formatEventSchedule(event.eventDate, event.startTime)}
           </p>
 
           {event.venue && (
-            <p className="member-text-sm mt-1 flex items-center gap-2 text-[#5F5E5E]">
-              <MapPin size={16} className="text-[#0F6E00]" />
+            <p className="member-text-sm mt-1 flex items-center gap-2 text-[#5F5E5E] member-dark:text-neutral-300">
+              <MapPin size={16} className="text-[#0F6E00] member-dark:text-brand-primary-200" />
               <span>{event.venue}</span>
             </p>
           )}
 
           <NavLink
             href={`/member/events/${event.id}`}
-            className="member-text-sm mt-4 inline-block font-semibold text-[#0F6E00]"
+            className="member-text-sm mt-4 inline-block font-semibold text-[#0F6E00] member-dark:text-brand-primary-200"
           >
             View event
           </NavLink>

@@ -37,9 +37,9 @@ export default function FeaturedEventCard({
   event: FeaturedEvent;
 }) {
   return (
-    <article className="flex w-[280px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-neutral-100 bg-white shadow-sm transition-all hover:border-neutral-200 hover:shadow-md">
+    <article className="flex w-[280px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-neutral-100 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 shadow-sm transition-all hover:border-neutral-200 member-dark:hover:border-neutral-700 hover:shadow-md">
       {/* 16:9 Banner Container */}
-      <div className="relative aspect-[16/9] w-full overflow-hidden bg-neutral-100">
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-neutral-100 member-dark:bg-neutral-800">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={event.imageUrl || "/event-placeholder.png"}
@@ -49,7 +49,7 @@ export default function FeaturedEventCard({
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
 
         {/* Floating Category Chip */}
-        <span className="absolute left-3 top-3 rounded-md border border-white/50 bg-white/90 px-2.5 py-0.5 text-xs font-semibold text-neutral-800 shadow-xs backdrop-blur-md">
+        <span className="absolute left-3 top-3 rounded-md border border-white/50 bg-white/90 member-dark:bg-neutral-900/90 px-2.5 py-0.5 text-xs font-semibold text-neutral-800 member-dark:text-neutral-100 shadow-xs backdrop-blur-md">
           {event.category || "Featured Event"}
         </span>
       </div>
@@ -58,7 +58,7 @@ export default function FeaturedEventCard({
       <div className="flex flex-1 flex-col justify-between p-4">
         <div>
           {/* Date Row */}
-          <div className="flex items-center gap-1.5 text-xs font-medium text-brand-primary-800">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-brand-primary-800 member-dark:text-brand-primary-200">
             <CalendarDays size={14} className="shrink-0" />
             <span className="truncate">
               {formatEventSchedule(event.eventDate, event.startTime)}
@@ -66,21 +66,21 @@ export default function FeaturedEventCard({
           </div>
 
           {/* Title */}
-          <h3 className="mt-1.5 line-clamp-1 text-base font-bold leading-snug text-neutral-900">
+          <h3 className="mt-1.5 line-clamp-1 text-base font-bold leading-snug text-neutral-900 member-dark:text-neutral-100">
             {event.title}
           </h3>
 
           {/* Venue (if present) */}
           {event.venue && (
-            <p className="mt-1 flex items-center gap-1.5 truncate text-xs text-neutral-500">
-              <MapPin size={13} className="shrink-0 text-neutral-400" />
+            <p className="mt-1 flex items-center gap-1.5 truncate text-xs text-neutral-500 member-dark:text-neutral-400">
+              <MapPin size={13} className="shrink-0 text-neutral-400 member-dark:text-neutral-400" />
               <span className="truncate">{event.venue}</span>
             </p>
           )}
 
           {/* Description clamped */}
           {event.description && (
-            <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-neutral-600">
+            <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-neutral-600 member-dark:text-neutral-300">
               {event.description}
             </p>
           )}

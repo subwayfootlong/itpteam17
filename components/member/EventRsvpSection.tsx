@@ -99,40 +99,40 @@ export default function EventRsvpSection({
   return (
     <div className="w-full space-y-3 font-helvetica">
       {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-medium text-red-700 flex items-center gap-2">
+        <div className="rounded-xl border border-red-200 member-dark:border-red-800 bg-red-50 member-dark:bg-red-950 p-3 text-xs font-medium text-red-700 member-dark:text-red-300 flex items-center gap-2">
           <AlertCircle size={15} className="shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {isRejected && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50/80 p-3.5 text-xs text-amber-900">
-          <p className="flex items-center gap-1.5 font-bold text-amber-800">
-            <AlertCircle size={15} className="text-amber-600 shrink-0" />
+        <div className="rounded-xl border border-amber-200 member-dark:border-amber-800 bg-amber-50/80 member-dark:bg-amber-950/80 p-3.5 text-xs text-amber-900 member-dark:text-amber-300">
+          <p className="flex items-center gap-1.5 font-bold text-amber-800 member-dark:text-amber-300">
+            <AlertCircle size={15} className="text-amber-600 member-dark:text-amber-300 shrink-0" />
             Registration Application Feedback
           </p>
           {initialRegistration?.rejection_message && (
-            <p className="mt-1 text-xs italic text-amber-950 break-words">
+            <p className="mt-1 text-xs italic text-amber-950 member-dark:text-amber-300 break-words">
               &ldquo;{initialRegistration.rejection_message}&rdquo;
             </p>
           )}
-          <p className="mt-2 text-[11px] text-amber-700">
+          <p className="mt-2 text-[11px] text-amber-700 member-dark:text-amber-300">
             You may review the feedback above and reapply using the button below.
           </p>
         </div>
       )}
 
       {isRegistered ? (
-        <div className="space-y-4 rounded-2xl border border-brand-primary-200 bg-brand-primary-50 p-4">
+        <div className="space-y-4 rounded-2xl border border-brand-primary-200 member-dark:border-brand-primary-700 bg-brand-primary-50 member-dark:bg-brand-primary-900 p-4">
           <div className="flex items-center gap-2.5">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-primary-800 text-white">
               <Check size={18} strokeWidth={3} aria-hidden="true" />
             </span>
             <div>
-              <p className="text-sm font-semibold text-brand-primary-900">
+              <p className="text-sm font-semibold text-brand-primary-900 member-dark:text-brand-primary-200">
                 You&apos;re registered
               </p>
-              <p className="text-xs text-neutral-600">
+              <p className="text-xs text-neutral-600 member-dark:text-neutral-300">
                 {attendeeName}, your place is confirmed.
               </p>
             </div>
@@ -143,13 +143,13 @@ export default function EventRsvpSection({
           <CalendarButtons event={event} eventId={eventId} />
 
           {!hasEnded && (
-            <div className="border-t border-brand-primary-200/70 pt-3">
+            <div className="border-t border-brand-primary-200/70 member-dark:border-brand-primary-700/70 pt-3">
               {confirmingCancel ? (
                 <div role="alertdialog" aria-label="Confirm cancellation">
-                  <p className="text-xs font-semibold text-neutral-900">
+                  <p className="text-xs font-semibold text-neutral-900 member-dark:text-neutral-100">
                     Cancel your registration for this event?
                   </p>
-                  <p className="mt-0.5 text-[11px] text-neutral-600">
+                  <p className="mt-0.5 text-[11px] text-neutral-600 member-dark:text-neutral-300">
                     Your place will be released for other members.
                   </p>
                   <div className="mt-2.5 grid grid-cols-2 gap-2">
@@ -157,7 +157,7 @@ export default function EventRsvpSection({
                       type="button"
                       onClick={() => setConfirmingCancel(false)}
                       disabled={cancelling}
-                      className="min-h-10 rounded-xl border border-neutral-300 bg-white px-3 py-2 text-xs font-semibold text-neutral-700 transition-transform duration-100 active:scale-[0.98] disabled:opacity-50"
+                      className="min-h-10 rounded-xl border border-neutral-300 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 px-3 py-2 text-xs font-semibold text-neutral-700 member-dark:text-neutral-300 transition-transform duration-100 active:scale-[0.98] disabled:opacity-50"
                     >
                       Keep my place
                     </button>
@@ -179,7 +179,7 @@ export default function EventRsvpSection({
                 <button
                   type="button"
                   onClick={() => setConfirmingCancel(true)}
-                  className="text-xs font-semibold text-brand-rose underline underline-offset-2 transition-transform duration-100 active:scale-95"
+                  className="text-xs font-semibold text-brand-rose member-dark:text-rose-300 underline underline-offset-2 transition-transform duration-100 active:scale-95"
                 >
                   Cancel RSVP
                 </button>
@@ -191,7 +191,7 @@ export default function EventRsvpSection({
         <button
           type="button"
           disabled
-          className="flex min-h-12 w-full items-center justify-center rounded-xl border border-neutral-200 bg-neutral-100 px-4 py-3 text-sm font-medium text-neutral-400 cursor-not-allowed"
+          className="flex min-h-12 w-full items-center justify-center rounded-xl border border-neutral-200 member-dark:border-neutral-700 bg-neutral-100 member-dark:bg-neutral-800 px-4 py-3 text-sm font-medium text-neutral-400 member-dark:text-neutral-400 cursor-not-allowed"
         >
           Event is Full
         </button>

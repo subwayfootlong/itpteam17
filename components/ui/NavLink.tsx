@@ -43,7 +43,7 @@ function PendingIndicator({
           aria-hidden="true"
           className={`pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-[inherit] transition-opacity duration-150 ${
             pending ? "opacity-100" : "opacity-0"
-          } ${dark ? "bg-brand-primary-900/70" : "bg-white/85"}`}
+          } ${dark ? "bg-brand-primary-900/70" : "bg-white/85 member-dark:bg-neutral-900/85"}`}
         >
           {pending && <LoadingSpinner label="" size="sm" light={dark} />}
         </span>

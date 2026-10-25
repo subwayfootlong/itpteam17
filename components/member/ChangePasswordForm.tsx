@@ -80,12 +80,12 @@ export default function ChangePasswordForm() {
     <div className="px-5 py-6">
       <header className="flex items-center gap-3">
         <NavLink href="/member/settings" aria-label="Back to settings">
-          <ArrowLeft size={24} className="text-[#0F6E00]" />
+          <ArrowLeft size={24} className="text-[#0F6E00] member-dark:text-brand-primary-200" />
         </NavLink>
 
         <h1
           id="change-password-title"
-          className="member-text-2xl text-2xl font-bold text-[#0F6E00]"
+          className="member-text-2xl text-2xl font-bold text-[#0F6E00] member-dark:text-brand-primary-200"
         >
           Change Password
         </h1>
@@ -94,15 +94,15 @@ export default function ChangePasswordForm() {
       <form
         onSubmit={handleSubmit}
         aria-labelledby="change-password-title"
-        className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+        className="mt-8 rounded-2xl border border-gray-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 p-6 shadow-sm"
       >
-        <div className="flex items-start gap-3 border-b border-gray-100 pb-4">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-50 text-[#0F6E00]">
+        <div className="flex items-start gap-3 border-b border-gray-100 member-dark:border-neutral-700 pb-4">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-50 member-dark:bg-green-950 text-[#0F6E00] member-dark:text-brand-primary-200">
             <KeyRound size={20} aria-hidden="true" />
           </span>
           <div>
-            <h3 className="member-text-base font-bold text-[#151C27]">Change password</h3>
-            <p className="member-text-sm mt-1 text-sm leading-5 text-[#5F5E5E]">
+            <h3 className="member-text-base font-bold text-[#151C27] member-dark:text-neutral-100">Change password</h3>
+            <p className="member-text-sm mt-1 text-sm leading-5 text-[#5F5E5E] member-dark:text-neutral-300">
               Enter your current password before choosing a new one.
             </p>
           </div>
@@ -138,7 +138,7 @@ export default function ChangePasswordForm() {
             disabled={isSubmitting}
             required
           />
-          <p id="new-password-help" className="member-text-xs -mt-2 text-xs text-[#5F5E5E]">
+          <p id="new-password-help" className="member-text-xs -mt-2 text-xs text-[#5F5E5E] member-dark:text-neutral-300">
             Use at least 8 characters.
           </p>
 
@@ -161,7 +161,7 @@ export default function ChangePasswordForm() {
         {error ? (
           <p
             role="alert"
-            className="member-text-sm mt-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700"
+            className="member-text-sm mt-4 rounded-xl border border-red-100 member-dark:border-red-800 bg-red-50 member-dark:bg-red-950 px-4 py-3 text-sm text-red-700 member-dark:text-red-300"
           >
             {error}
           </p>

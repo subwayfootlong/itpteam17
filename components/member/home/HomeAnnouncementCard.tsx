@@ -59,8 +59,8 @@ type Slide = {
 // Each kind has its own soft tint so members can tell slides apart at a glance
 const kindStyles: Record<SlideKind, { chip: string; tile: string }> = {
   registered: {
-    chip: "bg-brand-primary-100 text-brand-primary-900",
-    tile: "bg-brand-primary-100 text-brand-primary-800",
+    chip: "bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-900 member-dark:text-brand-primary-200",
+    tile: "bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200",
   },
   announcement: {
     chip: "bg-brand-secondary-soft text-brand-secondary-dark",
@@ -71,8 +71,8 @@ const kindStyles: Record<SlideKind, { chip: string; tile: string }> = {
     tile: "bg-sky-50 text-sky-800",
   },
   benefit: {
-    chip: "bg-brand-accent-soft text-amber-900",
-    tile: "bg-brand-accent-soft text-amber-900",
+    chip: "bg-brand-accent-soft member-dark:bg-neutral-800 text-amber-900 member-dark:text-amber-300",
+    tile: "bg-brand-accent-soft member-dark:bg-neutral-800 text-amber-900 member-dark:text-amber-300",
   },
 };
 
@@ -122,7 +122,7 @@ function SlideThumb({ slide }: { slide: Slide }) {
   return (
     <div
       className={`flex h-[76px] w-[76px] shrink-0 items-center justify-center overflow-hidden rounded-2xl ${
-        showImage ? "bg-neutral-100" : kindStyles[slide.kind].tile
+        showImage ? "bg-neutral-100 member-dark:bg-neutral-800" : kindStyles[slide.kind].tile
       }`}
     >
       {showImage ? (
@@ -263,7 +263,7 @@ export default function HomeAnnouncementCard({
       onTouchStart={() => setIsPaused(true)}
       onTouchEnd={() => setIsPaused(false)}
     >
-      <h2 className="mb-2.5 text-base font-bold tracking-tight text-neutral-900">
+      <h2 className="mb-2.5 text-base font-bold tracking-tight text-neutral-900 member-dark:text-neutral-100">
         Highlights
       </h2>
 
@@ -283,7 +283,7 @@ export default function HomeAnnouncementCard({
               aria-label={`${slideIndex + 1} of ${slides.length}`}
               className="w-full shrink-0 snap-center px-0.5"
             >
-              <div className="flex h-full min-h-[236px] flex-col rounded-3xl border border-neutral-100 bg-white p-5 shadow-[0_6px_16px_-10px_rgba(23,63,20,0.35)]">
+              <div className="flex h-full min-h-[236px] flex-col rounded-3xl border border-neutral-100 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 p-5 shadow-[0_6px_16px_-10px_rgba(23,63,20,0.35)]">
                 <div className="flex items-start gap-3.5">
                   <div className="min-w-0 flex-1">
                     <span
@@ -292,7 +292,7 @@ export default function HomeAnnouncementCard({
                       <Icon size={12} className="shrink-0" aria-hidden="true" />
                       <span className="truncate">{slide.badge}</span>
                     </span>
-                    <h3 className="mt-2.5 line-clamp-3 text-lg font-bold leading-snug text-neutral-950">
+                    <h3 className="mt-2.5 line-clamp-3 text-lg font-bold leading-snug text-neutral-950 member-dark:text-neutral-100">
                       {slide.title}
                     </h3>
                   </div>
@@ -300,19 +300,19 @@ export default function HomeAnnouncementCard({
                 </div>
 
                 {slide.lines.length > 0 && (
-                  <ul className="mt-3 space-y-1 text-[13px] text-neutral-700">
+                  <ul className="mt-3 space-y-1 text-[13px] text-neutral-700 member-dark:text-neutral-300">
                     {slide.lines.map((line, lineIndex) => (
                       <li key={line} className="flex items-center gap-2">
                         {lineIndex === 0 ? (
                           <CalendarDays
                             size={14}
-                            className="shrink-0 text-brand-primary-800"
+                            className="shrink-0 text-brand-primary-800 member-dark:text-brand-primary-200"
                             aria-hidden="true"
                           />
                         ) : (
                           <MapPin
                             size={14}
-                            className="shrink-0 text-brand-primary-800"
+                            className="shrink-0 text-brand-primary-800 member-dark:text-brand-primary-200"
                             aria-hidden="true"
                           />
                         )}
@@ -323,7 +323,7 @@ export default function HomeAnnouncementCard({
                 )}
 
                 {slide.summary && (
-                  <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-neutral-600">
+                  <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-neutral-600 member-dark:text-neutral-300">
                     {slide.summary}
                   </p>
                 )}
@@ -359,7 +359,7 @@ export default function HomeAnnouncementCard({
               className={`h-2 rounded-full transition-all duration-200 ${
                 dotIndex === index
                   ? "w-5 bg-brand-primary-800"
-                  : "w-2 bg-neutral-300 hover:bg-neutral-400"
+                  : "w-2 bg-neutral-300 member-dark:bg-neutral-800 hover:bg-neutral-400"
               }`}
             />
           ))}

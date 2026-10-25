@@ -14,13 +14,13 @@ const actions = [
     label: "Events",
     href: "/member/events",
     icon: CalendarDays,
-    tile: "bg-brand-primary-100 text-brand-primary-800",
+    tile: "bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200",
   },
   {
     label: "Benefits",
     href: "/member/benefit",
     icon: Gift,
-    tile: "bg-brand-accent-soft text-amber-900",
+    tile: "bg-brand-accent-soft member-dark:bg-neutral-800 text-amber-900 member-dark:text-amber-300",
   },
   {
     label: "Updates",
@@ -48,7 +48,7 @@ export default function HomeQuickActions() {
                 >
                   <Icon size={24} strokeWidth={2.1} aria-hidden="true" />
                 </span>
-                <span className="text-xs font-semibold text-neutral-800">
+                <span className="text-xs font-semibold text-neutral-800 member-dark:text-neutral-100">
                   {action.label}
                 </span>
               </NavLink>

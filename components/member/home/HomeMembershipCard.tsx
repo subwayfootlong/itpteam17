@@ -80,11 +80,11 @@ export default function HomeMembershipCard({
         <div className="mt-6">
           <NavLink
             href="/member/profile"
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-center text-sm font-bold text-brand-primary-800 shadow-md transition-transform duration-100 hover:bg-neutral-50 active:scale-[0.98]"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-white member-dark:bg-neutral-900 px-4 py-2.5 text-center text-sm font-bold text-brand-primary-800 member-dark:text-brand-primary-200 shadow-md transition-transform duration-100 hover:bg-neutral-50 member-dark:hover:bg-neutral-900 active:scale-[0.98]"
             aria-label={ctaLabel}
           >
-            <CreditCard size={16} className="shrink-0 text-brand-primary-800" />
-            <span className="font-bold text-brand-primary-800">
+            <CreditCard size={16} className="shrink-0 text-brand-primary-800 member-dark:text-brand-primary-200" />
+            <span className="font-bold text-brand-primary-800 member-dark:text-brand-primary-200">
               {ctaLabel}
             </span>
           </NavLink>

@@ -98,11 +98,11 @@ export default async function EventDetailsPage({
           <NavLink
             href="/member/events"
             aria-label="Back to events directory"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-neutral-200/80 bg-white text-neutral-700 shadow-2xs transition-all hover:bg-neutral-50 active:scale-95"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-neutral-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 text-neutral-700 member-dark:text-neutral-300 shadow-2xs transition-all hover:bg-neutral-50 member-dark:hover:bg-neutral-900 active:scale-95"
           >
             <ArrowLeft size={18} />
           </NavLink>
-          <h1 className="text-base font-bold font-sans text-neutral-900 line-clamp-1">
+          <h1 className="text-base font-bold font-sans text-neutral-900 member-dark:text-neutral-100 line-clamp-1">
             Event Details
           </h1>
         </header>
@@ -120,44 +120,44 @@ export default async function EventDetailsPage({
         <div className="mt-5">
           <div className="flex flex-wrap items-center gap-2">
             {isRegistered ? (
-              <span className="inline-flex items-center gap-1 rounded-full border border-[#CDE5CA] bg-[#E8F4E6] px-3 py-1 text-xs font-bold text-[#0F6E00]">
+              <span className="inline-flex items-center gap-1 rounded-full border border-[#CDE5CA] bg-[#E8F4E6] member-dark:bg-neutral-800 px-3 py-1 text-xs font-bold text-[#0F6E00] member-dark:text-brand-primary-200">
                 ✓ You&apos;re Registered
               </span>
             ) : isFull ? (
-              <span className="rounded-full border border-neutral-200 bg-stone-100 px-3 py-1 text-xs font-semibold text-neutral-600">
+              <span className="rounded-full border border-neutral-200 member-dark:border-neutral-700 bg-stone-100 member-dark:bg-neutral-800 px-3 py-1 text-xs font-semibold text-neutral-600 member-dark:text-neutral-300">
                 Event Full
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#CDE5CA] bg-[#E8F4E6] px-3 py-1 text-xs font-bold text-[#0F6E00]">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#CDE5CA] bg-[#E8F4E6] member-dark:bg-neutral-800 px-3 py-1 text-xs font-bold text-[#0F6E00] member-dark:text-brand-primary-200">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#0F6E00]" />
                 Open for Registration
               </span>
             )}
 
             {eventRecord.category && (
-              <span className="rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs font-medium text-neutral-600">
+              <span className="rounded-full border border-neutral-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 px-3 py-1 text-xs font-medium text-neutral-600 member-dark:text-neutral-300">
                 {eventRecord.category}
               </span>
             )}
           </div>
 
-          <h2 className="mt-3 text-xl sm:text-2xl font-bold font-sans tracking-tight text-neutral-950 leading-tight">
+          <h2 className="mt-3 text-xl sm:text-2xl font-bold font-sans tracking-tight text-neutral-950 member-dark:text-neutral-100 leading-tight">
             {eventRecord.title}
           </h2>
         </div>
 
         {/* 3. Unified Meta Details Card (Merging the 4 isolated cards) */}
-        <section className="mt-5 overflow-hidden rounded-2xl border border-neutral-200/70 bg-white shadow-xs divide-y divide-neutral-100">
+        <section className="mt-5 overflow-hidden rounded-2xl border border-neutral-200/70 member-dark:border-neutral-700/70 bg-white member-dark:bg-neutral-900 shadow-xs divide-y divide-neutral-100 member-dark:divide-neutral-700">
           {/* Row 1: DATE */}
           <div className="flex items-center gap-3.5 p-3.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] text-[#0F6E00]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] member-dark:bg-neutral-800 text-[#0F6E00] member-dark:text-brand-primary-200">
               <CalendarDays size={20} strokeWidth={2.2} />
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
                 Date
               </p>
-              <p className="mt-0.5 text-sm font-semibold text-neutral-900">
+              <p className="mt-0.5 text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
                 {formatMemberDate(eventRecord.event_date)}
               </p>
             </div>
@@ -165,14 +165,14 @@ export default async function EventDetailsPage({
 
           {/* Row 2: TIME */}
           <div className="flex items-center gap-3.5 p-3.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] text-[#0F6E00]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] member-dark:bg-neutral-800 text-[#0F6E00] member-dark:text-brand-primary-200">
               <Clock size={20} strokeWidth={2.2} />
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
                 Time
               </p>
-              <p className="mt-0.5 text-sm font-semibold text-neutral-900">
+              <p className="mt-0.5 text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
                 {formatTime(eventRecord.start_time, eventRecord.end_time)}
               </p>
             </div>
@@ -180,14 +180,14 @@ export default async function EventDetailsPage({
 
           {/* Row 3: VENUE */}
           <div className="flex items-center gap-3.5 p-3.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] text-[#0F6E00]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] member-dark:bg-neutral-800 text-[#0F6E00] member-dark:text-brand-primary-200">
               <MapPin size={20} strokeWidth={2.2} />
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
                 Venue
               </p>
-              <p className="mt-0.5 text-sm font-semibold text-neutral-900">
+              <p className="mt-0.5 text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
                 {eventRecord.venue || "Venue to be confirmed"}
               </p>
             </div>
@@ -195,14 +195,14 @@ export default async function EventDetailsPage({
 
           {/* Row 4: AVAILABILITY */}
           <div className="flex items-center gap-3.5 p-3.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] text-[#0F6E00]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F4E6] member-dark:bg-neutral-800 text-[#0F6E00] member-dark:text-brand-primary-200">
               <Users size={20} strokeWidth={2.2} />
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
                 Availability
               </p>
-              <p className="mt-0.5 text-sm font-semibold text-neutral-900">
+              <p className="mt-0.5 text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
                 {spotsAvailableText}
               </p>
             </div>
@@ -211,11 +211,11 @@ export default async function EventDetailsPage({
 
         {/* 4. Description Section */}
         {eventRecord.description && (
-          <section className="mt-5 rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-xs">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+          <section className="mt-5 rounded-2xl border border-neutral-200/70 member-dark:border-neutral-700/70 bg-white member-dark:bg-neutral-900 p-5 shadow-xs">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
               About This Event
             </h3>
-            <p className="mt-2.5 text-sm leading-relaxed text-neutral-700 whitespace-pre-line break-words">
+            <p className="mt-2.5 text-sm leading-relaxed text-neutral-700 member-dark:text-neutral-300 whitespace-pre-line break-words">
               {eventRecord.description}
             </p>
           </section>

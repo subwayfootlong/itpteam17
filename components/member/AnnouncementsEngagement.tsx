@@ -182,24 +182,24 @@ export default function AnnouncementsEngagement({
               type="button"
               onClick={handleBack}
               aria-label="Go back"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-neutral-200 bg-white text-brand-primary-800 shadow-xs transition-transform duration-100 active:scale-95"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-neutral-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 text-brand-primary-800 member-dark:text-brand-primary-200 shadow-xs transition-transform duration-100 active:scale-95"
             >
               <MemberIcon name="back" size={20} />
             </button>
           ) : (
             <span
               aria-hidden="true"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-primary-100 text-brand-primary-800"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200"
             >
               <MemberIcon name="message" size={20} />
             </span>
           )}
           <div className="min-w-0">
-            <h2 className="truncate font-butler text-xl font-semibold leading-tight text-neutral-900">
+            <h2 className="truncate font-butler text-xl font-semibold leading-tight text-neutral-900 member-dark:text-neutral-100">
               {pageTitle === "Pergas" ? "Community" : pageTitle}
             </h2>
             {!canGoBack && (
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs text-neutral-500 member-dark:text-neutral-400">
                 Announcements and member discussions
               </p>
             )}

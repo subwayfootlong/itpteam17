@@ -75,7 +75,7 @@ function SettingsSwitch({
       onClick={onClick}
       disabled={disabled}
       className={`relative h-7 w-12 rounded-full transition-colors ${
-        enabled ? "bg-brand-primary-800" : "bg-neutral-200"
+        enabled ? "bg-brand-primary-800" : "bg-neutral-200 member-dark:bg-neutral-800"
       } ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
     >
       <span
@@ -113,7 +113,7 @@ function SegmentedControl({
     <div
       role="group"
       aria-label={label}
-      className="mb-2 mt-3 grid grid-cols-4 rounded-xl bg-neutral-100 p-1"
+      className="mb-2 mt-3 grid grid-cols-4 rounded-xl bg-neutral-100 member-dark:bg-neutral-800 p-1"
     >
       {options.map((option, index) => {
         const isSelected = selectedIndex === index;
@@ -126,8 +126,8 @@ function SegmentedControl({
             onClick={() => onChange(index)}
             className={`rounded-lg px-2 py-2 text-center text-xs font-semibold transition-all ${
               isSelected
-                ? "bg-white text-brand-primary-800 shadow-xs"
-                : "text-neutral-500 hover:text-neutral-800"
+                ? "bg-white member-dark:bg-neutral-900 text-brand-primary-800 member-dark:text-brand-primary-200 shadow-xs"
+                : "text-neutral-500 member-dark:text-neutral-400 hover:text-neutral-800 member-dark:hover:text-neutral-100"
             }`}
           >
             {option}
@@ -249,16 +249,16 @@ export default function MemberSettingsView({
         <NavLink
           href="/member/profile"
           aria-label="Back to profile"
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700 transition-colors hover:bg-neutral-200/70 active:scale-95"
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300 transition-colors hover:bg-neutral-200/70 member-dark:hover:bg-neutral-800/70 active:scale-95"
         >
-          <ArrowLeft size={20} className="text-brand-primary-800" />
+          <ArrowLeft size={20} className="text-brand-primary-800 member-dark:text-brand-primary-200" />
         </NavLink>
 
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-neutral-900">
+          <h1 className="text-xl font-bold tracking-tight text-neutral-900 member-dark:text-neutral-100">
             Settings
           </h1>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-neutral-500 member-dark:text-neutral-400">
             App preferences & notifications
           </p>
         </div>
@@ -266,21 +266,21 @@ export default function MemberSettingsView({
 
       {/* 1. Appearance */}
       <section>
-        <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-neutral-400">
+        <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
           Appearance
         </h2>
 
-        <div className="mb-4 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
+        <div className="mb-4 divide-y divide-neutral-100 member-dark:divide-neutral-700 overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 shadow-xs">
           <div className="flex items-start gap-3.5 p-4">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300">
               <Type size={18} />
             </div>
 
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-neutral-900">
+              <p className="text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
                 Font Size
               </p>
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs text-neutral-500 member-dark:text-neutral-400">
                 Adjust reader scale across portal views
               </p>
 
@@ -302,15 +302,15 @@ export default function MemberSettingsView({
 
           <div className="space-y-3 p-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300">
                 <Palette size={18} />
               </div>
 
               <div>
-                <label htmlFor="app-theme" className="text-sm font-semibold text-neutral-900">
+                <label htmlFor="app-theme" className="text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
                   App Theme
                 </label>
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-neutral-400 member-dark:text-neutral-400">
                   Choose your preferred appearance
                 </p>
               </div>
@@ -321,7 +321,7 @@ export default function MemberSettingsView({
               value={mounted ? theme : ""}
               disabled={!mounted}
               onChange={(event) => setTheme(event.target.value)}
-              className="w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900"
+              className="w-full rounded-xl border border-neutral-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 px-3 py-2 text-sm text-neutral-900 member-dark:text-neutral-100"
             >
               {!mounted && <option value="">Loading appearance...</option>}
               <option value="light">Light Mode</option>
@@ -334,62 +334,62 @@ export default function MemberSettingsView({
 
       {/* 2. Account */}
       <section>
-        <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-neutral-400">
+        <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
           Account
         </h2>
 
-        <div className="mb-4 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
+        <div className="mb-4 divide-y divide-neutral-100 member-dark:divide-neutral-700 overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 shadow-xs">
           <NavLink
             href="/member/settings/password"
-            className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 active:scale-[0.98]"
+            className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 member-dark:hover:bg-neutral-900 active:scale-[0.98]"
           >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300">
               <KeyRound size={18} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-neutral-900">Password</p>
-              <p className="text-xs text-neutral-500">
+              <p className="text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">Password</p>
+              <p className="text-xs text-neutral-500 member-dark:text-neutral-400">
                 Change your account password
               </p>
             </div>
-            <ChevronRight size={18} className="shrink-0 text-neutral-300" />
+            <ChevronRight size={18} className="shrink-0 text-neutral-300 member-dark:text-neutral-400" />
           </NavLink>
 
           <NavLink
             href="/member/settings/email"
-            className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 active:scale-[0.98]"
+            className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 member-dark:hover:bg-neutral-900 active:scale-[0.98]"
           >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300">
               <Mail size={18} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-neutral-900">Change Email</p>
-              <p className="text-xs text-neutral-500">
+              <p className="text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">Change Email</p>
+              <p className="text-xs text-neutral-500 member-dark:text-neutral-400">
                 Update the email linked to your account
               </p>
             </div>
-            <ChevronRight size={18} className="shrink-0 text-neutral-300" />
+            <ChevronRight size={18} className="shrink-0 text-neutral-300 member-dark:text-neutral-400" />
           </NavLink>
         </div>
       </section>
 
       {/* 3. Notifications */}
       <section>
-        <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-neutral-400">
+        <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
           Notifications
         </h2>
 
-        <div className="mb-4 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
+        <div className="mb-4 divide-y divide-neutral-100 member-dark:divide-neutral-700 overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 shadow-xs">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-primary-100 text-brand-primary-800">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200">
                 <Bell size={18} />
               </div>
               <div>
-                <p className="text-sm font-semibold text-neutral-900">
+                <p className="text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
                   Push Notifications
                 </p>
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-neutral-500 member-dark:text-neutral-400">
                   Master alert control
                 </p>
               </div>
@@ -411,13 +411,13 @@ export default function MemberSettingsView({
             {preferenceCopy.map((preference) => (
               <div
                 key={preference.key}
-                className="flex items-center justify-between gap-3 rounded-xl border border-neutral-100 bg-neutral-50/70 px-3.5 py-2.5"
+                className="flex items-center justify-between gap-3 rounded-xl border border-neutral-100 member-dark:border-neutral-700 bg-neutral-50/70 member-dark:bg-neutral-900/70 px-3.5 py-2.5"
               >
                 <div>
-                  <p className="text-xs font-semibold text-neutral-800">
+                  <p className="text-xs font-semibold text-neutral-800 member-dark:text-neutral-100">
                     {preference.title}
                   </p>
-                  <p className="text-[11px] text-neutral-500">
+                  <p className="text-[11px] text-neutral-500 member-dark:text-neutral-400">
                     {preference.description}
                   </p>
                 </div>
@@ -438,14 +438,14 @@ export default function MemberSettingsView({
 
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300">
                 <Mail size={18} />
               </div>
               <div>
-                <p className="text-sm font-semibold text-neutral-900">
+                <p className="text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
                   Email Notifications
                 </p>
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-neutral-400 member-dark:text-neutral-400">
                   Coming soon in next release
                 </p>
               </div>
@@ -467,28 +467,28 @@ export default function MemberSettingsView({
 
       {/* 3. Preferences */}
       <section>
-        <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-neutral-400">
+        <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
           Preferences
         </h2>
 
-        <div className="mb-4 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
+        <div className="mb-4 divide-y divide-neutral-100 member-dark:divide-neutral-700 overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 shadow-xs">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300">
                 <Globe size={18} />
               </div>
 
               <div>
-                <p className="text-sm font-semibold text-neutral-900">
+                <p className="text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
                   Language
                 </p>
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-neutral-500 member-dark:text-neutral-400">
                   English (Singapore)
                 </p>
               </div>
             </div>
 
-            <span className="rounded-md bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-600">
+            <span className="rounded-md bg-neutral-100 member-dark:bg-neutral-800 px-2 py-0.5 text-xs font-medium text-neutral-600 member-dark:text-neutral-300">
               Default
             </span>
           </div>
@@ -497,50 +497,50 @@ export default function MemberSettingsView({
 
       {/* 4. About & Support */}
       <section>
-        <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-neutral-400">
+        <h2 className="mb-2 px-1 text-xs font-bold uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
           About & Support
         </h2>
 
-        <div className="mb-4 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
+        <div className="mb-4 divide-y divide-neutral-100 member-dark:divide-neutral-700 overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 shadow-xs">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300">
                 <Info size={18} />
               </div>
-              <p className="text-sm font-semibold text-neutral-900">
+              <p className="text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
                 Help & Support
               </p>
             </div>
-            <ChevronRight size={18} className="text-neutral-300" />
+            <ChevronRight size={18} className="text-neutral-300 member-dark:text-neutral-400" />
           </div>
 
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300">
                 <ShieldCheck size={18} />
               </div>
-              <p className="text-sm font-semibold text-neutral-900">
+              <p className="text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
                 Privacy Policy
               </p>
             </div>
-            <ExternalLink size={16} className="text-neutral-300" />
+            <ExternalLink size={16} className="text-neutral-300 member-dark:text-neutral-400" />
           </div>
 
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300">
                 <FileText size={18} />
               </div>
-              <p className="text-sm font-semibold text-neutral-900">
+              <p className="text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
                 Terms of Service
               </p>
             </div>
-            <ExternalLink size={16} className="text-neutral-300" />
+            <ExternalLink size={16} className="text-neutral-300 member-dark:text-neutral-400" />
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-neutral-50/50">
-            <p className="text-xs text-neutral-500">Pergas Member Portal</p>
-            <span className="font-mono text-xs font-medium text-neutral-400">
+          <div className="flex items-center justify-between p-4 bg-neutral-50/50 member-dark:bg-neutral-900/50">
+            <p className="text-xs text-neutral-500 member-dark:text-neutral-400">Pergas Member Portal</p>
+            <span className="font-mono text-xs font-medium text-neutral-400 member-dark:text-neutral-400">
               v2.4.0 (Build 108)
             </span>
           </div>
@@ -552,7 +552,7 @@ export default function MemberSettingsView({
         <button
           type="button"
           onClick={handleLogout}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-white px-4 py-3 text-sm font-semibold text-brand-rose shadow-2xs transition-transform duration-100 hover:bg-rose-50 active:scale-[0.98]"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 member-dark:border-rose-800 bg-white member-dark:bg-neutral-900 px-4 py-3 text-sm font-semibold text-brand-rose member-dark:text-rose-300 shadow-2xs transition-transform duration-100 hover:bg-rose-50 member-dark:hover:bg-rose-950 active:scale-[0.98]"
         >
           <LogOut size={18} />
           <span>Log Out</span>

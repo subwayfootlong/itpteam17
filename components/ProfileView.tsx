@@ -332,7 +332,7 @@ export default function ProfileView({
             {getExpiryInfo(member.expiry_date).urgency !== "none" && (
               <NavLink
                 href="/member/payment"
-                className="member-text-sm mt-4 inline-block rounded-xl bg-white px-5 py-2.5 text-center text-sm font-bold text-brand-primary-800! shadow-sm transition-transform duration-100 active:scale-[0.98]"
+                className="member-text-sm mt-4 inline-block rounded-xl bg-white member-dark:bg-neutral-900 px-5 py-2.5 text-center text-sm font-bold text-brand-primary-800! member-dark:text-brand-primary-200! shadow-sm transition-transform duration-100 active:scale-[0.98]"
               >
                 Pay Now
               </NavLink>
@@ -350,7 +350,7 @@ export default function ProfileView({
               className="inline-block cursor-pointer rounded-xl bg-white p-2.5 transition-transform duration-100 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
             >
               {qrValue ? (
-                <QRCodeCanvas
+                <QRCodeCanvas bgColor="#ffffff" fgColor="#000000"
                   value={qrValue}
                   size={74}
                   marginSize={4}
@@ -377,34 +377,34 @@ export default function ProfileView({
         id="membership-qr-dialog"
         aria-labelledby="membership-qr-title"
         aria-describedby="membership-qr-description"
-        className="fixed inset-0 m-auto max-h-[90dvh] w-[calc(100%_-_2rem)] max-w-sm overflow-y-auto rounded-2xl bg-white p-0 text-gray-900 shadow-xl backdrop:bg-black/60"
+        className="fixed inset-0 m-auto max-h-[90dvh] w-[calc(100%_-_2rem)] max-w-sm overflow-y-auto rounded-2xl bg-white member-dark:bg-neutral-900 p-0 text-gray-900 member-dark:text-neutral-100 shadow-xl backdrop:bg-black/60"
         onClick={(event) => {
           if (event.target === event.currentTarget) qrDialogRef.current?.close();
         }}
       >
         <div className="p-6">
           <div className="flex items-center justify-between gap-3">
-            <h2 id="membership-qr-title" className="text-lg font-bold text-[#0F6E00]">Membership QR</h2>
+            <h2 id="membership-qr-title" className="text-lg font-bold text-[#0F6E00] member-dark:text-brand-primary-200">Membership QR</h2>
             <form method="dialog">
-              <button type="submit" aria-label="Close QR overlay" className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-[#0F6E00]">
+              <button type="submit" aria-label="Close QR overlay" className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-gray-600 member-dark:text-neutral-300 hover:bg-gray-100 member-dark:hover:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-[#0F6E00]">
                 <X size={22} />
               </button>
             </form>
           </div>
           <div className="my-5 flex justify-center">
             {qrValue ? <QRCodeCanvas value={qrValue} size={280} marginSize={4} title="Scan to verify membership" className="h-auto! max-w-full" /> :
-              <p role="status" className="flex min-h-64 items-center text-center text-sm text-gray-600">
+              <p role="status" className="flex min-h-64 items-center text-center text-sm text-gray-600 member-dark:text-neutral-300">
                 {qrError || "Loading secure QR..."}
               </p>}
           </div>
-          <p id="membership-qr-description" className="text-center text-sm text-gray-600">Scan to verify membership. QR refreshes automatically for security.</p>
+          <p id="membership-qr-description" className="text-center text-sm text-gray-600 member-dark:text-neutral-300">Scan to verify membership. QR refreshes automatically for security.</p>
         </div>
       </dialog>
 
       {tier !== "ordinary" && (
         <NavLink
           href="/member/tier-upgrade"
-          className="flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-brand-primary-800/30 bg-brand-primary-100/60 px-4 py-3 text-sm font-semibold text-brand-primary-800 shadow-2xs transition-all hover:bg-brand-primary-100 active:scale-[0.99]"
+          className="flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-brand-primary-800/30 member-dark:border-brand-primary-700/30 bg-brand-primary-100/60 member-dark:bg-brand-primary-900/60 px-4 py-3 text-sm font-semibold text-brand-primary-800 member-dark:text-brand-primary-200 shadow-2xs transition-all hover:bg-brand-primary-100 member-dark:hover:bg-brand-primary-900 active:scale-[0.99]"
         >
           <Award size={18} />
           <span>Request Tier Upgrade</span>
@@ -415,36 +415,36 @@ export default function ProfileView({
       <section>
         <div className="mb-3 flex items-center justify-between">
           <div>
-            <h2 className="text-base font-bold tracking-tight text-neutral-900">
+            <h2 className="text-base font-bold tracking-tight text-neutral-900 member-dark:text-neutral-100">
               Account Details
             </h2>
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-neutral-500 member-dark:text-neutral-400">
               Personal & contact information
             </p>
           </div>
-          <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-[11px] font-medium text-neutral-600">
+          <span className="rounded-full bg-neutral-100 member-dark:bg-neutral-800 px-2.5 py-0.5 text-[11px] font-medium text-neutral-600 member-dark:text-neutral-300">
             Verified
           </span>
         </div>
 
-        <div className="rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-xs">
+        <div className="rounded-2xl border border-neutral-200/70 member-dark:border-neutral-700/70 bg-white member-dark:bg-neutral-900 p-5 shadow-xs">
           {/* Structured 2-column detail grid */}
           <div className="grid grid-cols-2 gap-x-4 gap-y-3.5">
             <div>
-              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
                 Salutation
               </span>
-              <span className="mt-0.5 block text-sm font-medium text-neutral-800">
+              <span className="mt-0.5 block text-sm font-medium text-neutral-800 member-dark:text-neutral-100">
                 {formatSalutationLabel(member.salutation) || "—"}
               </span>
             </div>
 
             <div>
-              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
                 Arabic Name
               </span>
               <span
-                className="mt-0.5 block truncate text-sm font-medium text-neutral-800"
+                className="mt-0.5 block truncate text-sm font-medium text-neutral-800 member-dark:text-neutral-100"
                 dir={member.arabic_name ? "rtl" : "ltr"}
               >
                 {member.arabic_name || "—"}
@@ -452,70 +452,70 @@ export default function ProfileView({
             </div>
 
             <div>
-              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
                 First Name
               </span>
-              <span className="mt-0.5 block truncate text-sm font-medium text-neutral-800">
+              <span className="mt-0.5 block truncate text-sm font-medium text-neutral-800 member-dark:text-neutral-100">
                 {member.first_name || "—"}
               </span>
             </div>
 
             <div>
-              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
                 Last Name
               </span>
-              <span className="mt-0.5 block truncate text-sm font-medium text-neutral-800">
+              <span className="mt-0.5 block truncate text-sm font-medium text-neutral-800 member-dark:text-neutral-100">
                 {member.last_name || "—"}
               </span>
             </div>
 
-            <div className="col-span-2 border-t border-neutral-100 pt-3">
-              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+            <div className="col-span-2 border-t border-neutral-100 member-dark:border-neutral-700 pt-3">
+              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
                 Email Address
               </span>
-              <span className="mt-0.5 block truncate text-sm font-medium text-neutral-800">
+              <span className="mt-0.5 block truncate text-sm font-medium text-neutral-800 member-dark:text-neutral-100">
                 {member.email}
               </span>
             </div>
 
             <div>
-              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
                 Phone Number
               </span>
-              <span className="mt-0.5 block text-sm font-medium text-neutral-800">
+              <span className="mt-0.5 block text-sm font-medium text-neutral-800 member-dark:text-neutral-100">
                 {member.phone || "—"}
               </span>
             </div>
 
             <div>
-              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
                 Organization
               </span>
-              <span className="mt-0.5 block truncate text-sm font-medium text-neutral-800">
+              <span className="mt-0.5 block truncate text-sm font-medium text-neutral-800 member-dark:text-neutral-100">
                 {member.organization || "—"}
               </span>
             </div>
 
             <div className="col-span-2">
-              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400">
+              <span className="block text-[11px] font-medium uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
                 Designation
               </span>
-              <span className="mt-0.5 block truncate text-sm font-medium text-neutral-800">
+              <span className="mt-0.5 block truncate text-sm font-medium text-neutral-800 member-dark:text-neutral-100">
                 {member.designation || "—"}
               </span>
             </div>
           </div>
 
           {/* Validity & Dates Row with soft badge pills */}
-          <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-neutral-100 pt-3.5">
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-stone-200/80 bg-stone-100/80 px-3 py-1 text-xs font-medium text-stone-700">
-              <span className="text-stone-500">Member Since:</span>
-              <span className="font-bold text-stone-900">
+          <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-neutral-100 member-dark:border-neutral-700 pt-3.5">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-stone-200/80 member-dark:border-neutral-700/80 bg-stone-100/80 member-dark:bg-neutral-800/80 px-3 py-1 text-xs font-medium text-stone-700 member-dark:text-neutral-300">
+              <span className="text-stone-500 member-dark:text-neutral-400">Member Since:</span>
+              <span className="font-bold text-stone-900 member-dark:text-neutral-100">
                 {formatMemberDate(member.member_since)}
               </span>
             </div>
 
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-brand-primary-200 bg-brand-primary-100 px-3 py-1 text-xs font-medium text-brand-primary-800">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-brand-primary-200 member-dark:border-brand-primary-700 bg-brand-primary-100 member-dark:bg-brand-primary-900 px-3 py-1 text-xs font-medium text-brand-primary-800 member-dark:text-brand-primary-200">
               <span>Renewal Date:</span>
               <span className="font-bold">
                 {formatMemberDate(member.expiry_date)}
@@ -526,7 +526,7 @@ export default function ProfileView({
           {/* Edit Profile CTA Button */}
           <NavLink
             href="/member/profile/edit"
-            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-brand-primary-800/30 bg-brand-primary-100/50 px-4 py-2.5 text-center text-sm font-semibold text-brand-primary-800 shadow-2xs transition-all hover:bg-brand-primary-100 active:scale-[0.99]"
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-brand-primary-800/30 member-dark:border-brand-primary-700/30 bg-brand-primary-100/50 member-dark:bg-brand-primary-900/50 px-4 py-2.5 text-center text-sm font-semibold text-brand-primary-800 member-dark:text-brand-primary-200 shadow-2xs transition-all hover:bg-brand-primary-100 member-dark:hover:bg-brand-primary-900 active:scale-[0.99]"
           >
             <Edit3 size={16} />
             <span>Edit Profile</span>
@@ -538,14 +538,14 @@ export default function ProfileView({
       <section>
         <div className="mb-3 flex items-center justify-between">
           <div>
-            <h2 className="text-base font-bold tracking-tight text-neutral-900">
+            <h2 className="text-base font-bold tracking-tight text-neutral-900 member-dark:text-neutral-100">
               Active Privileges
             </h2>
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-neutral-500 member-dark:text-neutral-400">
               Tier benefits & privileges
             </p>
           </div>
-          <span className="rounded-full bg-brand-primary-100 px-2.5 py-0.5 text-xs font-bold text-brand-primary-800">
+          <span className="rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 px-2.5 py-0.5 text-xs font-bold text-brand-primary-800 member-dark:text-brand-primary-200">
             {benefits.length} perks
           </span>
         </div>
@@ -559,13 +559,13 @@ export default function ProfileView({
             const iconClass = isTeal
               ? "bg-brand-secondary-soft text-brand-secondary-dark"
               : isGold
-                ? "bg-brand-accent-soft text-[#7A4B00]"
-                : "bg-brand-primary-100 text-brand-primary-800";
+                ? "bg-brand-accent-soft member-dark:bg-neutral-800 text-[#7A4B00] member-dark:text-amber-200"
+                : "bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200";
 
             return (
               <div
                 key={benefit.title}
-                className="flex w-[240px] shrink-0 snap-start flex-col justify-between rounded-2xl border border-neutral-100 bg-white p-4 shadow-xs transition-all hover:border-neutral-200 hover:shadow-sm"
+                className="flex w-[240px] shrink-0 snap-start flex-col justify-between rounded-2xl border border-neutral-100 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 p-4 shadow-xs transition-all hover:border-neutral-200 member-dark:hover:border-neutral-700 hover:shadow-sm"
               >
                 <div>
                   <div
@@ -574,20 +574,20 @@ export default function ProfileView({
                     <Icon size={20} strokeWidth={2.2} />
                   </div>
 
-                  <h3 className="mt-3 text-sm font-bold leading-snug text-neutral-900">
+                  <h3 className="mt-3 text-sm font-bold leading-snug text-neutral-900 member-dark:text-neutral-100">
                     {benefit.title}
                   </h3>
-                  <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-neutral-500">
+                  <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-neutral-500 member-dark:text-neutral-400">
                     {benefit.subtitle}
                   </p>
                 </div>
 
-                <div className="mt-3 flex items-center justify-between border-t border-neutral-100 pt-3">
-                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-brand-primary-800">
+                <div className="mt-3 flex items-center justify-between border-t border-neutral-100 member-dark:border-neutral-700 pt-3">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-brand-primary-800 member-dark:text-brand-primary-200">
                     <Check size={12} strokeWidth={3} />
                     Active Benefit
                   </span>
-                  <span className="text-[10px] font-medium uppercase tracking-wider text-neutral-400">
+                  <span className="text-[10px] font-medium uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
                     Included
                   </span>
                 </div>
@@ -601,43 +601,43 @@ export default function ProfileView({
       <section>
         <div className="mb-3 flex items-center justify-between">
           <div>
-            <h2 className="text-base font-bold tracking-tight text-neutral-900">
+            <h2 className="text-base font-bold tracking-tight text-neutral-900 member-dark:text-neutral-100">
               Participation History
             </h2>
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-neutral-500 member-dark:text-neutral-400">
               Your registered events & activities
             </p>
           </div>
           <NavLink
             href="/member/events"
-            className="text-xs font-semibold text-brand-primary-800 transition-colors hover:text-brand-primary-900"
+            className="text-xs font-semibold text-brand-primary-800 member-dark:text-brand-primary-200 transition-colors hover:text-brand-primary-900 member-dark:hover:text-brand-primary-200"
           >
             Browse events
           </NavLink>
         </div>
 
         {registrations.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50/70 p-6 text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-stone-200/80 bg-white text-brand-primary-800 shadow-2xs">
+          <div className="rounded-2xl border border-dashed border-stone-200 member-dark:border-neutral-700 bg-stone-50/70 member-dark:bg-neutral-900/70 p-6 text-center">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-stone-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 text-brand-primary-800 member-dark:text-brand-primary-200 shadow-2xs">
               <CalendarCheck size={22} />
             </div>
-            <h3 className="text-sm font-bold font-sans text-neutral-900">
+            <h3 className="text-sm font-bold font-sans text-neutral-900 member-dark:text-neutral-100">
               No upcoming registrations
             </h3>
-            <p className="mx-auto mt-1 max-w-xs text-xs leading-relaxed text-neutral-600">
+            <p className="mx-auto mt-1 max-w-xs text-xs leading-relaxed text-neutral-600 member-dark:text-neutral-300">
               Explore upcoming workshops, scholarly lectures, and community events!
             </p>
             <NavLink
               href="/member/events"
-              className="mt-3.5 inline-flex items-center gap-1 rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-brand-primary-800 shadow-2xs transition-all hover:bg-stone-50 active:scale-95"
+              className="mt-3.5 inline-flex items-center gap-1 rounded-xl border border-stone-200 member-dark:border-neutral-700 bg-white member-dark:bg-neutral-900 px-3.5 py-2 text-xs font-semibold text-brand-primary-800 member-dark:text-brand-primary-200 shadow-2xs transition-all hover:bg-stone-50 member-dark:hover:bg-neutral-900 active:scale-95"
             >
               <span>Explore upcoming events</span>
               <span aria-hidden="true">&rarr;</span>
             </NavLink>
           </div>
         ) : (
-          <div className="rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-xs">
-            <div className="relative space-y-6 border-l-2 border-brand-primary-100 pl-6">
+          <div className="rounded-2xl border border-neutral-200/70 member-dark:border-neutral-700/70 bg-white member-dark:bg-neutral-900 p-5 shadow-xs">
+            <div className="relative space-y-6 border-l-2 border-brand-primary-100 member-dark:border-brand-primary-700 pl-6">
               {registrations.map((reg) => {
                 const event = Array.isArray(reg.events)
                   ? reg.events[0]
@@ -662,12 +662,12 @@ export default function ProfileView({
                       }`}
                     />
 
-                    <p className="text-sm font-bold leading-snug text-neutral-900">
+                    <p className="text-sm font-bold leading-snug text-neutral-900 member-dark:text-neutral-100">
                       {event.title}
                     </p>
 
-                    <p className="mt-1 flex items-center gap-1.5 text-xs text-neutral-500">
-                      <MapPin size={13} className="shrink-0 text-neutral-400" />
+                    <p className="mt-1 flex items-center gap-1.5 text-xs text-neutral-500 member-dark:text-neutral-400">
+                      <MapPin size={13} className="shrink-0 text-neutral-400 member-dark:text-neutral-400" />
                       <span className="truncate">
                         {event.venue || "Venue to be confirmed"}
                       </span>
@@ -677,14 +677,14 @@ export default function ProfileView({
                       <span
                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
                           isRejected
-                            ? "border border-rose-200 bg-rose-50 text-rose-700"
-                            : "border border-brand-primary-200 bg-brand-primary-100 text-brand-primary-800"
+                            ? "border border-rose-200 member-dark:border-rose-800 bg-rose-50 member-dark:bg-rose-950 text-rose-700 member-dark:text-rose-300"
+                            : "border border-brand-primary-200 member-dark:border-brand-primary-700 bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200"
                         }`}
                       >
                         {isRejected ? "Rejected" : "Registered"}
                       </span>
 
-                      <span className="text-xs text-neutral-500">
+                      <span className="text-xs text-neutral-500 member-dark:text-neutral-400">
                         on{" "}
                         {new Date(reg.registered_at).toLocaleDateString(
                           "en-SG",
@@ -698,13 +698,13 @@ export default function ProfileView({
                     </div>
 
                     {isRejected && reg.rejection_message && (
-                      <div className="mt-2.5 max-w-md rounded-xl border border-rose-100 bg-rose-50/70 p-3 text-xs leading-relaxed text-rose-800">
+                      <div className="mt-2.5 max-w-md rounded-xl border border-rose-100 member-dark:border-rose-800 bg-rose-50/70 member-dark:bg-rose-950/70 p-3 text-xs leading-relaxed text-rose-800 member-dark:text-rose-300">
                         <span className="font-bold">Reason:</span> &ldquo;
                         {reg.rejection_message}&rdquo;
                       </div>
                     )}
 
-                    <p className="mt-1.5 text-[11px] text-neutral-400">
+                    <p className="mt-1.5 text-[11px] text-neutral-400 member-dark:text-neutral-400">
                       Scheduled: {dateLabel}
                     </p>
                   </div>
@@ -717,65 +717,65 @@ export default function ProfileView({
 
       {/* 5. Action Hub: Admin Portal, Settings & Logout (Benchmark: Zomato / Marriott) */}
       <section>
-        <div className="mb-4 divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
+        <div className="mb-4 divide-y divide-neutral-100 member-dark:divide-neutral-700 overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-neutral-700/80 bg-white member-dark:bg-neutral-900 shadow-xs">
           {member.role === "admin" && (
             <NavLink
               href="/admin"
-              className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 active:scale-[0.98]"
+              className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 member-dark:hover:bg-neutral-900 active:scale-[0.98]"
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-primary-100 text-brand-primary-800">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200">
                 <ShieldCheck size={20} strokeWidth={2.2} />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold leading-tight text-neutral-900">
+                <p className="text-sm font-semibold leading-tight text-neutral-900 member-dark:text-neutral-100">
                   Admin Portal
                 </p>
-                <p className="mt-0.5 text-xs leading-tight text-neutral-500">
+                <p className="mt-0.5 text-xs leading-tight text-neutral-500 member-dark:text-neutral-400">
                   Manage members, events & content
                 </p>
               </div>
-              <span className="rounded-full bg-brand-primary-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-primary-800">
+              <span className="rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-primary-800 member-dark:text-brand-primary-200">
                 Admin
               </span>
-              <ChevronRight size={18} className="shrink-0 text-neutral-300" />
+              <ChevronRight size={18} className="shrink-0 text-neutral-300 member-dark:text-neutral-400" />
             </NavLink>
           )}
 
           <NavLink
             href="/member/settings"
-            className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 active:scale-[0.98]"
+            className="flex items-center gap-3.5 p-4 transition-transform duration-100 hover:bg-neutral-50 member-dark:hover:bg-neutral-900 active:scale-[0.98]"
           >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-neutral-100 member-dark:bg-neutral-800 text-neutral-700 member-dark:text-neutral-300">
               <Settings size={18} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold leading-tight text-neutral-900">
+              <p className="text-sm font-semibold leading-tight text-neutral-900 member-dark:text-neutral-100">
                 Settings
               </p>
-              <p className="mt-0.5 text-xs leading-tight text-neutral-500">
+              <p className="mt-0.5 text-xs leading-tight text-neutral-500 member-dark:text-neutral-400">
                 Notifications, font size & preferences
               </p>
             </div>
-            <ChevronRight size={18} className="shrink-0 text-neutral-300" />
+            <ChevronRight size={18} className="shrink-0 text-neutral-300 member-dark:text-neutral-400" />
           </NavLink>
 
           <button
             type="button"
             onClick={handleLogout}
-            className="flex w-full items-center gap-3.5 p-4 text-left transition-transform duration-100 hover:bg-rose-50/40 active:scale-[0.98]"
+            className="flex w-full items-center gap-3.5 p-4 text-left transition-transform duration-100 hover:bg-rose-50/40 member-dark:hover:bg-rose-950/40 active:scale-[0.98]"
           >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-50 text-brand-rose">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-50 member-dark:bg-rose-950 text-brand-rose member-dark:text-rose-300">
               <LogOut size={18} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold leading-tight text-brand-rose">
+              <p className="text-sm font-semibold leading-tight text-brand-rose member-dark:text-rose-300">
                 Log Out
               </p>
-              <p className="mt-0.5 text-xs leading-tight text-neutral-500">
+              <p className="mt-0.5 text-xs leading-tight text-neutral-500 member-dark:text-neutral-400">
                 Sign out of your session
               </p>
             </div>
-            <ChevronRight size={18} className="shrink-0 text-neutral-300" />
+            <ChevronRight size={18} className="shrink-0 text-neutral-300 member-dark:text-neutral-400" />
           </button>
         </div>
       </section>

@@ -23,22 +23,22 @@ export default function FullScreenLoader({
       aria-modal="true"
       aria-busy="true"
       aria-label={title}
-      className="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-white/95 px-8 text-center backdrop-blur-sm"
+      className="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-white/95 member-dark:bg-neutral-900/95 px-8 text-center backdrop-blur-sm"
     >
-      <span className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-primary-50 ring-1 ring-brand-primary-100">
+      <span className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-primary-50 member-dark:bg-brand-primary-900 ring-1 ring-brand-primary-100 member-dark:ring-brand-primary-700">
         <LoadingSpinner label="" size="lg" />
       </span>
 
-      <h2 className="mt-6 font-butler text-xl font-semibold text-neutral-950">
+      <h2 className="mt-6 font-butler text-xl font-semibold text-neutral-950 member-dark:text-neutral-100">
         {title}
       </h2>
       {message && (
-        <p className="mt-1.5 max-w-xs text-sm text-neutral-600">{message}</p>
+        <p className="mt-1.5 max-w-xs text-sm text-neutral-600 member-dark:text-neutral-300">{message}</p>
       )}
 
       <p
         aria-live="polite"
-        className={`mt-4 max-w-xs text-xs text-neutral-500 transition-opacity duration-300 ${
+        className={`mt-4 max-w-xs text-xs text-neutral-500 member-dark:text-neutral-400 transition-opacity duration-300 ${
           showSlowMessage ? "opacity-100" : "opacity-0"
         }`}
       >
