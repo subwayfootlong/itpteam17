@@ -2,7 +2,8 @@
 
 import NavLink from "@/components/ui/NavLink";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 import FullScreenLoader from "@/components/ui/FullScreenLoader";
 import { startNavigationProgress } from "@/components/ui/NavigationProgress";
 import {
@@ -145,6 +146,9 @@ export default function MemberSettingsView({
   initialPushEnabled: boolean;
 }) {
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const { fontSize, setFontSize } = useMemberFontSize();
 
   const [pushEnabled, setPushEnabled] = useState(initialPushEnabled);
@@ -296,23 +300,34 @@ export default function MemberSettingsView({
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-4">
+          <div className="space-y-3 p-4">
             <div className="flex items-center gap-3.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-700">
                 <Palette size={18} />
               </div>
 
               <div>
-                <p className="text-sm font-semibold text-neutral-900">
+                <label htmlFor="app-theme" className="text-sm font-semibold text-neutral-900">
                   App Theme
-                </p>
+                </label>
                 <p className="text-xs text-neutral-400">
-                  System Default (Warm Light)
+                  Choose your preferred appearance
                 </p>
               </div>
             </div>
 
-            <ChevronRight size={18} className="text-neutral-300" />
+            <select
+              id="app-theme"
+              value={mounted ? theme : ""}
+              disabled={!mounted}
+              onChange={(event) => setTheme(event.target.value)}
+              className="w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900"
+            >
+              {!mounted && <option value="">Loading appearance...</option>}
+              <option value="light">Light Mode</option>
+              <option value="dark">Dark Mode</option>
+              <option value="system">System Default</option>
+            </select>
           </div>
         </div>
       </section>
