@@ -3,7 +3,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export default function MemberLoading() {
   return (
-    <MemberPageShell loading>
+    <MemberPageShell>
       <div
         className="flex min-h-[calc(100dvh-9rem)] items-center justify-center px-5 pb-20 text-[#315d25]"
         aria-label="Loading member page"

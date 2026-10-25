@@ -2,21 +2,25 @@
 
 import NavLink from "@/components/ui/NavLink";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Bell } from "lucide-react";
 import MemberAvatar from "@/components/member/MemberAvatar";
 import type { CurrentUser } from "@/lib/currentUser";
 
 type MemberTopBarProps = {
-  user: CurrentUser | null;
+  user: CurrentUser;
 };
 
 export default function MemberTopBar({ user }: MemberTopBarProps) {
+  const pathname = usePathname();
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     let ignore = false;
+    let receivedUnreadUpdate = false;
 
     function handleUnreadUpdate(event: Event) {
+      receivedUnreadUpdate = true;
       const detail = (event as CustomEvent<{ unreadCount?: number }>).detail;
       setUnreadCount(Number(detail?.unreadCount) || 0);
     }
@@ -28,11 +32,11 @@ export default function MemberTopBar({ user }: MemberTopBarProps) {
         });
         const result = await response.json();
 
-        if (!ignore && response.ok) {
+        if (!ignore && !receivedUnreadUpdate && response.ok) {
           setUnreadCount(Number(result.unreadCount) || 0);
         }
       } catch {
-        if (!ignore) setUnreadCount(0);
+        // Keep the last known count if a navigation refresh fails.
       }
     }
 
@@ -46,7 +50,18 @@ export default function MemberTopBar({ user }: MemberTopBarProps) {
         handleUnreadUpdate,
       );
     };
-  }, []);
+  }, [pathname]);
+
+  // These pages provide their own title and back navigation. Keep this
+  // component mounted so its notification state survives those visits too.
+  const hasPageHeader =
+    pathname === "/member/payment" ||
+    pathname === "/member/profile/edit" ||
+    pathname === "/member/settings" ||
+    pathname.startsWith("/member/settings/") ||
+    /^\/member\/events\/[^/]+\/?$/.test(pathname);
+
+  if (hasPageHeader) return null;
 
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between border-b border-neutral-100 bg-white/80 backdrop-blur-md px-5 py-3.5 transition-colors">
