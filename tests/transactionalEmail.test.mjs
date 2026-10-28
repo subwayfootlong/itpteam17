@@ -168,8 +168,18 @@ test('existing SMTP transport sends HTML/text, one recipient, sanitises failure 
   let mail,closed=0;
   const sender=loadModule('lib/email.ts',{nodemailer:{createTransport:()=>({sendMail:async(value)=>{mail=value;return {accepted:['ok'],rejected:[]};},close:()=>{closed++;}})}});
   await sender.sendEmail('member@example.test','Subject','Text','stable-id','<p>HTML</p>');
-  assert.equal(mail.to.length,1); assert.equal(mail.html,'<p>HTML</p>');assert.equal(mail.text,'Text');assert.equal(closed,1);
+  assert.equal(mail.to.length,1); assert.equal(mail.to[0].address,'member@example.test');
+  assert.equal(mail.html,'<p>HTML</p>');assert.equal(mail.text,'Text');assert.equal(closed,1);
   const failed=loadModule('lib/email.ts',{nodemailer:{createTransport:()=>({sendMail:async()=>{throw Error('SMTP_PASSWORD sensitive');},close:()=>{closed++;}})}});
   await assert.rejects(failed.sendEmail('member@example.test','Subject','Text','stable-id'),/Email delivery failed/);
   assert.equal(closed,2);
+});
+
+test('SMTP hard deadline closes a hanging transport and fails safely',async()=>{
+  Object.assign(process.env,{SMTP_HOST:'smtp.example.test',SMTP_PORT:'587',SMTP_USER:'test',SMTP_PASSWORD:'test',EMAIL_FROM:'pergas@example.test'});
+  let closed=0;
+  const sender=loadModule('lib/email.ts',{nodemailer:{createTransport:()=>({sendMail:()=>new Promise(()=>{}),close:()=>{closed++;}})}},
+    {setTimeout:(callback,delay)=>{assert.equal(delay,15000);return setTimeout(callback,1);}});
+  await assert.rejects(sender.sendEmail('member@example.test','Subject','Text','timeout'),/Email delivery failed/);
+  assert.ok(closed>=1);
 });

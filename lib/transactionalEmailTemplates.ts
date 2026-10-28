@@ -46,3 +46,11 @@ export function rsvpConfirmationEmail(name: string, event: {
     action: 'View event in Member Portal', href: portalEmailUrl(`/member/events/${encodeURIComponent(event.id)}`),
   });
 }
+
+export function announcementAlertEmail(name: string, announcement: { id: string; title: string; content: string | null }) {
+  const summary = (announcement.content || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  return pergasEmail({ subject: `Pergas announcement: ${announcement.title}`, name, title: announcement.title,
+    paragraphs: [summary.length > 360 ? `${summary.slice(0, 357)}?` : summary || 'Please open the Member Portal to read this announcement.'],
+    action: 'Read announcement in Member Portal', href: portalEmailUrl('/member/community'),
+  });
+}

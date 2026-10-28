@@ -9,12 +9,12 @@ const require = createRequire(import.meta.url);
 export const memberId = '11111111-1111-4111-8111-111111111111';
 export const eventId = '22222222-2222-4222-8222-222222222222';
 
-export async function database() {
+export async function database({ announcements = true } = {}) {
   const db = new PGlite();
   await db.exec(`
     create role anon; create role authenticated; create role service_role bypassrls;
     create table users (id uuid primary key, email text, role text default 'member', first_name text, last_name text,
-      phone text, organization text, membership_tier text default 'basic', membership_status text default 'active',
+      created_at timestamptz default now(), phone text, organization text, membership_tier text default 'basic', membership_status text default 'active',
       expiry_date date, profile_image_url text);
     create table events (id uuid primary key, title text, event_date date, start_time time, end_time time, venue text,
       capacity integer, spots_available integer, status text default 'published', external_rsvp_url text,
@@ -30,6 +30,7 @@ export async function database() {
       eligible_tiers text[] default '{}', show_locked_preview boolean default false);
   `);
   await db.exec(fs.readFileSync('docs/supabase-transactional-email.sql', 'utf8'));
+  if (announcements) await db.exec(fs.readFileSync('docs/supabase-announcement-email.sql', 'utf8'));
   return db;
 }
 
@@ -42,13 +43,15 @@ export async function seed(db, { optedIn = true, role = 'member', external = fal
 // Small PostgREST adapter: exercises the actual SQL triggers/functions and actual TS handlers.
 export function supabase(db) {
   const api = { from(table) {
-    let operation = 'select', payload, columns = null, filters = [], order = '', single = false;
+    let operation = 'select', payload, columns = null, filters = [], order = '', limit = '', single = false;
     const builder = new Proxy({}, { get(_, method) {
       if (method === 'then') return (resolve, reject) => execute().then(resolve, reject);
       return (...args) => {
         if (method === 'select') columns = args[0];
         if (['insert','update','upsert','delete'].includes(method)) { operation = method; payload = args[0]; }
         if (['eq','neq','gt','lte'].includes(method)) filters.push([args[0], method === 'eq' ? '=' : method === 'neq' ? '<>' : method === 'gt' ? '>' : '<=', args[1]]);
+        if (method === 'in') filters.push([args[0], '= any', args[1]]);
+        if (method === 'limit') limit = ` limit ${Number(args[0])}`;
         if (method === 'order') order = ` order by ${args[0]} ${args[1]?.ascending === false ? 'desc' : 'asc'}`;
         if (['maybeSingle','single'].includes(method)) single = true;
         return builder;
@@ -67,8 +70,8 @@ export function supabase(db) {
           sql = `insert into ${table} (${keys.join(',')}) values ${rows.map(r => `(${keys.map(k=>param(r[k])).join(',')})`).join(',')}`;
           if (operation === 'upsert') sql += ` on conflict (user_id) do update set ${keys.filter(k=>k!=='user_id').map(k=>`${k}=excluded.${k}`).join(',')}`;
         }
-        if (filters.length) sql += ' where ' + filters.map(([k,op,v])=>`${k} ${op} ${param(v)}`).join(' and ');
-        if (operation === 'select') sql += order;
+        if (filters.length) sql += ' where ' + filters.map(([k,op,v])=>op === '= any' ? `${k} = any(${param(v)})` : `${k} ${op} ${param(v)}`).join(' and ');
+        if (operation === 'select') sql += order + limit;
         else if (columns) sql += ` returning ${columns}`;
         const result = await db.query(sql, values);
         const rows = JSON.parse(JSON.stringify(result.rows));
@@ -83,7 +86,7 @@ export function supabase(db) {
         const params = Object.keys(args).map((k,i)=>`${k} => $${i+1}`).join(',');
         const result = await db.query(`select * from ${name}(${params})`, values);
         const scalar = name.startsWith('finish_');
-        return { data: scalar ? result.rows[0]?.[name] : result.rows, error: null };
+        return { data: JSON.parse(JSON.stringify(scalar ? result.rows[0]?.[name] : result.rows)), error: null };
       } catch (error) { return { data: null, error: { code: error.code, message: 'Test RPC failure' } }; }
     })();
     promise.abortSignal = () => promise;
@@ -92,7 +95,7 @@ export function supabase(db) {
   return api;
 }
 
-export function loadModule(filename, mocks = {}) {
+export function loadModule(filename, mocks = {}, globals = {}) {
   const cache = new Map();
   function load(file) {
     file = path.resolve(file);
@@ -109,7 +112,7 @@ export function loadModule(filename, mocks = {}) {
       return resolved ? load(resolved+'.ts') : require(name);
     };
     vm.runInNewContext(code,{ module,exports:module.exports,require:localRequire,process,Buffer,URL,Response,Request,AbortSignal,
-      setTimeout,clearTimeout,console },{filename:file});
+      setTimeout,clearTimeout,console,...globals },{filename:file});
     return module.exports;
   }
   return load(filename);

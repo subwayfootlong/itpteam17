@@ -32,7 +32,8 @@ export async function sendEmail(to: string, subject: string, text: string, id: s
   let deadline: ReturnType<typeof setTimeout> | undefined;
   try {
     const result = await Promise.race([transport.sendMail({
-      from, to: [to], subject, text, ...(html ? { html } : {}),
+      // A structured mailbox cannot be parsed as a caller-supplied address list.
+      from, to: [{ address: to, name: '' }], subject, text, ...(html ? { html } : {}),
       // Stable identity for retries; SMTP does not guarantee deduplication.
       messageId: `<${createHash("sha256").update(id).digest("hex")}@email-change.pergas.invalid>`,
     }), new Promise<never>((_resolve, reject) => {
