@@ -1,3 +1,4 @@
+import { MEMBER_DETAIL_FIELDS, responseFields } from "@/lib/responseFields";
 import { readJsonObject, isUuid, invalidInput, InputValidationError } from "@/lib/inputValidation";
 import { validateMemberInput } from "@/lib/apiInputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
@@ -10,8 +11,7 @@ import {
   isAcceptablePhoneNumber,
 } from '@/lib/phone';
 
-const MEMBER_SELECT =
-  'id, salutation, first_name, last_name, email, phone, organization, designation, arabic_name, ars_status, member_id, membership_tier, membership_status, expiry_date, member_since, role, created_at';
+const MEMBER_SELECT = MEMBER_DETAIL_FIELDS;
 
 const ALLOWED_PATCH_FIELDS = [
   'salutation',
@@ -66,7 +66,7 @@ export async function GET(
     .eq('user_id', id)
     .order('registered_at', { ascending: false });
 
-  return NextResponse.json({ member: data, registrations: registrations ?? [] });
+  return NextResponse.json({ member: responseFields(data, MEMBER_DETAIL_FIELDS), registrations: registrations ?? [] });
 }
 
 export async function PATCH(
@@ -180,5 +180,5 @@ export async function PATCH(
   if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   if (!data) return NextResponse.json({ error: 'Member not found' }, { status: 404 });
 
-  return NextResponse.json({ member: data });
+  return NextResponse.json({ member: responseFields(data, MEMBER_DETAIL_FIELDS) });
 }

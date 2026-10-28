@@ -8,7 +8,7 @@ import MemberAvatar from "@/components/member/MemberAvatar";
 import type { CurrentUser } from "@/lib/currentUser";
 
 type MemberTopBarProps = {
-  user: CurrentUser;
+  user: Pick<CurrentUser, "firstName" | "lastName" | "email" | "profileImageUrl">;
 };
 
 export default function MemberTopBar({ user }: MemberTopBarProps) {

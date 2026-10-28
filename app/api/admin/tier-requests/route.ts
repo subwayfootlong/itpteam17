@@ -60,7 +60,14 @@ export async function GET(req: Request) {
       const member = usersById.get(request.user_id);
       const reviewer = request.reviewed_by ? usersById.get(request.reviewed_by) : null;
       return {
-        ...request,
+        id: request.id,
+        current_tier: request.current_tier,
+        requested_tier: request.requested_tier,
+        reason: request.reason,
+        status: request.status,
+        admin_note: request.admin_note,
+        reviewed_at: request.reviewed_at,
+        created_at: request.created_at,
         member: member
           ? {
               id: member.id,

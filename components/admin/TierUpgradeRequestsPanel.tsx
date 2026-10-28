@@ -11,7 +11,6 @@ type RequestStatus = "pending" | "approved" | "rejected";
 
 type TierRequest = {
   id: string;
-  user_id: string;
   current_tier: string;
   requested_tier: string;
   reason: string | null;

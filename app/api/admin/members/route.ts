@@ -1,3 +1,4 @@
+import { MEMBER_DIRECTORY_FIELDS, responseFields } from "@/lib/responseFields";
 import { inputError } from "@/lib/inputValidation";
 import { validateMemberFilters } from "@/lib/apiInputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
@@ -17,7 +18,7 @@ export async function GET(req: Request) {
 
   let query = supabaseAdmin
     .from('users')
-    .select('id, first_name, last_name, salutation, email, member_id, membership_tier, membership_status, expiry_date, phone, organization, designation, ars_status, member_since, created_at')
+    .select(MEMBER_DIRECTORY_FIELDS)
     .neq('role', 'admin')
     .order('created_at', { ascending: false });
 
@@ -32,5 +33,5 @@ export async function GET(req: Request) {
   const { data, error } = await query;
 
   if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
-  return NextResponse.json({ members: data ?? [] });
+  return NextResponse.json({ members: (data ?? []).map((row) => responseFields(row, MEMBER_DIRECTORY_FIELDS)) });
 }

@@ -110,11 +110,11 @@ export async function POST(req: Request) {
         membership_status: 'active',
         member_since: today,
       })
-      .select()
+      .select('id, email')
       .limit(1)
       .maybeSingle();
 
-    if (error) {
+    if (error || !data) {
       return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
 

@@ -65,9 +65,10 @@ export default function RegisteredUsersCard({
 
   const handleRemove = async (registrationId: string) => {
     try {
-      const messageParam = encodeURIComponent(rejectionMessage.trim() || 'Registration cancelled by administrator.');
-      const res = await fetch(`/api/admin/events/${eventId}/registrations?registrationId=${registrationId}&rejectionMessage=${messageParam}`, {
+      const res = await fetch(`/api/admin/events/${eventId}/registrations?registrationId=${registrationId}`, {
         method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rejectionMessage: rejectionMessage.trim() || 'Registration cancelled by administrator.' }),
       });
       if (res.ok) {
         setUsers(users.filter(u => u.id !== registrationId));

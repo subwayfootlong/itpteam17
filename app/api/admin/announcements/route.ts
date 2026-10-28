@@ -37,7 +37,7 @@ export async function GET(req: Request) {
 
   const { data, error } = await query;
   if (error) {
-    console.error('Announcements GET Error:', error);
+    console.error('Announcements GET Error:');
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
@@ -52,10 +52,7 @@ export async function GET(req: Request) {
         .in('target_id', [announcement.id, `admin:${announcement.id}`]);
 
       if (viewError) {
-        console.error(
-          `Announcement views query failed for ${announcement.id}:`,
-          viewError,
-        );
+        console.error("Announcement views query failed");
         return null;
       }
 
@@ -114,11 +111,11 @@ export async function POST(req: Request) {
       }),
       // Add created_by: admin.sub if the announcements table includes it.
     })
-    .select()
+    .select('id, title, status')
     .single();
 
   if (error) {
-    console.error('Announcements POST Error:', error);
+    console.error('Announcements POST Error:');
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   if (data?.status === 'published') {
@@ -129,5 +126,5 @@ export async function POST(req: Request) {
     });
   }
 
-  return NextResponse.json({ announcement: data }, { status: 201 });
+  return NextResponse.json({ ok: true }, { status: 201 });
 }

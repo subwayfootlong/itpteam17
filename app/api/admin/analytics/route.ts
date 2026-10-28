@@ -47,7 +47,7 @@ export async function GET(req: Request) {
 
   const { data: logs, error: logsError } = await query;
   if (logsError) {
-    console.error('Analytics GET Logs Error:', logsError);
+    console.error('Analytics GET Logs Error');
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
@@ -62,10 +62,10 @@ export async function GET(req: Request) {
   ]);
 
   // Log any DB lookup errors for diagnostics (non-fatal)
-  if (eventsResult.error) console.error('[Analytics] events lookup error:', eventsResult.error.message);
-  if (benefitsResult.error) console.error('[Analytics] benefits lookup error:', benefitsResult.error.message);
-  if (announcementsResult.error) console.error('[Analytics] announcements lookup error:', announcementsResult.error.message);
-  if (registrationsResult.error) console.error('[Analytics] registrations lookup error:', registrationsResult.error.message);
+  if (eventsResult.error) console.error('[Analytics] events lookup error:');
+  if (benefitsResult.error) console.error('[Analytics] benefits lookup error:');
+  if (announcementsResult.error) console.error('[Analytics] announcements lookup error:');
+  if (registrationsResult.error) console.error('[Analytics] registrations lookup error:');
 
   const eventsMap = new Map((eventsResult.data ?? []).map(e => [e.id, e]));
 
