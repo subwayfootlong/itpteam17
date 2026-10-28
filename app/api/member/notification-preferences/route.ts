@@ -7,7 +7,7 @@ import {
   type NotificationPreferences,
 } from "@/lib/notifications";
 
-const preferenceKeys = ["benefit", "announcement", "event"] as const;
+const preferenceKeys = ["benefit", "announcement", "event", "email"] as const;
 
 export async function GET() {
   const { user, response: authResponse } = await requireMember();

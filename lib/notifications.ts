@@ -40,16 +40,18 @@ type ExistingNotificationKey = {
 
 export type NotificationPreferenceKey = "benefit" | "announcement" | "event";
 
-export type NotificationPreferences = Record<NotificationPreferenceKey, boolean>;
+export type NotificationPreferences = Record<NotificationPreferenceKey, boolean> & { email: boolean };
 
 export const defaultNotificationPreferences: NotificationPreferences = {
   benefit: true,
   announcement: true,
   event: true,
+  email: false,
 };
 
 type NotificationPreferenceRow = {
   user_id?: string;
+  email_enabled?: boolean | null;
   benefit_enabled: boolean | null;
   announcement_enabled: boolean | null;
   event_enabled: boolean | null;
@@ -86,6 +88,7 @@ function mapNotificationPreferences(
   row?: Partial<NotificationPreferenceRow> | null,
 ): NotificationPreferences {
   return {
+    email: row?.email_enabled === true,
     benefit: row?.benefit_enabled ?? defaultNotificationPreferences.benefit,
     announcement:
       row?.announcement_enabled ?? defaultNotificationPreferences.announcement,
@@ -129,7 +132,7 @@ export async function getNotificationPreferences(
 ): Promise<NotificationPreferences> {
   const { data, error } = await supabaseAdmin
     .from("notification_preferences")
-    .select("benefit_enabled, announcement_enabled, event_enabled")
+    .select("benefit_enabled, announcement_enabled, event_enabled, email_enabled")
     .eq("user_id", userId)
     .maybeSingle();
 
@@ -149,6 +152,7 @@ export async function updateNotificationPreferences(
   const next = { ...current, ...preferences };
   const update = {
     user_id: userId,
+    ...(typeof preferences.email === "boolean" ? { email_enabled: preferences.email } : {}),
     benefit_enabled: next.benefit,
     announcement_enabled: next.announcement,
     event_enabled: next.event,
@@ -158,7 +162,7 @@ export async function updateNotificationPreferences(
   const { data, error } = await supabaseAdmin
     .from("notification_preferences")
     .upsert(update, { onConflict: "user_id" })
-    .select("benefit_enabled, announcement_enabled, event_enabled")
+    .select("benefit_enabled, announcement_enabled, event_enabled, email_enabled")
     .single();
 
   if (error) {

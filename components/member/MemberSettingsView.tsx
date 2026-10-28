@@ -29,7 +29,7 @@ import {
 import type { NotificationPreferences } from "@/lib/notifications";
 import { LOGOUT_LOGIN_HINT_KEY } from "@/lib/session";
 
-type PreferenceKey = "benefit" | "announcement" | "event";
+type PreferenceKey = "benefit" | "announcement" | "event" | "email";
 const PUSH_NOTIFICATIONS_COOKIE = "pergas_push_notifications_enabled";
 
 const preferenceCopy: {
@@ -152,7 +152,8 @@ export default function MemberSettingsView({
   const { fontSize, setFontSize } = useMemberFontSize();
 
   const [pushEnabled, setPushEnabled] = useState(initialPushEnabled);
-  const [emailEnabled, setEmailEnabled] = useState(false);
+  const [savingPreferences, setSavingPreferences] = useState(false);
+  const [preferenceError, setPreferenceError] = useState("");
   const [preferences, setPreferences] = useState<NotificationPreferences>(
     initialPreferences,
   );
@@ -182,7 +183,7 @@ export default function MemberSettingsView({
   }
 
   async function handlePreferenceToggle(key: PreferenceKey) {
-    if (loadingPreferences || savingPush) {
+    if (loadingPreferences || savingPush || savingPreferences) {
       return;
     }
 
@@ -193,6 +194,8 @@ export default function MemberSettingsView({
     };
 
     setPreferences(nextPreferences);
+    setSavingPreferences(true);
+    setPreferenceError("");
 
     try {
       const response = await fetch("/api/member/notification-preferences", {
@@ -209,6 +212,9 @@ export default function MemberSettingsView({
       setPreferences(result.preferences);
     } catch {
       setPreferences(previousPreferences);
+      setPreferenceError("Unable to save notification settings. Please try again.");
+    } finally {
+      setSavingPreferences(false);
     }
   }
 
@@ -425,7 +431,7 @@ export default function MemberSettingsView({
                 <SettingsSwitch
                   enabled={preferences[preference.key]}
                   onClick={() => handlePreferenceToggle(preference.key)}
-                  disabled={loadingPreferences || savingPush || !pushEnabled}
+                  disabled={loadingPreferences || savingPush || savingPreferences || !pushEnabled}
                   label={
                     preferences[preference.key]
                       ? `${preference.title} enabled`
@@ -446,17 +452,17 @@ export default function MemberSettingsView({
                   Email Notifications
                 </p>
                 <p className="text-xs text-neutral-400 member-dark:text-neutral-400">
-                  Coming soon in next release
+                  RSVP confirmations and announcement emails. Off by default.
                 </p>
               </div>
             </div>
 
             <SettingsSwitch
-              enabled={emailEnabled}
-              onClick={() => setEmailEnabled((value) => !value)}
-              disabled
+              enabled={preferences.email}
+              onClick={() => handlePreferenceToggle("email")}
+              disabled={loadingPreferences || savingPreferences}
               label={
-                emailEnabled
+                preferences.email
                   ? "Email notifications enabled"
                   : "Email notifications disabled"
               }
@@ -464,6 +470,8 @@ export default function MemberSettingsView({
           </div>
         </div>
       </section>
+
+      {preferenceError && <p role="alert" className="text-xs text-red-600">{preferenceError}</p>}
 
       {/* 3. Preferences */}
       <section>
