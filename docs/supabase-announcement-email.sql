@@ -94,7 +94,20 @@ begin
   insert into public.email_outbox(kind,user_id,source_id,dedupe_key)
     select 'announcement', u.id, p_source, 'announcement:' || p_source::text || ':' || u.id::text
     from public.users u join public.notification_preferences pref on pref.user_id = u.id
+    join public.announcements a on a.id = p_source
     where u.id = any(p_recipients) and u.role = 'member' and pref.email_enabled
+      -- Recheck eligibility at commit time; do not trust the worker's recipient list.
+      and lower(u.membership_status) = 'active'
+      and (u.expiry_date is null or u.expiry_date >= current_date)
+      and a.status = 'published'
+      and (publication.audience_type = 'all' or
+        (publication.audience_type = 'selected_tiers' and
+          (case when u.membership_tier in ('basic','student','associate','ordinary')
+            then u.membership_tier else 'basic' end) = any(publication.eligible_tiers)))
+      and (a.audience_type = 'all' or
+        (a.audience_type = 'selected_tiers' and
+          (case when u.membership_tier in ('basic','student','associate','ordinary')
+            then u.membership_tier else 'basic' end) = any(a.eligible_tiers)))
       and pref.email_enabled_since <= publication.published_at
       and u.created_at <= publication.published_at
       and (publication.cursor_id is null or u.id > publication.cursor_id) and u.id <= p_cursor
