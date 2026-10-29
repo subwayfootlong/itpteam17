@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     });
 
   if (error) {
-    console.error('Analytics tracking error:', error);
+    console.error('Analytics tracking error:');
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 

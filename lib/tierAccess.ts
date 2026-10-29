@@ -132,7 +132,7 @@ export function isActiveMembership(member: MemberAccessContext): boolean {
   if (member.membershipStatus?.toLowerCase() !== "active") return false;
   if (!member.expiryDate) return true;
 
-  const expiryDate = new Date(`${member.expiryDate.slice(0, 10)}T23:59:59`);
+  const expiryDate = new Date(`${member.expiryDate.slice(0, 10)}T23:59:59.999+08:00`);
   return !Number.isNaN(expiryDate.getTime()) && expiryDate >= new Date();
 }
 

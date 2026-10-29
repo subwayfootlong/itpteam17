@@ -73,7 +73,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ url: publicUrlData.publicUrl }, { status: 200 });
 
   } catch (err) {
-    console.error('Upload Error:', err);
+    console.error('Upload Error:');
     return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 });
   }
 }

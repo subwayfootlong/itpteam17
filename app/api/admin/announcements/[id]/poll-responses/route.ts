@@ -7,8 +7,6 @@ import { formatMemberName } from '@/lib/memberName';
 type PollResponseRow = {
   id: string;
   response: 'yes' | 'no' | 'maybe';
-  updated_at: string;
-  user_id: string;
   users: { first_name: string | null; last_name: string | null; email: string | null } | { first_name: string | null; last_name: string | null; email: string | null }[] | null;
 };
 
@@ -27,8 +25,6 @@ export async function GET(
     .select(`
       id,
       response,
-      updated_at,
-      user_id,
       users (
         first_name,
         last_name,
@@ -39,7 +35,7 @@ export async function GET(
     .order('updated_at', { ascending: false });
 
   if (error) {
-    console.error('Announcement Poll Responses GET Error:', error);
+    console.error('Announcement Poll Responses GET Error:');
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
@@ -50,11 +46,9 @@ export async function GET(
     const user = Array.isArray(row.users) ? row.users[0] : row.users;
     return {
       id: row.id,
-      userId: row.user_id,
       name: formatMemberName(user ?? {}, 'Unknown User'),
       email: user?.email || 'No email',
       response: row.response,
-      updatedAt: row.updated_at,
     };
   });
 

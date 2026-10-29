@@ -10,7 +10,7 @@ export default function DiscussionThreadLoading() {
       >
         <div className="flex flex-col items-center gap-3">
           <LoadingSpinner label="" size="lg" />
-          <p className="member-text-base text-sm font-medium text-[#5F5E5E]">Loading discussion…</p>
+          <p className="member-text-base text-sm font-medium text-[#5F5E5E] member-dark:text-neutral-300">Loading discussion…</p>
         </div>
       </div>
     </MemberPageShell>

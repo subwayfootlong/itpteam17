@@ -6,11 +6,9 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 type PollResponse = {
   id: string;
-  userId: string;
   name: string;
   email: string;
   response: 'yes' | 'no' | 'maybe';
-  updatedAt: string;
 };
 
 const RESPONSE_LABELS: Record<PollResponse['response'], string> = {

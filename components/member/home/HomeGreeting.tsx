@@ -11,12 +11,12 @@ export default function HomeGreeting({
 
   return (
     <section>
-      <p className="text-xs font-semibold uppercase tracking-wider text-brand-primary-800">
+      <p className="text-xs font-semibold uppercase tracking-wider text-brand-primary-800 member-dark:text-brand-primary-200">
         Assalamualaikum
       </p>
-      <h1 className="mt-1 text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
+      <h1 className="mt-1 text-2xl font-bold tracking-tight text-neutral-900 member-dark:text-neutral-100 sm:text-3xl">
         Welcome back,{" "}
-        <span className="text-brand-primary-800">{displayName || "Member"}</span>
+        <span className="text-brand-primary-800 member-dark:text-brand-primary-200">{displayName || "Member"}</span>
       </h1>
     </section>
   );

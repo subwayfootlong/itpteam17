@@ -38,24 +38,24 @@ export default function ThreadCard({
   }
 
   return (
-    <article className="mb-3.5 rounded-2xl border border-neutral-200/80 bg-white p-4 shadow-xs">
+    <article className="mb-3.5 rounded-2xl border border-neutral-200/80 member-dark:border-member-border/80 bg-white member-dark:bg-member-surface p-4 shadow-xs">
       <header className="flex items-center gap-3">
         <span
           aria-hidden="true"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-primary-100 text-sm font-semibold text-brand-primary-800"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-sm font-semibold text-brand-primary-800 member-dark:text-brand-primary-200"
         >
           {authorInitials}
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span className="truncate text-sm font-semibold text-neutral-900">
+            <span className="truncate text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
               {thread.author}
             </span>
-            <span className="rounded border border-brand-primary-200/50 bg-brand-primary-50 px-1.5 py-0.5 text-[10px] font-bold text-brand-primary-800">
+            <span className="rounded border border-brand-primary-200/50 member-dark:border-brand-primary-700/50 bg-brand-primary-50 member-dark:bg-brand-primary-900 px-1.5 py-0.5 text-[10px] font-bold text-brand-primary-800 member-dark:text-brand-primary-200">
               {thread.authorRole}
             </span>
           </div>
-          <p className="mt-0.5 truncate text-xs text-neutral-500">
+          <p className="mt-0.5 truncate text-xs text-neutral-500 member-dark:text-neutral-400">
             {groupTitle} · {thread.postedAt}
           </p>
         </div>
@@ -70,22 +70,22 @@ export default function ThreadCard({
         href={threadHref}
         className="mt-2 block transition-transform duration-100 active:scale-[0.99]"
       >
-        <h2 className="mt-1 text-base font-semibold text-neutral-950">
+        <h2 className="mt-1 text-base font-semibold text-neutral-950 member-dark:text-neutral-100">
           {thread.title}
         </h2>
-        <p className="mt-1 line-clamp-3 text-sm text-neutral-600">{thread.body}</p>
+        <p className="mt-1 line-clamp-3 text-sm text-neutral-600 member-dark:text-neutral-300">{thread.body}</p>
       </NavLink>
 
       {thread.hasImage && (
         <div
           aria-hidden="true"
-          className="mt-2.5 flex aspect-video items-center justify-center overflow-hidden rounded-xl border border-neutral-100 bg-neutral-100 text-neutral-300"
+          className="mt-2.5 flex aspect-video items-center justify-center overflow-hidden rounded-xl border border-neutral-100 member-dark:border-member-border bg-neutral-100 member-dark:bg-member-raised text-neutral-300 member-dark:text-neutral-400"
         >
           <ImageIcon size={28} />
         </div>
       )}
 
-      <footer className="mt-3 flex items-center gap-6 border-t border-neutral-100 pt-3 text-xs text-neutral-500">
+      <footer className="mt-3 flex items-center gap-6 border-t border-neutral-100 member-dark:border-member-border pt-3 text-xs text-neutral-500 member-dark:text-neutral-400">
         <span
           className="flex items-center gap-1.5"
           aria-label={`${thread.votes} ${thread.votes === 1 ? "like" : "likes"}`}
@@ -96,7 +96,7 @@ export default function ThreadCard({
         <NavLink
           href={threadHref}
           aria-label={`${comments.length} ${comments.length === 1 ? "comment" : "comments"}`}
-          className="flex items-center gap-1.5 transition-transform duration-100 hover:text-brand-primary-800 active:scale-90"
+          className="flex items-center gap-1.5 transition-transform duration-100 hover:text-brand-primary-800 member-dark:hover:text-brand-primary-200 active:scale-90"
         >
           <MessageSquare size={18} aria-hidden="true" />
           {comments.length}
@@ -105,7 +105,7 @@ export default function ThreadCard({
           type="button"
           onClick={handleShare}
           aria-label="Share post"
-          className="ml-auto flex items-center gap-1.5 transition-transform duration-100 hover:text-brand-primary-800 active:scale-90"
+          className="ml-auto flex items-center gap-1.5 transition-transform duration-100 hover:text-brand-primary-800 member-dark:hover:text-brand-primary-200 active:scale-90"
         >
           <Share2 size={18} aria-hidden="true" />
         </button>

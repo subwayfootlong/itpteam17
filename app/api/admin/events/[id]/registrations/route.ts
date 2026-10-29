@@ -1,4 +1,4 @@
-import { isUuid, invalidInput } from "@/lib/inputValidation";
+import { isUuid, invalidInput, readJsonObject, InputValidationError } from "@/lib/inputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
@@ -31,11 +31,11 @@ export async function GET(
     .order('registered_at', { ascending: false });
 
   if (error) {
-    console.error('Events Registrations GET Error:', error);
+    console.error('Events Registrations GET Error:');
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
-  const formattedData = data.map((reg) => {
+  const formattedData = (data ?? []).map((reg) => {
     const user = Array.isArray(reg.users) ? reg.users[0] : reg.users;
 
     return {
@@ -61,7 +61,16 @@ export async function DELETE(
   if (!isUuid(id)) return invalidInput("ID must be a UUID");
   const url = new URL(req.url);
   const registrationId = url.searchParams.get('registrationId');
-  const rejectionMessage = url.searchParams.get('rejectionMessage') || 'Registration cancelled by administrator.';
+  let body;
+  try {
+    body = await readJsonObject(req);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
+  }
+  if (body.rejectionMessage !== undefined && typeof body.rejectionMessage !== 'string') {
+    return invalidInput("Rejection message must be text");
+  }
+  const rejectionMessage = body.rejectionMessage || 'Registration cancelled by administrator.';
 
   if (rejectionMessage.length > 1000 || rejectionMessage.includes("\u0000")) return invalidInput("Rejection message cannot exceed 1000 characters or contain null characters");
   if (!isUuid(registrationId)) {
@@ -95,7 +104,7 @@ export async function DELETE(
     .eq('event_id', id);
 
   if (error) {
-    console.error('Events Registrations DELETE Error:', error);
+    console.error('Events Registrations DELETE Error:');
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 

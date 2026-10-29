@@ -25,8 +25,8 @@ export async function loadCommunityPageData(): Promise<CommunityPageProps> {
       groups: communityData.groups,
       threads: communityData.threads,
     };
-  } catch (error) {
-    console.warn("Using community fallback data:", error);
+  } catch {
+    console.warn("Using community fallback data");
   }
 
   return {

@@ -86,18 +86,18 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
         <NavLink
           href="/member/profile"
           aria-label="Back to profile"
-          className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-100 text-neutral-700 transition-colors hover:bg-neutral-200/70 active:scale-95"
+          className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-100 member-dark:bg-member-raised text-neutral-700 member-dark:text-neutral-300 transition-colors hover:bg-neutral-200/70 member-dark:hover:bg-member-raised/70 active:scale-95"
         >
-          <ArrowLeft size={20} className="text-[#0F6E00]" />
+          <ArrowLeft size={20} className="text-[#0F6E00] member-dark:text-brand-primary-200" />
         </NavLink>
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-neutral-900">Edit Profile</h1>
-          <p className="text-xs text-neutral-500">Update your details and organization info</p>
+          <h1 className="text-xl font-bold tracking-tight text-neutral-900 member-dark:text-neutral-100">Edit Profile</h1>
+          <p className="text-xs text-neutral-500 member-dark:text-neutral-400">Update your details and organization info</p>
         </div>
       </header>
 
       {/* Avatar Card */}
-      <section className="flex flex-col items-center rounded-2xl border border-neutral-200/70 bg-white p-5 text-center shadow-xs">
+      <section className="flex flex-col items-center rounded-2xl border border-neutral-200/70 member-dark:border-member-border/70 bg-white member-dark:bg-member-surface p-5 text-center shadow-xs">
         <div className="relative">
           <MemberAvatar
             firstName={initial.first_name}
@@ -105,22 +105,22 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
             email={initial.email}
             profileImageUrl={initial.profile_image_url}
             size={88}
-            className="ring-4 ring-[#E8F4E6] shadow-sm"
+            className="ring-4 ring-[#E8F4E6] member-dark:ring-member-border shadow-sm"
           />
         </div>
 
-        <h2 className="mt-3 text-lg font-bold text-neutral-900">
+        <h2 className="mt-3 text-lg font-bold text-neutral-900 member-dark:text-neutral-100">
           {formatMemberName(initial, "Member")}
         </h2>
-        <p className="text-xs text-neutral-500">{initial.email}</p>
+        <p className="text-xs text-neutral-500 member-dark:text-neutral-400">{initial.email}</p>
       </section>
 
       {/* Form Fields Card */}
       <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-xs space-y-4">
+        <div className="rounded-2xl border border-neutral-200/70 member-dark:border-member-border/70 bg-white member-dark:bg-member-surface p-5 shadow-xs space-y-4">
           <div className="space-y-2">
             <Input label="Registered email" type="email" value={initial.email ?? ""} readOnly />
-            <NavLink href="/member/settings/email" className="member-text-sm block text-sm font-semibold text-brand-primary-800">Change Email</NavLink>
+            <NavLink href="/member/settings/email" className="member-text-sm block text-sm font-semibold text-brand-primary-800 member-dark:text-brand-primary-200">Change Email</NavLink>
           </div>
 
           <Select
@@ -181,7 +181,7 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
         </div>
 
         {error ? (
-          <p className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-medium text-rose-700">
+          <p className="rounded-xl border border-rose-200 member-dark:border-rose-800 bg-rose-50 member-dark:bg-rose-950 px-4 py-3 text-xs font-medium text-rose-700 member-dark:text-rose-300">
             {error}
           </p>
         ) : null}
@@ -189,7 +189,7 @@ export default function EditProfileForm({ initial }: { initial: EditProfileIniti
         <div className="grid grid-cols-2 gap-3 pt-1">
           <NavLink
             href="/member/profile"
-            className="flex min-h-11 items-center justify-center rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm font-semibold text-neutral-700 shadow-2xs transition-all hover:bg-neutral-50 active:scale-[0.98]"
+            className="flex min-h-11 items-center justify-center rounded-xl border border-neutral-200 member-dark:border-member-border bg-white member-dark:bg-member-surface px-4 py-2.5 text-sm font-semibold text-neutral-700 member-dark:text-neutral-300 shadow-2xs transition-all hover:bg-neutral-50 member-dark:hover:bg-member-surface active:scale-[0.98]"
           >
             Cancel
           </NavLink>

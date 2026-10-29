@@ -54,28 +54,28 @@ function CommentBranch({
       >
         <span
           aria-hidden="true"
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-primary-100 text-[10px] font-semibold text-brand-primary-800"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-[10px] font-semibold text-brand-primary-800 member-dark:text-brand-primary-200"
         >
           {initials(comment.author)}
         </span>
         <div className="min-w-0 flex-1">
           <header className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
-            <strong className="text-[13px] font-semibold text-neutral-900">
+            <strong className="text-[13px] font-semibold text-neutral-900 member-dark:text-neutral-100">
               {comment.author}
             </strong>
-            <span className="rounded border border-brand-primary-200/50 bg-brand-primary-50 px-1.5 py-0.5 text-[10px] font-bold text-brand-primary-800">
+            <span className="rounded border border-brand-primary-200/50 member-dark:border-brand-primary-700/50 bg-brand-primary-50 member-dark:bg-brand-primary-900 px-1.5 py-0.5 text-[10px] font-bold text-brand-primary-800 member-dark:text-brand-primary-200">
               {comment.role}
             </span>
-            <small className="text-[11px] text-neutral-500">
+            <small className="text-[11px] text-neutral-500 member-dark:text-neutral-400">
               · {comment.postedAt}
             </small>
           </header>
-          <p className="mt-1 text-sm leading-relaxed text-neutral-700">
+          <p className="mt-1 text-sm leading-relaxed text-neutral-700 member-dark:text-neutral-300">
             {comment.body}
           </p>
           <footer className="mt-1.5">
             {isUnderReview ? (
-              <span className="inline-flex items-center gap-1 rounded-md bg-brand-accent-soft px-2 py-0.5 text-[11px] font-semibold text-amber-900">
+              <span className="inline-flex items-center gap-1 rounded-md bg-brand-accent-soft member-dark:bg-member-raised px-2 py-0.5 text-[11px] font-semibold text-amber-900 member-dark:text-amber-300">
                 <Clock size={12} aria-hidden="true" />
                 {comment.status === "flagged" ? "Held for review" : "Pending approval"}
               </span>
@@ -83,7 +83,7 @@ function CommentBranch({
               <button
                 type="button"
                 onClick={() => onReply(comment)}
-                className="-ml-2 inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold text-neutral-500 transition-transform duration-100 hover:bg-neutral-100 hover:text-brand-primary-800 active:scale-95"
+                className="-ml-2 inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold text-neutral-500 member-dark:text-neutral-400 transition-transform duration-100 hover:bg-neutral-100 member-dark:hover:bg-member-raised hover:text-brand-primary-800 member-dark:hover:text-brand-primary-200 active:scale-95"
               >
                 <MessageSquare size={14} aria-hidden="true" />
                 Reply
@@ -98,7 +98,7 @@ function CommentBranch({
       {replies.length > 0 && (
         <div
           className={
-            depth < 5 ? "ml-3.5 border-l-2 border-neutral-200 pl-3" : ""
+            depth < 5 ? "ml-3.5 border-l-2 border-neutral-200 member-dark:border-member-border pl-3" : ""
           }
         >
           {replies.map((reply) => (
@@ -205,7 +205,7 @@ export default function DiscussionThreadDetail({
 
   const renderComposer = (replyingTo: CommunityComment | null) => (
     <form
-      className="my-2 rounded-xl border border-neutral-300 bg-white p-3 shadow-xs"
+      className="my-2 rounded-xl border border-neutral-300 member-dark:border-member-border bg-white member-dark:bg-member-surface p-3 shadow-xs"
       onSubmit={handleSubmit}
     >
       <textarea
@@ -216,15 +216,15 @@ export default function DiscussionThreadDetail({
         rows={3}
         aria-label={replyingTo ? `Reply to ${replyingTo.author}` : "Add a comment"}
         placeholder={replyingTo ? `Reply to ${replyingTo.author}` : "Add a comment..."}
-        className="w-full resize-none bg-transparent text-sm text-neutral-900 placeholder:text-neutral-500 focus:outline-none"
+        className="w-full resize-none bg-transparent text-sm text-neutral-900 member-dark:text-neutral-100 placeholder:text-neutral-500 member-dark:placeholder:text-neutral-400 focus:outline-none"
       />
       {error && (
-        <p className="mt-1 text-xs font-medium text-brand-rose" role="alert">
+        <p className="mt-1 text-xs font-medium text-brand-rose member-dark:text-rose-300" role="alert">
           {error}
         </p>
       )}
-      <div className="mt-2 flex items-center justify-between gap-2 border-t border-neutral-100 pt-2">
-        <small className="text-[11px] text-neutral-500">
+      <div className="mt-2 flex items-center justify-between gap-2 border-t border-neutral-100 member-dark:border-member-border pt-2">
+        <small className="text-[11px] text-neutral-500 member-dark:text-neutral-400">
           {draft.length}/500 · Replies require approval
         </small>
         <div className="flex items-center gap-2">
@@ -235,7 +235,7 @@ export default function DiscussionThreadDetail({
               setDraft("");
               setError("");
             }}
-            className="rounded-full px-3 py-1.5 text-xs font-semibold text-neutral-600 transition-transform duration-100 hover:bg-neutral-100 active:scale-95"
+            className="rounded-full px-3 py-1.5 text-xs font-semibold text-neutral-600 member-dark:text-neutral-300 transition-transform duration-100 hover:bg-neutral-100 member-dark:hover:bg-member-raised active:scale-95"
           >
             Cancel
           </button>
@@ -257,31 +257,31 @@ export default function DiscussionThreadDetail({
       <nav aria-label="Discussion navigation">
         <NavLink
           href={`/member/community?tab=discussions&group=${encodeURIComponent(thread.groupId)}`}
-          className="inline-flex items-center gap-1.5 rounded-full py-1 pr-3 text-xs font-semibold text-brand-primary-800 transition-transform duration-100 active:scale-95"
+          className="inline-flex items-center gap-1.5 rounded-full py-1 pr-3 text-xs font-semibold text-brand-primary-800 member-dark:text-brand-primary-200 transition-transform duration-100 active:scale-95"
         >
           <ArrowLeft size={16} aria-hidden="true" />
           Back to {groupTitle}
         </NavLink>
       </nav>
 
-      <article className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+      <article className="rounded-2xl border border-neutral-200 member-dark:border-member-border bg-white member-dark:bg-member-surface p-4 shadow-sm">
         <header className="flex items-center gap-3">
           <span
             aria-hidden="true"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-primary-100 text-sm font-semibold text-brand-primary-800"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-sm font-semibold text-brand-primary-800 member-dark:text-brand-primary-200"
           >
             {initials(thread.author)}
           </span>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <strong className="text-sm font-semibold text-neutral-900">
+              <strong className="text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
                 {thread.author}
               </strong>
-              <span className="rounded border border-brand-primary-200/50 bg-brand-primary-50 px-1.5 py-0.5 text-[10px] font-bold text-brand-primary-800">
+              <span className="rounded border border-brand-primary-200/50 member-dark:border-brand-primary-700/50 bg-brand-primary-50 member-dark:bg-brand-primary-900 px-1.5 py-0.5 text-[10px] font-bold text-brand-primary-800 member-dark:text-brand-primary-200">
                 {thread.authorRole}
               </span>
             </div>
-            <p className="mt-0.5 text-xs text-neutral-500">
+            <p className="mt-0.5 text-xs text-neutral-500 member-dark:text-neutral-400">
               {groupTitle} · {thread.postedAt}
             </p>
           </div>
@@ -291,21 +291,21 @@ export default function DiscussionThreadDetail({
             />
           )}
         </header>
-        <h1 className="mt-3 text-lg font-semibold leading-snug text-neutral-950">
+        <h1 className="mt-3 text-lg font-semibold leading-snug text-neutral-950 member-dark:text-neutral-100">
           {thread.title}
         </h1>
-        <p className="mt-1.5 whitespace-pre-line text-sm leading-relaxed text-neutral-700">
+        <p className="mt-1.5 whitespace-pre-line text-sm leading-relaxed text-neutral-700 member-dark:text-neutral-300">
           {thread.body}
         </p>
         {thread.hasImage && (
           <div
             aria-hidden="true"
-            className="mt-3 flex aspect-video items-center justify-center rounded-xl border border-neutral-100 bg-neutral-100 text-neutral-300"
+            className="mt-3 flex aspect-video items-center justify-center rounded-xl border border-neutral-100 member-dark:border-member-border bg-neutral-100 member-dark:bg-member-raised text-neutral-300 member-dark:text-neutral-400"
           >
             <ImageIcon size={28} />
           </div>
         )}
-        <footer className="mt-3 flex items-center justify-between border-t border-neutral-100 pt-3 text-xs text-neutral-500">
+        <footer className="mt-3 flex items-center justify-between border-t border-neutral-100 member-dark:border-member-border pt-3 text-xs text-neutral-500 member-dark:text-neutral-400">
           <span className="flex items-center gap-1.5">
             <MessageSquare size={16} aria-hidden="true" />
             {approvedCount} {approvedCount === 1 ? "reply" : "replies"}
@@ -324,22 +324,22 @@ export default function DiscussionThreadDetail({
       {activeReplyTarget === "post" && renderComposer(null)}
 
       <section
-        className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm"
+        className="rounded-2xl border border-neutral-200 member-dark:border-member-border bg-white member-dark:bg-member-surface p-4 shadow-sm"
         aria-labelledby="discussion-replies-heading"
       >
-        <div className="flex items-center justify-between gap-3 border-b border-neutral-100 pb-3">
+        <div className="flex items-center justify-between gap-3 border-b border-neutral-100 member-dark:border-member-border pb-3">
           <h2
             id="discussion-replies-heading"
-            className="text-sm font-semibold text-neutral-950"
+            className="text-sm font-semibold text-neutral-950 member-dark:text-neutral-100"
           >
             {approvedCount} {approvedCount === 1 ? "reply" : "replies"}
           </h2>
-          <label className="flex items-center gap-2 text-xs text-neutral-500">
+          <label className="flex items-center gap-2 text-xs text-neutral-500 member-dark:text-neutral-400">
             <span>Sort by</span>
             <select
               value={sortOrder}
               onChange={(event) => setSortOrder(event.target.value as SortOrder)}
-              className="rounded-lg border border-neutral-300 bg-white px-2 py-1 text-xs font-semibold text-neutral-800 focus:outline-none focus:ring-2 focus:ring-brand-primary-600/20"
+              className="rounded-lg border border-neutral-300 member-dark:border-member-border bg-white member-dark:bg-member-surface px-2 py-1 text-xs font-semibold text-neutral-800 member-dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-brand-primary-600/20 member-dark:focus:ring-brand-primary-700/20"
             >
               <option value="oldest">Oldest</option>
               <option value="newest">Newest</option>
@@ -348,7 +348,7 @@ export default function DiscussionThreadDetail({
         </div>
 
         {roots.length > 0 ? (
-          <div className="divide-y divide-neutral-100">
+          <div className="divide-y divide-neutral-100 member-dark:divide-member-border">
             {roots.map((comment) => (
               <CommentBranch
                 key={comment.id}
@@ -369,13 +369,13 @@ export default function DiscussionThreadDetail({
           <div className="flex flex-col items-center py-8 text-center">
             <MessageSquare
               size={26}
-              className="text-neutral-300"
+              className="text-neutral-300 member-dark:text-neutral-400"
               aria-hidden="true"
             />
-            <strong className="mt-2 text-sm font-semibold text-neutral-900">
+            <strong className="mt-2 text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
               No replies yet
             </strong>
-            <p className="mt-1 text-xs text-neutral-500">
+            <p className="mt-1 text-xs text-neutral-500 member-dark:text-neutral-400">
               Be the first member to continue this discussion.
             </p>
           </div>

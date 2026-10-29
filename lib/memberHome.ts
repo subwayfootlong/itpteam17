@@ -257,31 +257,19 @@ export async function getMemberHomeData(
   ]);
 
   if (announcementResult.error) {
-    console.error(
-      "Home announcement query failed:",
-      announcementResult.error.message,
-    );
+    console.error("Home announcement query failed:");
   }
 
   if (registrationResult.error) {
-    console.error(
-      "Home registration query failed:",
-      registrationResult.error.message,
-    );
+    console.error("Home registration query failed:");
   }
 
   if (featuredEventResult.error) {
-    console.error(
-      "Home featured event query failed:",
-      featuredEventResult.error.message,
-    );
+    console.error("Home featured event query failed:");
   }
 
   if (benefitResult.error) {
-    console.error(
-      "Home benefit query failed:",
-      benefitResult.error.message,
-    );
+    console.error("Home benefit query failed:");
   }
 
   const registeredEvents =

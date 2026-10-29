@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import nodemailer from "nodemailer";
 
 // Temporary SMTP delivery for ITP2 development/demo. Credentials stay server-side.
-export async function sendEmail(to: string, subject: string, text: string, id: string) {
+export async function sendEmail(to: string, subject: string, text: string, id: string, html?: string) {
   const host = process.env.SMTP_HOST?.trim();
   const port = Number(process.env.SMTP_PORT);
   const user = process.env.SMTP_USER;
@@ -29,17 +29,22 @@ export async function sendEmail(to: string, subject: string, text: string, id: s
     disableUrlAccess: true,
   });
 
+  let deadline: ReturnType<typeof setTimeout> | undefined;
   try {
-    const result = await transport.sendMail({
-      from, to: [to], subject, text,
+    const result = await Promise.race([transport.sendMail({
+      // A structured mailbox cannot be parsed as a caller-supplied address list.
+      from, to: [{ address: to, name: '' }], subject, text, ...(html ? { html } : {}),
       // Stable identity for retries; SMTP does not guarantee deduplication.
       messageId: `<${createHash("sha256").update(id).digest("hex")}@email-change.pergas.invalid>`,
-    });
+    }), new Promise<never>((_resolve, reject) => {
+      deadline = setTimeout(() => { transport.close(); reject(new Error("Email delivery timed out")); }, 15_000);
+    })]);
     if (!result.accepted.length || result.rejected.length) throw new Error("Email delivery failed");
   } catch {
     // Do not propagate provider responses or authentication details to callers.
     throw new Error("Email delivery failed");
   } finally {
+    clearTimeout(deadline);
     transport.close();
   }
 }

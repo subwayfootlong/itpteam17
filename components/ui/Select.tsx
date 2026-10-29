@@ -28,17 +28,17 @@ const Select: React.FC<SelectProps> = ({
       {label ? (
         <label
           htmlFor={selectId}
-          className="font-helvetica text-sm font-semibold tracking-tight text-gray-900"
+          className="font-helvetica text-sm font-semibold tracking-tight text-gray-900 member-dark:text-neutral-100"
         >
           {label}
         </label>
       ) : null}
 
-      <div className="relative w-full rounded-xl border border-stone-300 bg-slate-50 transition-all focus-within:border-[#53A63E]">
+      <div className="relative w-full rounded-xl border border-stone-300 member-dark:border-member-border bg-slate-50 member-dark:bg-member-raised transition-all focus-within:border-[#53A63E]">
         <select
           id={selectId}
           {...rest}
-          className="font-helvetica h-12 w-full cursor-pointer appearance-none bg-transparent px-4 text-sm font-normal text-gray-900 outline-none"
+          className="font-helvetica h-12 w-full cursor-pointer appearance-none bg-transparent px-4 text-sm font-normal text-gray-900 member-dark:text-neutral-100 outline-none"
         >
           {placeholder ? (
             <option value="" disabled>
@@ -52,7 +52,7 @@ const Select: React.FC<SelectProps> = ({
           ))}
         </select>
 
-        <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-stone-500">
+        <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-stone-500 member-dark:text-neutral-400">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
           </svg>

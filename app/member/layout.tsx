@@ -16,9 +16,9 @@ export default async function MemberLayout({
   return (
     <>
       <SessionTimeout />
-      <main className="flex min-h-screen justify-center bg-white">
-        <section className="min-h-screen w-full max-w-md bg-white font-helvetica">
-          <MemberTopBar user={user} />
+      <main className="member-theme flex min-h-screen justify-center bg-white member-dark:bg-member-canvas">
+        <section className="min-h-screen w-full max-w-md bg-white member-dark:bg-member-canvas font-helvetica">
+          <MemberTopBar user={{ firstName: user.firstName, lastName: user.lastName, email: user.email, profileImageUrl: user.profileImageUrl }} />
           <MemberFontSizeProvider>{children}</MemberFontSizeProvider>
           <MemberBottomNav />
         </section>

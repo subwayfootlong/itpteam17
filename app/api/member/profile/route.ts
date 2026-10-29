@@ -99,9 +99,7 @@ export async function PATCH(req: Request) {
       .from("users")
       .update(updates)
       .eq("id", user.id)
-      .select(
-        "id, first_name, last_name, salutation, email, role, member_id, membership_tier, membership_status, expiry_date, phone, organization, designation, arabic_name, member_since",
-      )
+      .select("id")
       .maybeSingle();
 
     if (error) {
@@ -112,7 +110,7 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ member: data });
+    return NextResponse.json({ ok: true });
   } catch (err: unknown) {
     if (err instanceof InputValidationError) return invalidInput(err.message);
     return NextResponse.json(

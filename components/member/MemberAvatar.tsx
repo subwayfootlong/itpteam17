@@ -41,7 +41,7 @@ export default function MemberAvatar({
   if (profileImageUrl && !imageFailed) {
     return (
       <div
-        className={`relative shrink-0 overflow-hidden rounded-full bg-gray-200 ${className}`}
+        className={`relative shrink-0 overflow-hidden rounded-full bg-gray-200 member-dark:bg-member-raised ${className}`}
         style={{ width: size, height: size }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -57,7 +57,7 @@ export default function MemberAvatar({
 
   return (
     <div
-      className={`flex shrink-0 items-center justify-center rounded-full border border-[#CFE8C8] bg-[#EAF6E7] font-bold text-[#0F6E00] ${className}`}
+      className={`flex shrink-0 items-center justify-center rounded-full border border-[#CFE8C8] member-dark:border-member-border bg-[#EAF6E7] member-dark:bg-member-raised font-bold text-[#0F6E00] member-dark:text-brand-primary-200 ${className}`}
       style={{
         width: size,
         height: size,

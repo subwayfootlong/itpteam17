@@ -14,7 +14,7 @@ export default function CommunityTabs({
 }) {
   return (
     <div
-      className="mx-4 mt-4 grid grid-cols-2 rounded-2xl border border-stone-200/60 bg-stone-100 p-1"
+      className="mx-4 mt-4 grid grid-cols-2 rounded-2xl border border-stone-200/60 member-dark:border-member-border/60 bg-stone-100 member-dark:bg-member-raised p-1"
       role="tablist"
       aria-label="Community views"
     >
@@ -30,8 +30,8 @@ export default function CommunityTabs({
             onClick={() => onSelect(tab.id)}
             className={`rounded-xl py-2.5 text-xs font-bold transition-all duration-100 active:scale-[0.98] ${
               isActive
-                ? "bg-white text-brand-primary-800 shadow-sm"
-                : "text-neutral-500 hover:text-neutral-800"
+                ? "bg-white member-dark:bg-member-surface text-brand-primary-800 member-dark:text-brand-primary-200 shadow-sm"
+                : "text-neutral-500 member-dark:text-neutral-400 hover:text-neutral-800 member-dark:hover:text-neutral-100"
             }`}
           >
             {tab.label}

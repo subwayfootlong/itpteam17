@@ -25,7 +25,7 @@ export async function GET(req: Request) {
 
   const { data, error } = await query;
   if (error) {
-    console.error('Events GET Error:', error);
+    console.error('Events GET Error:');
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   return NextResponse.json({ events: data ?? [] });
@@ -72,11 +72,11 @@ export async function POST(req: Request) {
       ...tierAudienceToDatabase(audience.value),
       // Add created_by: admin.sub if the events table includes that column.
     })
-    .select()
+    .select('id, title, status, event_date')
     .single();
 
   if (error) {
-    console.error('Events POST Error:', error);
+    console.error('Events POST Error:');
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   if (data?.status === 'published') {
@@ -88,5 +88,5 @@ export async function POST(req: Request) {
     });
   }
 
-  return NextResponse.json({ event: data }, { status: 201 });
+  return NextResponse.json({ ok: true }, { status: 201 });
 }

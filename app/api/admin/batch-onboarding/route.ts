@@ -161,7 +161,7 @@ export async function POST(request: Request) {
       .from('users')
       .select('email, phone, member_id');
     if (existingError) {
-      console.error('Batch onboarding lookup failed:', existingError);
+      console.error('Batch onboarding lookup failed:');
       return NextResponse.json({ error: 'Existing members could not be checked right now. Please try again.' }, { status: 500 });
     }
     const existingEmails = new Set(
@@ -217,7 +217,7 @@ export async function POST(request: Request) {
         .select('email');
 
       if (insertError) {
-        console.error('Batch onboarding insert failed:', insertError);
+        console.error('Batch onboarding insert failed:');
         const message = friendlyInsertError(insertError.message);
         for (const { member } of prepared) {
           results.push({ rowNumber: member.rowNumber, email: member.email, status: 'failed', message });
@@ -244,5 +244,5 @@ export async function POST(request: Request) {
       skipped: results.filter((result) => result.status === 'skipped').length,
       failed: results.filter((result) => result.status === 'failed').length,
     },
-  });
+  }, { headers: { "Cache-Control": "private, no-store" } });
 }

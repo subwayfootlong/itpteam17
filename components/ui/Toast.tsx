@@ -87,9 +87,9 @@ function ToastItemView({
   return (
     <div
       role="alert"
-      className="flex items-start gap-3 px-4 py-3 rounded-xl shadow-lg max-w-sm w-full"
+      className="portal-toast flex items-start gap-3 px-4 py-3 rounded-xl shadow-lg max-w-sm w-full"
       style={{
-        background: s.bg,
+        background: `var(--toast-surface, ${s.bg})`,
         border: `1.5px solid ${s.border}`,
         fontFamily: "'Helvetica Neue', -apple-system, sans-serif",
         animation: "toast-in 0.2s ease",
@@ -104,7 +104,7 @@ function ToastItemView({
       </div>
       <p
         className="flex-1 text-[13px] font-medium leading-snug"
-        style={{ color: "#1a2e1a" }}
+        style={{ color: "var(--toast-ink, #1a2e1a)" }}
       >
         {item.message}
       </p>

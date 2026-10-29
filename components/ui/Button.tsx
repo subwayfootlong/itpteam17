@@ -11,8 +11,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<Variant, string> = {
   primary: 'bg-[#53A63E] text-white hover:bg-opacity-95',
-  secondary: 'bg-stone-50 text-gray-900 border border-stone-300/80 hover:bg-stone-100',
-  ghost: 'bg-transparent text-stone-800 hover:bg-stone-50 border border-transparent',
+  secondary: 'bg-stone-50 member-dark:bg-member-surface text-gray-900 member-dark:text-neutral-100 border border-stone-300/80 member-dark:border-member-border/80 hover:bg-stone-100 member-dark:hover:bg-member-raised',
+  ghost: 'bg-transparent text-stone-800 member-dark:text-neutral-100 hover:bg-stone-50 member-dark:hover:bg-member-surface border border-transparent',
 };
 
 const Button: React.FC<ButtonProps> = ({ variant = 'primary', loading = false, fullWidth = true, children, className = '', disabled, ...rest }) => {

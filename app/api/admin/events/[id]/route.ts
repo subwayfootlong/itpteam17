@@ -1,3 +1,4 @@
+import { EVENT_DETAIL_FIELDS, responseFields } from "@/lib/responseFields";
 import { readJsonObject, invalidInput, InputValidationError, isUuid } from "@/lib/inputValidation";
 import { validateEventInput } from "@/lib/apiInputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
@@ -17,16 +18,16 @@ export async function GET(
   if (!isUuid(id)) return invalidInput("ID must be a UUID");
   const { data, error } = await supabaseAdmin
     .from('events')
-    .select('*')
+    .select(EVENT_DETAIL_FIELDS)
     .eq('id', id)
     .maybeSingle();
 
   if (error) {
-    console.error('Events GET by ID Error:', error);
+    console.error('Events GET by ID Error:');
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   if (!data) return NextResponse.json({ error: 'Event not found' }, { status: 404 });
-  return NextResponse.json({ event: data });
+  return NextResponse.json({ event: responseFields(data, EVENT_DETAIL_FIELDS) });
 }
 
 export async function PATCH(
@@ -78,11 +79,11 @@ export async function PATCH(
     .from('events')
     .update(updates)
     .eq('id', id)
-    .select()
+    .select('id, title, status, audience_type, eligible_tiers, show_locked_preview, event_date')
     .maybeSingle();
 
   if (error) {
-    console.error('Events PATCH Error:', error);
+    console.error('Events PATCH Error:');
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   if (data?.status === 'published' && (existing?.status !== 'published' || audienceChanged)) {
@@ -98,7 +99,7 @@ export async function PATCH(
     });
   }
 
-  return NextResponse.json({ event: data });
+  return NextResponse.json({ ok: true });
 }
 
 export async function DELETE(
@@ -112,7 +113,7 @@ export async function DELETE(
   if (!isUuid(id)) return invalidInput("ID must be a UUID");
   const { error } = await supabaseAdmin.from('events').delete().eq('id', id);
   if (error) {
-    console.error('Events DELETE Error:', error);
+    console.error('Events DELETE Error:');
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   return NextResponse.json({ ok: true });

@@ -9,7 +9,7 @@ import type { Country } from "react-phone-number-input";
 import { digitsOnly } from "@/lib/phone";
 
 const fieldBubble =
-  "relative rounded-xl bg-slate-50 border border-stone-300 focus-within:border-[#53A63E] transition-all";
+  "relative rounded-xl bg-slate-50 member-dark:bg-member-raised border border-stone-300 member-dark:border-member-border focus-within:border-[#53A63E] transition-all";
 
 interface PhoneInputFieldProps {
   label?: string;
@@ -76,7 +76,7 @@ const PhoneInputField: React.FC<PhoneInputFieldProps> = ({
       {label ? (
         <label
           htmlFor={inputId}
-          className="text-sm font-semibold tracking-tight text-gray-900"
+          className="text-sm font-semibold tracking-tight text-gray-900 member-dark:text-neutral-100"
         >
           {label}
         </label>
@@ -93,11 +93,11 @@ const PhoneInputField: React.FC<PhoneInputFieldProps> = ({
                 <Flag title={en[country] ?? country} />
               </span>
             ) : null}
-            <span className="text-sm font-normal tabular-nums text-gray-900">
+            <span className="text-sm font-normal tabular-nums text-gray-900 member-dark:text-neutral-100">
               +{callingCode}
             </span>
             <svg
-              className="w-3.5 h-3.5 text-stone-500 shrink-0 pointer-events-none"
+              className="w-3.5 h-3.5 text-stone-500 member-dark:text-neutral-400 shrink-0 pointer-events-none"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
@@ -130,7 +130,7 @@ const PhoneInputField: React.FC<PhoneInputFieldProps> = ({
             onChange={(e) => emitChange(country, digitsOnly(e.target.value))}
             placeholder={placeholder}
             required={required}
-            className="h-12 w-full bg-transparent px-4 text-sm font-normal text-gray-900 placeholder-stone-400 outline-none"
+            className="h-12 w-full bg-transparent px-4 text-sm font-normal text-gray-900 member-dark:text-neutral-100 placeholder-stone-400 member-dark:placeholder-neutral-400 outline-none"
           />
         </div>
       </div>
