@@ -33,7 +33,7 @@ Baseline run [`2026-10-29T13-16-06`](evidence/runs/2026-10-29T13-16-06/), 29 Oct
 | [TC-SFR-02](#tc-sfr-02-resource-level-access-control) | SFR-02 Resource-level access control (#48) | nerocladiaus | 7 | PASS |
 | [TC-SFR-03](#tc-sfr-03-membership-tier-access-control) | SFR-03 Membership-tier access control (#49) | nerocladiaus | 8 | PASS |
 | [TC-SFR-04](#tc-sfr-04-server-side-input-validation-and-sanitisation) | SFR-04 Server-side input validation and sanitisation (#50) | LiandoMaxin | 9 | PASS |
-| [TC-SFR-05](#tc-sfr-05-database-access-control) | SFR-05 Database access control (#51) | ooWise | 4 | PASS |
+| [TC-SFR-05](#tc-sfr-05-database-access-control) | SFR-05 Database access control (#51) | ooWise | 5 | PASS |
 | [TC-SFR-06](#tc-sfr-06-secure-session-and-cross-site-request-handling) | SFR-06 Secure session and cross-site request handling (#52) | nerocladiaus | 9 | **FAIL** |
 | [TC-SFR-07](#tc-sfr-07-secure-digital-membership-verification) | SFR-07 Secure digital membership verification (#53) | LiandoMaxin | 8 | PASS |
 | [TC-SFR-08](#tc-sfr-08-secure-email-address-change) | SFR-08 Secure email address change (#39) | LiandoMaxin | 11 | PASS (2 not run) |
@@ -170,7 +170,7 @@ needed.
 
 **Preconditions:** `docs/supabase-sfr05-rls.sql` applied; `SUPABASE_ANON_KEY` set.
 **Spec:** the existing SFR-05 suites (`npm run test:sfr05`), plus
-`tests/security/tc-sfr-05.spec.ts` for steps 3–4.
+`tests/security/tc-sfr-05.spec.ts` for steps 3–5.
 
 | # | Step | Expected result | Criterion | Method |
 |---|---|---|---|---|
@@ -178,8 +178,9 @@ needed.
 | 2 | Run `npm run test:sfr05:authz` and `npm run test:sfr05:workflows` | All pass | b | Auto |
 | 3 | Search the browser bundle (`.next/static`) and every page's HTML for the service-role key and `supabaseAdmin` | Not found | c | Auto |
 | 4 | Confirm the key is read only in `lib/supabaseServer.ts`, never from a `NEXT_PUBLIC_*` variable, and the module throws in a browser | True | c | Inspection |
+| 5 | Search every committed file for the UAT test-account password (added after DEF-01) | Not found; tests read it from `UAT_PASSWORD` in `.env.local` | c | Auto |
 
-**Status:** PASS (14/14) · **Evidence:** [`TC-SFR-05/`](evidence/runs/2026-10-29T13-16-06/TC-SFR-05/) · **Defects:** —
+**Status:** PASS (14/14 at baseline) · **Evidence:** [`TC-SFR-05/`](evidence/runs/2026-10-29T13-16-06/TC-SFR-05/) · **Retest after DEF-01:** PASS (15/15, with step 5) [`TC-SFR-05/`](evidence/runs/2026-10-29T15-28-54/TC-SFR-05/) · **Defects:** [DEF-01](defects.md#def-01) (found by inspection, fixed)
 
 ---
 

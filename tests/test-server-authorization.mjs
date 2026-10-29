@@ -1,17 +1,24 @@
-import http from 'http';
 import { spawn } from 'child_process';
+
+// Shared UAT test-account password, read from .env.local (never hardcode it:
+// this repository is public). Run through `npm run test:sfr05:*`, which loads .env.local.
+const UAT_PASSWORD = process.env.UAT_PASSWORD;
+if (!UAT_PASSWORD) {
+  console.error('UAT_PASSWORD is not set. Add the UAT test-account password to .env.local.');
+  process.exit(1);
+}
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 let serverProcess = null;
 
 const MEMBER_CREDENTIALS = {
   email: 'member1@uat.pergas.org',
-  password: 'Testing123!',
+  password: UAT_PASSWORD,
 };
 
 const ADMIN_CREDENTIALS = {
   email: 'admin2@uat.pergas.org',
-  password: 'Testing123!',
+  password: UAT_PASSWORD,
 };
 
 const testResults = [];

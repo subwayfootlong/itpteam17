@@ -67,6 +67,12 @@ test("TC-SFR-05 database access control", async ({ evidence, pageAs, baseURL }) 
     .filter((f) => /\.(ts|tsx)$/.test(f) && /supabaseServer|supabaseAdmin/.test(fs.readFileSync(f, "utf8")));
   ev.check("4 no component imports the server client", "0 files", `${clientImports.length} files`, clientImports.length === 0);
 
+  // Step 5: test-account credentials stay out of the (public) repository. Guards DEF-01.
+  const password = process.env.UAT_PASSWORD ?? "";
+  const grep = spawnSync("git", ["grep", "-l", "-F", "-e", password, "--", ".", ":!package-lock.json"], { cwd: process.cwd(), encoding: "utf8" });
+  const withPassword = password ? grep.stdout.split(/\r?\n/).filter(Boolean) : [];
+  ev.check("5 no committed file contains the UAT account password", "0 files", withPassword.length ? withPassword.join(", ") : "0 files", !!password && withPassword.length === 0);
+
   expect(ev.passed, "all TC-SFR-05 checks pass").toBe(true);
 });
 

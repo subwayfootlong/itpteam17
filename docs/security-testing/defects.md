@@ -14,7 +14,7 @@ defects below. Owners are the requirement owners from GitHub, to confirm offline
 
 | ID | Severity | Requirement (owner) | Defect | Status |
 |---|---|---|---|---|
-| [DEF-01](#def-01) | Medium | SFR-05 (ooWise) | UAT account password hardcoded in public test files | Open |
+| [DEF-01](#def-01) | Medium | SFR-05 (ooWise) | UAT account password hardcoded in public test files | Fixed (password change pending) |
 | [DEF-02](#def-02) | Medium | SFR-06 (nerocladiaus) | APIs accept sessions past the 15-minute idle timeout | Open |
 | [DEF-03](#def-03) | Medium | SFR-06 (nerocladiaus) | Session token still works after logout | Open |
 | [DEF-04](#def-04) | Medium | SFR-06 (nerocladiaus) | No Origin check on state-changing API requests | Open |
@@ -31,7 +31,7 @@ control the requirement asks for is missing, but another layer limits the impact
 
 ### DEF-01
 
-**UAT account password hardcoded in public test files** · Medium · Open
+**UAT account password hardcoded in public test files** · Medium · Fixed (password change pending)
 
 - **Found by:** code inspection during setup (not a test case).
 - **What:** the shared UAT password is in `tests/test-server-authorization.mjs`
@@ -41,7 +41,19 @@ control the requirement asks for is missing, but another layer limits the impact
 - **Suggested fix:** read it from `UAT_PASSWORD` in `.env.local`, as
   `tests/security/` does, and change the UAT accounts' password, since the current
   one is already in the git history.
-- **Fix:** — · **Retest evidence:** —
+- **Fix:** both files now read the password from `UAT_PASSWORD` and stop with a
+  clear message if it is missing; the `test:sfr05:authz` and
+  `test:sfr05:workflows` scripts load `.env.local`. TC-SFR-05 gained step 5, which
+  fails if any committed file contains the UAT password (the same check run
+  against the previous commit, `1df41d1`, finds both files). Confirmed by the
+  owner (ooWise).
+- **Retest evidence:** [`TC-SFR-05/`](evidence/runs/2026-10-29T15-28-54/TC-SFR-05/) (run 2026-10-29T15-28-54):
+  15/15 pass, including step 5 (0 files contain the password) and all three SFR-05
+  suites running with the password from `.env.local`.
+- **Still open:** the old password remains in the repository's git history, so the
+  UAT accounts' password should be changed. Not done here, because the accounts
+  are shared by the team. Close this defect once it is changed and `UAT_PASSWORD`
+  is updated in everyone's `.env.local`.
 
 ### DEF-02
 
