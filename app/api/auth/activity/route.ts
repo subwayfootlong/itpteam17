@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { verifyAccessToken } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/currentUser";
 import {
   clearSessionCookies,
   getLastActivityTimestamp,
@@ -11,15 +11,8 @@ import {
 
 export async function POST() {
   const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
-
-  if (!token) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
-    verifyAccessToken(token);
-  } catch {
+  // Session activity intentionally supports both member and admin accounts.
+  if (!(await getCurrentUser())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

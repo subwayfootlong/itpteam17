@@ -1,5 +1,7 @@
+import { readJsonObject, invalidInput, InputValidationError, isOneOf } from "@/lib/inputValidation";
+import { validatePaymentInput } from "@/lib/apiInputValidation";
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
-import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { ADMIN_PAYMENT_METHOD_SELECT } from '@/lib/adminPaymentMethods';
 import { normalizePaymentUrl } from '@/lib/paymentUrl';
 import { supabaseAdmin } from '@/lib/supabaseServer';
@@ -11,11 +13,12 @@ function cleanText(value: unknown) {
 }
 
 export async function GET(req: Request) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const url = new URL(req.url);
   const active = url.searchParams.get('active');
+  if (active !== null && !isOneOf(active, ['true', 'false'])) return invalidInput('Active must be true or false');
 
   let query = supabaseAdmin
     .from('payment_methods')
@@ -26,19 +29,19 @@ export async function GET(req: Request) {
   if (active === 'false') query = query.eq('is_active', false);
 
   const { data, error } = await query;
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   return NextResponse.json({ paymentMethods: data ?? [] });
 }
 
 export async function POST(req: Request) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   let body: Record<string, unknown>;
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    body = await readJsonObject(req, validatePaymentInput);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
   }
 
   const name = cleanText(body.name);
@@ -67,7 +70,7 @@ export async function POST(req: Request) {
       .from('payment_methods')
       .update({ is_active: false })
       .eq('is_active', true);
-    if (deactivateError) return NextResponse.json({ error: deactivateError.message }, { status: 500 });
+    if (deactivateError) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
   const { data, error } = await supabaseAdmin
@@ -82,6 +85,6 @@ export async function POST(req: Request) {
     .select(ADMIN_PAYMENT_METHOD_SELECT)
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   return NextResponse.json({ paymentMethod: data, deactivatedOthers: isActive }, { status: 201 });
 }

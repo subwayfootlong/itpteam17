@@ -1,7 +1,8 @@
+import { readJsonObject, invalidInput, InputValidationError } from "@/lib/inputValidation";
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 import { tierAudienceToDatabase, validateTierAudience } from "@/lib/tierAccess";
-import { getVerifiedAdmin, unauthorizedResponse } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
@@ -9,32 +10,34 @@ const GROUP_SELECT =
   "id, title, icon, tone, sort_order, audience_type, eligible_tiers, show_locked_preview";
 
 export async function GET() {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
+
   const { data, error } = await supabaseAdmin
     .from("discussion_groups")
     .select(GROUP_SELECT)
     .order("sort_order", { ascending: true });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
   return NextResponse.json({ groups: data ?? [] });
 }
 
 export async function PATCH(req: Request) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
+
   let body: Record<string, unknown>;
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+    body = await readJsonObject(req);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
   }
 
   const id = typeof body.id === "string" ? body.id.trim() : "";
-  if (!id) {
+  if (!/^[a-zA-Z0-9_-]{1,100}$/.test(id)) {
     return NextResponse.json({ error: "Discussion group ID is required." }, { status: 400 });
   }
 
@@ -55,7 +58,7 @@ export async function PATCH(req: Request) {
     .maybeSingle();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   if (!data) {
     return NextResponse.json({ error: "Discussion group not found." }, { status: 404 });

@@ -19,7 +19,7 @@ export default async function SettingsPage() {
     cookieStore.get(PUSH_NOTIFICATIONS_COOKIE)?.value !== "0";
 
   return (
-    <MemberPageShell showTopBar={false}>
+    <MemberPageShell>
       <MemberSettingsView
         initialPreferences={initialPreferences}
         initialPushEnabled={initialPushEnabled}

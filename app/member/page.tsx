@@ -29,7 +29,7 @@ export default async function HomePage() {
     <MemberPageShell>
       <div className="px-5 pb-6">
         {/* Soft tinted header: who you are, where to go, what is new */}
-        <div className="-mx-5 bg-gradient-to-b from-brand-primary-50 to-white px-5 pb-1 pt-6">
+        <div className="-mx-5 bg-gradient-to-b from-brand-primary-50 to-white member-dark:from-member-surface member-dark:to-member-canvas px-5 pb-1 pt-6">
           <HomeGreeting
             firstName={displayFirstName}
             lastName={displayLastName}

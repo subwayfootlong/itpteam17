@@ -1,36 +1,31 @@
+import { readJsonObject, invalidInput, InputValidationError } from "@/lib/inputValidation";
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/currentUser";
+import { requireMember } from "@/lib/currentUser";
 import {
   getNotificationPreferences,
   updateNotificationPreferences,
   type NotificationPreferences,
 } from "@/lib/notifications";
 
-const preferenceKeys = ["benefit", "announcement", "event"] as const;
+const preferenceKeys = ["benefit", "announcement", "event", "email"] as const;
 
 export async function GET() {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Please log in first" }, { status: 401 });
-  }
+  const { user, response: authResponse } = await requireMember();
+  if (authResponse) return authResponse;
 
   const preferences = await getNotificationPreferences(user.id);
   return NextResponse.json({ preferences });
 }
 
 export async function PATCH(req: Request) {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Please log in first" }, { status: 401 });
-  }
+  const { user, response: authResponse } = await requireMember();
+  if (authResponse) return authResponse;
 
   let body: unknown;
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+    body = await readJsonObject(req);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
   }
 
   if (!body || typeof body !== "object") {
@@ -41,6 +36,7 @@ export async function PATCH(req: Request) {
 
   for (const key of preferenceKeys) {
     const value = (body as Record<string, unknown>)[key];
+    if (value !== undefined && typeof value !== "boolean") return invalidInput(`${key} must be true or false`);
     if (typeof value === "boolean") {
       patch[key] = value;
     }
@@ -56,8 +52,8 @@ export async function PATCH(req: Request) {
   try {
     const preferences = await updateNotificationPreferences(user.id, patch);
     return NextResponse.json({ preferences });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Unable to save preferences";
+  } catch {
+    const message = "Unable to save preferences";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

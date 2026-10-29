@@ -1,21 +1,10 @@
-import Link from "next/link";
 import BenefitForm from "@/components/admin/BenefitForm";
+import AdminBreadcrumbs from '@/components/admin/AdminBreadcrumbs';
 
 export default function NewBenefitPage() {
   return (
     <div className="space-y-5">
-      <nav className="text-sm text-gray-400" aria-label="Breadcrumb">
-        <Link
-          href="/admin/engagement"
-          className="hover:text-[#3FAE2A]"
-        >
-          Benefits
-        </Link>
-        <span className="mx-2" aria-hidden="true">
-          &rsaquo;
-        </span>
-        <span className="text-gray-700">Create New Benefit</span>
-      </nav>
+      <AdminBreadcrumbs items={[{ label: 'Benefits', href: '/admin/engagement' }, { label: 'Create New Benefit' }]} />
 
       <div>
         <h2 className="text-2xl font-bold text-gray-800">

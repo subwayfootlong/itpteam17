@@ -25,7 +25,7 @@ export default async function EditProfilePage() {
   }
 
   return (
-    <MemberPageShell showTopBar={false}>
+    <MemberPageShell>
       <EditProfileForm initial={member} />
     </MemberPageShell>
   );

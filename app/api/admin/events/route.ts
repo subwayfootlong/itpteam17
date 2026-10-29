@@ -1,5 +1,7 @@
+import { readJsonObject, invalidInput, InputValidationError, isOneOf } from "@/lib/inputValidation";
+import { validateEventInput } from "@/lib/apiInputValidation";
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
-import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { notifyEventPublished } from '@/lib/notifications';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { tierAudienceToDatabase, validateTierAudience } from '@/lib/tierAccess';
@@ -7,11 +9,12 @@ import { tierAudienceToDatabase, validateTierAudience } from '@/lib/tierAccess';
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const url = new URL(req.url);
   const status = url.searchParams.get('status') ?? '';
+  if (status && !isOneOf(status, ['draft', 'published', 'archived'])) return invalidInput('Invalid status filter');
 
   let query = supabaseAdmin
     .from('events')
@@ -22,21 +25,21 @@ export async function GET(req: Request) {
 
   const { data, error } = await query;
   if (error) {
-    console.error('Events GET Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Events GET Error:');
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   return NextResponse.json({ events: data ?? [] });
 }
 
 export async function POST(req: Request) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   let body;
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+    body = await readJsonObject(req, validateEventInput);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
   }
 
   if (!body.title || typeof body.title !== 'string') {
@@ -69,12 +72,12 @@ export async function POST(req: Request) {
       ...tierAudienceToDatabase(audience.value),
       // Add created_by: admin.sub if the events table includes that column.
     })
-    .select()
+    .select('id, title, status, event_date')
     .single();
 
   if (error) {
-    console.error('Events POST Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Events POST Error:');
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   if (data?.status === 'published') {
     await notifyEventPublished({
@@ -85,5 +88,5 @@ export async function POST(req: Request) {
     });
   }
 
-  return NextResponse.json({ event: data }, { status: 201 });
+  return NextResponse.json({ ok: true }, { status: 201 });
 }

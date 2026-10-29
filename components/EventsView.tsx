@@ -99,7 +99,7 @@ function EventPosterBanner({
         </div>
 
         {category && (
-          <span className="absolute left-3 top-3 z-10 rounded-full border border-white/30 bg-white/95 px-2.5 py-0.5 text-[11px] font-bold text-brand-primary-800 shadow-xs backdrop-blur-md">
+          <span className="absolute left-3 top-3 z-10 rounded-full border border-white/30 bg-white/95 member-dark:bg-member-surface/95 px-2.5 py-0.5 text-[11px] font-bold text-brand-primary-800 member-dark:text-brand-primary-200 shadow-xs backdrop-blur-md">
             {category}
           </span>
         )}
@@ -108,7 +108,7 @@ function EventPosterBanner({
   }
 
   return (
-    <div className="relative w-full overflow-hidden bg-neutral-100">
+    <div className="relative w-full overflow-hidden bg-neutral-100 member-dark:bg-member-raised">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={imageUrl}
@@ -119,7 +119,7 @@ function EventPosterBanner({
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
 
       {category && (
-        <span className="absolute left-3 top-3 rounded-full border border-white/40 bg-white/95 px-2.5 py-0.5 text-[11px] font-bold text-brand-primary-800 shadow-xs backdrop-blur-md">
+        <span className="absolute left-3 top-3 rounded-full border border-white/40 bg-white/95 member-dark:bg-member-surface/95 px-2.5 py-0.5 text-[11px] font-bold text-brand-primary-800 member-dark:text-brand-primary-200 shadow-xs backdrop-blur-md">
           {category}
         </span>
       )}
@@ -161,14 +161,14 @@ function EventDescription({
     <div className="mt-2">
       <p
         ref={descriptionRef}
-        className="line-clamp-2 break-words text-xs leading-relaxed text-neutral-600"
+        className="line-clamp-2 break-words text-xs leading-relaxed text-neutral-600 member-dark:text-neutral-300"
       >
         {description}
       </p>
       {isTruncated && !isLocked && (
         <NavLink
           href={`/member/events/${eventId}`}
-          className="mt-1 inline-block text-xs font-semibold text-brand-primary-800 hover:underline"
+          className="mt-1 inline-block text-xs font-semibold text-brand-primary-800 member-dark:text-brand-primary-200 hover:underline"
         >
           See more
         </NavLink>
@@ -190,7 +190,7 @@ function EventCard({
   const hasRsvpLink = Boolean(event.external_rsvp_url?.trim());
 
   return (
-    <article className="group mb-4 flex flex-col overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs transition-all hover:border-neutral-300 hover:shadow-sm">
+    <article className="group mb-4 flex flex-col overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-member-border/80 bg-white member-dark:bg-member-surface shadow-xs transition-all hover:border-neutral-300 member-dark:hover:border-member-border hover:shadow-sm">
       {/* 16:9 Banner */}
       <div className="relative">
         {event.isLocked ? (
@@ -216,16 +216,16 @@ function EventCard({
         {/* Floating status pill on top right */}
         <div className="absolute right-3 top-3 z-10">
           {event.isRegistered ? (
-            <span className="inline-flex items-center gap-1 rounded-full border border-brand-primary-200 bg-brand-primary-100/95 px-2.5 py-0.5 text-[11px] font-bold text-brand-primary-800 shadow-xs backdrop-blur-md">
+            <span className="inline-flex items-center gap-1 rounded-full border border-brand-primary-200 member-dark:border-brand-primary-700 bg-brand-primary-100/95 member-dark:bg-brand-primary-900/95 px-2.5 py-0.5 text-[11px] font-bold text-brand-primary-800 member-dark:text-brand-primary-200 shadow-xs backdrop-blur-md">
               <Check size={12} strokeWidth={3} />
               Registered
             </span>
           ) : event.isRejected ? (
-            <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50/95 px-2.5 py-0.5 text-[11px] font-bold text-rose-700 shadow-xs backdrop-blur-md">
+            <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 member-dark:border-rose-800 bg-rose-50/95 member-dark:bg-rose-950/95 px-2.5 py-0.5 text-[11px] font-bold text-rose-700 member-dark:text-rose-300 shadow-xs backdrop-blur-md">
               Rejected
             </span>
           ) : event.isLocked ? (
-            <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50/95 px-2.5 py-0.5 text-[11px] font-bold text-amber-800 shadow-xs backdrop-blur-md">
+            <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 member-dark:border-amber-800 bg-amber-50/95 member-dark:bg-amber-950/95 px-2.5 py-0.5 text-[11px] font-bold text-amber-800 member-dark:text-amber-300 shadow-xs backdrop-blur-md">
               <LockKeyhole size={11} />
               Locked
             </span>
@@ -241,7 +241,7 @@ function EventCard({
       <div className="flex flex-1 flex-col justify-between p-4">
         <div>
           {/* Schedule Row */}
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-brand-primary-800">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-brand-primary-800 member-dark:text-brand-primary-200">
             <CalendarDays size={14} className="shrink-0" />
             <span>
               {formatMemberDate(event.event_date)} •{" "}
@@ -250,7 +250,7 @@ function EventCard({
           </div>
 
           {/* Event Title */}
-          <h3 className="mt-2 line-clamp-2 text-base font-bold font-sans leading-snug text-neutral-900 group-hover:text-brand-primary-800 transition-colors">
+          <h3 className="mt-2 line-clamp-2 text-base font-bold font-sans leading-snug text-neutral-900 member-dark:text-neutral-100 group-hover:text-brand-primary-800 transition-colors">
             {event.isLocked ? (
               event.title
             ) : (
@@ -259,17 +259,17 @@ function EventCard({
           </h3>
 
           {/* Venue & Capacity Row */}
-          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-neutral-500">
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-neutral-500 member-dark:text-neutral-400">
             <span className="flex items-center gap-1.5">
-              <MapPin size={13} className="shrink-0 text-neutral-400" />
+              <MapPin size={13} className="shrink-0 text-neutral-400 member-dark:text-neutral-400" />
               <span className="truncate">
                 {event.venue || "Venue to be confirmed"}
               </span>
             </span>
 
             {event.spots_available !== null && (
-              <span className="flex items-center gap-1 text-neutral-500">
-                <Users size={12} className="shrink-0 text-neutral-400" />
+              <span className="flex items-center gap-1 text-neutral-500 member-dark:text-neutral-400">
+                <Users size={12} className="shrink-0 text-neutral-400 member-dark:text-neutral-400" />
                 <span>
                   {event.spots_available > 0
                     ? `${event.spots_available} spots left`
@@ -290,12 +290,12 @@ function EventCard({
         </div>
 
         {/* Action Button Section with Guaranteed High-Contrast White Text */}
-        <div className="mt-4 pt-3 border-t border-neutral-100">
+        <div className="mt-4 pt-3 border-t border-neutral-100 member-dark:border-member-border">
           {event.isLocked ? (
             <button
               type="button"
               disabled
-              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs font-semibold text-amber-800"
+              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-amber-200 member-dark:border-amber-800 bg-amber-50 member-dark:bg-amber-950 px-4 py-2.5 text-xs font-semibold text-amber-800 member-dark:text-amber-300"
             >
               <LockKeyhole size={14} />
               <span>
@@ -307,7 +307,7 @@ function EventCard({
           ) : event.isRegistered ? (
             <NavLink
               href={`/member/events/${event.id}`}
-              className="flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-brand-primary-200 bg-brand-primary-100 px-4 py-2.5 text-xs font-bold text-brand-primary-800 transition-all hover:bg-brand-primary-200 active:scale-[0.99]"
+              className="flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-brand-primary-200 member-dark:border-brand-primary-700 bg-brand-primary-100 member-dark:bg-brand-primary-900 px-4 py-2.5 text-xs font-bold text-brand-primary-800 member-dark:text-brand-primary-200 transition-all hover:bg-brand-primary-200 member-dark:hover:bg-brand-primary-900 active:scale-[0.99]"
             >
               <Check size={14} strokeWidth={3} />
               <span>You&apos;re Registered • View Details</span>
@@ -329,7 +329,7 @@ function EventCard({
               </span>
             </button>
           ) : isFull ? (
-            <div className="flex min-h-11 w-full items-center justify-center rounded-xl border border-neutral-200 bg-stone-100 px-4 py-2.5 text-xs font-semibold text-neutral-500">
+            <div className="flex min-h-11 w-full items-center justify-center rounded-xl border border-neutral-200 member-dark:border-member-border bg-stone-100 member-dark:bg-member-raised px-4 py-2.5 text-xs font-semibold text-neutral-500 member-dark:text-neutral-400">
               Event is Full
             </div>
           ) : hasRsvpLink ? (
@@ -512,14 +512,14 @@ export default function EventsView({
   return (
     <div className="space-y-4 px-4 py-5 font-helvetica">
       {/* 1. View Mode Switcher Toggle (List View vs Calendar) */}
-      <div className="flex rounded-2xl bg-stone-100 p-1 shadow-inner border border-stone-200/50">
+      <div className="flex rounded-2xl bg-stone-100 member-dark:bg-member-raised p-1 shadow-inner border border-stone-200/50 member-dark:border-member-border/50">
         <button
           type="button"
           onClick={() => setViewMode("list")}
           className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold transition-all active:scale-[0.98] ${
             viewMode === "list"
-              ? "bg-white text-neutral-900 shadow-xs"
-              : "text-neutral-500 hover:text-neutral-700"
+              ? "bg-white member-dark:bg-member-surface text-neutral-900 member-dark:text-neutral-100 shadow-xs"
+              : "text-neutral-500 member-dark:text-neutral-400 hover:text-neutral-700 member-dark:hover:text-neutral-300"
           }`}
         >
           <List size={16} strokeWidth={2.5} />
@@ -531,8 +531,8 @@ export default function EventsView({
           onClick={() => setViewMode("calendar")}
           className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold transition-all active:scale-[0.98] ${
             viewMode === "calendar"
-              ? "bg-white text-neutral-900 shadow-xs"
-              : "text-neutral-500 hover:text-neutral-700"
+              ? "bg-white member-dark:bg-member-surface text-neutral-900 member-dark:text-neutral-100 shadow-xs"
+              : "text-neutral-500 member-dark:text-neutral-400 hover:text-neutral-700 member-dark:hover:text-neutral-300"
           }`}
         >
           <CalendarDays size={16} strokeWidth={2.5} />
@@ -549,7 +549,7 @@ export default function EventsView({
             className={`shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-100 active:scale-95 ${
               selectedFilter === "upcoming"
                 ? "bg-brand-primary-800 text-white shadow-sm"
-                : "border border-neutral-300 bg-white text-neutral-700 shadow-xs hover:border-brand-primary-600 hover:text-brand-primary-800"
+                : "border border-neutral-300 member-dark:border-member-border bg-white member-dark:bg-member-surface text-neutral-700 member-dark:text-neutral-300 shadow-xs hover:border-brand-primary-600 member-dark:hover:border-brand-primary-700 hover:text-brand-primary-800 member-dark:hover:text-brand-primary-200"
             }`}
             style={
               selectedFilter === "upcoming"
@@ -566,7 +566,7 @@ export default function EventsView({
             className={`shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-100 active:scale-95 ${
               selectedFilter === "all"
                 ? "bg-brand-primary-800 text-white shadow-sm"
-                : "border border-neutral-300 bg-white text-neutral-700 shadow-xs hover:border-brand-primary-600 hover:text-brand-primary-800"
+                : "border border-neutral-300 member-dark:border-member-border bg-white member-dark:bg-member-surface text-neutral-700 member-dark:text-neutral-300 shadow-xs hover:border-brand-primary-600 member-dark:hover:border-brand-primary-700 hover:text-brand-primary-800 member-dark:hover:text-brand-primary-200"
             }`}
             style={
               selectedFilter === "all"
@@ -583,7 +583,7 @@ export default function EventsView({
             className={`shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-100 active:scale-95 ${
               selectedFilter === "registered"
                 ? "bg-brand-primary-800 text-white shadow-sm"
-                : "border border-neutral-300 bg-white text-neutral-700 shadow-xs hover:border-brand-primary-600 hover:text-brand-primary-800"
+                : "border border-neutral-300 member-dark:border-member-border bg-white member-dark:bg-member-surface text-neutral-700 member-dark:text-neutral-300 shadow-xs hover:border-brand-primary-600 member-dark:hover:border-brand-primary-700 hover:text-brand-primary-800 member-dark:hover:text-brand-primary-200"
             }`}
             style={
               selectedFilter === "registered"
@@ -602,7 +602,7 @@ export default function EventsView({
               className={`shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-100 active:scale-95 ${
                 selectedFilter === category
                   ? "bg-brand-primary-800 text-white shadow-sm"
-                  : "border border-neutral-300 bg-white text-neutral-700 shadow-xs hover:border-brand-primary-600 hover:text-brand-primary-800"
+                  : "border border-neutral-300 member-dark:border-member-border bg-white member-dark:bg-member-surface text-neutral-700 member-dark:text-neutral-300 shadow-xs hover:border-brand-primary-600 member-dark:hover:border-brand-primary-700 hover:text-brand-primary-800 member-dark:hover:text-brand-primary-200"
               }`}
               style={
                 selectedFilter === category
@@ -617,7 +617,7 @@ export default function EventsView({
       )}
 
       {hasError && (
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-xs font-medium text-red-700">
+        <div className="rounded-2xl border border-red-200 member-dark:border-red-800 bg-red-50 member-dark:bg-red-950 p-4 text-xs font-medium text-red-700 member-dark:text-red-300">
           Failed to load events. Please check your network connection.
         </div>
       )}
@@ -626,21 +626,21 @@ export default function EventsView({
       {viewMode === "list" && (
         <div className="pt-1">
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+            <p className="text-xs font-bold uppercase tracking-wider text-neutral-400 member-dark:text-neutral-400">
               {listEvents.length} {listEvents.length === 1 ? "Event" : "Events"}{" "}
               Listed
             </p>
           </div>
 
           {listEvents.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50/70 p-8 text-center">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary-100 text-brand-primary-800">
+            <div className="rounded-2xl border border-dashed border-stone-200 member-dark:border-member-border bg-stone-50/70 member-dark:bg-member-surface/70 p-8 text-center">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200">
                 <CalendarDays size={22} />
               </div>
-              <h3 className="text-sm font-bold text-neutral-900">
+              <h3 className="text-sm font-bold text-neutral-900 member-dark:text-neutral-100">
                 No events found
               </h3>
-              <p className="mt-1 text-xs text-neutral-600">
+              <p className="mt-1 text-xs text-neutral-600 member-dark:text-neutral-300">
                 There are no events matching this filter. Switch filters or check back later!
               </p>
             </div>
@@ -662,19 +662,19 @@ export default function EventsView({
       {/* VIEW MODE: CALENDAR VIEW (Monarch iOS Reference) */}
       {viewMode === "calendar" && (
         <div className="space-y-4 pt-1">
-          <div className="rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-xs">
+          <div className="rounded-2xl border border-neutral-200/70 member-dark:border-member-border/70 bg-white member-dark:bg-member-surface p-5 shadow-xs">
             {/* Month Header */}
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-bold font-sans text-neutral-900">
+              <h2 className="text-base font-bold font-sans text-neutral-900 member-dark:text-neutral-100">
                 {getMonthTitle(currentMonth)}
               </h2>
 
-              <div className="flex items-center gap-1 text-neutral-600">
+              <div className="flex items-center gap-1 text-neutral-600 member-dark:text-neutral-300">
                 <button
                   type="button"
                   aria-label="Previous month"
                   onClick={goToPreviousMonth}
-                  className="rounded-lg p-1.5 transition-colors hover:bg-neutral-100 hover:text-neutral-900 active:scale-95"
+                  className="rounded-lg p-1.5 transition-colors hover:bg-neutral-100 member-dark:hover:bg-member-raised hover:text-neutral-900 member-dark:hover:text-neutral-100 active:scale-95"
                 >
                   <ChevronLeft size={20} />
                 </button>
@@ -683,7 +683,7 @@ export default function EventsView({
                   type="button"
                   aria-label="Next month"
                   onClick={goToNextMonth}
-                  className="rounded-lg p-1.5 transition-colors hover:bg-neutral-100 hover:text-neutral-900 active:scale-95"
+                  className="rounded-lg p-1.5 transition-colors hover:bg-neutral-100 member-dark:hover:bg-member-raised hover:text-neutral-900 member-dark:hover:text-neutral-100 active:scale-95"
                 >
                   <ChevronRight size={20} />
                 </button>
@@ -691,7 +691,7 @@ export default function EventsView({
             </div>
 
             {/* Days of Week Row */}
-            <div className="mt-4 grid grid-cols-7 text-center text-[11px] font-semibold tracking-wider text-neutral-400">
+            <div className="mt-4 grid grid-cols-7 text-center text-[11px] font-semibold tracking-wider text-neutral-400 member-dark:text-neutral-400">
               {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map((day) => (
                 <span key={day}>{day}</span>
               ))}
@@ -716,10 +716,10 @@ export default function EventsView({
                         isSelected
                           ? "bg-brand-primary-800 font-bold text-white"
                           : isToday
-                            ? "bg-brand-primary-100 font-bold text-brand-primary-800"
+                            ? "bg-brand-primary-100 member-dark:bg-brand-primary-900 font-bold text-brand-primary-800 member-dark:text-brand-primary-200"
                             : date.isCurrentMonth
-                              ? "font-semibold text-neutral-800 hover:bg-neutral-100"
-                              : "font-normal text-neutral-300"
+                              ? "font-semibold text-neutral-800 member-dark:text-neutral-100 hover:bg-neutral-100 member-dark:hover:bg-member-raised"
+                              : "font-normal text-neutral-300 member-dark:text-neutral-400"
                       }`}
                       style={
                         isSelected ? { color: "#ffffff", backgroundColor: "#245F1B" } : undefined
@@ -742,10 +742,10 @@ export default function EventsView({
 
           {/* Selected Date Header */}
           <div className="flex items-center justify-between px-1">
-            <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">
+            <p className="text-xs font-bold uppercase tracking-wider text-neutral-500 member-dark:text-neutral-400">
               Events on {getDateLabel(selectedDate)}
             </p>
-            <span className="rounded-full bg-brand-primary-100 px-2.5 py-0.5 text-xs font-bold text-brand-primary-800">
+            <span className="rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 px-2.5 py-0.5 text-xs font-bold text-brand-primary-800 member-dark:text-brand-primary-200">
               {selectedDateEvents.length}{" "}
               {selectedDateEvents.length === 1 ? "session" : "sessions"}
             </span>
@@ -753,11 +753,11 @@ export default function EventsView({
 
           {/* Events for Selected Date */}
           {selectedDateEvents.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-stone-200 bg-stone-50/70 p-6 text-center">
-              <p className="text-sm font-semibold text-neutral-800">
+            <div className="rounded-2xl border border-dashed border-stone-200 member-dark:border-member-border bg-stone-50/70 member-dark:bg-member-surface/70 p-6 text-center">
+              <p className="text-sm font-semibold text-neutral-800 member-dark:text-neutral-100">
                 No events scheduled for this day
               </p>
-              <p className="mt-1 text-xs text-neutral-500">
+              <p className="mt-1 text-xs text-neutral-500 member-dark:text-neutral-400">
                 Tap dates marked with green dots to view scheduled events.
               </p>
             </div>

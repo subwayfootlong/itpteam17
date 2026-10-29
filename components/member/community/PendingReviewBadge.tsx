@@ -20,7 +20,7 @@ export default function PendingReviewBadge({
       <button
         type="button"
         aria-describedby={tooltipId}
-        className="inline-flex items-center gap-1 rounded-full border border-brand-accent bg-brand-accent-soft px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-900 transition-transform duration-100 active:scale-95"
+        className="inline-flex items-center gap-1 rounded-full border border-brand-accent bg-brand-accent-soft member-dark:bg-member-raised px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-900 member-dark:text-amber-300 transition-transform duration-100 active:scale-95"
       >
         <Clock size={11} aria-hidden="true" />
         {label}

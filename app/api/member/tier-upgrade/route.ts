@@ -1,5 +1,6 @@
+import { readJsonObject, invalidInput, InputValidationError } from "@/lib/inputValidation";
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/currentUser";
+import { requireMember } from "@/lib/currentUser";
 import {
   formatTierLabel,
   getAvailableTierUpgrades,
@@ -8,10 +9,8 @@ import {
 import { supabaseAdmin } from "@/lib/supabaseServer";
 
 export async function GET() {
-  const currentUser = await getCurrentUser();
-  if (!currentUser) {
-    return NextResponse.json({ error: "Please log in first" }, { status: 401 });
-  }
+  const { user: currentUser, response: authResponse } = await requireMember();
+  if (authResponse) return authResponse;
 
   const { data: member, error: memberError } = await supabaseAdmin
     .from("users")
@@ -30,7 +29,7 @@ export async function GET() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
   return NextResponse.json({
@@ -41,16 +40,14 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const currentUser = await getCurrentUser();
-  if (!currentUser) {
-    return NextResponse.json({ error: "Please log in first" }, { status: 401 });
-  }
+  const { user: currentUser, response: authResponse } = await requireMember();
+  if (authResponse) return authResponse;
 
   let body: unknown;
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+    body = await readJsonObject(req);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
   }
 
   const payload = body as { requestedTier?: unknown; reason?: unknown };
@@ -120,7 +117,7 @@ export async function POST(req: Request) {
   if (error) {
     const message = error.code === "23505"
       ? "You already have a pending tier upgrade request"
-      : error.message;
+      : "Unable to submit tier upgrade request";
     return NextResponse.json({ error: message }, { status: error.code === "23505" ? 409 : 500 });
   }
 

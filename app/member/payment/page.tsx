@@ -21,7 +21,7 @@ export default async function MemberPaymentPage() {
   }
 
   return (
-    <MemberPageShell showTopBar={false}>
+    <MemberPageShell>
       <MemberPaymentView
         expiryDate={user?.expiryDate ?? null}
         paymentMethods={paymentMethods}

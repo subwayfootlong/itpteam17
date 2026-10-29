@@ -1,5 +1,7 @@
+import { readJsonObject, invalidInput, InputValidationError, isUuid } from "@/lib/inputValidation";
+import { validatePaymentInput } from "@/lib/apiInputValidation";
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
-import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { ADMIN_PAYMENT_METHOD_SELECT } from '@/lib/adminPaymentMethods';
 import { normalizePaymentUrl } from '@/lib/paymentUrl';
 import { supabaseAdmin } from '@/lib/supabaseServer';
@@ -16,14 +18,15 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
   const { data, error } = await supabaseAdmin
     .from('payment_methods').select(ADMIN_PAYMENT_METHOD_SELECT).eq('id', id).maybeSingle();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json({ paymentMethod: data });
 }
@@ -32,15 +35,16 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
   let body: Record<string, unknown>;
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    body = await readJsonObject(req, validatePaymentInput);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
   }
 
   const allowed = ['name', 'description', 'payment_url', 'qr_code_url', 'is_active'];
@@ -72,13 +76,13 @@ export async function PATCH(
       .update({ is_active: false })
       .eq('is_active', true)
       .neq('id', id);
-    if (deactivateError) return NextResponse.json({ error: deactivateError.message }, { status: 500 });
+    if (deactivateError) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
   const { data, error } = await supabaseAdmin
     .from('payment_methods').update(updates).eq('id', id).select(ADMIN_PAYMENT_METHOD_SELECT).maybeSingle();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json({ paymentMethod: data, deactivatedOthers: updates.is_active === true });
 }
@@ -87,11 +91,12 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
   const { error } = await supabaseAdmin.from('payment_methods').delete().eq('id', id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   return NextResponse.json({ ok: true });
 }

@@ -1,6 +1,7 @@
+import { readJsonObject, InputValidationError, invalidInput } from "@/lib/inputValidation";
+import { validateProfileInput } from "@/lib/apiInputValidation";
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/currentUser";
-import { getErrorMessage } from "@/lib/errors";
+import { requireMember } from "@/lib/currentUser";
 import { isValidSalutation } from "@/lib/memberProfileOptions";
 import {
   formatStoredPhone,
@@ -21,12 +22,10 @@ type ProfileUpdatePayload = {
 
 export async function PATCH(req: Request) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "Please log in first" }, { status: 401 });
-    }
+    const { user, response: authResponse } = await requireMember();
+    if (authResponse) return authResponse;
 
-    const body = (await req.json()) as ProfileUpdatePayload;
+    const body = (await readJsonObject(req, validateProfileInput)) as ProfileUpdatePayload;
     const salutation = body.salutation?.trim() ?? "";
     const firstName = body.first_name?.trim() ?? "";
     const lastName = body.last_name?.trim() ?? "";
@@ -100,23 +99,22 @@ export async function PATCH(req: Request) {
       .from("users")
       .update(updates)
       .eq("id", user.id)
-      .select(
-        "id, first_name, last_name, salutation, email, role, member_id, membership_tier, membership_status, expiry_date, phone, organization, designation, arabic_name, member_since",
-      )
+      .select("id")
       .maybeSingle();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
 
     if (!data) {
       return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ member: data });
+    return NextResponse.json({ ok: true });
   } catch (err: unknown) {
+    if (err instanceof InputValidationError) return invalidInput(err.message);
     return NextResponse.json(
-      { error: getErrorMessage(err, "Unable to update profile") },
+      { error: "Unable to update profile" },
       { status: 500 },
     );
   }

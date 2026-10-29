@@ -1,14 +1,10 @@
-import Link from 'next/link';
 import EventForm from '@/components/admin/EventForm';
+import AdminBreadcrumbs from '@/components/admin/AdminBreadcrumbs';
 
 export default function NewEventPage() {
   return (
     <div className="space-y-5">
-      <nav className="text-sm text-gray-400">
-        <Link href="/admin/events" className="hover:text-[#3FAE2A]">Events</Link>
-        <span className="mx-2">›</span>
-        <span className="text-gray-700">Create New Event</span>
-      </nav>
+      <AdminBreadcrumbs items={[{ label: 'Events', href: '/admin/events' }, { label: 'Create New Event' }]} />
       <div>
         <h2 className="text-2xl font-bold text-gray-800">Create New Event</h2>
         <p className="text-gray-500 text-sm mt-0.5">

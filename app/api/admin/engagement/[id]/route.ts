@@ -1,5 +1,7 @@
+import { readJsonObject, invalidInput, InputValidationError, isUuid } from "@/lib/inputValidation";
+import { validateBenefitInput } from "@/lib/apiInputValidation";
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
-import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { ADMIN_BENEFIT_SELECT } from '@/lib/adminBenefits';
 import { notifyBenefitAvailable } from '@/lib/notifications';
 import { supabaseAdmin } from '@/lib/supabaseServer';
@@ -17,14 +19,15 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
   const { data, error } = await supabaseAdmin
     .from('benefits').select(ADMIN_BENEFIT_SELECT).eq('id', id).maybeSingle();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json({ benefit: data });
 }
@@ -33,15 +36,16 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
   let body: Record<string, unknown>;
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    body = await readJsonObject(req, validateBenefitInput);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
   }
 
   const allowed = ['merchant_name', 'category', 'discount_description', 'discount_amount', 'address', 'description', 'image_url', 'logo_url', 'logo_initials', 'is_active'];
@@ -75,7 +79,7 @@ export async function PATCH(
   const { data, error } = await supabaseAdmin
     .from('benefits').update(updates).eq('id', id).select(ADMIN_BENEFIT_SELECT).maybeSingle();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   if (data.is_active && (!existing?.is_active || audienceChanged)) {
     await notifyBenefitAvailable({
@@ -97,11 +101,12 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
   const { error } = await supabaseAdmin.from('benefits').delete().eq('id', id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   return NextResponse.json({ ok: true });
 }

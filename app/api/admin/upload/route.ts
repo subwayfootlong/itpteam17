@@ -1,20 +1,24 @@
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
-import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { supabaseAdmin } from '@/lib/supabaseServer';
+import { randomUUID } from 'node:crypto';
 
 // Define strict security limits
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 export async function POST(req: Request) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   try {
-    const formData = await req.formData();
-    const file = formData.get('file') as File;
+    let formData: FormData;
+    try { formData = await req.formData(); } catch {
+      return NextResponse.json({ error: 'Invalid multipart form data' }, { status: 400 });
+    }
+    const file = formData.get('file');
 
-    if (!file) {
+    if (!(file instanceof File) || file.size === 0) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
@@ -40,9 +44,18 @@ export async function POST(req: Request) {
 
     // ==========================================
 
-    const uniqueSuffix = Date.now();
-    const extension = file.name.split('.').pop();
-    const fileName = `${uniqueSuffix}-${file.name.replace(/[^a-zA-Z0-9]/g, '')}.${extension}`;
+    const header = Buffer.from(await file.slice(0, 16).arrayBuffer());
+    const matchesSignature =
+      (file.type === 'image/jpeg' && header.length >= 3 && header[0] === 0xff && header[1] === 0xd8 && header[2] === 0xff) ||
+      (file.type === 'image/png' && header.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) ||
+      (file.type === 'image/webp' && header.length >= 16 && header.toString('ascii', 0, 4) === 'RIFF' &&
+        header.toString('ascii', 8, 12) === 'WEBP' && ['VP8 ', 'VP8L', 'VP8X'].includes(header.toString('ascii', 12, 16)) &&
+        header.readUInt32LE(4) + 8 === file.size);
+    if (!matchesSignature) {
+      return NextResponse.json({ error: 'Image contents do not match the declared file type' }, { status: 400 });
+    }
+    const extension = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' }[file.type];
+    const fileName = `${randomUUID()}.${extension}`;
 
     const { error: uploadError } = await supabaseAdmin.storage
       .from('pergas-images')
@@ -60,7 +73,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ url: publicUrlData.publicUrl }, { status: 200 });
 
   } catch (err) {
-    console.error('Upload Error:', err);
+    console.error('Upload Error:');
     return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 });
   }
 }

@@ -1,10 +1,11 @@
+import { readJsonObject, invalidInput, InputValidationError, isUuid } from "@/lib/inputValidation";
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from "next/server";
 import {
   getModerationTable,
   type ModerationSource,
   type ModerationStatus,
 } from "@/lib/commentModeration";
-import { getVerifiedAdmin, unauthorizedResponse } from "@/lib/adminAuth";
 
 const SOURCES: ModerationSource[] = [
   "admin-announcement",
@@ -19,15 +20,15 @@ const ACTION_STATUS: Record<string, ModerationStatus> = {
 };
 
 export async function PATCH(req: Request) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   let body: unknown;
 
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+    body = await readJsonObject(req);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
   }
 
   const payload = body as {
@@ -37,7 +38,7 @@ export async function PATCH(req: Request) {
     currentStatus?: unknown;
   };
 
-  if (typeof payload.id !== "string" || payload.id.trim().length === 0) {
+  if (!isUuid(payload.id)) {
     return NextResponse.json({ error: "Comment id is required" }, { status: 400 });
   }
 
@@ -74,7 +75,7 @@ export async function PATCH(req: Request) {
   );
 
   if (error) {
-    return NextResponse.json({ error }, { status: 500 });
+    return NextResponse.json({ error: "Unable to update moderation status" }, { status: 500 });
   }
 
   if (!data) {

@@ -9,6 +9,7 @@ import { formatArsStatusLabel, formatSalutationLabel } from '@/lib/memberProfile
 import { formatMemberDate } from '@/lib/dates';
 import { Badge } from '@/components/admin/ui/Badge';
 import { LoadingState } from '@/components/ui/LoadingSpinner';
+import AdminBreadcrumbs from '@/components/admin/AdminBreadcrumbs';
 
 interface Member {
   id: string;
@@ -103,11 +104,7 @@ export default function MemberViewPage() {
   return (
     <div className="w-full space-y-6 pb-12">
       <div className="flex items-center justify-between gap-4">
-        <nav className="text-[13px] text-gray-400 font-medium font-helvetica">
-          <Link href="/admin/members" className="hover:text-[#3FAE2A] transition-colors">Directory</Link>
-          <span className="mx-2">›</span>
-          <span className="text-gray-700">{formatMemberDisplayName(member)}</span>
-        </nav>
+        <AdminBreadcrumbs items={[{ label: 'Members', href: '/admin/members' }, { label: formatMemberDisplayName(member) }]} />
         <Link
           href={`/admin/members/${id}/edit`}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#3FAE2A] hover:bg-[#35941f] text-white text-[13px] font-bold transition-colors font-helvetica shadow-sm"

@@ -48,7 +48,7 @@ export default function LoadingSpinner({
 
 export function LoadingState({ label = 'Loading…', className = '' }: { label?: string; className?: string }) {
   return (
-    <div className={`flex min-h-40 items-center justify-center text-gray-500 ${className}`}>
+    <div className={`flex min-h-40 items-center justify-center text-gray-500 member-dark:text-neutral-400 ${className}`}>
       <LoadingSpinner label={label} size="lg" />
     </div>
   );

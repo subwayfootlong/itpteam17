@@ -25,13 +25,13 @@ export default function DiscussionFeed({
   return (
     <section className="px-4 pb-28 pt-4">
       <div className="mb-4">
-        <span className="text-[11px] font-bold uppercase tracking-wider text-brand-primary-800">
+        <span className="text-[11px] font-bold uppercase tracking-wider text-brand-primary-800 member-dark:text-brand-primary-200">
           {group?.title ?? "Discussion"}
         </span>
-        <h2 className="mt-1 font-butler text-lg font-semibold leading-tight text-neutral-900">
+        <h2 className="mt-1 font-butler text-lg font-semibold leading-tight text-neutral-900 member-dark:text-neutral-100">
           Share and learn with the community
         </h2>
-        <p className="mt-1 text-sm text-neutral-600">
+        <p className="mt-1 text-sm text-neutral-600 member-dark:text-neutral-300">
           Start a respectful post, then track it here after submission.
         </p>
       </div>
@@ -45,14 +45,14 @@ export default function DiscussionFeed({
           />
         ))
       ) : (
-        <div className="flex flex-col items-center rounded-2xl border border-dashed border-neutral-200 bg-neutral-50 p-8 text-center">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary-100 text-brand-primary-800">
+        <div className="flex flex-col items-center rounded-2xl border border-dashed border-neutral-200 member-dark:border-member-border bg-neutral-50 member-dark:bg-member-surface p-8 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200">
             <MessageSquare size={22} aria-hidden="true" />
           </span>
-          <h2 className="mt-3 text-base font-semibold text-neutral-900">
+          <h2 className="mt-3 text-base font-semibold text-neutral-900 member-dark:text-neutral-100">
             No posts yet
           </h2>
-          <p className="mt-1 text-sm text-neutral-600">
+          <p className="mt-1 text-sm text-neutral-600 member-dark:text-neutral-300">
             Be the first member to start a discussion in this space.
           </p>
           <NavLink

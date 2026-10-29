@@ -96,8 +96,8 @@ const ACTIVITY_STYLE: Record<string, { bg: string; color: string; icon: React.Re
 
 const QUICK_ACTIONS = [
   {
-    label: 'Add New Member',
-    href: '/admin/members',
+    label: 'Onboard Members',
+    href: '/admin/batch-onboarding',
     accent: '#3FAE2A',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,5 +1,8 @@
+import { MEMBER_DETAIL_FIELDS, responseFields } from "@/lib/responseFields";
+import { readJsonObject, isUuid, invalidInput, InputValidationError } from "@/lib/inputValidation";
+import { validateMemberInput } from "@/lib/apiInputValidation";
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
-import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { isValidArsStatus, isValidSalutation } from '@/lib/memberProfileOptions';
 import {
@@ -8,8 +11,7 @@ import {
   isAcceptablePhoneNumber,
 } from '@/lib/phone';
 
-const MEMBER_SELECT =
-  'id, salutation, first_name, last_name, email, phone, organization, designation, arabic_name, ars_status, member_id, membership_tier, membership_status, expiry_date, member_since, role, created_at';
+const MEMBER_SELECT = MEMBER_DETAIL_FIELDS;
 
 const ALLOWED_PATCH_FIELDS = [
   'salutation',
@@ -33,17 +35,18 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
   const { data, error } = await supabaseAdmin
     .from('users')
     .select(MEMBER_SELECT)
     .eq('id', id)
     .maybeSingle();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   if (!data) return NextResponse.json({ error: 'Member not found' }, { status: 404 });
 
   const { data: registrations } = await supabaseAdmin
@@ -63,18 +66,22 @@ export async function GET(
     .eq('user_id', id)
     .order('registered_at', { ascending: false });
 
-  return NextResponse.json({ member: data, registrations: registrations ?? [] });
+  return NextResponse.json({ member: responseFields(data, MEMBER_DETAIL_FIELDS), registrations: registrations ?? [] });
 }
 
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const { id } = await params;
-  const body = await req.json();
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
+  let body: Record<string, unknown>;
+  try { body = await readJsonObject(req, validateMemberInput); } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
+  }
 
   const updates: Record<string, unknown> = {};
   for (const key of ALLOWED_PATCH_FIELDS) {
@@ -170,8 +177,8 @@ export async function PATCH(
     .select(MEMBER_SELECT)
     .maybeSingle();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   if (!data) return NextResponse.json({ error: 'Member not found' }, { status: 404 });
 
-  return NextResponse.json({ member: data });
+  return NextResponse.json({ member: responseFields(data, MEMBER_DETAIL_FIELDS) });
 }

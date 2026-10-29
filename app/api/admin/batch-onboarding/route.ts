@@ -1,6 +1,7 @@
+import { readJsonObject } from "@/lib/inputValidation";
+import { requireAdmin } from "@/lib/adminAuth";
 import { randomBytes } from 'node:crypto';
 import { NextResponse } from 'next/server';
-import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { hashPassword } from '@/lib/auth';
 import type { BatchOnboardingResult, BatchOnboardingRow } from '@/lib/batchOnboarding';
 import { DEFAULT_TIER } from '@/lib/membershipTiers';
@@ -97,12 +98,12 @@ function friendlyInsertError(message: string): string {
 }
 
 export async function POST(request: Request) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   let body: { rows?: BatchOnboardingRow[] };
   try {
-    body = (await request.json()) as { rows?: BatchOnboardingRow[] };
+    body = (await readJsonObject(request)) as { rows?: BatchOnboardingRow[] };
   } catch {
     return NextResponse.json({ error: 'The uploaded information could not be read. Please upload the CSV again.' }, { status: 400 });
   }
@@ -112,6 +113,22 @@ export async function POST(request: Request) {
   }
   if (body.rows.length > MAX_ROWS) {
     return NextResponse.json({ error: `A batch can contain at most ${MAX_ROWS} rows.` }, { status: 400 });
+  }
+
+  // Check every row before calling string methods or writing any member records.
+  for (const row of body.rows) {
+    if (!row || typeof row !== 'object' || Array.isArray(row) || !Number.isInteger(row.rowNumber) || row.rowNumber < 1) {
+      return NextResponse.json({ error: 'Each row must be an object with a positive integer rowNumber' }, { status: 400 });
+    }
+    const limits = { salutation: 20, first_name: 100, last_name: 100, email: 254, phone: 40, organization: 200, designation: 200, ars_status: 20 };
+    for (const [field, max] of Object.entries(limits)) {
+      const value = row[field as keyof BatchOnboardingRow];
+      if (typeof value !== 'string' || value.length > max || value.includes('\u0000')) {
+        return NextResponse.json({ error: `Row ${row.rowNumber}: ${field} must be a string of at most ${max} characters` }, { status: 400 });
+      }
+    }
+    const checked = validateRow(row);
+    if (!checked.member) return NextResponse.json({ error: `Row ${row.rowNumber}: ${checked.message}` }, { status: 400 });
   }
 
   const results: BatchOnboardingResult[] = [];
@@ -144,7 +161,7 @@ export async function POST(request: Request) {
       .from('users')
       .select('email, phone, member_id');
     if (existingError) {
-      console.error('Batch onboarding lookup failed:', existingError);
+      console.error('Batch onboarding lookup failed:');
       return NextResponse.json({ error: 'Existing members could not be checked right now. Please try again.' }, { status: 500 });
     }
     const existingEmails = new Set(
@@ -200,7 +217,7 @@ export async function POST(request: Request) {
         .select('email');
 
       if (insertError) {
-        console.error('Batch onboarding insert failed:', insertError);
+        console.error('Batch onboarding insert failed:');
         const message = friendlyInsertError(insertError.message);
         for (const { member } of prepared) {
           results.push({ rowNumber: member.rowNumber, email: member.email, status: 'failed', message });
@@ -227,5 +244,5 @@ export async function POST(request: Request) {
       skipped: results.filter((result) => result.status === 'skipped').length,
       failed: results.filter((result) => result.status === 'failed').length,
     },
-  });
+  }, { headers: { "Cache-Control": "private, no-store" } });
 }

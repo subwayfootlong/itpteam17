@@ -1,7 +1,8 @@
+import { readJsonObject, InputValidationError, invalidInput } from "@/lib/inputValidation";
+import { validateRegistrationInput } from "@/lib/apiInputValidation";
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { hashPassword, createAccessToken } from '@/lib/auth';
-import { getErrorMessage } from '@/lib/errors';
 import { setLastActivityCookie } from '@/lib/session';
 import { DEFAULT_TIER } from '@/lib/membershipTiers';
 import { formatStoredPhone, isAcceptablePhoneNumber, getPhoneValidationMessage } from '@/lib/phone';
@@ -22,7 +23,7 @@ type RegistrationPayload = {
 
 export async function POST(req: Request) {
   try {
-    const body = (await req.json()) as RegistrationPayload;
+    const body = (await readJsonObject(req, validateRegistrationInput)) as RegistrationPayload;
     const salutation = body.salutation?.trim() ?? '';
     const firstName = body.firstName?.trim() ?? '';
     const lastName = body.lastName?.trim() ?? '';
@@ -109,12 +110,12 @@ export async function POST(req: Request) {
         membership_status: 'active',
         member_since: today,
       })
-      .select()
+      .select('id, email')
       .limit(1)
       .maybeSingle();
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error || !data) {
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
 
     const token = createAccessToken({ sub: data.id, email: data.email });
@@ -123,6 +124,7 @@ export async function POST(req: Request) {
     setLastActivityCookie(res);
     return res;
   } catch (err: unknown) {
-    return NextResponse.json({ error: getErrorMessage(err, 'Registration failed') }, { status: 500 });
+    if (err instanceof InputValidationError) return invalidInput(err.message);
+    return NextResponse.json({ error: 'Registration failed' }, { status: 500 });
   }
 }

@@ -104,10 +104,10 @@ function FeaturedMerchantBanner({
   const previewPartner = mappedPartners[0];
 
   return (
-    <section className="mb-5 grid grid-cols-[minmax(0,1fr)_7rem] items-center gap-4 rounded-2xl border border-brand-primary-100 bg-brand-primary-50 p-4">
+    <section className="mb-5 grid grid-cols-[minmax(0,1fr)_7rem] items-center gap-4 rounded-2xl border border-brand-primary-100 member-dark:border-brand-primary-700 bg-brand-primary-50 member-dark:bg-brand-primary-900 p-4">
       <div className="min-w-0">
-        <h3 className="text-sm font-bold text-neutral-900">Partners near you</h3>
-        <p className="mt-1 text-xs text-neutral-600">
+        <h3 className="text-sm font-bold text-neutral-900 member-dark:text-neutral-100">Partners near you</h3>
+        <p className="mt-1 text-xs text-neutral-600 member-dark:text-neutral-300">
           {mappedCount > 0
             ? `${mappedCount} partner ${
                 mappedCount === 1 ? "location" : "locations"
@@ -132,7 +132,7 @@ function FeaturedMerchantBanner({
           aria-hidden="true"
           className="absolute inset-0 translate-x-2 translate-y-2.5 rounded-2xl bg-brand-primary-900/30 blur-[2px]"
         />
-        <div className="relative h-full w-full overflow-hidden rounded-2xl border-[3px] border-white bg-brand-primary-100 shadow-[0_14px_22px_-8px_rgba(23,63,20,0.55)]">
+        <div className="relative h-full w-full overflow-hidden rounded-2xl border-[3px] border-white bg-brand-primary-100 member-dark:bg-brand-primary-900 shadow-[0_14px_22px_-8px_rgba(23,63,20,0.55)]">
           {previewPartner ? (
             <iframe
               title={`${previewPartner.name} map preview`}
@@ -143,7 +143,7 @@ function FeaturedMerchantBanner({
               className="pointer-events-none h-full w-full border-0"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-primary-100 to-brand-primary-200 text-brand-primary-800">
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-primary-100 member-dark:from-brand-primary-900 to-brand-primary-200 member-dark:to-member-raised text-brand-primary-800 member-dark:text-brand-primary-200">
               <MemberIcon name="pin" size={28} />
             </div>
           )}
@@ -180,7 +180,7 @@ function CategoryChips({
             className={`shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-100 active:scale-95 ${
               isActive
                 ? "bg-brand-primary-800 text-white shadow-sm"
-                : "border border-neutral-300 bg-white text-neutral-700 shadow-xs hover:border-brand-primary-600 hover:text-brand-primary-800"
+                : "border border-neutral-300 member-dark:border-member-border bg-white member-dark:bg-member-surface text-neutral-700 member-dark:text-neutral-300 shadow-xs hover:border-brand-primary-600 member-dark:hover:border-brand-primary-700 hover:text-brand-primary-800 member-dark:hover:text-brand-primary-200"
             }`}
           >
             {category}
@@ -242,8 +242,8 @@ function RewardCard({
     : "Tier-restricted reward";
 
   return (
-    <article className="mb-4 flex flex-col overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
-      <div className="relative aspect-video w-full overflow-hidden bg-neutral-100">
+    <article className="mb-4 flex flex-col overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-member-border/80 bg-white member-dark:bg-member-surface shadow-xs">
+      <div className="relative aspect-video w-full overflow-hidden bg-neutral-100 member-dark:bg-member-raised">
         {partner.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -264,7 +264,7 @@ function RewardCard({
           </div>
         )}
         {discount && (
-          <span className="absolute right-3 top-3 rounded-full border border-brand-accent/60 bg-brand-accent-soft px-2.5 py-1 text-xs font-bold text-amber-900 shadow-xs">
+          <span className="absolute right-3 top-3 rounded-full border border-brand-accent/60 bg-brand-accent-soft member-dark:bg-member-raised px-2.5 py-1 text-xs font-bold text-amber-900 member-dark:text-amber-300 shadow-xs">
             {discount}
           </span>
         )}
@@ -272,7 +272,7 @@ function RewardCard({
 
       <div className="flex flex-col p-4">
         <div className="mb-2 flex items-center gap-2.5">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-primary-100 text-xs font-bold text-brand-primary-800">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-xs font-bold text-brand-primary-800 member-dark:text-brand-primary-200">
             {partner.logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -287,29 +287,29 @@ function RewardCard({
             )}
           </span>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-xs font-semibold text-neutral-700">
+            <p className="truncate text-xs font-semibold text-neutral-700 member-dark:text-neutral-300">
               {partner.name}
             </p>
-            <span className="mt-0.5 inline-block rounded-md bg-neutral-100 px-1.5 py-0.5 text-[10px] font-semibold text-neutral-600">
+            <span className="mt-0.5 inline-block rounded-md bg-neutral-100 member-dark:bg-member-raised px-1.5 py-0.5 text-[10px] font-semibold text-neutral-600 member-dark:text-neutral-300">
               {partner.category}
             </span>
           </div>
           {partner.distance && (
-            <span className="shrink-0 text-[11px] text-neutral-500">
+            <span className="shrink-0 text-[11px] text-neutral-500 member-dark:text-neutral-400">
               {partner.distance}
             </span>
           )}
         </div>
 
-        <h2 className="mt-1 text-base font-semibold text-neutral-900">
+        <h2 className="mt-1 text-base font-semibold text-neutral-900 member-dark:text-neutral-100">
           {partner.offer}
         </h2>
-        <p className="mt-1 line-clamp-2 text-xs text-neutral-500">
+        <p className="mt-1 line-clamp-2 text-xs text-neutral-500 member-dark:text-neutral-400">
           {partner.description}
         </p>
 
         {partner.isLocked ? (
-          <span className="mt-3 inline-flex items-center gap-1.5 self-start rounded-lg border border-neutral-200 bg-neutral-100 px-2.5 py-1 text-xs text-neutral-500">
+          <span className="mt-3 inline-flex items-center gap-1.5 self-start rounded-lg border border-neutral-200 member-dark:border-member-border bg-neutral-100 member-dark:bg-member-raised px-2.5 py-1 text-xs text-neutral-500 member-dark:text-neutral-400">
             <Lock size={13} aria-hidden="true" />
             {lockedLabel}
           </span>
@@ -346,14 +346,14 @@ function PartnerMap({
 
   if (mappedPartners.length === 0) {
     return (
-      <section className="flex flex-col items-center rounded-2xl border border-dashed border-neutral-300 bg-white p-8 text-center">
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary-100 text-brand-primary-800">
+      <section className="flex flex-col items-center rounded-2xl border border-dashed border-neutral-300 member-dark:border-member-border bg-white member-dark:bg-member-surface p-8 text-center">
+        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200">
           <MemberIcon name="map" size={24} />
         </span>
-        <h2 className="mt-3 text-base font-semibold text-neutral-900">
+        <h2 className="mt-3 text-base font-semibold text-neutral-900 member-dark:text-neutral-100">
           No map locations
         </h2>
-        <p className="mt-1 text-sm text-neutral-600">
+        <p className="mt-1 text-sm text-neutral-600 member-dark:text-neutral-300">
           Benefits with admin-entered physical addresses will appear here.
         </p>
       </section>
@@ -363,7 +363,7 @@ function PartnerMap({
   return (
     <section>
       {activePartner && (
-        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-neutral-200 bg-brand-primary-50 shadow-md">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-neutral-200 member-dark:border-member-border bg-brand-primary-50 member-dark:bg-brand-primary-900 shadow-md">
           <iframe
             className="absolute inset-0 h-full w-full border-0"
             title={`${activePartner.name} location map`}
@@ -376,11 +376,11 @@ function PartnerMap({
 
       <div className="mb-3 mt-4 flex items-center justify-between gap-3">
         <div>
-          <strong className="block text-sm font-semibold text-neutral-900">
+          <strong className="block text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
             {mappedPartners.length} partner{" "}
             {mappedPartners.length === 1 ? "location" : "locations"}
           </strong>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-neutral-500 member-dark:text-neutral-400">
             Tap a partner to preview its location.
           </p>
         </div>
@@ -389,7 +389,7 @@ function PartnerMap({
             href={googleMapsSearchUrl(activePartner)}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-brand-primary-800 px-3.5 py-1.5 text-xs font-semibold text-brand-primary-800 transition-transform duration-100 hover:bg-brand-primary-50 active:scale-95"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-brand-primary-800 member-dark:border-brand-primary-700 px-3.5 py-1.5 text-xs font-semibold text-brand-primary-800 member-dark:text-brand-primary-200 transition-transform duration-100 hover:bg-brand-primary-50 member-dark:hover:bg-brand-primary-900 active:scale-95"
           >
             Open Maps
             <MemberIcon name="arrow" size={14} />
@@ -410,11 +410,11 @@ function PartnerMap({
                 aria-pressed={isActive}
                 className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-left shadow-xs transition-all duration-100 active:scale-[0.98] ${
                   isActive
-                    ? "border-brand-primary-700 bg-brand-primary-50 ring-2 ring-brand-primary-600/20"
-                    : "border-neutral-200 bg-white hover:border-brand-primary-600/50"
+                    ? "border-brand-primary-700 member-dark:border-brand-primary-700 bg-brand-primary-50 member-dark:bg-brand-primary-900 ring-2 ring-brand-primary-600/20 member-dark:ring-brand-primary-700/20"
+                    : "border-neutral-200 member-dark:border-member-border bg-white member-dark:bg-member-surface hover:border-brand-primary-600/50 member-dark:hover:border-brand-primary-700/50"
                 }`}
               >
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-primary-100 text-xs font-bold text-brand-primary-800">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 text-xs font-bold text-brand-primary-800 member-dark:text-brand-primary-200">
                   {partner.logoUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -429,19 +429,19 @@ function PartnerMap({
                   )}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <strong className="block truncate text-sm font-semibold text-neutral-900">
+                  <strong className="block truncate text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
                     {partner.name}
                   </strong>
-                  <span className="mt-0.5 block truncate text-xs font-medium text-brand-primary-800">
+                  <span className="mt-0.5 block truncate text-xs font-medium text-brand-primary-800 member-dark:text-brand-primary-200">
                     {partner.offer}
                   </span>
-                  <small className="mt-0.5 flex items-center gap-1 truncate text-[11px] text-neutral-500">
+                  <small className="mt-0.5 flex items-center gap-1 truncate text-[11px] text-neutral-500 member-dark:text-neutral-400">
                     <MemberIcon name="pin" size={11} />
                     <span className="truncate">{partner.address}</span>
                   </small>
                 </span>
                 {partner.distance && (
-                  <span className="shrink-0 rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-medium text-neutral-600">
+                  <span className="shrink-0 rounded-full bg-neutral-100 member-dark:bg-member-raised px-2 py-0.5 text-[11px] font-medium text-neutral-600 member-dark:text-neutral-300">
                     {partner.distance}
                   </span>
                 )}
@@ -595,10 +595,10 @@ export default function BenefitsDirectory({
 
       <main className="mx-auto w-full max-w-md px-4 pb-8 pt-4">
         <section className="mb-4">
-          <h2 className="font-butler text-2xl font-semibold leading-tight text-brand-primary-800">
+          <h2 className="font-butler text-2xl font-semibold leading-tight text-brand-primary-800 member-dark:text-brand-primary-200">
             Member Benefits
           </h2>
-          <p className="mt-1 text-sm text-neutral-600">
+          <p className="mt-1 text-sm text-neutral-600 member-dark:text-neutral-300">
             Access rewards, partner discounts, and active member privileges.
           </p>
         </section>
@@ -620,21 +620,21 @@ export default function BenefitsDirectory({
               <Search
                 size={18}
                 aria-hidden="true"
-                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-brand-primary-800"
+                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-brand-primary-800 member-dark:text-brand-primary-200"
               />
               <input
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search rewards or partners..."
-                className="h-12 w-full rounded-full border border-neutral-300 bg-white pl-11 pr-11 text-sm text-neutral-900 shadow-sm placeholder:text-neutral-500 focus:border-brand-primary-700 focus:outline-none focus:ring-4 focus:ring-brand-primary-600/15"
+                className="h-12 w-full rounded-full border border-neutral-300 member-dark:border-member-border bg-white member-dark:bg-member-surface pl-11 pr-11 text-sm text-neutral-900 member-dark:text-neutral-100 shadow-sm placeholder:text-neutral-500 member-dark:placeholder:text-neutral-400 focus:border-brand-primary-700 member-dark:focus:border-brand-primary-700 focus:outline-none focus:ring-4 focus:ring-brand-primary-600/15 member-dark:focus:ring-brand-primary-700/15"
               />
               {query && (
                 <button
                   type="button"
                   onClick={() => setQuery("")}
                   aria-label="Clear search"
-                  className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-neutral-500 transition-transform duration-100 hover:bg-neutral-200 active:scale-95"
+                  className="absolute right-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-neutral-500 member-dark:text-neutral-400 transition-transform duration-100 hover:bg-neutral-200 member-dark:hover:bg-member-raised active:scale-95"
                 >
                   <X size={16} aria-hidden="true" />
                 </button>
@@ -655,7 +655,7 @@ export default function BenefitsDirectory({
             </div>
 
             <div
-              className="mb-4 grid grid-cols-2 rounded-xl bg-neutral-100 p-1"
+              className="mb-4 grid grid-cols-2 rounded-xl bg-neutral-100 member-dark:bg-member-raised p-1"
               role="group"
               aria-label="Benefit view"
             >
@@ -667,8 +667,8 @@ export default function BenefitsDirectory({
                   onClick={() => setView(option)}
                   className={`rounded-lg py-2 text-xs font-semibold transition-transform duration-100 active:scale-[0.98] ${
                     view === option
-                      ? "bg-white text-brand-primary-800 shadow-xs"
-                      : "text-neutral-500 hover:text-neutral-800"
+                      ? "bg-white member-dark:bg-member-surface text-brand-primary-800 member-dark:text-brand-primary-200 shadow-xs"
+                      : "text-neutral-500 member-dark:text-neutral-400 hover:text-neutral-800 member-dark:hover:text-neutral-100"
                   }`}
                 >
                   {option === "list" ? "Rewards" : "Map"}
@@ -681,17 +681,17 @@ export default function BenefitsDirectory({
               aria-live="polite"
             >
               <div>
-                <span className="block text-[11px] font-bold uppercase tracking-wider text-brand-primary-800">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-brand-primary-800 member-dark:text-brand-primary-200">
                   Featured Rewards
                 </span>
-                <strong className="mt-0.5 block text-sm font-semibold text-neutral-900">
+                <strong className="mt-0.5 block text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
                   {filteredPartners.length} available
                 </strong>
               </div>
               {category !== "All" || query ? (
                 <button
                   type="button"
-                  className="text-xs font-semibold text-brand-primary-800 underline-offset-2 hover:underline active:scale-95"
+                  className="text-xs font-semibold text-brand-primary-800 member-dark:text-brand-primary-200 underline-offset-2 hover:underline active:scale-95"
                   onClick={() => {
                     setCategory("All");
                     setQuery("");

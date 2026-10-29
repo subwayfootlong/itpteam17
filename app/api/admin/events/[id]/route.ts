@@ -1,5 +1,8 @@
+import { EVENT_DETAIL_FIELDS, responseFields } from "@/lib/responseFields";
+import { readJsonObject, invalidInput, InputValidationError, isUuid } from "@/lib/inputValidation";
+import { validateEventInput } from "@/lib/apiInputValidation";
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
-import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { notifyEventPublished } from '@/lib/notifications';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { tierAudienceToDatabase, validateTierAudience } from '@/lib/tierAccess';
@@ -8,37 +11,39 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
   const { data, error } = await supabaseAdmin
     .from('events')
-    .select('*')
+    .select(EVENT_DETAIL_FIELDS)
     .eq('id', id)
     .maybeSingle();
 
   if (error) {
-    console.error('Events GET by ID Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Events GET by ID Error:');
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   if (!data) return NextResponse.json({ error: 'Event not found' }, { status: 404 });
-  return NextResponse.json({ event: data });
+  return NextResponse.json({ event: responseFields(data, EVENT_DETAIL_FIELDS) });
 }
 
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
   let body;
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+    body = await readJsonObject(req, validateEventInput);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
   }
 
   const allowed = [
@@ -62,6 +67,8 @@ export async function PATCH(
     Object.assign(updates, tierAudienceToDatabase(audience.value));
   }
 
+  if (Object.keys(updates).length === 0) return invalidInput("No fields to update");
+
   const { data: existing } = await supabaseAdmin
     .from('events')
     .select('status')
@@ -72,12 +79,12 @@ export async function PATCH(
     .from('events')
     .update(updates)
     .eq('id', id)
-    .select()
+    .select('id, title, status, audience_type, eligible_tiers, show_locked_preview, event_date')
     .maybeSingle();
 
   if (error) {
-    console.error('Events PATCH Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Events PATCH Error:');
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   if (data?.status === 'published' && (existing?.status !== 'published' || audienceChanged)) {
     await notifyEventPublished({
@@ -92,21 +99,22 @@ export async function PATCH(
     });
   }
 
-  return NextResponse.json({ event: data });
+  return NextResponse.json({ ok: true });
 }
 
 export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
   const { error } = await supabaseAdmin.from('events').delete().eq('id', id);
   if (error) {
-    console.error('Events DELETE Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Events DELETE Error:');
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   return NextResponse.json({ ok: true });
 }

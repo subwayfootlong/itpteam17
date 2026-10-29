@@ -7,6 +7,7 @@ import LoadingSpinner, { LoadingState } from '@/components/ui/LoadingSpinner';
 import { DEFAULT_TIER, MEMBERSHIP_TIERS } from '@/lib/membershipTiers';
 import { formatMemberDisplayName, formatMemberName } from '@/lib/memberName';
 import { ARS_STATUSES, SALUTATIONS } from '@/lib/memberProfileOptions';
+import AdminBreadcrumbs from '@/components/admin/AdminBreadcrumbs';
 
 interface Member {
   id: string;
@@ -115,15 +116,7 @@ export default function MemberEditPage() {
 
   return (
     <div className="w-full space-y-6 pb-12">
-      <nav className="text-[13px] text-gray-400 font-medium font-helvetica">
-        <Link href="/admin/members" className="hover:text-[#3FAE2A] transition-colors">Directory</Link>
-        <span className="mx-2">›</span>
-        <Link href={`/admin/members/${id}`} className="hover:text-[#3FAE2A] transition-colors">
-          {formatMemberName(member)}
-        </Link>
-        <span className="mx-2">›</span>
-        <span className="text-gray-700">Edit</span>
-      </nav>
+      <AdminBreadcrumbs items={[{ label: 'Members', href: '/admin/members' }, { label: formatMemberName(member), href: `/admin/members/${id}` }, { label: 'Edit' }]} />
 
       {message && (
         <div className={`px-4 py-3 rounded-xl text-sm font-bold shadow-sm ${message.includes('success') ? 'bg-[#e8f5e3] text-[#27500A] border border-[#cdd8cd]' : 'bg-red-50 text-red-700 border border-red-200'} font-helvetica`}>

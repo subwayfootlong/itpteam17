@@ -19,21 +19,21 @@ const Input: React.FC<InputProps> = ({ label, id, iconLeft, iconRight, showPassw
       {label ? (
         <label
           htmlFor={inputId}
-          className="font-helvetica text-sm font-semibold tracking-tight text-gray-900"
+          className="font-helvetica text-sm font-semibold tracking-tight text-gray-900 member-dark:text-neutral-100"
         >
           {label}
         </label>
       ) : null}
 
-      <div className="relative w-full rounded-xl border border-stone-300 bg-slate-50 transition-all focus-within:border-[#53A63E]">
+      <div className="relative w-full rounded-xl border border-stone-300 member-dark:border-member-border bg-slate-50 member-dark:bg-member-raised transition-all focus-within:border-[#53A63E]">
         {iconLeft ? (
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500">{iconLeft}</span>
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500 member-dark:text-neutral-400">{iconLeft}</span>
         ) : null}
 
         <input
           id={inputId}
           {...rest}
-          className={`font-helvetica h-12 w-full bg-transparent text-sm font-normal text-gray-900 placeholder-stone-400 outline-none ${iconLeft ? 'pl-12' : 'px-4'} ${showPasswordToggle ? 'pr-12' : 'pr-4'}`}
+          className={`font-helvetica h-12 w-full bg-transparent text-sm font-normal text-gray-900 member-dark:text-neutral-100 placeholder-stone-400 member-dark:placeholder-neutral-400 outline-none ${iconLeft ? 'pl-12' : 'px-4'} ${showPasswordToggle ? 'pr-12' : 'pr-4'}`}
         />
 
         {showPasswordToggle ? (
@@ -41,7 +41,7 @@ const Input: React.FC<InputProps> = ({ label, id, iconLeft, iconRight, showPassw
             type="button"
             onClick={onTogglePassword}
             aria-label={isPasswordVisible ? 'Hide password' : 'Show password'}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-500 hover:text-stone-700 transition-colors"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-500 member-dark:text-neutral-400 hover:text-stone-700 member-dark:hover:text-neutral-300 transition-colors"
           >
             {isPasswordVisible ? (
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -57,7 +57,7 @@ const Input: React.FC<InputProps> = ({ label, id, iconLeft, iconRight, showPassw
         ) : null}
 
         {iconRight ? (
-          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-500">{iconRight}</span>
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-500 member-dark:text-neutral-400">{iconRight}</span>
         ) : null}
       </div>
     </div>

@@ -74,7 +74,7 @@ export default function MemberBottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-1/2 z-50 w-full max-w-md -translate-x-1/2 border-t border-neutral-200 bg-white/95 px-2 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-md"
+      className="fixed bottom-0 left-1/2 z-50 w-full max-w-md -translate-x-1/2 border-t border-neutral-200 member-dark:border-member-border bg-white/95 member-dark:bg-member-surface/95 px-2 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-md"
       aria-label="Member navigation"
     >
       <div className="grid grid-cols-5 gap-1 text-center">
@@ -88,8 +88,8 @@ export default function MemberBottomNav() {
               aria-current={isActive ? "page" : undefined}
               className={`group flex min-w-0 flex-col items-center justify-center rounded-xl px-1 py-1 transition-transform duration-100 active:scale-95 ${
                 isActive
-                  ? "font-semibold text-brand-primary-800"
-                  : "font-normal text-neutral-400 hover:text-neutral-600"
+                  ? "font-semibold text-brand-primary-800 member-dark:text-brand-primary-200"
+                  : "font-normal text-neutral-400 member-dark:text-neutral-400 hover:text-neutral-600 member-dark:hover:text-neutral-300"
               }`}
             >
               <TabIcon icon={item.icon} isActive={isActive} />

@@ -1,5 +1,6 @@
+import { readJsonObject, invalidInput, InputValidationError, isUuid, isOneOf } from "@/lib/inputValidation";
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from "next/server";
-import { getVerifiedAdmin, unauthorizedResponse } from "@/lib/adminAuth";
 import {
   formatTierLabel,
   getAvailableTierUpgrades,
@@ -21,10 +22,11 @@ type TierRequestRow = {
 };
 
 export async function GET(req: Request) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const status = new URL(req.url).searchParams.get("status");
+  if (status && !isOneOf(status, ["pending", "approved", "rejected"])) return invalidInput("Invalid status filter");
   let query = supabaseAdmin
     .from("tier_upgrade_requests")
     .select("id, user_id, current_tier, requested_tier, reason, status, admin_note, reviewed_by, reviewed_at, created_at")
@@ -36,7 +38,7 @@ export async function GET(req: Request) {
 
   const { data, error } = await query;
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
   const requests = (data ?? []) as TierRequestRow[];
@@ -49,7 +51,7 @@ export async function GET(req: Request) {
     : { data: [], error: null };
 
   if (userError) {
-    return NextResponse.json({ error: userError.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
   const usersById = new Map((users ?? []).map((user) => [String(user.id), user]));
@@ -58,7 +60,14 @@ export async function GET(req: Request) {
       const member = usersById.get(request.user_id);
       const reviewer = request.reviewed_by ? usersById.get(request.reviewed_by) : null;
       return {
-        ...request,
+        id: request.id,
+        current_tier: request.current_tier,
+        requested_tier: request.requested_tier,
+        reason: request.reason,
+        status: request.status,
+        admin_note: request.admin_note,
+        reviewed_at: request.reviewed_at,
+        created_at: request.created_at,
         member: member
           ? {
               id: member.id,
@@ -74,21 +83,22 @@ export async function GET(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { user: admin, response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   let body: unknown;
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+    body = await readJsonObject(req);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
   }
 
   const payload = body as { id?: unknown; action?: unknown; adminNote?: unknown };
-  if (typeof payload.id !== "string" || !["approve", "reject"].includes(String(payload.action))) {
+  if (!isUuid(payload.id) || !isOneOf(payload.action, ["approve", "reject"])) {
     return NextResponse.json({ error: "Request id and a valid action are required" }, { status: 400 });
   }
 
+  if (payload.adminNote != null && typeof payload.adminNote !== "string") return invalidInput("Admin note must be a string");
   const adminNote = typeof payload.adminNote === "string" ? payload.adminNote.trim() : "";
   if (adminNote.length > 1000) {
     return NextResponse.json({ error: "Admin note must be 1,000 characters or fewer" }, { status: 400 });
@@ -151,7 +161,7 @@ export async function PATCH(req: Request) {
     .maybeSingle();
 
   if (claimError) {
-    return NextResponse.json({ error: claimError.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   if (!claimed) {
     return NextResponse.json({ error: "This request has already been reviewed" }, { status: 409 });
@@ -169,7 +179,7 @@ export async function PATCH(req: Request) {
         .update({ status: "pending", admin_note: null, reviewed_by: null, reviewed_at: null, updated_at: reviewedAt })
         .eq("id", request.id)
         .eq("status", "approved");
-      return NextResponse.json({ error: updateError.message }, { status: 500 });
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
   }
 

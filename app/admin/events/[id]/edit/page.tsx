@@ -6,6 +6,7 @@ import Link from 'next/link';
 import EventForm, { EventFormData } from '@/components/admin/EventForm';
 import RegisteredUsersCard from '@/components/admin/RegisteredUsersCard';
 import { LoadingState } from '@/components/ui/LoadingSpinner';
+import AdminBreadcrumbs from '@/components/admin/AdminBreadcrumbs';
 
 export default function EditEventPage() {
   const { id } = useParams<{ id: string }>();
@@ -57,11 +58,7 @@ export default function EditEventPage() {
 
   return (
     <div className="space-y-5 pb-12">
-      <nav className="text-sm text-gray-400">
-        <Link href="/admin/events" className="hover:text-[#3FAE2A]">Events</Link>
-        <span className="mx-2">›</span>
-        <span className="text-gray-700">Edit Event</span>
-      </nav>
+      <AdminBreadcrumbs items={[{ label: 'Events', href: '/admin/events' }, { label: 'Edit Event' }]} />
       <div>
         <h2 className="text-2xl font-bold text-gray-800">Edit Event</h2>
         <p className="text-gray-500 text-sm mt-0.5">Update event details. Changes save immediately.</p>

@@ -1,31 +1,26 @@
+import { readJsonObject, invalidInput, InputValidationError, isUuid } from "@/lib/inputValidation";
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/currentUser";
+import { requireMember } from "@/lib/currentUser";
 import { getUnreadNotificationCount } from "@/lib/notifications";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 
 export async function GET() {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Please log in first" }, { status: 401 });
-  }
+  const { user, response: authResponse } = await requireMember();
+  if (authResponse) return authResponse;
 
   const unreadCount = await getUnreadNotificationCount(user.id);
   return NextResponse.json({ unreadCount });
 }
 
 export async function PATCH(req: Request) {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Please log in first" }, { status: 401 });
-  }
+  const { user, response: authResponse } = await requireMember();
+  if (authResponse) return authResponse;
 
   let body: unknown;
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+    body = await readJsonObject(req);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
   }
 
   const payload = body as {
@@ -34,6 +29,7 @@ export async function PATCH(req: Request) {
     isRead?: unknown;
   };
 
+  if (payload.action !== undefined && payload.action !== "mark-all-read") return invalidInput("Invalid notification action");
   if (payload.action === "mark-all-read") {
     const { error } = await supabaseAdmin
       .from("notifications")
@@ -43,13 +39,13 @@ export async function PATCH(req: Request) {
       .eq("is_read", false);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
 
     return NextResponse.json({ ok: true });
   }
 
-  if (typeof payload.id !== "string" || typeof payload.isRead !== "boolean") {
+  if (!isUuid(payload.id) || typeof payload.isRead !== "boolean") {
     return NextResponse.json(
       { error: "Notification id and read state are required" },
       { status: 400 },
@@ -64,18 +60,15 @@ export async function PATCH(req: Request) {
     .eq("id", payload.id);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true });
 }
 
 export async function DELETE() {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Please log in first" }, { status: 401 });
-  }
+  const { user, response: authResponse } = await requireMember();
+  if (authResponse) return authResponse;
 
   const { error } = await supabaseAdmin
     .from("notifications")
@@ -85,7 +78,7 @@ export async function DELETE() {
     .eq("is_read", true);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true });

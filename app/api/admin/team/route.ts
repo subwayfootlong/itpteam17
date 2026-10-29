@@ -1,19 +1,24 @@
+import { MEMBER_DIRECTORY_FIELDS, responseFields } from "@/lib/responseFields";
+import { inputError } from "@/lib/inputValidation";
+import { validateMemberFilters } from "@/lib/apiInputValidation";
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
-import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 
 export async function GET(req: Request) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const url = new URL(req.url);
   const search = url.searchParams.get('search') ?? '';
   const tier = url.searchParams.get('tier') ?? '';
   const status = url.searchParams.get('status') ?? '';
+  const validation = inputError(() => validateMemberFilters(search, tier, status));
+  if (validation) return validation;
 
   let query = supabaseAdmin
     .from('users')
-    .select('id, first_name, last_name, salutation, email, member_id, membership_tier, membership_status, expiry_date, phone, organization, designation, ars_status, member_since, created_at')
+    .select(MEMBER_DIRECTORY_FIELDS)
     .eq('role', 'admin')
     .order('created_at', { ascending: false });
 
@@ -27,6 +32,6 @@ export async function GET(req: Request) {
 
   const { data, error } = await query;
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ members: data ?? [] });
+  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  return NextResponse.json({ members: (data ?? []).map((row) => responseFields(row, MEMBER_DIRECTORY_FIELDS)) });
 }

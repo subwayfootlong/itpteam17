@@ -3,14 +3,14 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export default function MemberLoading() {
   return (
-    <MemberPageShell loading>
+    <MemberPageShell>
       <div
         className="flex min-h-[calc(100dvh-9rem)] items-center justify-center px-5 pb-20 text-[#315d25]"
         aria-label="Loading member page"
       >
         <div className="flex flex-col items-center gap-3">
           <LoadingSpinner label="" size="lg" />
-          <p className="member-text-base text-sm font-medium text-[#5F5E5E]">Loading page…</p>
+          <p className="member-text-base text-sm font-medium text-[#5F5E5E] member-dark:text-neutral-300">Loading page…</p>
         </div>
       </div>
     </MemberPageShell>

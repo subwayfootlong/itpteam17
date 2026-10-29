@@ -1,5 +1,6 @@
+import { isUuid, invalidInput, readJsonObject, InputValidationError } from "@/lib/inputValidation";
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
-import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { formatMemberName } from '@/lib/memberName';
 
@@ -7,10 +8,11 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
 
   const { data, error } = await supabaseAdmin
     .from('event_registrations')
@@ -29,11 +31,11 @@ export async function GET(
     .order('registered_at', { ascending: false });
 
   if (error) {
-    console.error('Events Registrations GET Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Events Registrations GET Error:');
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
-  const formattedData = data.map((reg) => {
+  const formattedData = (data ?? []).map((reg) => {
     const user = Array.isArray(reg.users) ? reg.users[0] : reg.users;
 
     return {
@@ -52,15 +54,26 @@ export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const { id } = await params;
+  if (!isUuid(id)) return invalidInput("ID must be a UUID");
   const url = new URL(req.url);
   const registrationId = url.searchParams.get('registrationId');
-  const rejectionMessage = url.searchParams.get('rejectionMessage') || 'Registration cancelled by administrator.';
+  let body;
+  try {
+    body = await readJsonObject(req);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
+  }
+  if (body.rejectionMessage !== undefined && typeof body.rejectionMessage !== 'string') {
+    return invalidInput("Rejection message must be text");
+  }
+  const rejectionMessage = body.rejectionMessage || 'Registration cancelled by administrator.';
 
-  if (!registrationId) {
+  if (rejectionMessage.length > 1000 || rejectionMessage.includes("\u0000")) return invalidInput("Rejection message cannot exceed 1000 characters or contain null characters");
+  if (!isUuid(registrationId)) {
     return NextResponse.json({ error: 'registrationId is required' }, { status: 400 });
   }
 
@@ -91,8 +104,8 @@ export async function DELETE(
     .eq('event_id', id);
 
   if (error) {
-    console.error('Events Registrations DELETE Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Events Registrations DELETE Error:');
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
   const { data: eventData } = await supabaseAdmin

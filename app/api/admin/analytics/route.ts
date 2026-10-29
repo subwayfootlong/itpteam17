@@ -1,16 +1,18 @@
+import { isOneOf, invalidInput } from "@/lib/inputValidation";
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
-import { getVerifiedAdmin, unauthorizedResponse } from '@/lib/adminAuth';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { announcements as mockAnnouncements } from '@/lib/data/announcements';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
-  const admin = await getVerifiedAdmin();
-  if (!admin) return unauthorizedResponse();
+  const { response: authResponse } = await requireAdmin();
+  if (authResponse) return authResponse;
 
   const url = new URL(req.url);
   const range = url.searchParams.get('range') ?? '30d';
+  if (!isOneOf(range, ['7d', '30d', '90d', 'all'])) return invalidInput('Invalid analytics range');
 
   const today = new Date();
   today.setHours(23, 59, 59, 999);
@@ -45,8 +47,8 @@ export async function GET(req: Request) {
 
   const { data: logs, error: logsError } = await query;
   if (logsError) {
-    console.error('Analytics GET Logs Error:', logsError);
-    return NextResponse.json({ error: logsError.message }, { status: 500 });
+    console.error('Analytics GET Logs Error');
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
   const allLogs = logs ?? [];
@@ -60,10 +62,10 @@ export async function GET(req: Request) {
   ]);
 
   // Log any DB lookup errors for diagnostics (non-fatal)
-  if (eventsResult.error) console.error('[Analytics] events lookup error:', eventsResult.error.message);
-  if (benefitsResult.error) console.error('[Analytics] benefits lookup error:', benefitsResult.error.message);
-  if (announcementsResult.error) console.error('[Analytics] announcements lookup error:', announcementsResult.error.message);
-  if (registrationsResult.error) console.error('[Analytics] registrations lookup error:', registrationsResult.error.message);
+  if (eventsResult.error) console.error('[Analytics] events lookup error:');
+  if (benefitsResult.error) console.error('[Analytics] benefits lookup error:');
+  if (announcementsResult.error) console.error('[Analytics] announcements lookup error:');
+  if (registrationsResult.error) console.error('[Analytics] registrations lookup error:');
 
   const eventsMap = new Map((eventsResult.data ?? []).map(e => [e.id, e]));
 

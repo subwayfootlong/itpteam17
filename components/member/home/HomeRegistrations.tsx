@@ -35,28 +35,28 @@ export default function HomeRegistrations({
       <div className="mb-2.5 flex items-center justify-between">
         <h2
           id="home-registrations-heading"
-          className="text-base font-bold tracking-tight text-neutral-900"
+          className="text-base font-bold tracking-tight text-neutral-900 member-dark:text-neutral-100"
         >
           My registrations
         </h2>
         <NavLink
           href="/member/events"
-          className="text-xs font-semibold text-brand-primary-800 underline-offset-2 hover:underline"
+          className="text-xs font-semibold text-brand-primary-800 member-dark:text-brand-primary-200 underline-offset-2 hover:underline"
         >
           See all
         </NavLink>
       </div>
 
       {events.length === 0 ? (
-        <div className="flex items-center gap-3.5 rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 p-4">
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white text-brand-primary-800 shadow-xs">
+        <div className="flex items-center gap-3.5 rounded-2xl border border-dashed border-neutral-300 member-dark:border-member-border bg-neutral-50 member-dark:bg-member-surface p-4">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white member-dark:bg-member-surface text-brand-primary-800 member-dark:text-brand-primary-200 shadow-xs">
             <CalendarDays size={22} aria-hidden="true" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-neutral-900">
+            <p className="text-sm font-semibold text-neutral-900 member-dark:text-neutral-100">
               No upcoming registrations
             </p>
-            <p className="mt-0.5 text-xs text-neutral-600">
+            <p className="mt-0.5 text-xs text-neutral-600 member-dark:text-neutral-300">
               Browse Pergas events and reserve your place.
             </p>
           </div>
@@ -68,14 +68,14 @@ export default function HomeRegistrations({
           </NavLink>
         </div>
       ) : (
-        <ul className="divide-y divide-neutral-100 overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
+        <ul className="divide-y divide-neutral-100 member-dark:divide-member-border overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-member-border/80 bg-white member-dark:bg-member-surface shadow-xs">
           {events.map((event) => (
             <li key={event.id}>
               <NavLink
                 href={`/member/events/${event.id}`}
-                className="flex items-center gap-3.5 p-3.5 transition-transform duration-100 hover:bg-neutral-50 active:scale-[0.98]"
+                className="flex items-center gap-3.5 p-3.5 transition-transform duration-100 hover:bg-neutral-50 member-dark:hover:bg-member-surface active:scale-[0.98]"
               >
-                <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-brand-primary-100 text-brand-primary-800">
+                <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-brand-primary-100 member-dark:bg-brand-primary-900 text-brand-primary-800 member-dark:text-brand-primary-200">
                   {event.imageUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -90,14 +90,14 @@ export default function HomeRegistrations({
                 </span>
 
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-semibold text-neutral-950">
+                  <span className="block truncate text-sm font-semibold text-neutral-950 member-dark:text-neutral-100">
                     {event.title}
                   </span>
-                  <span className="mt-0.5 block truncate text-xs text-neutral-600">
+                  <span className="mt-0.5 block truncate text-xs text-neutral-600 member-dark:text-neutral-300">
                     {formatSchedule(event.eventDate, event.startTime)}
                   </span>
                   {event.venue && (
-                    <span className="mt-0.5 flex items-center gap-1 text-xs text-neutral-500">
+                    <span className="mt-0.5 flex items-center gap-1 text-xs text-neutral-500 member-dark:text-neutral-400">
                       <MapPin size={11} className="shrink-0" aria-hidden="true" />
                       <span className="truncate">{event.venue}</span>
                     </span>
@@ -105,12 +105,12 @@ export default function HomeRegistrations({
                 </span>
 
                 <span className="flex shrink-0 flex-col items-end gap-1.5">
-                  <span className="rounded-full bg-brand-primary-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-primary-900">
+                  <span className="rounded-full bg-brand-primary-100 member-dark:bg-brand-primary-900 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-primary-900 member-dark:text-brand-primary-200">
                     Registered
                   </span>
                   <ChevronRight
                     size={16}
-                    className="text-neutral-300"
+                    className="text-neutral-300 member-dark:text-neutral-400"
                     aria-hidden="true"
                   />
                 </span>

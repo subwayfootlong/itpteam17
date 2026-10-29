@@ -40,16 +40,18 @@ type ExistingNotificationKey = {
 
 export type NotificationPreferenceKey = "benefit" | "announcement" | "event";
 
-export type NotificationPreferences = Record<NotificationPreferenceKey, boolean>;
+export type NotificationPreferences = Record<NotificationPreferenceKey, boolean> & { email: boolean };
 
 export const defaultNotificationPreferences: NotificationPreferences = {
   benefit: true,
   announcement: true,
   event: true,
+  email: false,
 };
 
 type NotificationPreferenceRow = {
   user_id?: string;
+  email_enabled?: boolean | null;
   benefit_enabled: boolean | null;
   announcement_enabled: boolean | null;
   event_enabled: boolean | null;
@@ -86,6 +88,7 @@ function mapNotificationPreferences(
   row?: Partial<NotificationPreferenceRow> | null,
 ): NotificationPreferences {
   return {
+    email: row?.email_enabled === true,
     benefit: row?.benefit_enabled ?? defaultNotificationPreferences.benefit,
     announcement:
       row?.announcement_enabled ?? defaultNotificationPreferences.announcement,
@@ -129,12 +132,12 @@ export async function getNotificationPreferences(
 ): Promise<NotificationPreferences> {
   const { data, error } = await supabaseAdmin
     .from("notification_preferences")
-    .select("benefit_enabled, announcement_enabled, event_enabled")
+    .select("benefit_enabled, announcement_enabled, event_enabled, email_enabled")
     .eq("user_id", userId)
     .maybeSingle();
 
   if (error) {
-    console.warn("Unable to load notification preferences:", error.message);
+    console.warn("Unable to load notification preferences:");
     return defaultNotificationPreferences;
   }
 
@@ -149,6 +152,7 @@ export async function updateNotificationPreferences(
   const next = { ...current, ...preferences };
   const update = {
     user_id: userId,
+    ...(typeof preferences.email === "boolean" ? { email_enabled: preferences.email } : {}),
     benefit_enabled: next.benefit,
     announcement_enabled: next.announcement,
     event_enabled: next.event,
@@ -158,7 +162,7 @@ export async function updateNotificationPreferences(
   const { data, error } = await supabaseAdmin
     .from("notification_preferences")
     .upsert(update, { onConflict: "user_id" })
-    .select("benefit_enabled, announcement_enabled, event_enabled")
+    .select("benefit_enabled, announcement_enabled, event_enabled, email_enabled")
     .single();
 
   if (error) {
@@ -183,7 +187,7 @@ export async function getMemberNotifications(
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.warn("Unable to load notifications:", error.message);
+    console.warn("Unable to load notifications:");
     return [];
   }
 
@@ -201,7 +205,7 @@ export async function getUnreadNotificationCount(userId: string) {
     .eq("is_read", false);
 
   if (error) {
-    console.warn("Unable to count unread notifications:", error.message);
+    console.warn("Unable to count unread notifications:");
     return 0;
   }
 
@@ -235,7 +239,7 @@ async function syncMemberContentNotifications(userId: string) {
     .eq("user_id", userId);
 
   if (existingError) {
-    console.warn("Unable to sync notifications:", existingError.message);
+    console.warn("Unable to sync notifications:");
     return;
   }
 
@@ -342,7 +346,7 @@ async function syncMemberContentNotifications(userId: string) {
 
   const { error } = await supabaseAdmin.from("notifications").insert(rows);
   if (error) {
-    console.warn("Unable to insert synced notifications:", error.message);
+    console.warn("Unable to insert synced notifications:");
   }
 }
 
@@ -353,7 +357,7 @@ async function getMemberPreferenceMap(memberIds: string[]) {
     .in("user_id", memberIds);
 
   if (error) {
-    console.warn("Unable to load member notification preferences:", error.message);
+    console.warn("Unable to load member notification preferences:");
     return new Map<string, NotificationPreferences>();
   }
 
@@ -449,8 +453,8 @@ export async function safeNotifyMembers(input: NotifyMembersInput) {
   try {
     await notifyMembers(input);
     return { ok: true, error: null };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+  } catch {
+    const message = "Notification creation skipped";
     console.warn(
       "Notification creation skipped:",
       message,

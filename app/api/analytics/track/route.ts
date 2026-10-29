@@ -1,18 +1,18 @@
+import { readJsonObject, invalidInput, InputValidationError } from "@/lib/inputValidation";
+import { validateAnalyticsInput } from "@/lib/apiInputValidation";
 import { NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/currentUser';
+import { requireMember } from '@/lib/currentUser';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 
 export async function POST(req: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const { user, response: authResponse } = await requireMember();
+  if (authResponse) return authResponse;
 
   let body;
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
+    body = await readJsonObject(req, validateAnalyticsInput);
+  } catch (error) {
+    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
   }
 
   const { eventType, targetId, category, metadata } = body;
@@ -32,8 +32,8 @@ export async function POST(req: Request) {
     });
 
   if (error) {
-    console.error('Analytics tracking error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Analytics tracking error:');
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
   return NextResponse.json({ success: true });
