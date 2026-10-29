@@ -452,7 +452,7 @@ export default function MemberSettingsView({
                   Email Notifications
                 </p>
                 <p className="text-xs text-neutral-400 member-dark:text-neutral-400">
-                  RSVP confirmations and announcement emails. Off by default.
+                  RSVP confirmations and announcement emails.
                 </p>
               </div>
             </div>

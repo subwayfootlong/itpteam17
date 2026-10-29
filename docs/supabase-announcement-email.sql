@@ -98,7 +98,7 @@ begin
     where u.id = any(p_recipients) and u.role = 'member' and pref.email_enabled
       -- Recheck eligibility at commit time; do not trust the worker's recipient list.
       and lower(u.membership_status) = 'active'
-      and (u.expiry_date is null or u.expiry_date >= current_date)
+      and (u.expiry_date is null or u.expiry_date >= (now() at time zone 'Asia/Singapore')::date)
       and a.status = 'published'
       and (publication.audience_type = 'all' or
         (publication.audience_type = 'selected_tiers' and
