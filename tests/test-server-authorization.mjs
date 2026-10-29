@@ -141,7 +141,7 @@ async function runTests() {
     // -------------------------------------------------------------------------
     // SUITE 2: Member Privilege Escalation (Member Token -> Admin Endpoints)
     // -------------------------------------------------------------------------
-    console.log('\n--- SUITE 2: Member Privilege Escalation Prevention (401 Expected) ---');
+    console.log('\n--- SUITE 2: Member Privilege Escalation Prevention (403 Expected) ---');
 
     console.log(`Logging in member: ${MEMBER_CREDENTIALS.email}...`);
     const memberCookie = await login(MEMBER_CREDENTIALS.email, MEMBER_CREDENTIALS.password);
@@ -157,7 +157,8 @@ async function runTests() {
         body: ep.body ? JSON.stringify(ep.body) : undefined,
       });
 
-      const passed = res.status === 401;
+      // Authenticated non-admin -> 403 Forbidden (requireAdmin)
+      const passed = res.status === 403;
       record('Member Role Isolation', `Member blocked from ${ep.method} ${ep.url}`, passed, `Status: ${res.status}`);
     }
 

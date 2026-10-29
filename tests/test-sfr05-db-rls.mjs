@@ -71,6 +71,7 @@ async function testAnon() {
     'discussion_groups', 'discussion', 'discussion_comments', 'notifications',
     'notification_preferences', 'tier_upgrade_requests', 'analytics_events', 'payment_methods',
     'email_change_requests', 'email_change_limits', 'email_change_notifications',
+    'email_outbox', 'announcement_email_publications',
   ];
   for (const t of privateTables) {
     const real = await service.from(t).select('*', { count: 'exact', head: true });

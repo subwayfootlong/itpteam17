@@ -541,7 +541,9 @@ END $$;
 
 
 -- ==============================================================================
--- 17. Email-change tables (created by docs/supabase-email-change-migration.sql)
+-- 17. Server-only tables: email change (docs/supabase-email-change-migration.sql)
+--     and transactional/announcement email (docs/supabase-transactional-email.sql,
+--     docs/supabase-announcement-email.sql)
 --     Server-only: accessed exclusively through the service-role key and the
 --     SECURITY DEFINER email_change_* functions. RLS enabled with no policies, and
 --     all anon/authenticated privileges revoked, so the Data API can never read them.
@@ -550,7 +552,8 @@ END $$;
 DO $$
 DECLARE t text;
 BEGIN
-  FOREACH t IN ARRAY ARRAY['email_change_requests', 'email_change_limits', 'email_change_notifications']
+  FOREACH t IN ARRAY ARRAY['email_change_requests', 'email_change_limits', 'email_change_notifications',
+                         'email_outbox', 'announcement_email_publications']
   LOOP
     IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = t) THEN
       EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t);

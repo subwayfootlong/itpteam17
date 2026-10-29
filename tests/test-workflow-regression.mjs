@@ -233,7 +233,7 @@ async function testSecurityBoundaries() {
     const res = await fetch(`${BASE_URL}${url}`, {
       headers: { Cookie: member1Cookie },
     });
-    record('SECURITY', `Member strictly rejected from ${url} (401)`, res.status === 401, `status=${res.status}`);
+    record('SECURITY', `Member strictly rejected from ${url} (403)`, res.status === 403, `status=${res.status}`);
   }
 }
 
