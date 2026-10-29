@@ -25,20 +25,22 @@ change a test makes is restored.
 
 ## Summary
 
+Baseline run [`2026-10-29T13-16-06`](evidence/runs/2026-10-29T13-16-06/), 29 Oct 2026, production build: 13 test cases (including the TC-00 harness check), 507 checks, 469 passed, 38 failed, 2 not run (SMTP). Failures are grouped into defects in [defects.md](defects.md).
+
 | ID | Requirement | Owner | Steps | Status |
 |---|---|---|---|---|
-| [TC-SFR-01](#tc-sfr-01-api-authorisation-and-role-enforcement) | SFR-01 API authorisation and role enforcement (#47) | LiandoMaxin | 6 | Not run |
-| [TC-SFR-02](#tc-sfr-02-resource-level-access-control) | SFR-02 Resource-level access control (#48) | nerocladiaus | 7 | Not run |
-| [TC-SFR-03](#tc-sfr-03-membership-tier-access-control) | SFR-03 Membership-tier access control (#49) | nerocladiaus | 8 | Not run |
-| [TC-SFR-04](#tc-sfr-04-server-side-input-validation-and-sanitisation) | SFR-04 Server-side input validation and sanitisation (#50) | LiandoMaxin | 9 | Not run |
-| [TC-SFR-05](#tc-sfr-05-database-access-control) | SFR-05 Database access control (#51) | ooWise | 4 | Not run |
-| [TC-SFR-06](#tc-sfr-06-secure-session-and-cross-site-request-handling) | SFR-06 Secure session and cross-site request handling (#52) | nerocladiaus | 9 | Not run |
-| [TC-SFR-07](#tc-sfr-07-secure-digital-membership-verification) | SFR-07 Secure digital membership verification (#53) | LiandoMaxin | 8 | Not run |
-| [TC-SFR-08](#tc-sfr-08-secure-email-address-change) | SFR-08 Secure email address change (#39) | LiandoMaxin | 11 | Not run |
-| [TC-SNFR-01](#tc-snfr-01-secure-session-configuration) | SNFR-01 Secure session configuration (#54) | — | 5 | Not run |
-| [TC-SNFR-02](#tc-snfr-02-personal-data-minimisation) | SNFR-02 Personal data minimisation (#55) | LiandoMaxin | 6 | Not run |
-| [TC-SNFR-03](#tc-snfr-03-controlled-error-disclosure) | SNFR-03 Controlled error disclosure (#56) | — | 7 | Not run |
-| [TC-REG-01](#tc-reg-01-regression-existing-workflows-still-work) | SNFR-04/05 Regression: existing workflows still work (#57) | ooWise | 4 | Not run |
+| [TC-SFR-01](#tc-sfr-01-api-authorisation-and-role-enforcement) | SFR-01 API authorisation and role enforcement (#47) | LiandoMaxin | 6 | PASS |
+| [TC-SFR-02](#tc-sfr-02-resource-level-access-control) | SFR-02 Resource-level access control (#48) | nerocladiaus | 7 | PASS |
+| [TC-SFR-03](#tc-sfr-03-membership-tier-access-control) | SFR-03 Membership-tier access control (#49) | nerocladiaus | 8 | PASS |
+| [TC-SFR-04](#tc-sfr-04-server-side-input-validation-and-sanitisation) | SFR-04 Server-side input validation and sanitisation (#50) | LiandoMaxin | 9 | PASS |
+| [TC-SFR-05](#tc-sfr-05-database-access-control) | SFR-05 Database access control (#51) | ooWise | 4 | PASS |
+| [TC-SFR-06](#tc-sfr-06-secure-session-and-cross-site-request-handling) | SFR-06 Secure session and cross-site request handling (#52) | nerocladiaus | 9 | **FAIL** |
+| [TC-SFR-07](#tc-sfr-07-secure-digital-membership-verification) | SFR-07 Secure digital membership verification (#53) | LiandoMaxin | 8 | PASS |
+| [TC-SFR-08](#tc-sfr-08-secure-email-address-change) | SFR-08 Secure email address change (#39) | LiandoMaxin | 11 | PASS (2 not run) |
+| [TC-SNFR-01](#tc-snfr-01-secure-session-configuration) | SNFR-01 Secure session configuration (#54) | — | 5 | **FAIL** |
+| [TC-SNFR-02](#tc-snfr-02-personal-data-minimisation) | SNFR-02 Personal data minimisation (#55) | LiandoMaxin | 6 | PASS |
+| [TC-SNFR-03](#tc-snfr-03-controlled-error-disclosure) | SNFR-03 Controlled error disclosure (#56) | — | 7 | **FAIL** |
+| [TC-REG-01](#tc-reg-01-regression-existing-workflows-still-work) | SNFR-04/05 Regression: existing workflows still work (#57) | ooWise | 4 | PASS |
 
 ---
 
@@ -65,7 +67,7 @@ valid-shaped body so a missing check can't hide behind a validation error.
 | 5 | Call both internal email endpoints with no secret, and with a wrong bearer secret | 401 for both | a, c | Auto |
 | 6 | Send `memberA`'s requests to admin handlers with a correctly signed token that also claims `role: "admin"` | 403: the role is read from the database on every request, never trusted from the token | b | Auto |
 
-**Status:** Not run · **Evidence:** — · **Defects:** —
+**Status:** PASS (153/153 checks) · **Evidence:** [`TC-SFR-01/`](evidence/runs/2026-10-29T13-16-06/TC-SFR-01/) · **Defects:** —
 
 ---
 
@@ -89,11 +91,11 @@ discussion thread by `memberB`.
 | 2 | `memberA` marks `memberB`'s notification as read by its id (`PATCH /api/member/notifications`) | No change to `memberB`'s notification (still unread); response does not reveal it exists | a, b, c | Auto |
 | 3 | `memberA` calls `GET /api/member/notifications` | Only `memberA`'s notifications; none of `memberB`'s | a, c | Auto |
 | 4 | `memberA` cancels the event `memberB` registered for (`DELETE /api/events/rsvp`) | Only `memberA`'s own registration (if any) is affected; `memberB`'s registration still exists | a, b, c | Auto |
-| 5 | `memberA` opens `memberB`'s pending thread by URL (`/member/community/<threadId>`) | Not shown to `memberA` (not found / redirected); pending posts are visible only to their author | a, b, c | Browser |
+| 5 | `memberA` opens `memberB`'s pending thread by URL (`/member/community/<threadId>`) | Not-found screen shown, and the thread's content is not in the page source; pending posts are visible only to their author | a, b, c | Browser |
 | 6 | `memberA` calls `GET /api/member/tier-upgrade` | Only `memberA`'s own requests | a, c | Auto |
 | 7 | `memberA` requests a membership QR (`GET /api/member/qr-token`) and verifies it | The verified identity is `memberA`; there is no parameter that selects another member | a, b | Auto |
 
-**Status:** Not run · **Evidence:** — · **Defects:** —
+**Status:** PASS (8/8) · **Evidence:** [`TC-SFR-02/`](evidence/runs/2026-10-29T13-16-06/TC-SFR-02/) · **Defects:** —
 
 ---
 
@@ -122,9 +124,9 @@ server-side; (b) lower-tier users are blocked even if they call the API directly
 | 5 | `memberA` opens `/member/events` | E2 not listed (no locked preview) | a | Browser |
 | 6 | `memberA` opens `/member/benefit` | B1 not listed, and its details are not in the page source | a | Browser |
 | 7 | `memberC` (membership expired) registers for E1 | 403; an expired membership loses tier access even for allowed tiers | a, b | Auto |
-| 8 | `memberA` posts to a discussion group restricted to `ordinary` via `POST /api/community/threads` | 403; no thread created | a, b | Auto |
+| 8 | `memberA` posts to a discussion group restricted to `ordinary` via `POST /api/community/threads` | 403 or 404 (group hidden); no thread created | a, b | Auto |
 
-**Status:** Not run · **Evidence:** — · **Defects:** —
+**Status:** PASS (8/8) · **Evidence:** [`TC-SFR-03/`](evidence/runs/2026-10-29T13-16-06/TC-SFR-03/) · **Defects:** —
 
 ---
 
@@ -153,7 +155,7 @@ and React escapes everything it displays. Both halves are tested.
 | 8 | Admin creates an event with `javascript:` and `data:` RSVP URLs | 400 "must be an HTTP or HTTPS URL" | a, c | Auto |
 | 9 | Inventory check: every handler that reads a body or query parameter calls a validator | Every input-accepting handler in Appendix A validates before use | a | Inspection |
 
-**Status:** Not run · **Evidence:** — · **Defects:** —
+**Status:** PASS (155/155) · **Evidence:** [`TC-SFR-04/`](evidence/runs/2026-10-29T13-16-06/TC-SFR-04/) · **Defects:** —
 
 ---
 
@@ -177,7 +179,7 @@ needed.
 | 3 | Search the browser bundle (`.next/static`) and every page's HTML for the service-role key and `supabaseAdmin` | Not found | c | Auto |
 | 4 | Confirm the key is read only in `lib/supabaseServer.ts`, never from a `NEXT_PUBLIC_*` variable, and the module throws in a browser | True | c | Inspection |
 
-**Status:** Not run · **Evidence:** — · **Defects:** —
+**Status:** PASS (14/14) · **Evidence:** [`TC-SFR-05/`](evidence/runs/2026-10-29T13-16-06/TC-SFR-05/) · **Defects:** —
 
 ---
 
@@ -204,10 +206,10 @@ can build expired and forged tokens.
 | 5 | Log out, then reuse the old token | 401 | a, c | Auto |
 | 6 | Send it with a valid session and `Origin: https://evil.example` | 403 (cross-site request refused) | b | Auto |
 | 7 | Inspect the session cookie's `SameSite` attribute | `SameSite=Lax` or `Strict` set explicitly | b | Auto |
-| 8 | From a page on another site (`127.0.0.1`), have the browser submit a cross-site POST to the portal (`localhost`) with credentials | Request arrives without a session, or is refused; no state change | b | Browser |
+| 8 | From a page on another site (`127.0.0.1`), have the browser send a cross-site script request (8a) and submit a cross-site form (8b) to the portal (`localhost`) with credentials. Control 8c: the same form from the portal's own site | 8a, 8b: no state change. 8c: state changes, proving the test can detect a successful request | b | Browser |
 | 9 | Confirm a valid session still works for the same request (control) | 200 | a | Auto |
 
-**Status:** Not run · **Evidence:** — · **Defects:** —
+**Status:** FAIL (9/14; steps 4, 5, 6, 7 fail) · **Evidence:** [`TC-SFR-06/`](evidence/runs/2026-10-29T13-16-06/TC-SFR-06/) · **Defects:** [DEF-02](defects.md#def-02), [DEF-03](defects.md#def-03), [DEF-04](defects.md#def-04), [DEF-05](defects.md#def-05)
 
 ---
 
@@ -233,7 +235,7 @@ fail verification.
 | 7 | Check the QR responses' headers | `Cache-Control: no-store`, `Referrer-Policy: no-referrer` | b | Auto |
 | 8 | Open the verify page with a valid and a tampered token | Valid shows the member card; tampered shows "Invalid Membership QR" | c | Browser |
 
-**Status:** Not run · **Evidence:** — · **Defects:** —
+**Status:** PASS (16/16) · **Evidence:** [`TC-SFR-07/`](evidence/runs/2026-10-29T13-16-06/TC-SFR-07/) · **Defects:** —
 
 ---
 
@@ -268,7 +270,7 @@ before sending the email.
 | 10 | Verify with the correct code within the time limit | 200; email changed; session ended; a notification for the old email is queued. Email restored afterwards | c, d | Auto |
 | 11 | The old email address actually receives the change notice | Notice delivered | d | Not run (SMTP) |
 
-**Status:** Not run · **Evidence:** — · **Defects:** —
+**Status:** PASS (19/19; steps 4 and 11 not run, SMTP not configured) · **Evidence:** [`TC-SFR-08/`](evidence/runs/2026-10-29T13-16-06/TC-SFR-08/) · **Defects:** —
 
 ---
 
@@ -291,7 +293,7 @@ apply.
 | 4 | Decode a session token | `exp` is set; lifetime equals the configured maximum (7 days) and matches the cookie `Max-Age` | b | Auto |
 | 5 | Check the documentation | Session lifetime (7 days) and idle timeout (15 minutes) are documented | b | Inspection |
 
-**Status:** Not run · **Evidence:** — · **Defects:** —
+**Status:** FAIL (3/9; steps 1, 2, 3, 5 fail) · **Evidence:** [`TC-SNFR-01/`](evidence/runs/2026-10-29T13-16-06/TC-SNFR-01/) · **Defects:** [DEF-05](defects.md#def-05), [DEF-06](defects.md#def-06)
 
 ---
 
@@ -314,7 +316,7 @@ phone, IDs); (b) select only the required columns in queries.
 | 5 | Admin member list and member detail | No `password_hash` in any admin response | a | Auto |
 | 6 | Review queries in member-facing code paths for `select("*")` or selecting `password_hash` outside authentication | Explicit column lists; `password_hash` only in login, password change and email change | b | Inspection |
 
-**Status:** Not run · **Evidence:** — · **Defects:** —
+**Status:** PASS (23/23) · **Evidence:** [`TC-SNFR-02/`](evidence/runs/2026-10-29T13-16-06/TC-SNFR-02/) · **Defects:** —
 
 ---
 
@@ -341,9 +343,9 @@ values of secrets from `.env.local`.
 | 4 | Verify garbage QR tokens and call internal endpoints with bad secrets | Generic error; no leak patterns | a, c | Auto |
 | 5 | Open an unknown page and an unknown API path | Generic 404 page; no stack trace or framework detail | a, c | Browser |
 | 6 | Response headers across steps 1–5 | No `X-Powered-By`, no server version headers | a | Auto |
-| 7 | Review API error handling: database errors are logged with `console.error` and the client gets a generic message | No handler returns `error.message` or raw database errors to the client | a, b | Inspection |
+| 7 | Review API error handling in every route file | No handler returns `error.message` or raw database errors to the client, and every route that can return a 5xx logs the error server-side | a, b | Inspection |
 
-**Status:** Not run · **Evidence:** — · **Defects:** —
+**Status:** FAIL (33/60; steps 6, 7 fail) · **Evidence:** [`TC-SNFR-03/`](evidence/runs/2026-10-29T13-16-06/TC-SNFR-03/) · **Defects:** [DEF-07](defects.md#def-07), [DEF-08](defects.md#def-08)
 
 ---
 
@@ -361,7 +363,7 @@ at the end (steps 1–4).
 | 3 | Run `npm run test:sfr05` (RLS, authorisation, member and admin workflows) | All pass | Auto |
 | 4 | Member and admin journeys in the browser: log in, view home, events, benefits, community, profile, digital card; admin dashboard, members, events | Every page loads and works; screenshots kept | Browser |
 
-**Status:** Not run · **Evidence:** — · **Defects:** —
+**Status:** PASS (21/21 pages) · **Evidence:** [`TC-REG-01/`](evidence/runs/2026-10-29T13-16-06/TC-REG-01/) · **Defects:** —
 
 ---
 

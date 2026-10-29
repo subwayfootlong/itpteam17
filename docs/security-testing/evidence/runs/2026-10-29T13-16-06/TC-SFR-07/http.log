@@ -1,0 +1,104 @@
+### 1 GET qr-token
+> GET /api/member/qr-token
+< 200 OK
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    cache-control: private, no-store, max-age=0
+    content-type: application/json
+    referrer-policy: no-referrer
+    x-robots-tag: noindex, nofollow
+    date: Thu, 29 Oct 2026 13:17:54 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"verificationUrl":"http://localhost:3000/verify/member?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6ImY3MDgxYzA0LTMxZjctNGViOC05ZDg4LTQyNWYwZDg5ZGZiNSIsInB1cnBvc2UiOiJtZW1iZXJzaGlwLXZlcmlmaWNhdGlvbiIsImlhdCI6MTc5MzI3OTg3NCwiZXhwIjoxNzkzMjgwMTc0fQ.[signature redacted]","expiresIn":300}
+### 2 verify genuine token
+> GET /api/verify/member
+< 200 OK
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    cache-control: private, no-store, max-age=0
+    content-type: application/json
+    referrer-policy: no-referrer
+    x-robots-tag: noindex, nofollow
+    date: Thu, 29 Oct 2026 13:17:55 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"valid":true,"member":{"displayName":"Member 3.","membershipTier":"basic","membershipStatus":"active","expiryDate":"2027-09-16"}}
+### 3 payload changed to memberB's id
+> GET /api/verify/member
+< 400 Bad Request
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    cache-control: private, no-store, max-age=0
+    content-type: application/json
+    referrer-policy: no-referrer
+    x-robots-tag: noindex, nofollow
+    date: Thu, 29 Oct 2026 13:17:55 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"valid":false,"code":"invalid","error":"Invalid Membership QR"}
+### 4 signature altered
+> GET /api/verify/member
+< 400 Bad Request
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    cache-control: private, no-store, max-age=0
+    content-type: application/json
+    referrer-policy: no-referrer
+    x-robots-tag: noindex, nofollow
+    date: Thu, 29 Oct 2026 13:17:55 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"valid":false,"code":"invalid","error":"Invalid Membership QR"}
+### 5 expired QR
+> GET /api/verify/member
+< 400 Bad Request
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    cache-control: private, no-store, max-age=0
+    content-type: application/json
+    referrer-policy: no-referrer
+    x-robots-tag: noindex, nofollow
+    date: Thu, 29 Oct 2026 13:17:55 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"valid":false,"code":"expired","error":"QR Expired"}
+### 6 signed with a different secret
+> GET /api/verify/member
+< 400 Bad Request
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    cache-control: private, no-store, max-age=0
+    content-type: application/json
+    referrer-policy: no-referrer
+    x-robots-tag: noindex, nofollow
+    date: Thu, 29 Oct 2026 13:17:55 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"valid":false,"code":"invalid","error":"Invalid Membership QR"}
+### 6 wrong purpose
+> GET /api/verify/member
+< 400 Bad Request
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    cache-control: private, no-store, max-age=0
+    content-type: application/json
+    referrer-policy: no-referrer
+    x-robots-tag: noindex, nofollow
+    date: Thu, 29 Oct 2026 13:17:55 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"valid":false,"code":"invalid","error":"Invalid Membership QR"}
+### 6 member's session token used as a QR
+> GET /api/verify/member
+< 400 Bad Request
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    cache-control: private, no-store, max-age=0
+    content-type: application/json
+    referrer-policy: no-referrer
+    x-robots-tag: noindex, nofollow
+    date: Thu, 29 Oct 2026 13:17:55 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"valid":false,"code":"invalid","error":"Invalid Membership QR"}

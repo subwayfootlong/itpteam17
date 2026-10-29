@@ -41,7 +41,7 @@ export class Evidence {
 
   /** Record one expected-vs-actual check. Returns `pass` so callers can assert on it. */
   check(step: string, expected: string, actual: string, pass: boolean): boolean {
-    this.checks.push({ step, expected, actual, pass });
+    this.checks.push({ step: redactJwts(step), expected: redactJwts(expected), actual: redactJwts(actual), pass });
     return pass;
   }
 
@@ -65,10 +65,10 @@ export class Evidence {
       [
         `### ${label}`,
         `> ${method} ${url}`,
-        requestBody === undefined ? "" : `> body: ${truncate(JSON.stringify(requestBody), 500)}`,
+        requestBody === undefined ? "" : `> body: ${truncate(redactJwts(JSON.stringify(requestBody)), 500)}`,
         `< ${res.status()} ${res.statusText()}`,
-        headers,
-        `< body: ${truncate(body, 1500)}`,
+        redactJwts(headers),
+        `< body: ${truncate(redactJwts(body), 1500)}`,
         "",
       ]
         .filter(Boolean)
@@ -128,6 +128,11 @@ function redactCookie(name: string, value: string) {
     .split("\n")
     .map((line) => line.replace(/^([^=]+)=[^;]*/, "$1=[redacted]"))
     .join(" | ");
+}
+
+/** Keep a JWT's header and payload readable (useful evidence) but drop its signature, so no working token is saved. */
+export function redactJwts(s: string) {
+  return s.replace(/(eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+)\.[A-Za-z0-9_-]+/g, "$1.[signature redacted]");
 }
 
 function truncate(s: string, max: number) {

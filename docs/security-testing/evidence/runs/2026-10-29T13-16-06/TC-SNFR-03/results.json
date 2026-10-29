@@ -1,0 +1,372 @@
+{
+  "testCase": "TC-SNFR-03",
+  "title": "Controlled error disclosure",
+  "finishedAt": "2026-10-29T13:18:19.235Z",
+  "status": "FAIL",
+  "checks": [
+    {
+      "step": "1 malformed JSON to POST /api/community/threads",
+      "expected": "4xx; no internal detail",
+      "actual": "400; \"{\"error\":\"Request body must be a JSON object\",\"details\":\"Request body \"",
+      "pass": true
+    },
+    {
+      "step": "1 wrong types to PATCH /api/member/profile",
+      "expected": "4xx; no internal detail",
+      "actual": "400; \"{\"error\":\"first_name must be a string\",\"details\":\"first_name must be a\"",
+      "pass": true
+    },
+    {
+      "step": "1 invalid UUID to POST /api/events/rsvp",
+      "expected": "4xx; no internal detail",
+      "actual": "400; \"{\"error\":\"eventId is required\"}\"",
+      "pass": true
+    },
+    {
+      "step": "1 invalid UUID in admin path /api/admin/events/not-a-uuid",
+      "expected": "4xx; no internal detail",
+      "actual": "400; \"{\"error\":\"ID must be a UUID\",\"details\":\"ID must be a UUID\"}\"",
+      "pass": true
+    },
+    {
+      "step": "1 invalid UUID in admin path /api/admin/members/not-a-uuid",
+      "expected": "4xx; no internal detail",
+      "actual": "400; \"{\"error\":\"ID must be a UUID\",\"details\":\"ID must be a UUID\"}\"",
+      "pass": true
+    },
+    {
+      "step": "1 invalid UUID in admin path /api/admin/announcements/1 or 1=1",
+      "expected": "4xx; no internal detail",
+      "actual": "400; \"{\"error\":\"ID must be a UUID\",\"details\":\"ID must be a UUID\"}\"",
+      "pass": true
+    },
+    {
+      "step": "1 PostgREST filter characters in member search",
+      "expected": "4xx; no internal detail",
+      "actual": "400; \"{\"error\":\"Search contains unsupported filter characters\",\"details\":\"Se\"",
+      "pass": true
+    },
+    {
+      "step": "2 unknown event id",
+      "expected": "404 or harmless no-op; no internal detail",
+      "actual": "404; \"{\"error\":\"Event not found\"}\"",
+      "pass": true
+    },
+    {
+      "step": "2 unknown announcement id",
+      "expected": "404 or harmless no-op; no internal detail",
+      "actual": "404; \"{\"error\":\"Not found\"}\"",
+      "pass": true
+    },
+    {
+      "step": "2 unknown member id",
+      "expected": "404 or harmless no-op; no internal detail",
+      "actual": "404; \"{\"error\":\"Member not found\"}\"",
+      "pass": true
+    },
+    {
+      "step": "2 unknown event for RSVP",
+      "expected": "404 or harmless no-op; no internal detail",
+      "actual": "404; \"{\"error\":\"Event not found\"}\"",
+      "pass": true
+    },
+    {
+      "step": "2 unknown notification id",
+      "expected": "404 or harmless no-op; no internal detail",
+      "actual": "200; \"{\"ok\":true}\"",
+      "pass": true
+    },
+    {
+      "step": "3 1 MB body to POST /api/community/threads",
+      "expected": "4xx; no internal detail",
+      "actual": "400; \"{\"error\":\"Post cannot exceed 800 characters\",\"details\":\"Post cannot ex\"",
+      "pass": true
+    },
+    {
+      "step": "3 XML body to PATCH /api/member/profile",
+      "expected": "4xx; no internal detail",
+      "actual": "400; \"{\"error\":\"Invalid JSON payload\",\"details\":\"Invalid JSON payload\"}\"",
+      "pass": true
+    },
+    {
+      "step": "3 non-image upload to /api/admin/upload",
+      "expected": "4xx; no internal detail",
+      "actual": "400; \"{\"error\":\"Invalid file format. Only JPG, PNG, and WEBP are allowed.\"}\"",
+      "pass": true
+    },
+    {
+      "step": "4 verify QR \"garbage\"",
+      "expected": "4xx; no internal detail",
+      "actual": "400; \"{\"valid\":false,\"code\":\"invalid\",\"error\":\"Invalid Membership QR\"}\"",
+      "pass": true
+    },
+    {
+      "step": "4 verify QR \"a.b.c\"",
+      "expected": "4xx; no internal detail",
+      "actual": "400; \"{\"valid\":false,\"code\":\"invalid\",\"error\":\"Invalid Membership QR\"}\"",
+      "pass": true
+    },
+    {
+      "step": "4 verify QR \"xxxxxxxxxxxx…\"",
+      "expected": "4xx; no internal detail",
+      "actual": "400; \"{\"valid\":false,\"code\":\"invalid\",\"error\":\"Invalid Membership QR\"}\"",
+      "pass": true
+    },
+    {
+      "step": "4 email worker with bad secret",
+      "expected": "401; no internal detail",
+      "actual": "401; \"{\"error\":\"Unauthorized\"}\"",
+      "pass": true
+    },
+    {
+      "step": "4 notification worker with bad secret",
+      "expected": "401; no internal detail",
+      "actual": "401; \"{\"error\":\"Unauthorized\"}\"",
+      "pass": true
+    },
+    {
+      "step": "5 unknown page",
+      "expected": "404 page; no internal detail",
+      "actual": "404; generic 404 page",
+      "pass": true
+    },
+    {
+      "step": "5 unknown API path",
+      "expected": "404; no internal detail",
+      "actual": "404; \"<!DOCTYPE html><html lang=\"en\" class=\"h-full antialiased\" data-scroll-\"",
+      "pass": true
+    },
+    {
+      "step": "6 no X-Powered-By or versioned Server header",
+      "expected": "none",
+      "actual": "X-Powered-By: Next.js",
+      "pass": false
+    },
+    {
+      "step": "7 no handler returns a raw error message to the client",
+      "expected": "0 files",
+      "actual": "0 files",
+      "pass": true
+    },
+    {
+      "step": "7 app/api/admin/analytics/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "logs",
+      "pass": true
+    },
+    {
+      "step": "7 app/api/admin/announcements/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "logs",
+      "pass": true
+    },
+    {
+      "step": "7 app/api/admin/announcements/[id]/poll-responses/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "logs",
+      "pass": true
+    },
+    {
+      "step": "7 app/api/admin/announcements/[id]/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "logs",
+      "pass": true
+    },
+    {
+      "step": "7 app/api/admin/batch-onboarding/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "logs",
+      "pass": true
+    },
+    {
+      "step": "7 app/api/admin/comment-moderation/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/admin/discussion-groups/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/admin/engagement/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/admin/engagement/[id]/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/admin/events/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "logs",
+      "pass": true
+    },
+    {
+      "step": "7 app/api/admin/events/[id]/registrations/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "logs",
+      "pass": true
+    },
+    {
+      "step": "7 app/api/admin/events/[id]/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "logs",
+      "pass": true
+    },
+    {
+      "step": "7 app/api/admin/members/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/admin/members/[id]/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/admin/payment-methods/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/admin/payment-methods/[id]/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/admin/team/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/admin/tier-requests/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/admin/upload/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "logs",
+      "pass": true
+    },
+    {
+      "step": "7 app/api/analytics/track/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "logs",
+      "pass": true
+    },
+    {
+      "step": "7 app/api/auth/login/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/auth/register/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/community/announcement-comments/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/community/announcement-poll/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/community/thread-comments/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/community/threads/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/events/rsvp/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/internal/email-change-notifications/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/internal/transactional-emails/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/member/change-password/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/member/notification-preferences/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/member/notifications/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/member/profile/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/member/qr-token/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/member/tier-upgrade/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    },
+    {
+      "step": "7 app/api/verify/member/route.ts logs server-side when it returns 5xx",
+      "expected": "logs the error",
+      "actual": "returns 5xx WITHOUT logging",
+      "pass": false
+    }
+  ],
+  "skipped": [],
+  "screenshots": [
+    "01-unknown-page.png"
+  ]
+}

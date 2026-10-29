@@ -1,0 +1,109 @@
+{
+  "testCase": "TC-SFR-07",
+  "title": "Secure digital membership verification",
+  "finishedAt": "2026-10-29T13:17:55.630Z",
+  "status": "PASS",
+  "checks": [
+    {
+      "step": "1 token is signed HS256",
+      "expected": "alg = HS256",
+      "actual": "alg = HS256",
+      "pass": true
+    },
+    {
+      "step": "1 payload holds only the needed fields",
+      "expected": "exp, iat, memberId, purpose",
+      "actual": "exp, iat, memberId, purpose",
+      "pass": true
+    },
+    {
+      "step": "1 token lifetime",
+      "expected": "300 seconds",
+      "actual": "300 seconds",
+      "pass": true
+    },
+    {
+      "step": "2 genuine token verifies",
+      "expected": "valid: true",
+      "actual": "valid: true",
+      "pass": true
+    },
+    {
+      "step": "2 response holds only display fields",
+      "expected": "displayName, expiryDate, membershipStatus, membershipTier",
+      "actual": "displayName, expiryDate, membershipStatus, membershipTier",
+      "pass": true
+    },
+    {
+      "step": "2 display name is first name + last initial",
+      "expected": "Member 3.",
+      "actual": "Member 3.",
+      "pass": true
+    },
+    {
+      "step": "3 payload changed to memberB's id",
+      "expected": "valid: false, code: invalid",
+      "actual": "valid: false, code: invalid",
+      "pass": true
+    },
+    {
+      "step": "4 signature altered",
+      "expected": "valid: false, code: invalid",
+      "actual": "valid: false, code: invalid",
+      "pass": true
+    },
+    {
+      "step": "5 expired QR",
+      "expected": "valid: false, code: expired",
+      "actual": "valid: false, code: expired",
+      "pass": true
+    },
+    {
+      "step": "6 signed with a different secret",
+      "expected": "valid: false, code: invalid",
+      "actual": "valid: false, code: invalid",
+      "pass": true
+    },
+    {
+      "step": "6 wrong purpose",
+      "expected": "valid: false, code: invalid",
+      "actual": "valid: false, code: invalid",
+      "pass": true
+    },
+    {
+      "step": "6 member's session token used as a QR",
+      "expected": "valid: false, code: invalid",
+      "actual": "valid: false, code: invalid",
+      "pass": true
+    },
+    {
+      "step": "7 qr-token response headers",
+      "expected": "Cache-Control: no-store; Referrer-Policy: no-referrer",
+      "actual": "Cache-Control: private, no-store, max-age=0; Referrer-Policy: no-referrer",
+      "pass": true
+    },
+    {
+      "step": "7 verify response headers",
+      "expected": "Cache-Control: no-store; Referrer-Policy: no-referrer",
+      "actual": "Cache-Control: private, no-store, max-age=0; Referrer-Policy: no-referrer",
+      "pass": true
+    },
+    {
+      "step": "8 verify page shows the member card for a genuine QR",
+      "expected": "shows \"Member 3.\"",
+      "actual": "member card shown",
+      "pass": true
+    },
+    {
+      "step": "8 verify page rejects a tampered QR",
+      "expected": "shows \"Invalid Membership QR\"",
+      "actual": "rejected",
+      "pass": true
+    }
+  ],
+  "skipped": [],
+  "screenshots": [
+    "01-verify-page-genuine-qr.png",
+    "02-verify-page-tampered-qr.png"
+  ]
+}

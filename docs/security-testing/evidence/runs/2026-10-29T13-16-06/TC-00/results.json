@@ -1,0 +1,54 @@
+{
+  "testCase": "TC-00",
+  "title": "Test harness and accounts are ready",
+  "finishedAt": "2026-10-29T13:16:11.945Z",
+  "status": "PASS",
+  "checks": [
+    {
+      "step": "Anonymous call to member API",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "Log in as memberA (member3@uat.pergas.org)",
+      "expected": "logged in",
+      "actual": "logged in",
+      "pass": true
+    },
+    {
+      "step": "Log in as memberB (member4@uat.pergas.org)",
+      "expected": "logged in",
+      "actual": "logged in",
+      "pass": true
+    },
+    {
+      "step": "Log in as memberC (member5@uat.pergas.org)",
+      "expected": "logged in",
+      "actual": "logged in",
+      "pass": true
+    },
+    {
+      "step": "Log in as admin (admin3@uat.pergas.org)",
+      "expected": "logged in",
+      "actual": "logged in",
+      "pass": true
+    },
+    {
+      "step": "Logged-in member calls a member API",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "Logged-in member opens /member in the browser",
+      "expected": "stays on /member",
+      "actual": "/member",
+      "pass": true
+    }
+  ],
+  "skipped": [],
+  "screenshots": [
+    "01-member-home-as-membera.png"
+  ]
+}

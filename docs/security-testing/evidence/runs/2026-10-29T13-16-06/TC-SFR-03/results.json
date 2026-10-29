@@ -1,0 +1,61 @@
+{
+  "testCase": "TC-SFR-03",
+  "title": "Membership-tier access control",
+  "finishedAt": "2026-10-29T13:17:05.802Z",
+  "status": "PASS",
+  "checks": [
+    {
+      "step": "1 basic member registers for basic-tier event E1",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "2 RSVP to ordinary-only E2 refused",
+      "expected": "403, no registration created",
+      "actual": "403, 0 registration(s)",
+      "pass": true
+    },
+    {
+      "step": "3 RSVP link for E2 not revealed",
+      "expected": "404, no redirect",
+      "actual": "404",
+      "pass": true
+    },
+    {
+      "step": "4 E2 detail page blocked",
+      "expected": "not-found screen; E2 not in page source",
+      "actual": "not-found screen; E2 not in source",
+      "pass": true
+    },
+    {
+      "step": "5 events list omits E2",
+      "expected": "E2 not listed (E1 listed as control)",
+      "actual": "E2 not listed; E1 listed",
+      "pass": true
+    },
+    {
+      "step": "6 benefits page omits ordinary-only B1",
+      "expected": "B1 not in page source",
+      "actual": "B1 not in source",
+      "pass": true
+    },
+    {
+      "step": "7 expired member refused even for allowed tier",
+      "expected": "403, no registration",
+      "actual": "403, 0 registration(s)",
+      "pass": true
+    },
+    {
+      "step": "8 post to ordinary-only group refused",
+      "expected": "403 or 404, no thread created",
+      "actual": "404, 0 thread(s)",
+      "pass": true
+    }
+  ],
+  "skipped": [],
+  "screenshots": [
+    "01-membera-opens-ordinary-only-event.png",
+    "02-membera-benefits-page.png"
+  ]
+}

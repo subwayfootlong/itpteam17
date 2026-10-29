@@ -1,0 +1,158 @@
+{
+  "testCase": "TC-REG-01",
+  "title": "Regression: existing workflows still work",
+  "finishedAt": "2026-10-29T13:16:41.256Z",
+  "status": "PASS",
+  "checks": [
+    {
+      "step": "4 member /member",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    },
+    {
+      "step": "4 member /member/events",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    },
+    {
+      "step": "4 member /member/benefit",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    },
+    {
+      "step": "4 member /member/community",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    },
+    {
+      "step": "4 member /member/notifications",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    },
+    {
+      "step": "4 member /member/profile",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    },
+    {
+      "step": "4 member /member/settings",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    },
+    {
+      "step": "4 member /member/tier-upgrade",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    },
+    {
+      "step": "4 member /member/payment",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    },
+    {
+      "step": "4 admin /admin/dashboard",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    },
+    {
+      "step": "4 admin /admin/members",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    },
+    {
+      "step": "4 admin /admin/events",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    },
+    {
+      "step": "4 admin /admin/announcements",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    },
+    {
+      "step": "4 admin /admin/engagement",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    },
+    {
+      "step": "4 admin /admin/comment-moderation",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    },
+    {
+      "step": "4 admin /admin/tier-requests",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    },
+    {
+      "step": "4 admin /admin/analytics",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    },
+    {
+      "step": "4 admin /admin/payment-methods",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    },
+    {
+      "step": "4 admin /admin/team",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    },
+    {
+      "step": "4 admin /admin/batch-onboarding",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    },
+    {
+      "step": "4 admin /admin/settings",
+      "expected": "loads, stays in portal, no errors",
+      "actual": "loaded (200)",
+      "pass": true
+    }
+  ],
+  "skipped": [],
+  "screenshots": [
+    "01-member-member.png",
+    "02-member-member-events.png",
+    "03-member-member-benefit.png",
+    "04-member-member-community.png",
+    "05-member-member-notifications.png",
+    "06-member-member-profile.png",
+    "07-member-member-settings.png",
+    "08-member-member-tier-upgrade.png",
+    "09-member-member-payment.png",
+    "10-admin-admin-dashboard.png",
+    "11-admin-admin-members.png",
+    "12-admin-admin-events.png",
+    "13-admin-admin-announcements.png",
+    "14-admin-admin-engagement.png",
+    "15-admin-admin-comment-moderation.png",
+    "16-admin-admin-tier-requests.png",
+    "17-admin-admin-analytics.png",
+    "18-admin-admin-payment-methods.png",
+    "19-admin-admin-team.png",
+    "20-admin-admin-batch-onboarding.png",
+    "21-admin-admin-settings.png"
+  ]
+}

@@ -1,0 +1,150 @@
+{
+  "testCase": "TC-SNFR-02",
+  "title": "Personal data minimisation",
+  "finishedAt": "2026-10-29T13:18:17.732Z",
+  "status": "PASS",
+  "checks": [
+    {
+      "step": "1 /api/member/notifications returns only needed fields",
+      "expected": "unreadCount",
+      "actual": "only allowed fields (1)",
+      "pass": true
+    },
+    {
+      "step": "1 /api/member/notifications has no personal identifier fields",
+      "expected": "none of password_hash, passwordHash, email, phone, user_id, userId",
+      "actual": "none",
+      "pass": true
+    },
+    {
+      "step": "1 /api/member/notification-preferences returns only needed fields",
+      "expected": "preferences, preferences.benefit, preferences.announcement, preferences.event, preferences.email",
+      "actual": "only allowed fields (5)",
+      "pass": true
+    },
+    {
+      "step": "1 /api/member/notification-preferences has no personal identifier fields",
+      "expected": "none of password_hash, passwordHash, email, phone, user_id, userId",
+      "actual": "none",
+      "pass": true
+    },
+    {
+      "step": "1 /api/member/tier-upgrade returns only needed fields",
+      "expected": "currentTier, availableTiers, availableTiers[].value, availableTiers[].label, requests, requests[].id, requests[].current_tier, requests[].requested_tier, requests[].reason, requests[].status, requests[].admin_note, requests[].reviewed_at, requests[].created_at",
+      "actual": "only allowed fields (5)",
+      "pass": true
+    },
+    {
+      "step": "1 /api/member/tier-upgrade has no personal identifier fields",
+      "expected": "none of password_hash, passwordHash, email, phone, user_id, userId",
+      "actual": "none",
+      "pass": true
+    },
+    {
+      "step": "1 /api/member/qr-token returns only needed fields",
+      "expected": "verificationUrl, expiresIn",
+      "actual": "only allowed fields (2)",
+      "pass": true
+    },
+    {
+      "step": "1 /api/member/qr-token has no personal identifier fields",
+      "expected": "none of password_hash, passwordHash, email, phone, user_id, userId",
+      "actual": "none",
+      "pass": true
+    },
+    {
+      "step": "2 QR payload fields",
+      "expected": "exp, iat, memberId, purpose",
+      "actual": "exp, iat, memberId, purpose",
+      "pass": true
+    },
+    {
+      "step": "2 verify response fields",
+      "expected": "member, member.displayName, member.expiryDate, member.membershipStatus, member.membershipTier, valid",
+      "actual": "member, member.displayName, member.expiryDate, member.membershipStatus, member.membershipTier, valid",
+      "pass": true
+    },
+    {
+      "step": "3 /member (as memberA)",
+      "expected": "no other member's email, phone, id or password hash",
+      "actual": "none found",
+      "pass": true
+    },
+    {
+      "step": "3 /member/community (as memberA)",
+      "expected": "no other member's email, phone, id or password hash",
+      "actual": "none found",
+      "pass": true
+    },
+    {
+      "step": "3 /member/community/ea6c2f10-68b3-46b3-b699-cc11b32f090a (as memberA)",
+      "expected": "no other member's email, phone, id or password hash",
+      "actual": "none found",
+      "pass": true
+    },
+    {
+      "step": "3 /member/events (as memberA)",
+      "expected": "no other member's email, phone, id or password hash",
+      "actual": "none found",
+      "pass": true
+    },
+    {
+      "step": "3 /member/benefit (as memberA)",
+      "expected": "no other member's email, phone, id or password hash",
+      "actual": "none found",
+      "pass": true
+    },
+    {
+      "step": "4 login: unknown email and wrong password look the same",
+      "expected": "identical status and message",
+      "actual": "both 401 {\"error\":\"Invalid credentials\"}",
+      "pass": true
+    },
+    {
+      "step": "4 email change with wrong password does not confirm an existing address",
+      "expected": "401 (not 409)",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "5 /api/admin/members has no password hash",
+      "expected": "no password_hash",
+      "actual": "200, none",
+      "pass": true
+    },
+    {
+      "step": "5 /api/admin/members/f7081c04-31f7-4eb8-9d88-425f0d89dfb5 has no password hash",
+      "expected": "no password_hash",
+      "actual": "200, none",
+      "pass": true
+    },
+    {
+      "step": "5 /api/admin/team has no password hash",
+      "expected": "no password_hash",
+      "actual": "200, none",
+      "pass": true
+    },
+    {
+      "step": "5 /api/admin/dashboard has no password hash",
+      "expected": "no password_hash",
+      "actual": "200, none",
+      "pass": true
+    },
+    {
+      "step": "6 no select(\"*\") in app or lib",
+      "expected": "0 files",
+      "actual": "0 files",
+      "pass": true
+    },
+    {
+      "step": "6 password_hash only in authentication code",
+      "expected": "app/api/auth/login/route.ts, app/api/auth/register/route.ts, app/api/member/change-password/route.ts, app/api/admin/batch-onboarding/route.ts, lib/emailChange.ts, lib/emailChangeServer.ts",
+      "actual": "app/api/admin/batch-onboarding/route.ts, app/api/auth/login/route.ts, app/api/auth/register/route.ts, app/api/member/change-password/route.ts, lib/emailChange.ts, lib/emailChangeServer.ts",
+      "pass": true
+    }
+  ],
+  "skipped": [],
+  "screenshots": [
+    "01-thread-by-memberb-as-seen-by-membera.png"
+  ]
+}

@@ -1,6 +1,7 @@
 import { test as base, expect, request as playwrightRequest, type APIRequestContext, type Page } from "@playwright/test";
 import { ACCOUNTS, uatPassword, type AccountRole } from "./accounts";
 import { Evidence } from "./evidence";
+import type { RouteCase } from "./routes";
 
 type SecurityFixtures = {
   /** Evidence recorder for the current test. Call `evidence.start(id, title)` first. */
@@ -11,6 +12,8 @@ type SecurityFixtures = {
   apiAs: (role: AccountRole) => Promise<APIRequestContext>;
   /** Returns a browser page logged in as the given UAT account. */
   pageAs: (role: AccountRole) => Promise<Page>;
+  /** Returns an API client that sends exactly this Cookie header (for forged/expired sessions). */
+  apiWithCookie: (cookie: string, extraHeaders?: Record<string, string>) => Promise<APIRequestContext>;
 };
 
 type EvidenceHandle = {
@@ -52,6 +55,16 @@ export const test = base.extend<SecurityFixtures>({
     await Promise.all(contexts.map((c) => c.dispose()));
   },
 
+  apiWithCookie: async ({ baseURL }, provide) => {
+    const contexts: APIRequestContext[] = [];
+    await provide(async (cookie, extraHeaders = {}) => {
+      const ctx = await playwrightRequest.newContext({ baseURL, extraHTTPHeaders: { Cookie: cookie, ...extraHeaders } });
+      contexts.push(ctx);
+      return ctx;
+    });
+    await Promise.all(contexts.map((c) => c.dispose()));
+  },
+
   pageAs: async ({ browser }, provide) => {
     const contexts: Awaited<ReturnType<typeof browser.newContext>>[] = [];
     await provide(async (role) => {
@@ -65,6 +78,26 @@ export const test = base.extend<SecurityFixtures>({
     await Promise.all(contexts.map((c) => c.close()));
   },
 });
+
+/** Wait for text to appear (pages stream in after a loading screen). False if it never appears. */
+export async function waitForText(page: Page, text: string, timeout = 15_000) {
+  try {
+    await page.getByText(text).first().waitFor({ state: "visible", timeout });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Call a route from the inventory. Bodies are sent only for methods that take one. */
+export function call(ctx: APIRequestContext, route: RouteCase, data: unknown = {}, headers: Record<string, string> = {}) {
+  return ctx.fetch(route.path, {
+    method: route.method,
+    data: route.method === "GET" ? undefined : data,
+    headers,
+    maxRedirects: 0,
+  });
+}
 
 async function login(ctx: APIRequestContext, role: AccountRole) {
   const res = await ctx.post("/api/auth/login", {
