@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { verifyPassword, createAccessToken } from '@/lib/auth';
 import { setLastActivityCookie } from '@/lib/session';
+import { emailMatchPattern } from '@/lib/emailIdentity';
 
 export async function POST(req: Request) {
   try {
@@ -15,8 +16,7 @@ export async function POST(req: Request) {
     const { data: user, error } = await supabaseAdmin
       .from('users')
       .select('id, email, password_hash')
-      .eq('email', email)
-      .limit(1)
+      .regexIMatch('email', emailMatchPattern(email))
       .maybeSingle();
 
     if (error) {

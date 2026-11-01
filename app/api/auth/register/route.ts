@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { hashPassword, createAccessToken } from '@/lib/auth';
 import { setLastActivityCookie } from '@/lib/session';
+import { emailMatchPattern } from '@/lib/emailIdentity';
 import { DEFAULT_TIER } from '@/lib/membershipTiers';
 import { formatStoredPhone, isAcceptablePhoneNumber, getPhoneValidationMessage } from '@/lib/phone';
 import { isValidArsStatus, isValidSalutation } from '@/lib/memberProfileOptions';
@@ -28,7 +29,7 @@ export async function POST(req: Request) {
     const firstName = body.firstName?.trim() ?? '';
     const lastName = body.lastName?.trim() ?? '';
     const arabicName = body.arabicName?.trim() ?? '';
-    const email = body.email?.trim() ?? '';
+    const email = body.email?.trim().toLowerCase() ?? '';
     const organization = body.organization?.trim() ?? '';
     const designation = body.designation?.trim() ?? '';
     const arsStatus = body.arsStatus?.trim() ?? '';
@@ -77,15 +78,19 @@ export async function POST(req: Request) {
       );
     }
 
-    const { data: existing } = await supabaseAdmin
+    const { data: existing, error: lookupError } = await supabaseAdmin
       .from('users')
       .select('id')
-      .eq('email', email)
+      .regexIMatch('email', emailMatchPattern(email))
       .limit(1)
       .maybeSingle();
 
+    if (lookupError) {
+      return NextResponse.json({ error: 'Unable to complete request' }, { status: 500 });
+    }
+
     if (existing) {
-      return NextResponse.json({ error: 'User already exists' }, { status: 409 });
+      return NextResponse.json({ error: 'Unable to register with these details' }, { status: 409 });
     }
 
     const password_hash = await hashPassword(password);
@@ -113,6 +118,11 @@ export async function POST(req: Request) {
       .select('id, email')
       .limit(1)
       .maybeSingle();
+
+    // The normalized unique index also protects concurrent registrations.
+    if (error?.code === '23505') {
+      return NextResponse.json({ error: 'Unable to register with these details' }, { status: 409 });
+    }
 
     if (error || !data) {
       return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
