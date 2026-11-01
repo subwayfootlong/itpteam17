@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { logServerError } from "./serverErrors";
 import { NextResponse } from "next/server";
 import { verifyAccessToken } from "./auth";
 import { supabaseAdmin } from "./supabaseServer";
@@ -35,13 +36,15 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     const payload = verifyAccessToken(token) as TokenPayload;
     if (typeof payload.sub !== "string" || !payload.sub || typeof payload.email !== "string") return null;
 
-    const { data } = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from("users")
       .select(
         "id, email, role, first_name, last_name, phone, organization, membership_tier, membership_status, expiry_date, profile_image_url",
       )
       .eq("id", payload.sub)
       .maybeSingle();
+
+    if (error) logServerError("current-user.lookup", error);
 
     // Reject deleted users and JWTs issued before an email change.
     if (!data || payload.email !== data.email) return null;
@@ -64,7 +67,8 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
       expiryDate: data.expiry_date ?? null,
       profileImageUrl: data.profile_image_url ?? null,
     };
-  } catch {
+  } catch (error) {
+    logServerError("current-user.authenticate", error);
     return null;
   }
 }

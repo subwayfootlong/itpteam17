@@ -1,3 +1,4 @@
+import { logServerError } from "@/lib/serverErrors";
 import type {
   NotificationPriority,
   NotificationType,
@@ -137,7 +138,7 @@ export async function getNotificationPreferences(
     .maybeSingle();
 
   if (error) {
-    console.warn("Unable to load notification preferences:");
+    logServerError("lib/notifications.getNotificationPreferences", error);
     return defaultNotificationPreferences;
   }
 
@@ -166,6 +167,7 @@ export async function updateNotificationPreferences(
     .single();
 
   if (error) {
+    logServerError("lib/notifications.updateNotificationPreferences", error);
     throw error;
   }
 
@@ -187,7 +189,7 @@ export async function getMemberNotifications(
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.warn("Unable to load notifications:");
+    logServerError("lib/notifications.getMemberNotifications", error);
     return [];
   }
 
@@ -205,7 +207,7 @@ export async function getUnreadNotificationCount(userId: string) {
     .eq("is_read", false);
 
   if (error) {
-    console.warn("Unable to count unread notifications:");
+    logServerError("lib/notifications.getUnreadNotificationCount", error);
     return 0;
   }
 
@@ -239,7 +241,7 @@ async function syncMemberContentNotifications(userId: string) {
     .eq("user_id", userId);
 
   if (existingError) {
-    console.warn("Unable to sync notifications:");
+    logServerError("lib/notifications.syncMemberContentNotifications", existingError);
     return;
   }
 
@@ -346,7 +348,7 @@ async function syncMemberContentNotifications(userId: string) {
 
   const { error } = await supabaseAdmin.from("notifications").insert(rows);
   if (error) {
-    console.warn("Unable to insert synced notifications:");
+    logServerError("lib/notifications.syncMemberContentNotifications", error);
   }
 }
 
@@ -357,7 +359,7 @@ async function getMemberPreferenceMap(memberIds: string[]) {
     .in("user_id", memberIds);
 
   if (error) {
-    console.warn("Unable to load member notification preferences:");
+    logServerError("lib/notifications.getMemberPreferenceMap", error);
     return new Map<string, NotificationPreferences>();
   }
 
@@ -376,6 +378,7 @@ export async function notifyMembers(input: NotifyMembersInput) {
     .select("id, role, membership_tier, membership_status, expiry_date");
 
   if (userError) {
+    logServerError("lib/notifications.notifyMembers", userError);
     throw userError;
   }
 
@@ -407,7 +410,10 @@ export async function notifyMembers(input: NotifyMembersInput) {
       .eq("source_id", input.sourceId)
       .in("user_id", excludedMemberIds);
 
-    if (cleanupError) throw cleanupError;
+    if (cleanupError) {
+      logServerError("lib/notifications.notifyMembers", cleanupError);
+      throw cleanupError;
+    }
   }
 
   if (memberIds.length === 0) return;
@@ -445,6 +451,7 @@ export async function notifyMembers(input: NotifyMembersInput) {
     });
 
   if (error) {
+    logServerError("lib/notifications.notifyMembers", error);
     throw error;
   }
 }
@@ -453,12 +460,9 @@ export async function safeNotifyMembers(input: NotifyMembersInput) {
   try {
     await notifyMembers(input);
     return { ok: true, error: null };
-  } catch {
+  } catch (caughtError) {
+    logServerError("lib/notifications.safeNotifyMembers", caughtError);
     const message = "Notification creation skipped";
-    console.warn(
-      "Notification creation skipped:",
-      message,
-    );
     return { ok: false, error: message };
   }
 }

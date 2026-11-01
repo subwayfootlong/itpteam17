@@ -1,3 +1,4 @@
+import { logServerError } from "@/lib/serverErrors";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 import type { CurrentUser } from "@/lib/currentUser";
 import { evaluateTierAccess, normalizeTierAudience } from "@/lib/tierAccess";
@@ -257,19 +258,19 @@ export async function getMemberHomeData(
   ]);
 
   if (announcementResult.error) {
-    console.error("Home announcement query failed:");
+    logServerError("lib/memberHome.getMemberHomeData", announcementResult.error);
   }
 
   if (registrationResult.error) {
-    console.error("Home registration query failed:");
+    logServerError("lib/memberHome.getMemberHomeData", registrationResult.error);
   }
 
   if (featuredEventResult.error) {
-    console.error("Home featured event query failed:");
+    logServerError("lib/memberHome.getMemberHomeData", featuredEventResult.error);
   }
 
   if (benefitResult.error) {
-    console.error("Home benefit query failed:");
+    logServerError("lib/memberHome.getMemberHomeData", benefitResult.error);
   }
 
   const registeredEvents =

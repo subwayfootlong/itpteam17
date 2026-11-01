@@ -1,3 +1,4 @@
+import { logServerError } from "@/lib/serverErrors";
 import { readJsonObject, invalidInput } from "@/lib/inputValidation";
 import { NextResponse } from "next/server";
 import { hashPassword, verifyPassword } from "@/lib/auth";
@@ -21,7 +22,8 @@ export async function PATCH(request: Request) {
     let body: ChangePasswordBody;
     try {
       body = (await readJsonObject(request)) as ChangePasswordBody;
-    } catch {
+    } catch (caughtError) {
+      logServerError("app/api/member/change-password/route.PATCH", caughtError);
       return NextResponse.json(
         { error: "Please complete all password fields and try again." },
         { status: 400 },
@@ -73,6 +75,7 @@ export async function PATCH(request: Request) {
       .maybeSingle();
 
     if (userError) {
+      logServerError("app/api/member/change-password/route.PATCH", userError);
       return NextResponse.json(
         { error: "We could not check your password. Please try again." },
         { status: 500 },
@@ -115,6 +118,7 @@ export async function PATCH(request: Request) {
       .eq("id", currentUser.id);
 
     if (updateError) {
+      logServerError("app/api/member/change-password/route.PATCH", updateError);
       return NextResponse.json(
         { error: "We could not update your password. Please try again." },
         { status: 500 },
@@ -122,7 +126,8 @@ export async function PATCH(request: Request) {
     }
 
     return NextResponse.json({ ok: true });
-  } catch {
+  } catch (caughtError) {
+    logServerError("app/api/member/change-password/route.PATCH", caughtError);
     return NextResponse.json(
       { error: "Something went wrong while updating your password. Please try again." },
       { status: 500 },

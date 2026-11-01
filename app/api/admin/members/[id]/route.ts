@@ -1,3 +1,4 @@
+import { logServerError, unexpectedApiError } from "@/lib/serverErrors";
 import { MEMBER_DETAIL_FIELDS, responseFields } from "@/lib/responseFields";
 import { readJsonObject, isUuid, invalidInput, InputValidationError } from "@/lib/inputValidation";
 import { validateMemberInput } from "@/lib/apiInputValidation";
@@ -35,150 +36,165 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
+  try {
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
 
-  const { id } = await params;
-  if (!isUuid(id)) return invalidInput("ID must be a UUID");
-  const { data, error } = await supabaseAdmin
-    .from('users')
-    .select(MEMBER_SELECT)
-    .eq('id', id)
-    .maybeSingle();
+    const { id } = await params;
+    if (!isUuid(id)) return invalidInput("ID must be a UUID");
+    const { data, error } = await supabaseAdmin
+      .from('users')
+      .select(MEMBER_SELECT)
+      .eq('id', id)
+      .maybeSingle();
 
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
-  if (!data) return NextResponse.json({ error: 'Member not found' }, { status: 404 });
+    if (error) {
+      logServerError("app/api/admin/members/[id]/route.GET", error);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    }
+    if (!data) return NextResponse.json({ error: 'Member not found' }, { status: 404 });
 
-  const { data: registrations } = await supabaseAdmin
-    .from('event_registrations')
-    .select(`
-      id,
-      registered_at,
-      status,
-      rejection_message,
-      event_id,
-      events (
-        title,
-        venue,
-        event_date
-      )
-    `)
-    .eq('user_id', id)
-    .order('registered_at', { ascending: false });
+    const { data: registrations } = await supabaseAdmin
+      .from('event_registrations')
+      .select(`
+        id,
+        registered_at,
+        status,
+        rejection_message,
+        event_id,
+        events (
+          title,
+          venue,
+          event_date
+        )
+      `)
+      .eq('user_id', id)
+      .order('registered_at', { ascending: false });
 
-  return NextResponse.json({ member: responseFields(data, MEMBER_DETAIL_FIELDS), registrations: registrations ?? [] });
+    return NextResponse.json({ member: responseFields(data, MEMBER_DETAIL_FIELDS), registrations: registrations ?? [] });
+  } catch (error) {
+    return unexpectedApiError("app/api/admin/members/[id]/route.GET", error);
+  }
 }
 
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
+  try {
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
 
-  const { id } = await params;
-  if (!isUuid(id)) return invalidInput("ID must be a UUID");
-  let body: Record<string, unknown>;
-  try { body = await readJsonObject(req, validateMemberInput); } catch (error) {
-    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
-  }
-
-  const updates: Record<string, unknown> = {};
-  for (const key of ALLOWED_PATCH_FIELDS) {
-    if (key in body) updates[key] = body[key] === '' ? null : body[key];
-  }
-
-  if ('salutation' in updates && updates.salutation != null) {
-    const salutation = String(updates.salutation).trim();
-    if (!isValidSalutation(salutation)) {
-      return NextResponse.json({ error: 'Invalid salutation' }, { status: 400 });
+    const { id } = await params;
+    if (!isUuid(id)) return invalidInput("ID must be a UUID");
+    let body: Record<string, unknown>;
+    try { body = await readJsonObject(req, validateMemberInput); } catch (error) {
+      if (!(error instanceof InputValidationError)) logServerError("app/api/admin/members/[id]/route.PATCH", error);
+      return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
     }
-    updates.salutation = salutation;
-  }
 
-  if ('ars_status' in updates && updates.ars_status != null) {
-    const arsStatus = String(updates.ars_status).trim();
-    if (!isValidArsStatus(arsStatus)) {
-      return NextResponse.json({ error: 'Invalid ARS status' }, { status: 400 });
+    const updates: Record<string, unknown> = {};
+    for (const key of ALLOWED_PATCH_FIELDS) {
+      if (key in body) updates[key] = body[key] === '' ? null : body[key];
     }
-    updates.ars_status = arsStatus;
-  }
 
-  if ('email' in updates && updates.email != null) {
-    const email = String(updates.email).trim();
-    if (!email) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
-    }
-    const { data: existing } = await supabaseAdmin
-      .from('users')
-      .select('id')
-      .eq('email', email)
-      .neq('id', id)
-      .limit(1)
-      .maybeSingle();
-    if (existing) {
-      return NextResponse.json({ error: 'Email is already in use' }, { status: 409 });
-    }
-    updates.email = email;
-  }
-
-  if ('phone' in updates && updates.phone != null) {
-    const phoneInput = String(updates.phone).trim();
-    if (!phoneInput) {
-      updates.phone = null;
-    } else {
-      if (!isAcceptablePhoneNumber(phoneInput)) {
-        return NextResponse.json(
-          { error: getPhoneValidationMessage(phoneInput) },
-          { status: 400 }
-        );
+    if ('salutation' in updates && updates.salutation != null) {
+      const salutation = String(updates.salutation).trim();
+      if (!isValidSalutation(salutation)) {
+        return NextResponse.json({ error: 'Invalid salutation' }, { status: 400 });
       }
-      const phone = formatStoredPhone(phoneInput);
-      if (!phone) {
-        return NextResponse.json(
-          { error: getPhoneValidationMessage(phoneInput) },
-          { status: 400 }
-        );
-      }
-      updates.phone = phone;
+      updates.salutation = salutation;
     }
-  }
 
-  // member_id defaults to phone at signup; keep it in sync on phone changes
-  // unless this same request is explicitly setting member_id (an admin override)
-  if ('phone' in updates && !('member_id' in body)) {
-    const { data: current } = await supabaseAdmin
+    if ('ars_status' in updates && updates.ars_status != null) {
+      const arsStatus = String(updates.ars_status).trim();
+      if (!isValidArsStatus(arsStatus)) {
+        return NextResponse.json({ error: 'Invalid ARS status' }, { status: 400 });
+      }
+      updates.ars_status = arsStatus;
+    }
+
+    if ('email' in updates && updates.email != null) {
+      const email = String(updates.email).trim();
+      if (!email) {
+        return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+      }
+      const { data: existing } = await supabaseAdmin
+        .from('users')
+        .select('id')
+        .eq('email', email)
+        .neq('id', id)
+        .limit(1)
+        .maybeSingle();
+      if (existing) {
+        return NextResponse.json({ error: 'Email is already in use' }, { status: 409 });
+      }
+      updates.email = email;
+    }
+
+    if ('phone' in updates && updates.phone != null) {
+      const phoneInput = String(updates.phone).trim();
+      if (!phoneInput) {
+        updates.phone = null;
+      } else {
+        if (!isAcceptablePhoneNumber(phoneInput)) {
+          return NextResponse.json(
+            { error: getPhoneValidationMessage(phoneInput) },
+            { status: 400 }
+          );
+        }
+        const phone = formatStoredPhone(phoneInput);
+        if (!phone) {
+          return NextResponse.json(
+            { error: getPhoneValidationMessage(phoneInput) },
+            { status: 400 }
+          );
+        }
+        updates.phone = phone;
+      }
+    }
+
+    // member_id defaults to phone at signup; keep it in sync on phone changes
+    // unless this same request is explicitly setting member_id (an admin override)
+    if ('phone' in updates && !('member_id' in body)) {
+      const { data: current } = await supabaseAdmin
+        .from('users')
+        .select('phone, member_id')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (current && current.member_id === current.phone) {
+        updates.member_id = updates.phone;
+      }
+    }
+
+    if ('role' in updates && updates.role != null) {
+      const role = String(updates.role).trim();
+      if (role !== 'member' && role !== 'admin') {
+        return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
+      }
+      updates.role = role;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
+    }
+
+    const { data, error } = await supabaseAdmin
       .from('users')
-      .select('phone, member_id')
+      .update(updates)
       .eq('id', id)
+      .select(MEMBER_SELECT)
       .maybeSingle();
 
-    if (current && current.member_id === current.phone) {
-      updates.member_id = updates.phone;
+    if (error) {
+      logServerError("app/api/admin/members/[id]/route.PATCH", error);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
+    if (!data) return NextResponse.json({ error: 'Member not found' }, { status: 404 });
+
+    return NextResponse.json({ member: responseFields(data, MEMBER_DETAIL_FIELDS) });
+  } catch (error) {
+    return unexpectedApiError("app/api/admin/members/[id]/route.PATCH", error);
   }
-
-  if ('role' in updates && updates.role != null) {
-    const role = String(updates.role).trim();
-    if (role !== 'member' && role !== 'admin') {
-      return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
-    }
-    updates.role = role;
-  }
-
-  if (Object.keys(updates).length === 0) {
-    return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
-  }
-
-  const { data, error } = await supabaseAdmin
-    .from('users')
-    .update(updates)
-    .eq('id', id)
-    .select(MEMBER_SELECT)
-    .maybeSingle();
-
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
-  if (!data) return NextResponse.json({ error: 'Member not found' }, { status: 404 });
-
-  return NextResponse.json({ member: responseFields(data, MEMBER_DETAIL_FIELDS) });
 }

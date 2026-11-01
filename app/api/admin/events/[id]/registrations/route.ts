@@ -1,3 +1,4 @@
+import { logServerError, unexpectedApiError } from "@/lib/serverErrors";
 import { isUuid, invalidInput, readJsonObject, InputValidationError } from "@/lib/inputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
@@ -8,118 +9,127 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
+  try {
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
 
-  const { id } = await params;
-  if (!isUuid(id)) return invalidInput("ID must be a UUID");
+    const { id } = await params;
+    if (!isUuid(id)) return invalidInput("ID must be a UUID");
 
-  const { data, error } = await supabaseAdmin
-    .from('event_registrations')
-    .select(`
-      id,
-      registered_at,
-      user_id,
-      users (
-        first_name,
-        last_name,
-        email
-      )
-    `)
-    .eq('event_id', id)
-    .eq('status', 'registered')
-    .order('registered_at', { ascending: false });
+    const { data, error } = await supabaseAdmin
+      .from('event_registrations')
+      .select(`
+        id,
+        registered_at,
+        user_id,
+        users (
+          first_name,
+          last_name,
+          email
+        )
+      `)
+      .eq('event_id', id)
+      .eq('status', 'registered')
+      .order('registered_at', { ascending: false });
 
-  if (error) {
-    console.error('Events Registrations GET Error:');
-    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    if (error) {
+      logServerError("app/api/admin/events/[id]/registrations/route.GET", error);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    }
+
+    const formattedData = (data ?? []).map((reg) => {
+      const user = Array.isArray(reg.users) ? reg.users[0] : reg.users;
+
+      return {
+        id: reg.id,
+        user_id: reg.user_id,
+        name: formatMemberName(user ?? {}, 'Unknown User'),
+        email: user?.email || 'No email',
+        date: reg.registered_at,
+      };
+    });
+
+    return NextResponse.json({ registrations: formattedData });
+  } catch (error) {
+    return unexpectedApiError("app/api/admin/events/[id]/registrations/route.GET", error);
   }
-
-  const formattedData = (data ?? []).map((reg) => {
-    const user = Array.isArray(reg.users) ? reg.users[0] : reg.users;
-
-    return {
-      id: reg.id,
-      user_id: reg.user_id,
-      name: formatMemberName(user ?? {}, 'Unknown User'),
-      email: user?.email || 'No email',
-      date: reg.registered_at,
-    };
-  });
-
-  return NextResponse.json({ registrations: formattedData });
 }
 
 export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
-
-  const { id } = await params;
-  if (!isUuid(id)) return invalidInput("ID must be a UUID");
-  const url = new URL(req.url);
-  const registrationId = url.searchParams.get('registrationId');
-  let body;
   try {
-    body = await readJsonObject(req);
-  } catch (error) {
-    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
-  }
-  if (body.rejectionMessage !== undefined && typeof body.rejectionMessage !== 'string') {
-    return invalidInput("Rejection message must be text");
-  }
-  const rejectionMessage = body.rejectionMessage || 'Registration cancelled by administrator.';
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
 
-  if (rejectionMessage.length > 1000 || rejectionMessage.includes("\u0000")) return invalidInput("Rejection message cannot exceed 1000 characters or contain null characters");
-  if (!isUuid(registrationId)) {
-    return NextResponse.json({ error: 'registrationId is required' }, { status: 400 });
-  }
+    const { id } = await params;
+    if (!isUuid(id)) return invalidInput("ID must be a UUID");
+    const url = new URL(req.url);
+    const registrationId = url.searchParams.get('registrationId');
+    let body;
+    try {
+      body = await readJsonObject(req);
+    } catch (error) {
+      if (!(error instanceof InputValidationError)) logServerError("app/api/admin/events/[id]/registrations/route.DELETE", error);
+      return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
+    }
+    if (body.rejectionMessage !== undefined && typeof body.rejectionMessage !== 'string') {
+      return invalidInput("Rejection message must be text");
+    }
+    const rejectionMessage = body.rejectionMessage || 'Registration cancelled by administrator.';
 
-  // Fetch registration details to get user_id for analytics cleanup
-  const { data: regDetails } = await supabaseAdmin
-    .from('event_registrations')
-    .select('user_id')
-    .eq('id', registrationId)
-    .maybeSingle();
+    if (rejectionMessage.length > 1000 || rejectionMessage.includes("\u0000")) return invalidInput("Rejection message cannot exceed 1000 characters or contain null characters");
+    if (!isUuid(registrationId)) {
+      return NextResponse.json({ error: 'registrationId is required' }, { status: 400 });
+    }
 
-  if (regDetails?.user_id) {
-    // Delete the corresponding analytics RSVP click event so it doesn't double count if they reapply
-    await supabaseAdmin
-      .from('analytics_events')
-      .delete()
-      .eq('user_id', regDetails.user_id)
-      .eq('target_id', id)
-      .eq('event_type', 'event_rsvp_click');
-  }
+    // Fetch registration details to get user_id for analytics cleanup
+    const { data: regDetails } = await supabaseAdmin
+      .from('event_registrations')
+      .select('user_id')
+      .eq('id', registrationId)
+      .maybeSingle();
 
-  const { error } = await supabaseAdmin
-    .from('event_registrations')
-    .update({
-      status: 'rejected',
-      rejection_message: rejectionMessage,
-    })
-    .eq('id', registrationId)
-    .eq('event_id', id);
+    if (regDetails?.user_id) {
+      // Delete the corresponding analytics RSVP click event so it doesn't double count if they reapply
+      await supabaseAdmin
+        .from('analytics_events')
+        .delete()
+        .eq('user_id', regDetails.user_id)
+        .eq('target_id', id)
+        .eq('event_type', 'event_rsvp_click');
+    }
 
-  if (error) {
-    console.error('Events Registrations DELETE Error:');
-    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
-  }
+    const { error } = await supabaseAdmin
+      .from('event_registrations')
+      .update({
+        status: 'rejected',
+        rejection_message: rejectionMessage,
+      })
+      .eq('id', registrationId)
+      .eq('event_id', id);
 
-  const { data: eventData } = await supabaseAdmin
-    .from('events')
-    .select('spots_available')
-    .eq('id', id)
-    .single();
+    if (error) {
+      logServerError("app/api/admin/events/[id]/registrations/route.DELETE", error);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    }
 
-  if (eventData && eventData.spots_available !== null) {
-    await supabaseAdmin
+    const { data: eventData } = await supabaseAdmin
       .from('events')
-      .update({ spots_available: eventData.spots_available + 1 })
-      .eq('id', id);
-  }
+      .select('spots_available')
+      .eq('id', id)
+      .single();
 
-  return NextResponse.json({ ok: true });
+    if (eventData && eventData.spots_available !== null) {
+      await supabaseAdmin
+        .from('events')
+        .update({ spots_available: eventData.spots_available + 1 })
+        .eq('id', id);
+    }
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    return unexpectedApiError("app/api/admin/events/[id]/registrations/route.DELETE", error);
+  }
 }

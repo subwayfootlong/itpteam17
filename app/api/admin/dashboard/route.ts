@@ -1,3 +1,4 @@
+import { unexpectedApiError } from "@/lib/serverErrors";
 import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
@@ -10,7 +11,7 @@ function generateSparkline(dataDates: Date[], totalCurrentCount: number): string
   const counts = [0, 0, 0, 0, 0, 0, 0];
   const today = new Date();
   today.setHours(23, 59, 59, 999);
-  
+
   const sevenDaysAgo = new Date(today);
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
   sevenDaysAgo.setHours(0, 0, 0, 0);
@@ -23,7 +24,7 @@ function generateSparkline(dataDates: Date[], totalCurrentCount: number): string
     startOfDay.setDate(startOfDay.getDate() + i);
     const endOfDay = new Date(startOfDay);
     endOfDay.setHours(23, 59, 59, 999);
-    
+
     const addedToday = recentItems.filter(d => d >= startOfDay && d <= endOfDay).length;
     runningTotal += addedToday;
     counts[i] = runningTotal;
@@ -33,7 +34,7 @@ function generateSparkline(dataDates: Date[], totalCurrentCount: number): string
   const min = Math.min(...counts);
   const max = Math.max(...counts);
   const range = max - min;
-  
+
   const pathParts = counts.map((val, i) => {
     const x = i * 10;
     const y = range === 0 ? 12 : 20 - ((val - min) / range) * 16;
@@ -44,145 +45,149 @@ function generateSparkline(dataDates: Date[], totalCurrentCount: number): string
 }
 
 export async function GET() {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
+  try {
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
 
-  const [members, events, announcements, benefits, discussionPosts, discussionComments] = await Promise.all([
-    supabaseAdmin.from('users').select('id, first_name, last_name, email, membership_status, created_at').neq('role', 'admin'),
-    supabaseAdmin.from('events').select('id, title, status, event_date, created_at'),
-    supabaseAdmin.from('announcements').select('id, title, status, created_at'),
-    supabaseAdmin.from('benefits').select('id').eq('is_active', true),
-    supabaseAdmin.from('discussion').select('id, title, status, created_at, author_name'),
-    supabaseAdmin.from('discussion_comments').select('id, body, status, created_at, author_name'),
-  ]);
+    const [members, events, announcements, benefits, discussionPosts, discussionComments] = await Promise.all([
+      supabaseAdmin.from('users').select('id, first_name, last_name, email, membership_status, created_at').neq('role', 'admin'),
+      supabaseAdmin.from('events').select('id, title, status, event_date, created_at'),
+      supabaseAdmin.from('announcements').select('id, title, status, created_at'),
+      supabaseAdmin.from('benefits').select('id').eq('is_active', true),
+      supabaseAdmin.from('discussion').select('id, title, status, created_at, author_name'),
+      supabaseAdmin.from('discussion_comments').select('id, body, status, created_at, author_name'),
+    ]);
 
-  const allMembers = members.data ?? [];
-  const totalMembers = allMembers.length;
-  const activeMembersList = allMembers.filter((m) => m.membership_status === 'active');
-  const activeMembers = activeMembersList.length;
-  const expiredMembers = allMembers.filter((m) => m.membership_status === 'expired').length;
+    const allMembers = members.data ?? [];
+    const totalMembers = allMembers.length;
+    const activeMembersList = allMembers.filter((m) => m.membership_status === 'active');
+    const activeMembers = activeMembersList.length;
+    const expiredMembers = allMembers.filter((m) => m.membership_status === 'expired').length;
 
-  const todayStr = new Date().toISOString().split('T')[0];
-  const upcomingEvents = (events.data ?? []).filter((e) => e.event_date >= todayStr).length;
-  const publishedAnnouncementsList = (announcements.data ?? []).filter(a => a.status === 'published');
-  const publishedAnnouncements = publishedAnnouncementsList.length;
-  const allDiscussionPosts = discussionPosts.data ?? [];
-  const allDiscussionComments = discussionComments.data ?? [];
-  const pendingCommunityItems =
-    allDiscussionPosts.filter((item) => item.status === 'pending').length +
-    allDiscussionComments.filter((item) => item.status === 'pending').length;
+    const todayStr = new Date().toISOString().split('T')[0];
+    const upcomingEvents = (events.data ?? []).filter((e) => e.event_date >= todayStr).length;
+    const publishedAnnouncementsList = (announcements.data ?? []).filter(a => a.status === 'published');
+    const publishedAnnouncements = publishedAnnouncementsList.length;
+    const allDiscussionPosts = discussionPosts.data ?? [];
+    const allDiscussionComments = discussionComments.data ?? [];
+    const pendingCommunityItems =
+      allDiscussionPosts.filter((item) => item.status === 'pending').length +
+      allDiscussionComments.filter((item) => item.status === 'pending').length;
 
-  // Calculate simple real trends (last 30 days vs prior)
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-  const newMembersCount = allMembers.filter(m => new Date(m.created_at) >= thirtyDaysAgo).length;
-  const newEventsCount = (events.data ?? []).filter(e => new Date(e.created_at) >= thirtyDaysAgo).length;
-  const newAnnouncementsCount = (announcements.data ?? []).filter(a => new Date(a.created_at) >= thirtyDaysAgo).length;
-  const newDiscussionCount = allDiscussionPosts.filter(p => new Date(p.created_at) >= thirtyDaysAgo).length;
+    // Calculate simple real trends (last 30 days vs prior)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const newMembersCount = allMembers.filter(m => new Date(m.created_at) >= thirtyDaysAgo).length;
+    const newEventsCount = (events.data ?? []).filter(e => new Date(e.created_at) >= thirtyDaysAgo).length;
+    const newAnnouncementsCount = (announcements.data ?? []).filter(a => new Date(a.created_at) >= thirtyDaysAgo).length;
+    const newDiscussionCount = allDiscussionPosts.filter(p => new Date(p.created_at) >= thirtyDaysAgo).length;
 
-  // Generate Real Sparklines
-  const sparklines = {
-    totalMembers: generateSparkline(allMembers.map(m => new Date(m.created_at)), totalMembers),
-    activeMembers: generateSparkline(activeMembersList.map(m => new Date(m.created_at)), activeMembers),
-    upcomingEvents: generateSparkline((events.data ?? []).map(e => new Date(e.created_at)), upcomingEvents),
-    publishedAnnouncements: generateSparkline(publishedAnnouncementsList.map(a => new Date(a.created_at)), publishedAnnouncements),
-  };
+    // Generate Real Sparklines
+    const sparklines = {
+      totalMembers: generateSparkline(allMembers.map(m => new Date(m.created_at)), totalMembers),
+      activeMembers: generateSparkline(activeMembersList.map(m => new Date(m.created_at)), activeMembers),
+      upcomingEvents: generateSparkline((events.data ?? []).map(e => new Date(e.created_at)), upcomingEvents),
+      publishedAnnouncements: generateSparkline(publishedAnnouncementsList.map(a => new Date(a.created_at)), publishedAnnouncements),
+    };
 
-  // Generate Real Insights
-  const insights = [];
-  if (newAnnouncementsCount > newEventsCount * 2 && newAnnouncementsCount > 0) {
-    insights.push("Announcement engagement is high. Consider aligning announcement timing with new event launches to capitalise on traffic spikes.");
-  }
-  if (newMembersCount === 0) {
-    insights.push("No new members in the last 30 days. Consider sending out a promotional campaign or exclusive perk to attract new registrations.");
-  } else if (newMembersCount > 5) {
-    insights.push("Great member growth! Several new members joined recently. Engage them quickly with a welcome announcement or onboarding event.");
-  }
-  if (upcomingEvents === 0) {
-    insights.push("There are no upcoming events scheduled. Create a new event to keep the community active and engaged.");
-  }
-  if (expiredMembers > 0) {
-    insights.push(`You have ${expiredMembers} expired members. Reach out to them via email to renew their memberships and retain your base.`);
-  }
-  if (pendingCommunityItems > 0) {
-    insights.push(`${pendingCommunityItems} community moderation item${pendingCommunityItems === 1 ? ' is' : 's are'} waiting for review.`);
-  }
+    // Generate Real Insights
+    const insights = [];
+    if (newAnnouncementsCount > newEventsCount * 2 && newAnnouncementsCount > 0) {
+      insights.push("Announcement engagement is high. Consider aligning announcement timing with new event launches to capitalise on traffic spikes.");
+    }
+    if (newMembersCount === 0) {
+      insights.push("No new members in the last 30 days. Consider sending out a promotional campaign or exclusive perk to attract new registrations.");
+    } else if (newMembersCount > 5) {
+      insights.push("Great member growth! Several new members joined recently. Engage them quickly with a welcome announcement or onboarding event.");
+    }
+    if (upcomingEvents === 0) {
+      insights.push("There are no upcoming events scheduled. Create a new event to keep the community active and engaged.");
+    }
+    if (expiredMembers > 0) {
+      insights.push(`You have ${expiredMembers} expired members. Reach out to them via email to renew their memberships and retain your base.`);
+    }
+    if (pendingCommunityItems > 0) {
+      insights.push(`${pendingCommunityItems} community moderation item${pendingCommunityItems === 1 ? ' is' : 's are'} waiting for review.`);
+    }
 
-  let selectedInsight = "Your dashboard is looking good. Keep monitoring engagement metrics to ensure steady community growth.";
-  if (insights.length > 0) {
-    selectedInsight = insights[Math.floor(Math.random() * insights.length)];
-  }
+    let selectedInsight = "Your dashboard is looking good. Keep monitoring engagement metrics to ensure steady community growth.";
+    if (insights.length > 0) {
+      selectedInsight = insights[Math.floor(Math.random() * insights.length)];
+    }
 
-  // Build a unified recent-activity feed
-  const activityList = [];
-  
-  for (const m of allMembers) {
-    activityList.push({
-      id: `m_${m.id}`,
-      message: `${formatMemberName(m, 'A user')} registered as a new member`,
-      createdAt: new Date(m.created_at),
-      type: 'member',
-      author: 'User',
-    });
-  }
-  for (const e of events.data ?? []) {
-    activityList.push({
-      id: `e_${e.id}`,
-      message: `"${e.title}" event was successfully created`,
-      createdAt: new Date(e.created_at),
-      type: 'event',
-      author: 'Admin Team',
-    });
-  }
-  for (const a of announcements.data ?? []) {
-    activityList.push({
-      id: `a_${a.id}`,
-      message: `Announcement "${a.title}" was published`,
-      createdAt: new Date(a.created_at),
-      type: 'announcement',
-      author: 'Admin Team',
-    });
-  }
-  for (const post of allDiscussionPosts) {
-    activityList.push({
-      id: `d_${post.id}`,
-      message: `Discussion post "${post.title}" was submitted`,
-      createdAt: new Date(post.created_at),
-      type: 'discussion',
-      author: post.author_name || 'Member',
-    });
-  }
+    // Build a unified recent-activity feed
+    const activityList = [];
 
-  activityList.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-  const recentActivity = activityList.slice(0, 5).map(act => ({
-    id: act.id,
-    message: act.message,
-    timeAgo: timeAgo(act.createdAt),
-    author: act.author,
-    type: act.type,
-  }));
+    for (const m of allMembers) {
+      activityList.push({
+        id: `m_${m.id}`,
+        message: `${formatMemberName(m, 'A user')} registered as a new member`,
+        createdAt: new Date(m.created_at),
+        type: 'member',
+        author: 'User',
+      });
+    }
+    for (const e of events.data ?? []) {
+      activityList.push({
+        id: `e_${e.id}`,
+        message: `"${e.title}" event was successfully created`,
+        createdAt: new Date(e.created_at),
+        type: 'event',
+        author: 'Admin Team',
+      });
+    }
+    for (const a of announcements.data ?? []) {
+      activityList.push({
+        id: `a_${a.id}`,
+        message: `Announcement "${a.title}" was published`,
+        createdAt: new Date(a.created_at),
+        type: 'announcement',
+        author: 'Admin Team',
+      });
+    }
+    for (const post of allDiscussionPosts) {
+      activityList.push({
+        id: `d_${post.id}`,
+        message: `Discussion post "${post.title}" was submitted`,
+        createdAt: new Date(post.created_at),
+        type: 'discussion',
+        author: post.author_name || 'Member',
+      });
+    }
 
-  return NextResponse.json({
-    stats: {
-      totalMembers,
-      activeMembers,
-      expiredMembers,
-      upcomingEvents,
-      publishedAnnouncements,
-      activePerks: (benefits.data ?? []).length,
-      discussionPosts: allDiscussionPosts.length,
-      pendingCommunityItems,
-      trends: {
-        totalMembers: `+${newMembersCount}`,
-        activeMembers: `+${newMembersCount}`,
-        upcomingEvents: `+${newEventsCount}`,
-        publishedAnnouncements: `+${newAnnouncementsCount}`,
-        discussionPosts: `+${newDiscussionCount}`,
-        pendingCommunityItems: `${pendingCommunityItems}`,
+    activityList.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    const recentActivity = activityList.slice(0, 5).map(act => ({
+      id: act.id,
+      message: act.message,
+      timeAgo: timeAgo(act.createdAt),
+      author: act.author,
+      type: act.type,
+    }));
+
+    return NextResponse.json({
+      stats: {
+        totalMembers,
+        activeMembers,
+        expiredMembers,
+        upcomingEvents,
+        publishedAnnouncements,
+        activePerks: (benefits.data ?? []).length,
+        discussionPosts: allDiscussionPosts.length,
+        pendingCommunityItems,
+        trends: {
+          totalMembers: `+${newMembersCount}`,
+          activeMembers: `+${newMembersCount}`,
+          upcomingEvents: `+${newEventsCount}`,
+          publishedAnnouncements: `+${newAnnouncementsCount}`,
+          discussionPosts: `+${newDiscussionCount}`,
+          pendingCommunityItems: `${pendingCommunityItems}`,
+        },
+        sparklines,
+        insight: selectedInsight
       },
-      sparklines,
-      insight: selectedInsight
-    },
-    recentActivity,
-  });
+      recentActivity,
+    });
+  } catch (error) {
+    return unexpectedApiError("app/api/admin/dashboard/route.GET", error);
+  }
 }

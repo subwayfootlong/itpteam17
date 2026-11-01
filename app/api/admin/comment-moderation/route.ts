@@ -1,3 +1,4 @@
+import { logServerError, unexpectedApiError } from "@/lib/serverErrors";
 import { readJsonObject, invalidInput, InputValidationError, isUuid } from "@/lib/inputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from "next/server";
@@ -20,82 +21,88 @@ const ACTION_STATUS: Record<string, ModerationStatus> = {
 };
 
 export async function PATCH(req: Request) {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
-
-  let body: unknown;
-
   try {
-    body = await readJsonObject(req);
-  } catch (error) {
-    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
-  }
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
 
-  const payload = body as {
-    id?: unknown;
-    source?: unknown;
-    action?: unknown;
-    currentStatus?: unknown;
-  };
+    let body: unknown;
 
-  if (!isUuid(payload.id)) {
-    return NextResponse.json({ error: "Comment id is required" }, { status: 400 });
-  }
+    try {
+      body = await readJsonObject(req);
+    } catch (error) {
+      if (!(error instanceof InputValidationError)) logServerError("app/api/admin/comment-moderation/route.PATCH", error);
+      return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
+    }
 
-  if (
-    typeof payload.source !== "string" ||
-    !SOURCES.includes(payload.source as ModerationSource)
-  ) {
-    return NextResponse.json({ error: "Invalid comment source" }, { status: 400 });
-  }
+    const payload = body as {
+      id?: unknown;
+      source?: unknown;
+      action?: unknown;
+      currentStatus?: unknown;
+    };
 
-  if (
-    typeof payload.action !== "string" ||
-    !Object.prototype.hasOwnProperty.call(ACTION_STATUS, payload.action)
-  ) {
-    return NextResponse.json({ error: "Invalid moderation action" }, { status: 400 });
-  }
+    if (!isUuid(payload.id)) {
+      return NextResponse.json({ error: "Comment id is required" }, { status: 400 });
+    }
 
-  if (
-    payload.currentStatus !== undefined &&
-    (typeof payload.currentStatus !== "string" ||
-      !["approved", "pending", "flagged"].includes(payload.currentStatus))
-  ) {
-    return NextResponse.json({ error: "Invalid current moderation status" }, { status: 400 });
-  }
+    if (
+      typeof payload.source !== "string" ||
+      !SOURCES.includes(payload.source as ModerationSource)
+    ) {
+      return NextResponse.json({ error: "Invalid comment source" }, { status: 400 });
+    }
 
-  const status = ACTION_STATUS[payload.action];
-  const source = payload.source as ModerationSource;
+    if (
+      typeof payload.action !== "string" ||
+      !Object.prototype.hasOwnProperty.call(ACTION_STATUS, payload.action)
+    ) {
+      return NextResponse.json({ error: "Invalid moderation action" }, { status: 400 });
+    }
 
-  const { data, error } = await supabaseUpdateStatus(
-    getModerationTable(source),
-    payload.id,
-    status,
-    payload.currentStatus as ModerationStatus | undefined,
-  );
+    if (
+      payload.currentStatus !== undefined &&
+      (typeof payload.currentStatus !== "string" ||
+        !["approved", "pending", "flagged"].includes(payload.currentStatus))
+    ) {
+      return NextResponse.json({ error: "Invalid current moderation status" }, { status: 400 });
+    }
 
-  if (error) {
-    return NextResponse.json({ error: "Unable to update moderation status" }, { status: 500 });
-  }
+    const status = ACTION_STATUS[payload.action];
+    const source = payload.source as ModerationSource;
 
-  if (!data) {
-    return NextResponse.json(
-      {
-        error: payload.currentStatus
-          ? "This item was changed by another administrator. Refresh and try again."
-          : "Moderation item not found",
-      },
-      { status: payload.currentStatus ? 409 : 404 },
+    const { data, error } = await supabaseUpdateStatus(
+      getModerationTable(source),
+      payload.id,
+      status,
+      payload.currentStatus as ModerationStatus | undefined,
     );
-  }
 
-  return NextResponse.json({
-    comment: {
-      id: data.id,
-      status: data.status,
-      source,
-    },
-  });
+    if (error) {
+      logServerError("app/api/admin/comment-moderation/route.PATCH", error);
+      return NextResponse.json({ error: "Unable to update moderation status" }, { status: 500 });
+    }
+
+    if (!data) {
+      return NextResponse.json(
+        {
+          error: payload.currentStatus
+            ? "This item was changed by another administrator. Refresh and try again."
+            : "Moderation item not found",
+        },
+        { status: payload.currentStatus ? 409 : 404 },
+      );
+    }
+
+    return NextResponse.json({
+      comment: {
+        id: data.id,
+        status: data.status,
+        source,
+      },
+    });
+  } catch (error) {
+    return unexpectedApiError("app/api/admin/comment-moderation/route.PATCH", error);
+  }
 }
 
 async function supabaseUpdateStatus(
@@ -120,6 +127,6 @@ async function supabaseUpdateStatus(
 
   return {
     data,
-    error: error?.message,
+    error,
   };
 }

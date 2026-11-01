@@ -1,3 +1,4 @@
+import { logServerError, unexpectedApiError } from "@/lib/serverErrors";
 import { readJsonObject } from "@/lib/inputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
 import { randomBytes } from 'node:crypto';
@@ -98,151 +99,156 @@ function friendlyInsertError(message: string): string {
 }
 
 export async function POST(request: Request) {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
-
-  let body: { rows?: BatchOnboardingRow[] };
   try {
-    body = (await readJsonObject(request)) as { rows?: BatchOnboardingRow[] };
-  } catch {
-    return NextResponse.json({ error: 'The uploaded information could not be read. Please upload the CSV again.' }, { status: 400 });
-  }
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
 
-  if (!Array.isArray(body.rows) || body.rows.length === 0) {
-    return NextResponse.json({ error: 'Add at least one member row.' }, { status: 400 });
-  }
-  if (body.rows.length > MAX_ROWS) {
-    return NextResponse.json({ error: `A batch can contain at most ${MAX_ROWS} rows.` }, { status: 400 });
-  }
-
-  // Check every row before calling string methods or writing any member records.
-  for (const row of body.rows) {
-    if (!row || typeof row !== 'object' || Array.isArray(row) || !Number.isInteger(row.rowNumber) || row.rowNumber < 1) {
-      return NextResponse.json({ error: 'Each row must be an object with a positive integer rowNumber' }, { status: 400 });
+    let body: { rows?: BatchOnboardingRow[] };
+    try {
+      body = (await readJsonObject(request)) as { rows?: BatchOnboardingRow[] };
+    } catch (caughtError) {
+      logServerError("app/api/admin/batch-onboarding/route.POST", caughtError);
+      return NextResponse.json({ error: 'The uploaded information could not be read. Please upload the CSV again.' }, { status: 400 });
     }
-    const limits = { salutation: 20, first_name: 100, last_name: 100, email: 254, phone: 40, organization: 200, designation: 200, ars_status: 20 };
-    for (const [field, max] of Object.entries(limits)) {
-      const value = row[field as keyof BatchOnboardingRow];
-      if (typeof value !== 'string' || value.length > max || value.includes('\u0000')) {
-        return NextResponse.json({ error: `Row ${row.rowNumber}: ${field} must be a string of at most ${max} characters` }, { status: 400 });
+
+    if (!Array.isArray(body.rows) || body.rows.length === 0) {
+      return NextResponse.json({ error: 'Add at least one member row.' }, { status: 400 });
+    }
+    if (body.rows.length > MAX_ROWS) {
+      return NextResponse.json({ error: `A batch can contain at most ${MAX_ROWS} rows.` }, { status: 400 });
+    }
+
+    // Check every row before calling string methods or writing any member records.
+    for (const row of body.rows) {
+      if (!row || typeof row !== 'object' || Array.isArray(row) || !Number.isInteger(row.rowNumber) || row.rowNumber < 1) {
+        return NextResponse.json({ error: 'Each row must be an object with a positive integer rowNumber' }, { status: 400 });
       }
-    }
-    const checked = validateRow(row);
-    if (!checked.member) return NextResponse.json({ error: `Row ${row.rowNumber}: ${checked.message}` }, { status: 400 });
-  }
-
-  const results: BatchOnboardingResult[] = [];
-  const valid: PreparedMember[] = [];
-  const emailsInFile = new Set<string>();
-  const phonesInFile = new Set<string>();
-
-  for (const row of body.rows) {
-    const checked = validateRow(row);
-    const email = row.email?.trim().toLowerCase() ?? '';
-    if (!checked.member) {
-      results.push({ rowNumber: row.rowNumber, email, status: 'failed', message: checked.message ?? 'Check this row and complete the required information.' });
-      continue;
-    }
-    if (emailsInFile.has(checked.member.email)) {
-      results.push({ rowNumber: row.rowNumber, email: checked.member.email, status: 'skipped', message: 'This email appears more than once in the CSV. Remove the duplicate row.' });
-      continue;
-    }
-    if (phonesInFile.has(checked.member.phone)) {
-      results.push({ rowNumber: row.rowNumber, email: checked.member.email, status: 'skipped', message: 'This phone number appears more than once in the CSV. Enter a different number.' });
-      continue;
-    }
-    emailsInFile.add(checked.member.email);
-    phonesInFile.add(checked.member.phone);
-    valid.push(checked.member);
-  }
-
-  if (valid.length > 0) {
-    const { data: existingUsers, error: existingError } = await supabaseAdmin
-      .from('users')
-      .select('email, phone, member_id');
-    if (existingError) {
-      console.error('Batch onboarding lookup failed:');
-      return NextResponse.json({ error: 'Existing members could not be checked right now. Please try again.' }, { status: 500 });
-    }
-    const existingEmails = new Set(
-      (existingUsers ?? []).map((user) => String(user.email ?? '').trim().toLowerCase()),
-    );
-    const existingPhones = new Set(
-      (existingUsers ?? []).flatMap((user) => [user.phone, user.member_id])
-        .filter(Boolean)
-        .map((phone) => String(phone).trim()),
-    );
-    const newMembers = valid.filter((member) => {
-      if (existingEmails.has(member.email)) {
-        results.push({ rowNumber: member.rowNumber, email: member.email, status: 'skipped', message: 'A member account already uses this email address.' });
-        return false;
-      }
-      if (existingPhones.has(member.phone)) {
-        results.push({ rowNumber: member.rowNumber, email: member.email, status: 'skipped', message: 'This phone number is already used by another member. Enter a different number or update the existing member.' });
-        return false;
-      }
-      return true;
-    });
-
-    const today = new Date().toISOString().slice(0, 10);
-    const prepared: Array<{ member: PreparedMember; password: string; passwordHash: string }> = [];
-    for (let index = 0; index < newMembers.length; index += 5) {
-      const chunk = newMembers.slice(index, index + 5);
-      const hashedChunk = await Promise.all(chunk.map(async (member) => {
-        const password = temporaryPassword();
-        return { member, password, passwordHash: await hashPassword(password) };
-      }));
-      prepared.push(...hashedChunk);
-    }
-
-    if (prepared.length > 0) {
-      const { data: created, error: insertError } = await supabaseAdmin
-        .from('users')
-        .insert(prepared.map(({ member, passwordHash }) => ({
-          salutation: member.salutation,
-          first_name: member.firstName,
-          last_name: member.lastName || null,
-          email: member.email,
-          phone: member.phone,
-          organization: member.organization,
-          designation: member.designation,
-          ars_status: member.arsStatus,
-          password_hash: passwordHash,
-          role: 'member',
-          member_id: member.phone,
-          membership_tier: DEFAULT_TIER,
-          membership_status: 'active',
-          member_since: today,
-        })))
-        .select('email');
-
-      if (insertError) {
-        console.error('Batch onboarding insert failed:');
-        const message = friendlyInsertError(insertError.message);
-        for (const { member } of prepared) {
-          results.push({ rowNumber: member.rowNumber, email: member.email, status: 'failed', message });
+      const limits = { salutation: 20, first_name: 100, last_name: 100, email: 254, phone: 40, organization: 200, designation: 200, ars_status: 20 };
+      for (const [field, max] of Object.entries(limits)) {
+        const value = row[field as keyof BatchOnboardingRow];
+        if (typeof value !== 'string' || value.length > max || value.includes('\u0000')) {
+          return NextResponse.json({ error: `Row ${row.rowNumber}: ${field} must be a string of at most ${max} characters` }, { status: 400 });
         }
-      } else {
-        const createdEmails = new Set((created ?? []).map((user) => String(user.email).toLowerCase()));
-        for (const { member, password } of prepared) {
-          if (createdEmails.has(member.email)) {
-            results.push({ rowNumber: member.rowNumber, email: member.email, status: 'created', message: 'Account created successfully.', temporaryPassword: password });
-          } else {
-            results.push({ rowNumber: member.rowNumber, email: member.email, status: 'failed', message: 'The account may not have been created. Check the member directory before trying again.' });
+      }
+      const checked = validateRow(row);
+      if (!checked.member) return NextResponse.json({ error: `Row ${row.rowNumber}: ${checked.message}` }, { status: 400 });
+    }
+
+    const results: BatchOnboardingResult[] = [];
+    const valid: PreparedMember[] = [];
+    const emailsInFile = new Set<string>();
+    const phonesInFile = new Set<string>();
+
+    for (const row of body.rows) {
+      const checked = validateRow(row);
+      const email = row.email?.trim().toLowerCase() ?? '';
+      if (!checked.member) {
+        results.push({ rowNumber: row.rowNumber, email, status: 'failed', message: checked.message ?? 'Check this row and complete the required information.' });
+        continue;
+      }
+      if (emailsInFile.has(checked.member.email)) {
+        results.push({ rowNumber: row.rowNumber, email: checked.member.email, status: 'skipped', message: 'This email appears more than once in the CSV. Remove the duplicate row.' });
+        continue;
+      }
+      if (phonesInFile.has(checked.member.phone)) {
+        results.push({ rowNumber: row.rowNumber, email: checked.member.email, status: 'skipped', message: 'This phone number appears more than once in the CSV. Enter a different number.' });
+        continue;
+      }
+      emailsInFile.add(checked.member.email);
+      phonesInFile.add(checked.member.phone);
+      valid.push(checked.member);
+    }
+
+    if (valid.length > 0) {
+      const { data: existingUsers, error: existingError } = await supabaseAdmin
+        .from('users')
+        .select('email, phone, member_id');
+      if (existingError) {
+        logServerError("app/api/admin/batch-onboarding/route.POST", existingError);
+        return NextResponse.json({ error: 'Existing members could not be checked right now. Please try again.' }, { status: 500 });
+      }
+      const existingEmails = new Set(
+        (existingUsers ?? []).map((user) => String(user.email ?? '').trim().toLowerCase()),
+      );
+      const existingPhones = new Set(
+        (existingUsers ?? []).flatMap((user) => [user.phone, user.member_id])
+          .filter(Boolean)
+          .map((phone) => String(phone).trim()),
+      );
+      const newMembers = valid.filter((member) => {
+        if (existingEmails.has(member.email)) {
+          results.push({ rowNumber: member.rowNumber, email: member.email, status: 'skipped', message: 'A member account already uses this email address.' });
+          return false;
+        }
+        if (existingPhones.has(member.phone)) {
+          results.push({ rowNumber: member.rowNumber, email: member.email, status: 'skipped', message: 'This phone number is already used by another member. Enter a different number or update the existing member.' });
+          return false;
+        }
+        return true;
+      });
+
+      const today = new Date().toISOString().slice(0, 10);
+      const prepared: Array<{ member: PreparedMember; password: string; passwordHash: string }> = [];
+      for (let index = 0; index < newMembers.length; index += 5) {
+        const chunk = newMembers.slice(index, index + 5);
+        const hashedChunk = await Promise.all(chunk.map(async (member) => {
+          const password = temporaryPassword();
+          return { member, password, passwordHash: await hashPassword(password) };
+        }));
+        prepared.push(...hashedChunk);
+      }
+
+      if (prepared.length > 0) {
+        const { data: created, error: insertError } = await supabaseAdmin
+          .from('users')
+          .insert(prepared.map(({ member, passwordHash }) => ({
+            salutation: member.salutation,
+            first_name: member.firstName,
+            last_name: member.lastName || null,
+            email: member.email,
+            phone: member.phone,
+            organization: member.organization,
+            designation: member.designation,
+            ars_status: member.arsStatus,
+            password_hash: passwordHash,
+            role: 'member',
+            member_id: member.phone,
+            membership_tier: DEFAULT_TIER,
+            membership_status: 'active',
+            member_since: today,
+          })))
+          .select('email');
+
+        if (insertError) {
+          logServerError("app/api/admin/batch-onboarding/route.POST", insertError);
+          const message = friendlyInsertError(insertError.message);
+          for (const { member } of prepared) {
+            results.push({ rowNumber: member.rowNumber, email: member.email, status: 'failed', message });
+          }
+        } else {
+          const createdEmails = new Set((created ?? []).map((user) => String(user.email).toLowerCase()));
+          for (const { member, password } of prepared) {
+            if (createdEmails.has(member.email)) {
+              results.push({ rowNumber: member.rowNumber, email: member.email, status: 'created', message: 'Account created successfully.', temporaryPassword: password });
+            } else {
+              results.push({ rowNumber: member.rowNumber, email: member.email, status: 'failed', message: 'The account may not have been created. Check the member directory before trying again.' });
+            }
           }
         }
       }
     }
-  }
 
-  results.sort((left, right) => left.rowNumber - right.rowNumber);
-  return NextResponse.json({
-    results,
-    summary: {
-      total: results.length,
-      created: results.filter((result) => result.status === 'created').length,
-      skipped: results.filter((result) => result.status === 'skipped').length,
-      failed: results.filter((result) => result.status === 'failed').length,
-    },
-  }, { headers: { "Cache-Control": "private, no-store" } });
+    results.sort((left, right) => left.rowNumber - right.rowNumber);
+    return NextResponse.json({
+      results,
+      summary: {
+        total: results.length,
+        created: results.filter((result) => result.status === 'created').length,
+        skipped: results.filter((result) => result.status === 'skipped').length,
+        failed: results.filter((result) => result.status === 'failed').length,
+      },
+    }, { headers: { "Cache-Control": "private, no-store" } });
+  } catch (error) {
+    return unexpectedApiError("app/api/admin/batch-onboarding/route.POST", error);
+  }
 }

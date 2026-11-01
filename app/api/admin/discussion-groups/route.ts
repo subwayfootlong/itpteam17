@@ -1,3 +1,4 @@
+import { logServerError, unexpectedApiError } from "@/lib/serverErrors";
 import { readJsonObject, invalidInput, InputValidationError } from "@/lib/inputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from "next/server";
@@ -10,59 +11,70 @@ const GROUP_SELECT =
   "id, title, icon, tone, sort_order, audience_type, eligible_tiers, show_locked_preview";
 
 export async function GET() {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
+  try {
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
 
-  const { data, error } = await supabaseAdmin
-    .from("discussion_groups")
-    .select(GROUP_SELECT)
-    .order("sort_order", { ascending: true });
+    const { data, error } = await supabaseAdmin
+      .from("discussion_groups")
+      .select(GROUP_SELECT)
+      .order("sort_order", { ascending: true });
 
-  if (error) {
-    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    if (error) {
+      logServerError("app/api/admin/discussion-groups/route.GET", error);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    }
+
+    return NextResponse.json({ groups: data ?? [] });
+  } catch (error) {
+    return unexpectedApiError("app/api/admin/discussion-groups/route.GET", error);
   }
-
-  return NextResponse.json({ groups: data ?? [] });
 }
 
 export async function PATCH(req: Request) {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
-
-  let body: Record<string, unknown>;
   try {
-    body = await readJsonObject(req);
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
+
+    let body: Record<string, unknown>;
+    try {
+      body = await readJsonObject(req);
+    } catch (error) {
+      if (!(error instanceof InputValidationError)) logServerError("app/api/admin/discussion-groups/route.PATCH", error);
+      return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
+    }
+
+    const id = typeof body.id === "string" ? body.id.trim() : "";
+    if (!/^[a-zA-Z0-9_-]{1,100}$/.test(id)) {
+      return NextResponse.json({ error: "Discussion group ID is required." }, { status: 400 });
+    }
+
+    const audience = validateTierAudience(body);
+    if (!audience.ok) {
+      return NextResponse.json({ error: audience.error }, { status: 400 });
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from("discussion_groups")
+      .update({
+        ...tierAudienceToDatabase(audience.value),
+        // Community spaces are private when restricted; previews stay disabled.
+        show_locked_preview: false,
+      })
+      .eq("id", id)
+      .select(GROUP_SELECT)
+      .maybeSingle();
+
+    if (error) {
+      logServerError("app/api/admin/discussion-groups/route.PATCH", error);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    }
+    if (!data) {
+      return NextResponse.json({ error: "Discussion group not found." }, { status: 404 });
+    }
+
+    return NextResponse.json({ group: data });
   } catch (error) {
-    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
+    return unexpectedApiError("app/api/admin/discussion-groups/route.PATCH", error);
   }
-
-  const id = typeof body.id === "string" ? body.id.trim() : "";
-  if (!/^[a-zA-Z0-9_-]{1,100}$/.test(id)) {
-    return NextResponse.json({ error: "Discussion group ID is required." }, { status: 400 });
-  }
-
-  const audience = validateTierAudience(body);
-  if (!audience.ok) {
-    return NextResponse.json({ error: audience.error }, { status: 400 });
-  }
-
-  const { data, error } = await supabaseAdmin
-    .from("discussion_groups")
-    .update({
-      ...tierAudienceToDatabase(audience.value),
-      // Community spaces are private when restricted; previews stay disabled.
-      show_locked_preview: false,
-    })
-    .eq("id", id)
-    .select(GROUP_SELECT)
-    .maybeSingle();
-
-  if (error) {
-    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
-  }
-  if (!data) {
-    return NextResponse.json({ error: "Discussion group not found." }, { status: 404 });
-  }
-
-  return NextResponse.json({ group: data });
 }

@@ -1,3 +1,4 @@
+import { logServerError, unexpectedApiError } from "@/lib/serverErrors";
 import { readJsonObject, invalidInput, InputValidationError, isOneOf } from "@/lib/inputValidation";
 import { validatePaymentInput } from "@/lib/apiInputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
@@ -13,78 +14,96 @@ function cleanText(value: unknown) {
 }
 
 export async function GET(req: Request) {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
+  try {
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
 
-  const url = new URL(req.url);
-  const active = url.searchParams.get('active');
-  if (active !== null && !isOneOf(active, ['true', 'false'])) return invalidInput('Active must be true or false');
+    const url = new URL(req.url);
+    const active = url.searchParams.get('active');
+    if (active !== null && !isOneOf(active, ['true', 'false'])) return invalidInput('Active must be true or false');
 
-  let query = supabaseAdmin
-    .from('payment_methods')
-    .select(ADMIN_PAYMENT_METHOD_SELECT)
-    .order('created_at', { ascending: false });
+    let query = supabaseAdmin
+      .from('payment_methods')
+      .select(ADMIN_PAYMENT_METHOD_SELECT)
+      .order('created_at', { ascending: false });
 
-  if (active === 'true') query = query.eq('is_active', true);
-  if (active === 'false') query = query.eq('is_active', false);
+    if (active === 'true') query = query.eq('is_active', true);
+    if (active === 'false') query = query.eq('is_active', false);
 
-  const { data, error } = await query;
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
-  return NextResponse.json({ paymentMethods: data ?? [] });
+    const { data, error } = await query;
+    if (error) {
+      logServerError("app/api/admin/payment-methods/route.GET", error);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    }
+    return NextResponse.json({ paymentMethods: data ?? [] });
+  } catch (error) {
+    return unexpectedApiError("app/api/admin/payment-methods/route.GET", error);
+  }
 }
 
 export async function POST(req: Request) {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
-
-  let body: Record<string, unknown>;
   try {
-    body = await readJsonObject(req, validatePaymentInput);
-  } catch (error) {
-    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
-  }
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
 
-  const name = cleanText(body.name);
-  const rawPaymentUrl = cleanText(body.payment_url);
-  const qrCodeUrl = cleanText(body.qr_code_url);
+    let body: Record<string, unknown>;
+    try {
+      body = await readJsonObject(req, validatePaymentInput);
+    } catch (error) {
+      if (!(error instanceof InputValidationError)) logServerError("app/api/admin/payment-methods/route.POST", error);
+      return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
+    }
 
-  if (!name) {
-    return NextResponse.json({ error: 'Name is required.' }, { status: 400 });
-  }
-  if (!rawPaymentUrl) {
-    return NextResponse.json({ error: 'Payment link is required.' }, { status: 400 });
-  }
-  const paymentUrl = normalizePaymentUrl(rawPaymentUrl);
-  if (!paymentUrl) {
-    return NextResponse.json(
-      { error: 'Payment link must be a valid web address (http or https).' },
-      { status: 400 },
-    );
-  }
+    const name = cleanText(body.name);
+    const rawPaymentUrl = cleanText(body.payment_url);
+    const qrCodeUrl = cleanText(body.qr_code_url);
 
-  const isActive = typeof body.is_active === 'boolean' ? body.is_active : true;
+    if (!name) {
+      return NextResponse.json({ error: 'Name is required.' }, { status: 400 });
+    }
+    if (!rawPaymentUrl) {
+      return NextResponse.json({ error: 'Payment link is required.' }, { status: 400 });
+    }
+    const paymentUrl = normalizePaymentUrl(rawPaymentUrl);
+    if (!paymentUrl) {
+      return NextResponse.json(
+        { error: 'Payment link must be a valid web address (http or https).' },
+        { status: 400 },
+      );
+    }
 
-  // Only one payment method can be active at a time.
-  if (isActive) {
-    const { error: deactivateError } = await supabaseAdmin
+    const isActive = typeof body.is_active === 'boolean' ? body.is_active : true;
+
+    // Only one payment method can be active at a time.
+    if (isActive) {
+      const { error: deactivateError } = await supabaseAdmin
+        .from('payment_methods')
+        .update({ is_active: false })
+        .eq('is_active', true);
+      if (deactivateError) {
+        logServerError("app/api/admin/payment-methods/route.POST", deactivateError);
+        return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+      }
+    }
+
+    const { data, error } = await supabaseAdmin
       .from('payment_methods')
-      .update({ is_active: false })
-      .eq('is_active', true);
-    if (deactivateError) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+      .insert({
+        name,
+        description: cleanText(body.description) || null,
+        payment_url: paymentUrl,
+        qr_code_url: qrCodeUrl || null,
+        is_active: isActive,
+      })
+      .select(ADMIN_PAYMENT_METHOD_SELECT)
+      .single();
+
+    if (error) {
+      logServerError("app/api/admin/payment-methods/route.POST", error);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    }
+    return NextResponse.json({ paymentMethod: data, deactivatedOthers: isActive }, { status: 201 });
+  } catch (error) {
+    return unexpectedApiError("app/api/admin/payment-methods/route.POST", error);
   }
-
-  const { data, error } = await supabaseAdmin
-    .from('payment_methods')
-    .insert({
-      name,
-      description: cleanText(body.description) || null,
-      payment_url: paymentUrl,
-      qr_code_url: qrCodeUrl || null,
-      is_active: isActive,
-    })
-    .select(ADMIN_PAYMENT_METHOD_SELECT)
-    .single();
-
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
-  return NextResponse.json({ paymentMethod: data, deactivatedOthers: isActive }, { status: 201 });
 }

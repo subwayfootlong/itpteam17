@@ -1,3 +1,4 @@
+import { logServerError } from "@/lib/serverErrors";
 import { getCommunityData } from "./community";
 import { getCurrentUser } from "./currentUser";
 import { announcements } from "./data/announcements";
@@ -25,8 +26,8 @@ export async function loadCommunityPageData(): Promise<CommunityPageProps> {
       groups: communityData.groups,
       threads: communityData.threads,
     };
-  } catch {
-    console.warn("Using community fallback data");
+  } catch (caughtError) {
+    logServerError("lib/loadCommunityPage.loadCommunityPageData", caughtError);
   }
 
   return {

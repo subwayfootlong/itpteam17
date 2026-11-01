@@ -1,3 +1,4 @@
+import { logServerError, unexpectedApiError } from "@/lib/serverErrors";
 import { readJsonObject, invalidInput, InputValidationError, isOneOf } from "@/lib/inputValidation";
 import { validateEventInput } from "@/lib/apiInputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
@@ -9,84 +10,93 @@ import { tierAudienceToDatabase, validateTierAudience } from '@/lib/tierAccess';
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
+  try {
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
 
-  const url = new URL(req.url);
-  const status = url.searchParams.get('status') ?? '';
-  if (status && !isOneOf(status, ['draft', 'published', 'archived'])) return invalidInput('Invalid status filter');
+    const url = new URL(req.url);
+    const status = url.searchParams.get('status') ?? '';
+    if (status && !isOneOf(status, ['draft', 'published', 'archived'])) return invalidInput('Invalid status filter');
 
-  let query = supabaseAdmin
-    .from('events')
-    .select('id, title, event_date, start_time, end_time, venue, category, capacity, spots_available, status, external_rsvp_url, created_at, image_url, audience_type, eligible_tiers, show_locked_preview')
-    .order('event_date', { ascending: false });
+    let query = supabaseAdmin
+      .from('events')
+      .select('id, title, event_date, start_time, end_time, venue, category, capacity, spots_available, status, external_rsvp_url, created_at, image_url, audience_type, eligible_tiers, show_locked_preview')
+      .order('event_date', { ascending: false });
 
-  if (status) query = query.eq('status', status);
+    if (status) query = query.eq('status', status);
 
-  const { data, error } = await query;
-  if (error) {
-    console.error('Events GET Error:');
-    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    const { data, error } = await query;
+    if (error) {
+      logServerError("app/api/admin/events/route.GET", error);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    }
+    return NextResponse.json({ events: data ?? [] });
+  } catch (error) {
+    return unexpectedApiError("app/api/admin/events/route.GET", error);
   }
-  return NextResponse.json({ events: data ?? [] });
 }
 
 export async function POST(req: Request) {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
-
-  let body;
   try {
-    body = await readJsonObject(req, validateEventInput);
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
+
+    let body;
+    try {
+      body = await readJsonObject(req, validateEventInput);
+    } catch (error) {
+      if (!(error instanceof InputValidationError)) logServerError("app/api/admin/events/route.POST", error);
+      return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
+    }
+
+    if (!body.title || typeof body.title !== 'string') {
+      return NextResponse.json({ error: 'Title is required and must be a string' }, { status: 400 });
+    }
+    if (!body.event_date || typeof body.event_date !== 'string') {
+      return NextResponse.json({ error: 'Event date is required' }, { status: 400 });
+    }
+
+    const audience = validateTierAudience(body);
+    if (!audience.ok) {
+      return NextResponse.json({ error: audience.error }, { status: 400 });
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('events')
+      .insert({
+        title: body.title,
+        description: body.description || null,
+        event_date: body.event_date,
+        start_time: body.start_time || null,
+        end_time: body.end_time || null,
+        venue: body.venue || null,
+        category: body.category ?? 'General',
+        capacity: body.capacity ?? null,
+        spots_available: body.capacity ?? null,
+        external_rsvp_url: body.external_rsvp_url || null,
+        image_url: body.image_url || null,
+        status: body.status ?? 'draft',
+        ...tierAudienceToDatabase(audience.value),
+        // Add created_by: admin.sub if the events table includes that column.
+      })
+      .select('id, title, status, event_date')
+      .single();
+
+    if (error) {
+      logServerError("app/api/admin/events/route.POST", error);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    }
+    if (data?.status === 'published') {
+      await notifyEventPublished({
+        id: String(data.id),
+        title: data.title,
+        eventDate: data.event_date,
+        audience: audience.value,
+      });
+    }
+
+    return NextResponse.json({ ok: true }, { status: 201 });
   } catch (error) {
-    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
+    return unexpectedApiError("app/api/admin/events/route.POST", error);
   }
-
-  if (!body.title || typeof body.title !== 'string') {
-    return NextResponse.json({ error: 'Title is required and must be a string' }, { status: 400 });
-  }
-  if (!body.event_date || typeof body.event_date !== 'string') {
-    return NextResponse.json({ error: 'Event date is required' }, { status: 400 });
-  }
-
-  const audience = validateTierAudience(body);
-  if (!audience.ok) {
-    return NextResponse.json({ error: audience.error }, { status: 400 });
-  }
-
-  const { data, error } = await supabaseAdmin
-    .from('events')
-    .insert({
-      title: body.title,
-      description: body.description || null,
-      event_date: body.event_date,
-      start_time: body.start_time || null,
-      end_time: body.end_time || null,
-      venue: body.venue || null,
-      category: body.category ?? 'General',
-      capacity: body.capacity ?? null,
-      spots_available: body.capacity ?? null,
-      external_rsvp_url: body.external_rsvp_url || null,
-      image_url: body.image_url || null,
-      status: body.status ?? 'draft',
-      ...tierAudienceToDatabase(audience.value),
-      // Add created_by: admin.sub if the events table includes that column.
-    })
-    .select('id, title, status, event_date')
-    .single();
-
-  if (error) {
-    console.error('Events POST Error:');
-    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
-  }
-  if (data?.status === 'published') {
-    await notifyEventPublished({
-      id: String(data.id),
-      title: data.title,
-      eventDate: data.event_date,
-      audience: audience.value,
-    });
-  }
-
-  return NextResponse.json({ ok: true }, { status: 201 });
 }

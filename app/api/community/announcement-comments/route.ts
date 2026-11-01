@@ -1,3 +1,4 @@
+import { logServerError } from "@/lib/serverErrors";
 import { InputValidationError, invalidInput, readJsonObject, requireUuid, requirePlainText } from "@/lib/inputValidation";
 import { NextResponse } from "next/server";
 import { requireMember } from "@/lib/currentUser";
@@ -60,6 +61,7 @@ export async function POST(req: Request) {
         announcement.status !== "published" ||
         !access?.canAccess
       ) {
+    if (announcementError) logServerError("app/api/community/announcement-comments/route.POST", announcementError);
         return NextResponse.json({ error: "Announcement not found" }, { status: 404 });
       }
       const { data, error } = await supabaseAdmin
@@ -76,6 +78,7 @@ export async function POST(req: Request) {
         .single<CommentRow>();
 
       if (error) {
+        logServerError("app/api/community/announcement-comments/route.POST", error);
         return NextResponse.json({ error: "Unable to save community content" }, { status: 500 });
       }
 
@@ -98,6 +101,7 @@ export async function POST(req: Request) {
       .eq("id", announcementId)
       .maybeSingle();
     if (announcementError || !announcement || announcement.status !== "published" || announcement.comments_enabled === false) {
+    if (announcementError) logServerError("app/api/community/announcement-comments/route.POST", announcementError);
       return NextResponse.json({ error: "Announcement not found" }, { status: 404 });
     }
 
@@ -115,6 +119,7 @@ export async function POST(req: Request) {
       .single<CommentRow>();
 
     if (error) {
+      logServerError("app/api/community/announcement-comments/route.POST", error);
       return NextResponse.json({ error: "Unable to save community content" }, { status: 500 });
     }
 
@@ -130,6 +135,7 @@ export async function POST(req: Request) {
       },
     });
   } catch (err: unknown) {
+    if (!(err instanceof InputValidationError)) logServerError("app/api/community/announcement-comments/route.POST", err);
     if (err instanceof InputValidationError) return invalidInput(err.message);
     return NextResponse.json(
       { error: "Unable to post comment" },

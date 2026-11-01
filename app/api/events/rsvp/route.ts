@@ -1,3 +1,4 @@
+import { logServerError, unexpectedApiError } from "@/lib/serverErrors";
 import { readJsonObject, invalidInput, InputValidationError, isUuid } from "@/lib/inputValidation";
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
@@ -5,240 +6,260 @@ import { requireMember } from '@/lib/currentUser';
 import { evaluateTierAccess, normalizeTierAudience } from '@/lib/tierAccess';
 
 export async function GET(req: Request) {
-  const { user, response: authResponse } = await requireMember();
-  if (authResponse) return authResponse;
+  try {
+    const { user, response: authResponse } = await requireMember();
+    if (authResponse) return authResponse;
 
-  const { searchParams } = new URL(req.url);
-  const eventId = searchParams.get('eventId');
+    const { searchParams } = new URL(req.url);
+    const eventId = searchParams.get('eventId');
 
-  if (!isUuid(eventId)) {
-    return new Response('Event ID is required', { status: 400 });
+    if (!isUuid(eventId)) {
+      return new Response('Event ID is required', { status: 400 });
+    }
+
+    const { data: event, error } = await supabaseAdmin
+      .from('events')
+      .select('id, external_rsvp_url, audience_type, eligible_tiers, show_locked_preview, status')
+      .eq('id', eventId)
+      .single();
+
+    if (error || !event) {
+      if (error) logServerError("app/api/events/rsvp/route.GET", error);
+      return new Response('Event not found', { status: 404 });
+    }
+
+    const access = evaluateTierAccess(
+      {
+        membershipTier: user.membershipTier,
+        membershipStatus: user.membershipStatus,
+        expiryDate: user.expiryDate,
+      },
+      normalizeTierAudience(event),
+    );
+    if (event.status !== 'published' || !access.canAccess) {
+      return new Response('Event not found', { status: 404 });
+    }
+
+    // 1. Log the click event
+    await supabaseAdmin.from('analytics_events').insert({
+      user_id: user.id,
+      event_type: 'event_rsvp_click',
+      target_id: event.id,
+      category: 'event',
+    });
+
+    // 2. Redirect to Zoho Backstage / external URL
+    const redirectUrl = event.external_rsvp_url?.trim() || '/member/events';
+    return NextResponse.redirect(redirectUrl);
+  } catch (error) {
+    return unexpectedApiError("app/api/events/rsvp/route.GET", error);
   }
-
-  const { data: event, error } = await supabaseAdmin
-    .from('events')
-    .select('id, external_rsvp_url, audience_type, eligible_tiers, show_locked_preview, status')
-    .eq('id', eventId)
-    .single();
-
-  if (error || !event) {
-    return new Response('Event not found', { status: 404 });
-  }
-
-  const access = evaluateTierAccess(
-    {
-      membershipTier: user.membershipTier,
-      membershipStatus: user.membershipStatus,
-      expiryDate: user.expiryDate,
-    },
-    normalizeTierAudience(event),
-  );
-  if (event.status !== 'published' || !access.canAccess) {
-    return new Response('Event not found', { status: 404 });
-  }
-
-  // 1. Log the click event
-  await supabaseAdmin.from('analytics_events').insert({
-    user_id: user.id,
-    event_type: 'event_rsvp_click',
-    target_id: event.id,
-    category: 'event',
-  });
-
-  // 2. Redirect to Zoho Backstage / external URL
-  const redirectUrl = event.external_rsvp_url?.trim() || '/member/events';
-  return NextResponse.redirect(redirectUrl);
 }
 
 export async function POST(req: Request) {
-  const { user, response: authResponse } = await requireMember();
-  if (authResponse) return authResponse;
-
-  let body;
   try {
-    body = await readJsonObject(req);
+    const { user, response: authResponse } = await requireMember();
+    if (authResponse) return authResponse;
+
+    let body;
+    try {
+      body = await readJsonObject(req);
+    } catch (error) {
+      if (!(error instanceof InputValidationError)) logServerError("app/api/events/rsvp/route.POST", error);
+      return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
+    }
+
+    const { eventId } = body;
+    if (!isUuid(eventId)) {
+      return NextResponse.json({ error: 'eventId is required' }, { status: 400 });
+    }
+
+    // Fetch event details
+    const { data: event, error: eventError } = await supabaseAdmin
+      .from('events')
+      .select('id, title, capacity, spots_available, status, audience_type, eligible_tiers, show_locked_preview')
+      .eq('id', eventId)
+      .single();
+
+    if (eventError || !event) {
+      if (eventError) logServerError("app/api/events/rsvp/route.POST", eventError);
+      return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+    }
+
+    if (event.status !== 'published') {
+      return NextResponse.json({ error: 'This event is not open for registration' }, { status: 400 });
+    }
+
+    const access = evaluateTierAccess(
+      {
+        membershipTier: user.membershipTier,
+        membershipStatus: user.membershipStatus,
+        expiryDate: user.expiryDate,
+      },
+      normalizeTierAudience(event),
+    );
+    if (!access.canAccess) {
+      return NextResponse.json({ error: 'This event is not available for your membership tier.' }, { status: 403 });
+    }
+
+    // Check existing registration
+    const { data: existingReg } = await supabaseAdmin
+      .from('event_registrations')
+      .select('id, status')
+      .eq('event_id', eventId)
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (existingReg) {
+      if (existingReg.status === 'registered') {
+        return NextResponse.json({ error: 'Already registered for this event' }, { status: 400 });
+      }
+
+      // If rejected, re-apply
+      const { error: updateError } = await supabaseAdmin
+        .from('event_registrations')
+        .update({
+          status: 'registered',
+          rejection_message: null,
+          registered_at: new Date().toISOString()
+        })
+        .eq('id', existingReg.id);
+
+      if (updateError) {
+        logServerError("app/api/events/rsvp/route.POST", updateError);
+        return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+      }
+
+      // Decrement spots_available
+      if (event.spots_available !== null) {
+        await supabaseAdmin
+          .from('events')
+          .update({ spots_available: Math.max(0, event.spots_available - 1) })
+          .eq('id', eventId);
+      }
+    } else {
+      // Check capacity/spots
+      if (event.capacity !== null && event.spots_available !== null && event.spots_available <= 0) {
+        return NextResponse.json({ error: 'This event is full' }, { status: 400 });
+      }
+
+      // Insert new registration
+      const { error: insertError } = await supabaseAdmin
+        .from('event_registrations')
+        .insert({
+          event_id: eventId,
+          user_id: user.id,
+          status: 'registered',
+          registered_at: new Date().toISOString()
+        });
+
+      if (insertError) {
+        logServerError("app/api/events/rsvp/route.POST", insertError);
+        return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+      }
+
+      // Decrement spots_available
+      if (event.spots_available !== null) {
+        await supabaseAdmin
+          .from('events')
+          .update({ spots_available: Math.max(0, event.spots_available - 1) })
+          .eq('id', eventId);
+      }
+    }
+
+    // Log analytics event for metrics
+    await supabaseAdmin.from('analytics_events').insert({
+      user_id: user.id,
+      event_type: 'event_rsvp_click',
+      target_id: eventId,
+      category: 'event',
+      metadata: { title: event.title }
+    });
+
+    return NextResponse.json({ ok: true });
   } catch (error) {
-    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
+    return unexpectedApiError("app/api/events/rsvp/route.POST", error);
   }
-
-  const { eventId } = body;
-  if (!isUuid(eventId)) {
-    return NextResponse.json({ error: 'eventId is required' }, { status: 400 });
-  }
-
-  // Fetch event details
-  const { data: event, error: eventError } = await supabaseAdmin
-    .from('events')
-    .select('id, title, capacity, spots_available, status, audience_type, eligible_tiers, show_locked_preview')
-    .eq('id', eventId)
-    .single();
-
-  if (eventError || !event) {
-    return NextResponse.json({ error: 'Event not found' }, { status: 404 });
-  }
-
-  if (event.status !== 'published') {
-    return NextResponse.json({ error: 'This event is not open for registration' }, { status: 400 });
-  }
-
-  const access = evaluateTierAccess(
-    {
-      membershipTier: user.membershipTier,
-      membershipStatus: user.membershipStatus,
-      expiryDate: user.expiryDate,
-    },
-    normalizeTierAudience(event),
-  );
-  if (!access.canAccess) {
-    return NextResponse.json({ error: 'This event is not available for your membership tier.' }, { status: 403 });
-  }
-
-  // Check existing registration
-  const { data: existingReg } = await supabaseAdmin
-    .from('event_registrations')
-    .select('id, status')
-    .eq('event_id', eventId)
-    .eq('user_id', user.id)
-    .maybeSingle();
-
-  if (existingReg) {
-    if (existingReg.status === 'registered') {
-      return NextResponse.json({ error: 'Already registered for this event' }, { status: 400 });
-    }
-    
-    // If rejected, re-apply
-    const { error: updateError } = await supabaseAdmin
-      .from('event_registrations')
-      .update({
-        status: 'registered',
-        rejection_message: null,
-        registered_at: new Date().toISOString()
-      })
-      .eq('id', existingReg.id);
-
-    if (updateError) {
-      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
-    }
-
-    // Decrement spots_available
-    if (event.spots_available !== null) {
-      await supabaseAdmin
-        .from('events')
-        .update({ spots_available: Math.max(0, event.spots_available - 1) })
-        .eq('id', eventId);
-    }
-  } else {
-    // Check capacity/spots
-    if (event.capacity !== null && event.spots_available !== null && event.spots_available <= 0) {
-      return NextResponse.json({ error: 'This event is full' }, { status: 400 });
-    }
-
-    // Insert new registration
-    const { error: insertError } = await supabaseAdmin
-      .from('event_registrations')
-      .insert({
-        event_id: eventId,
-        user_id: user.id,
-        status: 'registered',
-        registered_at: new Date().toISOString()
-      });
-
-    if (insertError) {
-      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
-    }
-
-    // Decrement spots_available
-    if (event.spots_available !== null) {
-      await supabaseAdmin
-        .from('events')
-        .update({ spots_available: Math.max(0, event.spots_available - 1) })
-        .eq('id', eventId);
-    }
-  }
-
-  // Log analytics event for metrics
-  await supabaseAdmin.from('analytics_events').insert({
-    user_id: user.id,
-    event_type: 'event_rsvp_click',
-    target_id: eventId,
-    category: 'event',
-    metadata: { title: event.title }
-  });
-
-  return NextResponse.json({ ok: true });
 }
 
 export async function DELETE(req: Request) {
-  const { user, response: authResponse } = await requireMember();
-  if (authResponse) return authResponse;
-
-  let body;
   try {
-    body = await readJsonObject(req);
-  } catch (error) {
-    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
-  }
+    const { user, response: authResponse } = await requireMember();
+    if (authResponse) return authResponse;
 
-  const { eventId } = body;
-  if (!isUuid(eventId)) {
-    return NextResponse.json({ error: 'eventId is required' }, { status: 400 });
-  }
+    let body;
+    try {
+      body = await readJsonObject(req);
+    } catch (error) {
+      if (!(error instanceof InputValidationError)) logServerError("app/api/events/rsvp/route.DELETE", error);
+      return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
+    }
 
-  const { data: event, error: eventError } = await supabaseAdmin
-    .from('events')
-    .select('id, capacity, spots_available, event_date')
-    .eq('id', eventId)
-    .single();
+    const { eventId } = body;
+    if (!isUuid(eventId)) {
+      return NextResponse.json({ error: 'eventId is required' }, { status: 400 });
+    }
 
-  if (eventError || !event) {
-    return NextResponse.json({ error: 'Event not found' }, { status: 404 });
-  }
-
-  // Only the member's own active registration can be cancelled
-  const { data: registration } = await supabaseAdmin
-    .from('event_registrations')
-    .select('id, status')
-    .eq('event_id', eventId)
-    .eq('user_id', user.id)
-    .maybeSingle();
-
-  if (!registration || registration.status !== 'registered') {
-    return NextResponse.json({ error: 'You are not registered for this event' }, { status: 400 });
-  }
-
-  const today = new Date().toISOString().slice(0, 10);
-  if (event.event_date && event.event_date < today) {
-    return NextResponse.json({ error: 'This event has already taken place' }, { status: 400 });
-  }
-
-  const { error: deleteError } = await supabaseAdmin
-    .from('event_registrations')
-    .delete()
-    .eq('id', registration.id)
-    .eq('user_id', user.id);
-
-  if (deleteError) {
-    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
-  }
-
-  // Give the seat back, never exceeding the event capacity
-  if (event.spots_available !== null) {
-    const restored = event.spots_available + 1;
-    await supabaseAdmin
+    const { data: event, error: eventError } = await supabaseAdmin
       .from('events')
-      .update({
-        spots_available: event.capacity !== null ? Math.min(event.capacity, restored) : restored,
-      })
-      .eq('id', eventId);
+      .select('id, capacity, spots_available, event_date')
+      .eq('id', eventId)
+      .single();
+
+    if (eventError || !event) {
+      if (eventError) logServerError("app/api/events/rsvp/route.DELETE", eventError);
+      return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+    }
+
+    // Only the member's own active registration can be cancelled
+    const { data: registration } = await supabaseAdmin
+      .from('event_registrations')
+      .select('id, status')
+      .eq('event_id', eventId)
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (!registration || registration.status !== 'registered') {
+      return NextResponse.json({ error: 'You are not registered for this event' }, { status: 400 });
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+    if (event.event_date && event.event_date < today) {
+      return NextResponse.json({ error: 'This event has already taken place' }, { status: 400 });
+    }
+
+    const { error: deleteError } = await supabaseAdmin
+      .from('event_registrations')
+      .delete()
+      .eq('id', registration.id)
+      .eq('user_id', user.id);
+
+    if (deleteError) {
+      logServerError("app/api/events/rsvp/route.DELETE", deleteError);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    }
+
+    // Give the seat back, never exceeding the event capacity
+    if (event.spots_available !== null) {
+      const restored = event.spots_available + 1;
+      await supabaseAdmin
+        .from('events')
+        .update({
+          spots_available: event.capacity !== null ? Math.min(event.capacity, restored) : restored,
+        })
+        .eq('id', eventId);
+    }
+
+    // Remove the RSVP click so analytics don't double count if they register again
+    await supabaseAdmin
+      .from('analytics_events')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('target_id', eventId)
+      .eq('event_type', 'event_rsvp_click');
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    return unexpectedApiError("app/api/events/rsvp/route.DELETE", error);
   }
-
-  // Remove the RSVP click so analytics don't double count if they register again
-  await supabaseAdmin
-    .from('analytics_events')
-    .delete()
-    .eq('user_id', user.id)
-    .eq('target_id', eventId)
-    .eq('event_type', 'event_rsvp_click');
-
-  return NextResponse.json({ ok: true });
 }

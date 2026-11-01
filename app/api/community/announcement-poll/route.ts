@@ -1,3 +1,4 @@
+import { logServerError } from "@/lib/serverErrors";
 import { readJsonObject, InputValidationError, invalidInput, requireUuid } from "@/lib/inputValidation";
 import { NextResponse } from "next/server";
 import { requireMember } from "@/lib/currentUser";
@@ -44,6 +45,7 @@ export async function POST(req: Request) {
       >();
 
     if (announcementError) {
+      logServerError("app/api/community/announcement-poll/route.POST", announcementError);
       return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
     if (!announcement || announcement.status !== "published" || !announcement.poll_enabled) {
@@ -78,6 +80,7 @@ export async function POST(req: Request) {
       );
 
     if (upsertError) {
+      logServerError("app/api/community/announcement-poll/route.POST", upsertError);
       return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
 
@@ -87,6 +90,7 @@ export async function POST(req: Request) {
       .eq("announcement_id", id);
 
     if (tallyError) {
+      logServerError("app/api/community/announcement-poll/route.POST", tallyError);
       return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
 
@@ -97,6 +101,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ response, counts });
   } catch (err: unknown) {
+    if (!(err instanceof InputValidationError)) logServerError("app/api/community/announcement-poll/route.POST", err);
     if (err instanceof InputValidationError) return invalidInput(err.message);
     return NextResponse.json(
       { error: "Unable to record your response" },

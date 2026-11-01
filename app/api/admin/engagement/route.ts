@@ -1,3 +1,4 @@
+import { logServerError, unexpectedApiError } from "@/lib/serverErrors";
 import { readJsonObject, invalidInput, InputValidationError, isOneOf } from "@/lib/inputValidation";
 import { validateBenefitInput } from "@/lib/apiInputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
@@ -14,81 +15,96 @@ function cleanText(value: unknown) {
 }
 
 export async function GET(req: Request) {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
+  try {
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
 
-  const url = new URL(req.url);
-  const active = url.searchParams.get('active');
-  if (active !== null && !isOneOf(active, ['true', 'false'])) return invalidInput('Active must be true or false');
+    const url = new URL(req.url);
+    const active = url.searchParams.get('active');
+    if (active !== null && !isOneOf(active, ['true', 'false'])) return invalidInput('Active must be true or false');
 
-  let query = supabaseAdmin
-    .from('benefits')
-    .select(ADMIN_BENEFIT_SELECT)
-    .order('merchant_name', { ascending: true });
+    let query = supabaseAdmin
+      .from('benefits')
+      .select(ADMIN_BENEFIT_SELECT)
+      .order('merchant_name', { ascending: true });
 
-  if (active === 'true') query = query.eq('is_active', true);
-  if (active === 'false') query = query.eq('is_active', false);
+    if (active === 'true') query = query.eq('is_active', true);
+    if (active === 'false') query = query.eq('is_active', false);
 
-  const { data, error } = await query;
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
-  return NextResponse.json({ benefits: data ?? [] });
+    const { data, error } = await query;
+    if (error) {
+      logServerError("app/api/admin/engagement/route.GET", error);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    }
+    return NextResponse.json({ benefits: data ?? [] });
+  } catch (error) {
+    return unexpectedApiError("app/api/admin/engagement/route.GET", error);
+  }
 }
 
 export async function POST(req: Request) {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
-
-  let body: Record<string, unknown>;
   try {
-    body = await readJsonObject(req, validateBenefitInput);
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
+
+    let body: Record<string, unknown>;
+    try {
+      body = await readJsonObject(req, validateBenefitInput);
+    } catch (error) {
+      if (!(error instanceof InputValidationError)) logServerError("app/api/admin/engagement/route.POST", error);
+      return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
+    }
+
+    const merchantName = cleanText(body.merchant_name);
+    const category = cleanText(body.category);
+    const discountDescription = cleanText(body.discount_description);
+
+    if (!merchantName || !category || !discountDescription) {
+      return NextResponse.json(
+        { error: 'Merchant name, category, and offer details are required.' },
+        { status: 400 },
+      );
+    }
+
+    const audience = validateTierAudience(body);
+    if (!audience.ok) {
+      return NextResponse.json({ error: audience.error }, { status: 400 });
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('benefits')
+      .insert({
+        merchant_name: merchantName,
+        category,
+        discount_description: discountDescription,
+        discount_amount: cleanText(body.discount_amount) || null,
+        address: cleanText(body.address) || null,
+        description: cleanText(body.description) || null,
+        image_url: cleanText(body.image_url) || null,
+        logo_url: cleanText(body.logo_url) || null,
+        logo_initials: cleanText(body.logo_initials) || null,
+        is_active: typeof body.is_active === 'boolean' ? body.is_active : true,
+        ...tierAudienceToDatabase(audience.value),
+        // Add created_by: admin.sub if the benefits table includes it.
+      })
+      .select(ADMIN_BENEFIT_SELECT)
+      .single();
+
+    if (error) {
+      logServerError("app/api/admin/engagement/route.POST", error);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    }
+    if (data?.is_active) {
+      await notifyBenefitAvailable({
+        id: String(data.id),
+        merchantName: data.merchant_name,
+        offer: data.discount_description,
+        audience: audience.value,
+      });
+    }
+
+    return NextResponse.json({ benefit: data }, { status: 201 });
   } catch (error) {
-    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
+    return unexpectedApiError("app/api/admin/engagement/route.POST", error);
   }
-
-  const merchantName = cleanText(body.merchant_name);
-  const category = cleanText(body.category);
-  const discountDescription = cleanText(body.discount_description);
-
-  if (!merchantName || !category || !discountDescription) {
-    return NextResponse.json(
-      { error: 'Merchant name, category, and offer details are required.' },
-      { status: 400 },
-    );
-  }
-
-  const audience = validateTierAudience(body);
-  if (!audience.ok) {
-    return NextResponse.json({ error: audience.error }, { status: 400 });
-  }
-
-  const { data, error } = await supabaseAdmin
-    .from('benefits')
-    .insert({
-      merchant_name: merchantName,
-      category,
-      discount_description: discountDescription,
-      discount_amount: cleanText(body.discount_amount) || null,
-      address: cleanText(body.address) || null,
-      description: cleanText(body.description) || null,
-      image_url: cleanText(body.image_url) || null,
-      logo_url: cleanText(body.logo_url) || null,
-      logo_initials: cleanText(body.logo_initials) || null,
-      is_active: typeof body.is_active === 'boolean' ? body.is_active : true,
-      ...tierAudienceToDatabase(audience.value),
-      // Add created_by: admin.sub if the benefits table includes it.
-    })
-    .select(ADMIN_BENEFIT_SELECT)
-    .single();
-
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
-  if (data?.is_active) {
-    await notifyBenefitAvailable({
-      id: String(data.id),
-      merchantName: data.merchant_name,
-      offer: data.discount_description,
-      audience: audience.value,
-    });
-  }
-
-  return NextResponse.json({ benefit: data }, { status: 201 });
 }

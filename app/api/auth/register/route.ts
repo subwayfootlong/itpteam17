@@ -1,3 +1,4 @@
+import { logServerError } from "@/lib/serverErrors";
 import { readJsonObject, InputValidationError, invalidInput } from "@/lib/inputValidation";
 import { validateRegistrationInput } from "@/lib/apiInputValidation";
 import { NextResponse } from 'next/server';
@@ -86,6 +87,7 @@ export async function POST(req: Request) {
       .maybeSingle();
 
     if (lookupError) {
+      logServerError("app/api/auth/register/route.POST", lookupError);
       return NextResponse.json({ error: 'Unable to complete request' }, { status: 500 });
     }
 
@@ -125,6 +127,7 @@ export async function POST(req: Request) {
     }
 
     if (error || !data) {
+    if (error) logServerError("app/api/auth/register/route.POST", error);
       return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
 
@@ -134,6 +137,7 @@ export async function POST(req: Request) {
     setLastActivityCookie(res);
     return res;
   } catch (err: unknown) {
+    if (!(err instanceof InputValidationError)) logServerError("app/api/auth/register/route.POST", err);
     if (err instanceof InputValidationError) return invalidInput(err.message);
     return NextResponse.json({ error: 'Registration failed' }, { status: 500 });
   }

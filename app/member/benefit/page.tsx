@@ -1,3 +1,4 @@
+import { logServerError } from "@/lib/serverErrors";
 import MemberPageShell from "@/components/member/MemberPageShell";
 import BenefitsDirectory from "@/components/member/BenefitsDirectory";
 import { getCurrentUser } from "@/lib/currentUser";
@@ -18,7 +19,7 @@ export default async function BenefitPage() {
       expiryDate: user?.expiryDate,
     });
   } catch (error) {
-    console.warn("Unable to load benefit data:", error);
+    logServerError("app/member/benefit/page.BenefitPage", error);
   }
 
   return (

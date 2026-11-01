@@ -1,3 +1,4 @@
+import { logServerError } from "@/lib/serverErrors";
 import PaymentMethodManagementPanel from "@/components/admin/PaymentMethodManagementPanel";
 import { getAdminPaymentMethods } from "@/lib/adminPaymentMethods";
 import type { AdminPaymentMethod } from "@/lib/adminPaymentMethods";
@@ -11,10 +12,8 @@ export default async function PaymentMethodManagementPage() {
   try {
     paymentMethods = await getAdminPaymentMethods();
   } catch (error) {
-    loadError =
-      error instanceof Error
-        ? `Failed to load payment methods: ${error.message}`
-        : "Failed to load payment methods.";
+    logServerError("app/admin/payment-methods/page", error);
+    loadError = "Failed to load payment methods.";
   }
 
   return (

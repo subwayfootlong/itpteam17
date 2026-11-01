@@ -1,3 +1,4 @@
+import { logServerError } from "@/lib/serverErrors";
 import { InputValidationError, invalidInput, readJsonObject, requirePlainText } from "@/lib/inputValidation";
 import { NextResponse } from "next/server";
 import { requireMember } from "@/lib/currentUser";
@@ -66,6 +67,7 @@ export async function POST(req: Request) {
         )
       : null;
     if (groupError || !group || !groupAccess?.canAccess) {
+    if (groupError) logServerError("app/api/community/threads/route.POST", groupError);
       return NextResponse.json({ error: "Discussion group not found" }, { status: 404 });
     }
 
@@ -86,6 +88,7 @@ export async function POST(req: Request) {
       .single<ThreadRow>();
 
     if (error) {
+      logServerError("app/api/community/threads/route.POST", error);
       return NextResponse.json({ error: "Unable to save community content" }, { status: 500 });
     }
 
@@ -105,6 +108,7 @@ export async function POST(req: Request) {
       },
     });
   } catch (err: unknown) {
+    if (!(err instanceof InputValidationError)) logServerError("app/api/community/threads/route.POST", err);
     if (err instanceof InputValidationError) return invalidInput(err.message);
     return NextResponse.json(
       { error: "Unable to create discussion" },

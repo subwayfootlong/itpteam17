@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { logServerError } from "./serverErrors";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 import { verifyAccessToken, verifyPassword } from "@/lib/auth";
@@ -9,12 +10,7 @@ import { EmailChangeError, maskEmail, requestEmailChange, verifyEmailChange, typ
 async function rpc(name: string, args: Record<string, unknown>) {
   const { data, error } = await supabaseAdmin.rpc(name, args);
   if (error) {
-    // Log only the operation and an error code, never RPC arguments or DB details.
-    const code = /^[A-Z0-9]{5,10}$/.test(error.code ?? "") ? error.code : "unknown";
-    console.error("[email-change] Database function failed", { operation: name, code });
-    if (code === "PGRST202") {
-      console.error("[email-change] Apply docs/supabase-email-change-migration.sql in the Supabase SQL editor; the migration also reloads the schema cache.");
-    }
+    logServerError("email-change.rpc", error);
     throw new Error("Email change database operation failed");
   }
   return data;
@@ -91,6 +87,7 @@ export async function handleEmailChange(req: Request, action: "request" | "verif
     return response;
   } catch (error) {
     const status = error instanceof EmailChangeError ? error.status : 503;
+    if (status >= 500) logServerError("email-change.handle", error);
     return NextResponse.json({ error: error instanceof EmailChangeError ? error.message : "Unable to change email. Please try again later." },
       { status, headers: { "Cache-Control": "no-store" } });
   }

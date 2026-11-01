@@ -1,3 +1,4 @@
+import { logServerError } from "@/lib/serverErrors";
 import { readJsonObject, InputValidationError, invalidInput } from "@/lib/inputValidation";
 import { validateProfileInput } from "@/lib/apiInputValidation";
 import { NextResponse } from "next/server";
@@ -103,6 +104,7 @@ export async function PATCH(req: Request) {
       .maybeSingle();
 
     if (error) {
+      logServerError("app/api/member/profile/route.PATCH", error);
       return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
 
@@ -112,6 +114,7 @@ export async function PATCH(req: Request) {
 
     return NextResponse.json({ ok: true });
   } catch (err: unknown) {
+    if (!(err instanceof InputValidationError)) logServerError("app/api/member/profile/route.PATCH", err);
     if (err instanceof InputValidationError) return invalidInput(err.message);
     return NextResponse.json(
       { error: "Unable to update profile" },

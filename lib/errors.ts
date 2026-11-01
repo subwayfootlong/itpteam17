@@ -1,10 +1,9 @@
-export function getErrorMessage(error: unknown, fallback = 'Request failed') {
-  if (error instanceof Error) {
-    return error.message;
-  }
+// Only messages deliberately returned by our API are suitable for display.
+export class PublicRequestError extends Error {}
 
-  if (typeof error === 'string') {
-    return error;
+export function getErrorMessage(error: unknown, fallback = 'Request failed') {
+  if (error instanceof PublicRequestError) {
+    return error.message;
   }
 
   return fallback;

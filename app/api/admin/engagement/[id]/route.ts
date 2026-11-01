@@ -1,3 +1,4 @@
+import { logServerError, unexpectedApiError } from "@/lib/serverErrors";
 import { readJsonObject, invalidInput, InputValidationError, isUuid } from "@/lib/inputValidation";
 import { validateBenefitInput } from "@/lib/apiInputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
@@ -19,94 +20,116 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
+  try {
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
 
-  const { id } = await params;
-  if (!isUuid(id)) return invalidInput("ID must be a UUID");
-  const { data, error } = await supabaseAdmin
-    .from('benefits').select(ADMIN_BENEFIT_SELECT).eq('id', id).maybeSingle();
+    const { id } = await params;
+    if (!isUuid(id)) return invalidInput("ID must be a UUID");
+    const { data, error } = await supabaseAdmin
+      .from('benefits').select(ADMIN_BENEFIT_SELECT).eq('id', id).maybeSingle();
 
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
-  if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  return NextResponse.json({ benefit: data });
+    if (error) {
+      logServerError("app/api/admin/engagement/[id]/route.GET", error);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    }
+    if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    return NextResponse.json({ benefit: data });
+  } catch (error) {
+    return unexpectedApiError("app/api/admin/engagement/[id]/route.GET", error);
+  }
 }
 
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
-
-  const { id } = await params;
-  if (!isUuid(id)) return invalidInput("ID must be a UUID");
-  let body: Record<string, unknown>;
   try {
-    body = await readJsonObject(req, validateBenefitInput);
-  } catch (error) {
-    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
-  }
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
 
-  const allowed = ['merchant_name', 'category', 'discount_description', 'discount_amount', 'address', 'description', 'image_url', 'logo_url', 'logo_initials', 'is_active'];
-  const updates: Record<string, unknown> = {};
-  const audienceChanged =
-    'audience_type' in body ||
-    'eligible_tiers' in body ||
-    'show_locked_preview' in body;
-  for (const key of allowed) {
-    if (key in body) updates[key] = cleanPatchValue(body[key]);
-  }
-
-  if (audienceChanged) {
-    const audience = validateTierAudience(body);
-    if (!audience.ok) {
-      return NextResponse.json({ error: audience.error }, { status: 400 });
+    const { id } = await params;
+    if (!isUuid(id)) return invalidInput("ID must be a UUID");
+    let body: Record<string, unknown>;
+    try {
+      body = await readJsonObject(req, validateBenefitInput);
+    } catch (error) {
+      if (!(error instanceof InputValidationError)) logServerError("app/api/admin/engagement/[id]/route.PATCH", error);
+      return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
     }
-    Object.assign(updates, tierAudienceToDatabase(audience.value));
+
+    const allowed = ['merchant_name', 'category', 'discount_description', 'discount_amount', 'address', 'description', 'image_url', 'logo_url', 'logo_initials', 'is_active'];
+    const updates: Record<string, unknown> = {};
+    const audienceChanged =
+      'audience_type' in body ||
+      'eligible_tiers' in body ||
+      'show_locked_preview' in body;
+    for (const key of allowed) {
+      if (key in body) updates[key] = cleanPatchValue(body[key]);
+    }
+
+    if (audienceChanged) {
+      const audience = validateTierAudience(body);
+      if (!audience.ok) {
+        return NextResponse.json({ error: audience.error }, { status: 400 });
+      }
+      Object.assign(updates, tierAudienceToDatabase(audience.value));
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: 'No benefit fields provided.' }, { status: 400 });
+    }
+
+    const { data: existing } = await supabaseAdmin
+      .from('benefits')
+      .select('is_active')
+      .eq('id', id)
+      .maybeSingle<{ is_active: boolean | null }>();
+
+    const { data, error } = await supabaseAdmin
+      .from('benefits').update(updates).eq('id', id).select(ADMIN_BENEFIT_SELECT).maybeSingle();
+
+    if (error) {
+      logServerError("app/api/admin/engagement/[id]/route.PATCH", error);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    }
+    if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    if (data.is_active && (!existing?.is_active || audienceChanged)) {
+      await notifyBenefitAvailable({
+        id: String(data.id),
+        merchantName: data.merchant_name,
+        offer: data.discount_description,
+        audience: {
+          audienceType: data.audience_type === 'selected_tiers' ? 'selected_tiers' : 'all',
+          eligibleTiers: Array.isArray(data.eligible_tiers) ? data.eligible_tiers : [],
+          showLockedPreview: Boolean(data.show_locked_preview),
+        },
+      });
+    }
+
+    return NextResponse.json({ benefit: data });
+  } catch (error) {
+    return unexpectedApiError("app/api/admin/engagement/[id]/route.PATCH", error);
   }
-
-  if (Object.keys(updates).length === 0) {
-    return NextResponse.json({ error: 'No benefit fields provided.' }, { status: 400 });
-  }
-
-  const { data: existing } = await supabaseAdmin
-    .from('benefits')
-    .select('is_active')
-    .eq('id', id)
-    .maybeSingle<{ is_active: boolean | null }>();
-
-  const { data, error } = await supabaseAdmin
-    .from('benefits').update(updates).eq('id', id).select(ADMIN_BENEFIT_SELECT).maybeSingle();
-
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
-  if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  if (data.is_active && (!existing?.is_active || audienceChanged)) {
-    await notifyBenefitAvailable({
-      id: String(data.id),
-      merchantName: data.merchant_name,
-      offer: data.discount_description,
-      audience: {
-        audienceType: data.audience_type === 'selected_tiers' ? 'selected_tiers' : 'all',
-        eligibleTiers: Array.isArray(data.eligible_tiers) ? data.eligible_tiers : [],
-        showLockedPreview: Boolean(data.show_locked_preview),
-      },
-    });
-  }
-
-  return NextResponse.json({ benefit: data });
 }
 
 export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
+  try {
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
 
-  const { id } = await params;
-  if (!isUuid(id)) return invalidInput("ID must be a UUID");
-  const { error } = await supabaseAdmin.from('benefits').delete().eq('id', id);
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
-  return NextResponse.json({ ok: true });
+    const { id } = await params;
+    if (!isUuid(id)) return invalidInput("ID must be a UUID");
+    const { error } = await supabaseAdmin.from('benefits').delete().eq('id', id);
+    if (error) {
+      logServerError("app/api/admin/engagement/[id]/route.DELETE", error);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    }
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    return unexpectedApiError("app/api/admin/engagement/[id]/route.DELETE", error);
+  }
 }

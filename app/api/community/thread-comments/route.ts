@@ -1,3 +1,4 @@
+import { logServerError } from "@/lib/serverErrors";
 import { InputValidationError, invalidInput, readJsonObject, requireUuid, requirePlainText } from "@/lib/inputValidation";
 import { NextResponse } from "next/server";
 import { requireMember } from "@/lib/currentUser";
@@ -51,6 +52,7 @@ export async function POST(req: Request) {
       !thread ||
       (thread.status !== "approved" && thread.user_id !== user.id)
     ) {
+    if (threadError) logServerError("app/api/community/thread-comments/route.POST", threadError);
       return NextResponse.json({ error: "Discussion not found" }, { status: 404 });
     }
 
@@ -70,6 +72,7 @@ export async function POST(req: Request) {
         )
       : null;
     if (groupError || !group || !groupAccess?.canAccess) {
+    if (groupError) logServerError("app/api/community/thread-comments/route.POST", groupError);
       return NextResponse.json({ error: "Discussion not found" }, { status: 404 });
     }
 
@@ -96,6 +99,7 @@ export async function POST(req: Request) {
         parentComment.thread_id !== threadId ||
         (parentComment.status !== "approved" && parentComment.user_id !== user.id)
       ) {
+    if (parentError) logServerError("app/api/community/thread-comments/route.POST", parentError);
         return NextResponse.json(
           { error: "The reply target does not belong to this discussion." },
           { status: 400 },
@@ -119,6 +123,7 @@ export async function POST(req: Request) {
       .single<CommentRow>();
 
     if (error) {
+      logServerError("app/api/community/thread-comments/route.POST", error);
       return NextResponse.json({ error: "Unable to save community content" }, { status: 500 });
     }
 
@@ -135,6 +140,7 @@ export async function POST(req: Request) {
       },
     });
   } catch (err: unknown) {
+    if (!(err instanceof InputValidationError)) logServerError("app/api/community/thread-comments/route.POST", err);
     if (err instanceof InputValidationError) return invalidInput(err.message);
     return NextResponse.json(
       { error: "Unable to post comment" },

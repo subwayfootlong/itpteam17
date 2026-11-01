@@ -1,3 +1,5 @@
+import { PublicRequestError } from "./errors";
+
 type JsonBody = Record<string, unknown>;
 
 export async function postJson<T = JsonBody>(
@@ -15,8 +17,8 @@ export async function postJson<T = JsonBody>(
     | null;
 
   if (!res.ok) {
-    const err = payload?.error || res.statusText || "Request failed";
-    throw new Error(err);
+    const err = res.status >= 500 ? "Unable to complete request" : payload?.error || "Request failed";
+    throw new PublicRequestError(err);
   }
 
   return payload as T;

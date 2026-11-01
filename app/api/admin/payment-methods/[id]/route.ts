@@ -1,3 +1,4 @@
+import { logServerError, unexpectedApiError } from "@/lib/serverErrors";
 import { readJsonObject, invalidInput, InputValidationError, isUuid } from "@/lib/inputValidation";
 import { validatePaymentInput } from "@/lib/apiInputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
@@ -18,85 +19,110 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
+  try {
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
 
-  const { id } = await params;
-  if (!isUuid(id)) return invalidInput("ID must be a UUID");
-  const { data, error } = await supabaseAdmin
-    .from('payment_methods').select(ADMIN_PAYMENT_METHOD_SELECT).eq('id', id).maybeSingle();
+    const { id } = await params;
+    if (!isUuid(id)) return invalidInput("ID must be a UUID");
+    const { data, error } = await supabaseAdmin
+      .from('payment_methods').select(ADMIN_PAYMENT_METHOD_SELECT).eq('id', id).maybeSingle();
 
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
-  if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  return NextResponse.json({ paymentMethod: data });
+    if (error) {
+      logServerError("app/api/admin/payment-methods/[id]/route.GET", error);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    }
+    if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    return NextResponse.json({ paymentMethod: data });
+  } catch (error) {
+    return unexpectedApiError("app/api/admin/payment-methods/[id]/route.GET", error);
+  }
 }
 
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
-
-  const { id } = await params;
-  if (!isUuid(id)) return invalidInput("ID must be a UUID");
-  let body: Record<string, unknown>;
   try {
-    body = await readJsonObject(req, validatePaymentInput);
-  } catch (error) {
-    return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
-  }
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
 
-  const allowed = ['name', 'description', 'payment_url', 'qr_code_url', 'is_active'];
-  const updates: Record<string, unknown> = {};
-  for (const key of allowed) {
-    if (key in body) updates[key] = cleanPatchValue(body[key]);
-  }
-
-  if (Object.keys(updates).length === 0) {
-    return NextResponse.json({ error: 'No payment method fields provided.' }, { status: 400 });
-  }
-
-  if ('payment_url' in updates) {
-    const paymentUrl =
-      typeof updates.payment_url === 'string' ? normalizePaymentUrl(updates.payment_url) : null;
-    if (!paymentUrl) {
-      return NextResponse.json(
-        { error: 'Payment link must be a valid web address (http or https).' },
-        { status: 400 },
-      );
+    const { id } = await params;
+    if (!isUuid(id)) return invalidInput("ID must be a UUID");
+    let body: Record<string, unknown>;
+    try {
+      body = await readJsonObject(req, validatePaymentInput);
+    } catch (error) {
+      if (!(error instanceof InputValidationError)) logServerError("app/api/admin/payment-methods/[id]/route.PATCH", error);
+      return invalidInput(error instanceof InputValidationError ? error.message : "Invalid JSON payload");
     }
-    updates.payment_url = paymentUrl;
+
+    const allowed = ['name', 'description', 'payment_url', 'qr_code_url', 'is_active'];
+    const updates: Record<string, unknown> = {};
+    for (const key of allowed) {
+      if (key in body) updates[key] = cleanPatchValue(body[key]);
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: 'No payment method fields provided.' }, { status: 400 });
+    }
+
+    if ('payment_url' in updates) {
+      const paymentUrl =
+        typeof updates.payment_url === 'string' ? normalizePaymentUrl(updates.payment_url) : null;
+      if (!paymentUrl) {
+        return NextResponse.json(
+          { error: 'Payment link must be a valid web address (http or https).' },
+          { status: 400 },
+        );
+      }
+      updates.payment_url = paymentUrl;
+    }
+
+    // Only one payment method can be active at a time.
+    if (updates.is_active === true) {
+      const { error: deactivateError } = await supabaseAdmin
+        .from('payment_methods')
+        .update({ is_active: false })
+        .eq('is_active', true)
+        .neq('id', id);
+      if (deactivateError) {
+        logServerError("app/api/admin/payment-methods/[id]/route.PATCH", deactivateError);
+        return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+      }
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('payment_methods').update(updates).eq('id', id).select(ADMIN_PAYMENT_METHOD_SELECT).maybeSingle();
+
+    if (error) {
+      logServerError("app/api/admin/payment-methods/[id]/route.PATCH", error);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    }
+    if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    return NextResponse.json({ paymentMethod: data, deactivatedOthers: updates.is_active === true });
+  } catch (error) {
+    return unexpectedApiError("app/api/admin/payment-methods/[id]/route.PATCH", error);
   }
-
-  // Only one payment method can be active at a time.
-  if (updates.is_active === true) {
-    const { error: deactivateError } = await supabaseAdmin
-      .from('payment_methods')
-      .update({ is_active: false })
-      .eq('is_active', true)
-      .neq('id', id);
-    if (deactivateError) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
-  }
-
-  const { data, error } = await supabaseAdmin
-    .from('payment_methods').update(updates).eq('id', id).select(ADMIN_PAYMENT_METHOD_SELECT).maybeSingle();
-
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
-  if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  return NextResponse.json({ paymentMethod: data, deactivatedOthers: updates.is_active === true });
 }
 
 export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { response: authResponse } = await requireAdmin();
-  if (authResponse) return authResponse;
+  try {
+    const { response: authResponse } = await requireAdmin();
+    if (authResponse) return authResponse;
 
-  const { id } = await params;
-  if (!isUuid(id)) return invalidInput("ID must be a UUID");
-  const { error } = await supabaseAdmin.from('payment_methods').delete().eq('id', id);
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
-  return NextResponse.json({ ok: true });
+    const { id } = await params;
+    if (!isUuid(id)) return invalidInput("ID must be a UUID");
+    const { error } = await supabaseAdmin.from('payment_methods').delete().eq('id', id);
+    if (error) {
+      logServerError("app/api/admin/payment-methods/[id]/route.DELETE", error);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    }
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    return unexpectedApiError("app/api/admin/payment-methods/[id]/route.DELETE", error);
+  }
 }
