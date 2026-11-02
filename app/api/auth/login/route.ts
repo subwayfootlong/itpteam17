@@ -3,8 +3,9 @@ import { readJsonObject, InputValidationError, invalidInput } from "@/lib/inputV
 import { validateLoginInput } from "@/lib/apiInputValidation";
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
-import { verifyPassword, createAccessToken } from '@/lib/auth';
-import { setLastActivityCookie } from '@/lib/session';
+import { verifyPassword } from '@/lib/auth';
+import { setLastActivityCookie, SESSION_COOKIE_OPTIONS } from '@/lib/session';
+import { createSession } from '@/lib/sessionServer';
 import { emailMatchPattern } from '@/lib/emailIdentity';
 
 export async function POST(req: Request) {
@@ -34,9 +35,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    const token = createAccessToken({ sub: user.id, email: user.email });
+    const token = await createSession(user, user.password_hash);
     const res = NextResponse.json({ ok: true });
-    res.cookies.set('token', token, { httpOnly: true, path: '/', maxAge: 60 * 60 * 24 * 7 });
+    res.cookies.set('token', token, { ...SESSION_COOKIE_OPTIONS, maxAge: 60 * 60 * 24 * 7 });
     setLastActivityCookie(res);
     return res;
   } catch (err: unknown) {

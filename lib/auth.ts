@@ -18,5 +18,5 @@ export function createAccessToken(payload: Record<string, unknown>) {
 }
 
 export function verifyAccessToken(token: string) {
-  return jwt.verify(token, process.env.JWT_SECRET as string);
+  return jwt.verify(token, process.env.JWT_SECRET as string, { algorithms: ["HS256"] });
 }

@@ -1,14 +1,9 @@
 import { cookies } from "next/headers";
 import { logServerError } from "./serverErrors";
 import { NextResponse } from "next/server";
-import { verifyAccessToken } from "./auth";
+import { validateSession } from "./sessionServer";
 import { supabaseAdmin } from "./supabaseServer";
 import { formatMemberName, memberInitials } from "./memberName";
-
-type TokenPayload = {
-  sub?: string;
-  email?: string;
-};
 
 export type CurrentUser = {
   id: string;
@@ -33,8 +28,8 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
   if (!token) return null;
 
   try {
-    const payload = verifyAccessToken(token) as TokenPayload;
-    if (typeof payload.sub !== "string" || !payload.sub || typeof payload.email !== "string") return null;
+    const payload = await validateSession(token);
+    if (!payload) return null;
 
     const { data, error } = await supabaseAdmin
       .from("users")
@@ -44,7 +39,10 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
       .eq("id", payload.sub)
       .maybeSingle();
 
-    if (error) logServerError("current-user.lookup", error);
+    if (error) {
+      logServerError("current-user.lookup", error);
+      return null;
+    }
 
     // Reject deleted users and JWTs issued before an email change.
     if (!data || payload.email !== data.email) return null;

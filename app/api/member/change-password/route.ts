@@ -1,3 +1,6 @@
+import { cookies } from "next/headers";
+import { changeSessionPassword } from "@/lib/sessionServer";
+import { clearSessionCookies } from "@/lib/session";
 import { logServerError } from "@/lib/serverErrors";
 import { readJsonObject, invalidInput } from "@/lib/inputValidation";
 import { NextResponse } from "next/server";
@@ -112,20 +115,13 @@ export async function PATCH(request: Request) {
     }
 
     const newPasswordHash = await hashPassword(newPassword);
-    const { error: updateError } = await supabaseAdmin
-      .from("users")
-      .update({ password_hash: newPasswordHash })
-      .eq("id", currentUser.id);
-
-    if (updateError) {
-      logServerError("app/api/member/change-password/route.PATCH", updateError);
-      return NextResponse.json(
-        { error: "We could not update your password. Please try again." },
-        { status: 500 },
-      );
+    const token = (await cookies()).get("token")?.value;
+    if (!token || !await changeSessionPassword(token, user.password_hash, newPasswordHash)) {
+      return NextResponse.json({ error: "Unable to update password. Please log in and try again." }, { status: 401 });
     }
-
-    return NextResponse.json({ ok: true });
+    const response = NextResponse.json({ ok: true });
+    clearSessionCookies(response);
+    return response;
   } catch (caughtError) {
     logServerError("app/api/member/change-password/route.PATCH", caughtError);
     return NextResponse.json(

@@ -68,7 +68,8 @@ export default function ChangePasswordForm() {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      toast.success("Password updated successfully. Use your new password the next time you log in.");
+      toast.success("Password updated successfully. Please log in with your new password.");
+      window.location.assign("/?screen=login");
     } catch {
       setError("We could not connect to the server. Please check your connection and try again.");
     } finally {

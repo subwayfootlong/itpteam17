@@ -1,9 +1,9 @@
-import { cookies } from "next/headers";
+import { getCurrentUser } from "./currentUser";
 import { logServerError } from "./serverErrors";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseServer";
-import { verifyAccessToken, verifyPassword } from "@/lib/auth";
-import { clearSessionCookies, getLastActivityTimestamp, isSessionIdleExpired, LAST_ACTIVITY_COOKIE } from "@/lib/session";
+import { verifyPassword } from "@/lib/auth";
+import { clearSessionCookies } from "@/lib/session";
 import { sendEmail } from "@/lib/email";
 import { EmailChangeError, maskEmail, requestEmailChange, verifyEmailChange, type EmailChangeDependencies, type EmailChangeUser } from "@/lib/emailChange";
 
@@ -54,17 +54,12 @@ const dependencies: EmailChangeDependencies = {
 };
 
 async function authenticatedMember(): Promise<EmailChangeUser | null> {
-  const jar = await cookies();
-  const token = jar.get("token")?.value;
-  const activity = getLastActivityTimestamp(jar.get(LAST_ACTIVITY_COOKIE)?.value);
-  if (!token || (activity !== null && isSessionIdleExpired(activity))) return null;
-  let payload;
-  try { payload = verifyAccessToken(token); } catch { return null; }
-  if (typeof payload === "string" || typeof payload.sub !== "string" || !payload.sub || typeof payload.email !== "string") return null;
+  const user = await getCurrentUser();
+  if (!user) return null;
   const { data, error } = await supabaseAdmin.from("users").select("id,email,password_hash,role")
-    .eq("id", payload.sub).maybeSingle();
+    .eq("id", user.id).maybeSingle();
   if (error) throw new Error("Unable to authenticate");
-  if (!data || data.email !== payload.email) return null;
+  if (!data || data.email !== user.email) return null;
   if (data.role !== "member") throw new EmailChangeError("Forbidden", 403);
   return data;
 }
