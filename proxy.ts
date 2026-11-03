@@ -5,10 +5,28 @@ import {
   getLastActivityTimestamp,
   isSessionIdleExpired,
   LAST_ACTIVITY_COOKIE,
-  setLastActivityCookie,
 } from "@/lib/session";
+import { isSameOriginMutation } from "@/lib/requestSecurity";
+
+const INTERNAL_BEARER_ROUTES = new Set([
+  "/api/internal/email-change-notifications",
+  "/api/internal/transactional-emails",
+]);
 
 export function proxy(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  if (pathname.startsWith("/api/")) {
+    const isInternalWorker = INTERNAL_BEARER_ROUTES.has(pathname);
+    if (!isInternalWorker && !isSameOriginMutation(request)) {
+      return NextResponse.json(
+        { error: "Invalid request origin" },
+        { status: 403, headers: { "Cache-Control": "no-store", Vary: "Origin" } },
+      );
+    }
+    return NextResponse.next();
+  }
+
   const token = request.cookies.get("token")?.value;
 
   if (!token) {
@@ -20,8 +38,8 @@ export function proxy(request: NextRequest) {
   );
 
   if (lastActivity === null) {
-    const response = NextResponse.next();
-    setLastActivityCookie(response);
+    const response = NextResponse.redirect(new URL("/?screen=login", request.url));
+    clearSessionCookies(response);
     return response;
   }
 
@@ -37,5 +55,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/member/:path*", "/admin/:path*"],
+  matcher: ["/member/:path*", "/admin/:path*", "/api/:path*"],
 };
