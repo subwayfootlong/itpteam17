@@ -1,45 +1,35 @@
 import { NextResponse } from "next/server";
+import {
+  getSessionCookieOptions,
+  LAST_ACTIVITY_COOKIE,
+  SESSION_COOKIE,
+} from "./sessionPolicy";
 
-export const SESSION_IDLE_TIMEOUT_MS = 15 * 60 * 1000;
-export const LAST_ACTIVITY_COOKIE = "last_activity";
-export const LOGOUT_LOGIN_HINT_KEY = "pergas:show-login-after-logout";
-
-export function getLastActivityTimestamp(
-  cookieValue: string | undefined,
-): number | null {
-  if (!cookieValue) return null;
-
-  const parsed = Number(cookieValue);
-  return Number.isFinite(parsed) ? parsed : null;
-}
-
-export function isSessionIdleExpired(lastActivity: number): boolean {
-  return Date.now() - lastActivity > SESSION_IDLE_TIMEOUT_MS;
-}
+export * from "./sessionPolicy";
 
 export function setLastActivityCookie(
   res: NextResponse,
   timestamp = Date.now(),
 ) {
   res.cookies.set(LAST_ACTIVITY_COOKIE, String(timestamp), {
-    httpOnly: true,
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7,
-    sameSite: "lax",
+    ...getSessionCookieOptions(),
   });
 }
 
+export function setSessionCookies(res: NextResponse, token: string) {
+  res.cookies.set(SESSION_COOKIE, token, getSessionCookieOptions());
+  setLastActivityCookie(res);
+}
+
 export function clearSessionCookies(res: NextResponse) {
-  res.cookies.set("token", "", {
-    httpOnly: true,
-    path: "/",
+  res.cookies.set(SESSION_COOKIE, "", {
+    ...getSessionCookieOptions(),
     expires: new Date(0),
     maxAge: 0,
   });
 
   res.cookies.set(LAST_ACTIVITY_COOKIE, "", {
-    httpOnly: true,
-    path: "/",
+    ...getSessionCookieOptions(),
     expires: new Date(0),
     maxAge: 0,
   });

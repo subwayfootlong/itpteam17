@@ -3,6 +3,13 @@ import { NextResponse } from "next/server";
 import { verifyAccessToken } from "./auth";
 import { supabaseAdmin } from "./supabaseServer";
 import { formatMemberName, memberInitials } from "./memberName";
+import {
+  clearSessionCookies,
+  getLastActivityTimestamp,
+  isSessionIdleExpired,
+  LAST_ACTIVITY_COOKIE,
+  SESSION_COOKIE,
+} from "./session";
 
 type TokenPayload = {
   sub?: string;
@@ -27,9 +34,14 @@ export type CurrentUser = {
 
 export async function getCurrentUser(): Promise<CurrentUser | null> {
   const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  const token = cookieStore.get(SESSION_COOKIE)?.value;
+  const lastActivity = getLastActivityTimestamp(
+    cookieStore.get(LAST_ACTIVITY_COOKIE)?.value,
+  );
 
-  if (!token) return null;
+  if (!token || lastActivity === null || isSessionIdleExpired(lastActivity)) {
+    return null;
+  }
 
   try {
     const payload = verifyAccessToken(token) as TokenPayload;
@@ -77,7 +89,9 @@ export type AuthorizationResult<T> =
 export async function getAuthorizedUser(role: "admin" | "member"): Promise<AuthorizationResult<CurrentUser>> {
   const user = await getCurrentUser();
   if (!user) {
-    return { response: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
+    const response = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    clearSessionCookies(response);
+    return { response };
   }
   if (user.role !== role) {
     return { response: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };

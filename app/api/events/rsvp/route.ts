@@ -37,15 +37,7 @@ export async function GET(req: Request) {
     return new Response('Event not found', { status: 404 });
   }
 
-  // 1. Log the click event
-  await supabaseAdmin.from('analytics_events').insert({
-    user_id: user.id,
-    event_type: 'event_rsvp_click',
-    target_id: event.id,
-    category: 'event',
-  });
-
-  // 2. Redirect to Zoho Backstage / external URL
+  // GET remains read-only so cross-site navigation cannot mutate member data.
   const redirectUrl = event.external_rsvp_url?.trim() || '/member/events';
   return NextResponse.redirect(redirectUrl);
 }

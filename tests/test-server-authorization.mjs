@@ -1,7 +1,7 @@
-import http from 'http';
 import { spawn } from 'child_process';
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+const ORIGIN = new URL(BASE_URL).origin;
 let serverProcess = null;
 
 const MEMBER_CREDENTIALS = {
@@ -67,7 +67,7 @@ function stopServer() {
 async function login(email, password) {
   const res = await fetch(`${BASE_URL}/api/auth/login`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
     body: JSON.stringify({ email, password }),
   });
 
@@ -80,13 +80,13 @@ async function login(email, password) {
     throw new Error(`No Set-Cookie header returned for ${email}`);
   }
 
-  // Extract token cookie
-  const match = setCookie.match(/token=([^;]+)/);
-  if (!match) {
+  const tokenMatch = setCookie.match(/token=([^;]+)/);
+  const activityMatch = setCookie.match(/last_activity=([^;]+)/);
+  if (!tokenMatch || !activityMatch) {
     throw new Error(`Token cookie not found in set-cookie: ${setCookie}`);
   }
 
-  return match[0]; // e.g. token=xxx
+  return `${tokenMatch[0]}; ${activityMatch[0]}`;
 }
 
 async function runTests() {
@@ -130,7 +130,7 @@ async function runTests() {
     for (const ep of adminEndpoints) {
       const res = await fetch(`${BASE_URL}${ep.url}`, {
         method: ep.method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
         body: ep.body ? JSON.stringify(ep.body) : undefined,
       });
 
@@ -152,6 +152,7 @@ async function runTests() {
         method: ep.method,
         headers: {
           'Content-Type': 'application/json',
+          Origin: ORIGIN,
           Cookie: memberCookie,
         },
         body: ep.body ? JSON.stringify(ep.body) : undefined,

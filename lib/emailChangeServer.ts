@@ -61,7 +61,7 @@ async function authenticatedMember(): Promise<EmailChangeUser | null> {
   const jar = await cookies();
   const token = jar.get("token")?.value;
   const activity = getLastActivityTimestamp(jar.get(LAST_ACTIVITY_COOKIE)?.value);
-  if (!token || (activity !== null && isSessionIdleExpired(activity))) return null;
+  if (!token || activity === null || isSessionIdleExpired(activity)) return null;
   let payload;
   try { payload = verifyAccessToken(token); } catch { return null; }
   if (typeof payload === "string" || typeof payload.sub !== "string" || !payload.sub || typeof payload.email !== "string") return null;

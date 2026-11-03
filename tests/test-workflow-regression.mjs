@@ -1,6 +1,7 @@
 import { spawn } from 'child_process';
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+const ORIGIN = new URL(BASE_URL).origin;
 let serverProcess = null;
 
 const MEMBER1_CREDENTIALS = {
@@ -74,7 +75,7 @@ function stopServer() {
 async function loginUser(email, password) {
   const res = await fetch(`${BASE_URL}/api/auth/login`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
     body: JSON.stringify({ email, password }),
   });
 
@@ -88,11 +89,12 @@ async function loginUser(email, password) {
   }
 
   const tokenMatch = setCookie.match(/token=([^;]+)/);
-  if (!tokenMatch) {
+  const activityMatch = setCookie.match(/last_activity=([^;]+)/);
+  if (!tokenMatch || !activityMatch) {
     throw new Error(`Token cookie not found in Set-Cookie for ${email}`);
   }
 
-  return `token=${tokenMatch[1]}`;
+  return `token=${tokenMatch[1]}; last_activity=${activityMatch[1]}`;
 }
 
 // -----------------------------------------------------------------------------
@@ -103,7 +105,6 @@ async function testPortalWorkflows() {
 
   // 1. Authenticate users
   let member1Cookie = '';
-  let member2Cookie = '';
   let adminCookie = '';
 
   try {
@@ -114,7 +115,7 @@ async function testPortalWorkflows() {
   }
 
   try {
-    member2Cookie = await loginUser(MEMBER2_CREDENTIALS.email, MEMBER2_CREDENTIALS.password);
+    await loginUser(MEMBER2_CREDENTIALS.email, MEMBER2_CREDENTIALS.password);
     record('AUTH', 'Member 2 login succeeds & receives token', true);
   } catch (err) {
     record('AUTH', 'Member 2 login succeeds & receives token', false, err.message);
@@ -166,6 +167,7 @@ async function testPortalWorkflows() {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
+      Origin: ORIGIN,
       Cookie: member1Cookie,
     },
     body: JSON.stringify({
@@ -207,7 +209,7 @@ async function testSecurityBoundaries() {
   // 1. Unauthenticated cannot access member APIs
   const unauthProfileRes = await fetch(`${BASE_URL}/api/member/profile`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Origin: ORIGIN },
     body: JSON.stringify({ first_name: 'Hacker' }),
   });
   record('SECURITY', 'Unauthenticated denied on member profile update (401)', unauthProfileRes.status === 401);
@@ -220,6 +222,41 @@ async function testSecurityBoundaries() {
 
   // 2. Member cannot access Admin APIs (Vertical Privilege Escalation Blocked)
   const member1Cookie = await loginUser(MEMBER1_CREDENTIALS.email, MEMBER1_CREDENTIALS.password);
+
+  const crossSiteRes = await fetch(`${BASE_URL}/api/member/profile`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Origin: 'https://attacker.example',
+      Cookie: member1Cookie,
+    },
+    body: JSON.stringify({ first_name: 'Cross-site mutation' }),
+  });
+  record('SECURITY', 'Cross-site mutation is rejected (403)', crossSiteRes.status === 403, `status=${crossSiteRes.status}`);
+
+  const idleCookie = member1Cookie.replace(/last_activity=[^;]+/, 'last_activity=1');
+  const idleSessionRes = await fetch(`${BASE_URL}/api/member/profile`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Origin: ORIGIN,
+      Cookie: idleCookie,
+    },
+    body: JSON.stringify({ first_name: 'Expired session' }),
+  });
+  record('SECURITY', 'Idle-expired session is rejected (401)', idleSessionRes.status === 401, `status=${idleSessionRes.status}`);
+
+  const invalidSessionRes = await fetch(`${BASE_URL}/api/member/profile`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Origin: ORIGIN,
+      Cookie: `token=invalid; last_activity=${Date.now()}`,
+    },
+    body: JSON.stringify({ first_name: 'Invalid session' }),
+  });
+  record('SECURITY', 'Invalid session is rejected (401)', invalidSessionRes.status === 401, `status=${invalidSessionRes.status}`);
+
   const adminEndpointsToTest = [
     '/api/admin/members',
     '/api/admin/dashboard',

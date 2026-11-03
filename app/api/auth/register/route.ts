@@ -3,7 +3,7 @@ import { validateRegistrationInput } from "@/lib/apiInputValidation";
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { hashPassword, createAccessToken } from '@/lib/auth';
-import { setLastActivityCookie } from '@/lib/session';
+import { setSessionCookies } from '@/lib/session';
 import { DEFAULT_TIER } from '@/lib/membershipTiers';
 import { formatStoredPhone, isAcceptablePhoneNumber, getPhoneValidationMessage } from '@/lib/phone';
 import { isValidArsStatus, isValidSalutation } from '@/lib/memberProfileOptions';
@@ -120,8 +120,7 @@ export async function POST(req: Request) {
 
     const token = createAccessToken({ sub: data.id, email: data.email });
     const res = NextResponse.json({ ok: true });
-    res.cookies.set('token', token, { httpOnly: true, path: '/', maxAge: 60 * 60 * 24 * 7 });
-    setLastActivityCookie(res);
+    setSessionCookies(res, token);
     return res;
   } catch (err: unknown) {
     if (err instanceof InputValidationError) return invalidInput(err.message);

@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     const store = await cookies();
     const token = store.get("token")?.value;
     const lastActivity = getLastActivityTimestamp(store.get(LAST_ACTIVITY_COOKIE)?.value);
-    if (!token || (lastActivity !== null && isSessionIdleExpired(lastActivity))) {
+    if (!token || lastActivity === null || isSessionIdleExpired(lastActivity)) {
       return respond({ error: "Unauthorized" }, 401);
     }
     let userId: string;
