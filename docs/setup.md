@@ -36,7 +36,8 @@ Set `APP_URL` to the browser's exact origin (scheme, hostname and port), without
 the page path. For `http://localhost:3000/member/settings/email`, use
 `APP_URL=http://localhost:3000` in `.env.local`. Restart the dev server after
 changing it. OTP requests validate this origin; `localhost`, `127.0.0.1` and a
-network IP are different origins. In deployment, use the public application origin.
+network IP are different origins. All browser state-changing API requests validate
+this origin to prevent CSRF. In deployment, use the public application origin.
 
 SMTP through Nodemailer is used temporarily for ITP2 development/demo. Configure
 these server-side variables in `.env.local` or the deployment environment:

@@ -4,7 +4,7 @@ import { validateLoginInput } from "@/lib/apiInputValidation";
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { verifyPassword } from '@/lib/auth';
-import { setLastActivityCookie, SESSION_COOKIE_OPTIONS } from '@/lib/session';
+import { setSessionCookies } from '@/lib/session';
 import { createSession } from '@/lib/sessionServer';
 import { emailMatchPattern } from '@/lib/emailIdentity';
 
@@ -37,8 +37,7 @@ export async function POST(req: Request) {
 
     const token = await createSession(user, user.password_hash);
     const res = NextResponse.json({ ok: true });
-    res.cookies.set('token', token, { ...SESSION_COOKIE_OPTIONS, maxAge: 60 * 60 * 24 * 7 });
-    setLastActivityCookie(res);
+    setSessionCookies(res, token);
     return res;
   } catch (err: unknown) {
     if (!(err instanceof InputValidationError)) logServerError("app/api/auth/login/route.POST", err);

@@ -1,34 +1,35 @@
 import { NextResponse } from "next/server";
+import {
+  getSessionCookieOptions,
+  LAST_ACTIVITY_COOKIE,
+  SESSION_COOKIE,
+} from "./sessionPolicy";
 
-export const SESSION_IDLE_TIMEOUT_MS = 15 * 60 * 1000;
-export const LAST_ACTIVITY_COOKIE = "last_activity";
-export const LOGOUT_LOGIN_HINT_KEY = "pergas:show-login-after-logout";
-export const SESSION_COOKIE_OPTIONS = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax" as const,
-  path: "/",
-};
+export * from "./sessionPolicy";
 
 export function setLastActivityCookie(
   res: NextResponse,
   timestamp = Date.now(),
 ) {
   res.cookies.set(LAST_ACTIVITY_COOKIE, String(timestamp), {
-    ...SESSION_COOKIE_OPTIONS,
-    maxAge: 60 * 60 * 24 * 7,
+    ...getSessionCookieOptions(),
   });
 }
 
+export function setSessionCookies(res: NextResponse, token: string) {
+  res.cookies.set(SESSION_COOKIE, token, getSessionCookieOptions());
+  setLastActivityCookie(res);
+}
+
 export function clearSessionCookies(res: NextResponse) {
-  res.cookies.set("token", "", {
-    ...SESSION_COOKIE_OPTIONS,
+  res.cookies.set(SESSION_COOKIE, "", {
+    ...getSessionCookieOptions(),
     expires: new Date(0),
     maxAge: 0,
   });
 
   res.cookies.set(LAST_ACTIVITY_COOKIE, "", {
-    ...SESSION_COOKIE_OPTIONS,
+    ...getSessionCookieOptions(),
     expires: new Date(0),
     maxAge: 0,
   });

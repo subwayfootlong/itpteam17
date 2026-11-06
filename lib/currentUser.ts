@@ -4,6 +4,10 @@ import { NextResponse } from "next/server";
 import { validateSession } from "./sessionServer";
 import { supabaseAdmin } from "./supabaseServer";
 import { formatMemberName, memberInitials } from "./memberName";
+import {
+  clearSessionCookies,
+  SESSION_COOKIE,
+} from "./session";
 
 export type CurrentUser = {
   id: string;
@@ -23,8 +27,7 @@ export type CurrentUser = {
 
 export async function getCurrentUser(): Promise<CurrentUser | null> {
   const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
-
+  const token = cookieStore.get(SESSION_COOKIE)?.value;
   if (!token) return null;
 
   try {
@@ -79,7 +82,9 @@ export type AuthorizationResult<T> =
 export async function getAuthorizedUser(role: "admin" | "member"): Promise<AuthorizationResult<CurrentUser>> {
   const user = await getCurrentUser();
   if (!user) {
-    return { response: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
+    const response = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    clearSessionCookies(response);
+    return { response };
   }
   if (user.role !== role) {
     return { response: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
