@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { LOGOUT_LOGIN_HINT_KEY, SESSION_IDLE_TIMEOUT_MS } from "@/lib/session";
+import { LOGOUT_LOGIN_HINT_KEY, SESSION_IDLE_TIMEOUT_MS } from "@/lib/sessionPolicy";
 
 const ACTIVITY_SYNC_INTERVAL_MS = 60 * 1000;
 

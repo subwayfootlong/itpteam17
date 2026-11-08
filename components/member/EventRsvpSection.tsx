@@ -197,10 +197,20 @@ export default function EventRsvpSection({
         </button>
       ) : hasRsvpLink ? (
         <a
-          href={`/api/events/rsvp?eventId=${eventId}`}
+          href={externalRsvpUrl!.trim()}
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => {
+            void fetch("/api/analytics/track", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                eventType: "event_rsvp_click",
+                targetId: eventId,
+                category: "event",
+                metadata: { source: "external_rsvp" },
+              }),
+            });
             setTimeout(() => router.refresh(), 1000);
           }}
           className="flex min-h-12 w-full items-center justify-center rounded-xl bg-brand-primary-800 px-4 py-3 text-center text-sm font-semibold text-white shadow-xs transition-all hover:bg-brand-primary-900 active:scale-[0.98]"

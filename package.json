@@ -11,10 +11,11 @@
     "test:sfr05:workflows": "node --env-file=.env.local tests/test-workflow-regression.mjs",
     "test:sfr05:rls": "node --env-file=.env.local tests/test-sfr05-db-rls.mjs",
     "test:sfr05": "npm run test:sfr05:rls && npm run test:sfr05:authz && npm run test:sfr05:workflows",
+    "test:security": "node --test tests/security-controls.test.mjs",
     "test:qr": "node --test tests/membershipQr.test.mjs",
     "test:email": "node --test tests/emailChange.test.mjs",
-    "test:security": "playwright test",
-    "test:security:report": "playwright show-report"
+    "test:security:e2e": "playwright test",
+    "test:security:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.28.0",

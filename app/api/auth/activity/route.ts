@@ -11,17 +11,19 @@ import {
 
 export async function POST() {
   const cookieStore = await cookies();
-  // Session activity intentionally supports both member and admin accounts.
-  if (!(await getCurrentUser())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const lastActivity = getLastActivityTimestamp(
     cookieStore.get(LAST_ACTIVITY_COOKIE)?.value,
   );
 
-  if (lastActivity !== null && isSessionIdleExpired(lastActivity)) {
+  if (lastActivity === null || isSessionIdleExpired(lastActivity)) {
     const res = NextResponse.json({ error: "Session expired" }, { status: 401 });
+    clearSessionCookies(res);
+    return res;
+  }
+
+  // Session activity intentionally supports both member and admin accounts.
+  if (!(await getCurrentUser())) {
+    const res = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     clearSessionCookies(res);
     return res;
   }

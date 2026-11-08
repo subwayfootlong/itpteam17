@@ -3,7 +3,7 @@ import { validateLoginInput } from "@/lib/apiInputValidation";
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { verifyPassword, createAccessToken } from '@/lib/auth';
-import { setLastActivityCookie } from '@/lib/session';
+import { setSessionCookies } from '@/lib/session';
 
 export async function POST(req: Request) {
   try {
@@ -34,8 +34,7 @@ export async function POST(req: Request) {
 
     const token = createAccessToken({ sub: user.id, email: user.email });
     const res = NextResponse.json({ ok: true });
-    res.cookies.set('token', token, { httpOnly: true, path: '/', maxAge: 60 * 60 * 24 * 7 });
-    setLastActivityCookie(res);
+    setSessionCookies(res, token);
     return res;
   } catch (err: unknown) {
     if (err instanceof InputValidationError) return invalidInput(err.message);
