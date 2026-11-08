@@ -6,7 +6,7 @@ import {
   CalendarPlus,
   CheckCircle2,
   Download,
-  MailX,
+  Mail,
   MapPin,
   QrCode,
 } from "lucide-react";
@@ -51,38 +51,41 @@ export function CalendarButtons({
   );
 }
 
+// UAT 2: some members could not say what to do on event day, so the one step
+// that matters leads, and the record-keeping detail sits underneath it.
 export function CheckInGuidance() {
   return (
-    <ul className="space-y-2.5 text-xs text-neutral-700 member-dark:text-neutral-300">
-      <li className="flex items-start gap-2.5">
-        <QrCode
-          size={16}
-          className="mt-0.5 shrink-0 text-brand-primary-800 member-dark:text-brand-primary-200"
-          aria-hidden="true"
-        />
-        <span>
-          <strong className="font-semibold text-neutral-900 member-dark:text-neutral-100">
-            Check-in at the door:
-          </strong>{" "}
-          present your digital membership card QR code. Open it any time from
-          Profile.
+    <div className="space-y-3">
+      <div className="flex items-start gap-3 rounded-2xl bg-brand-primary-800 p-3.5 text-white">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/15">
+          <QrCode size={24} aria-hidden="true" />
         </span>
-      </li>
-      <li className="flex items-start gap-2.5">
-        <MailX
+        <div className="min-w-0">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-brand-primary-100">
+            On event day
+          </p>
+          <p className="mt-0.5 text-sm font-semibold">
+            Show your membership QR code at the door
+          </p>
+          <p className="mt-0.5 text-xs text-brand-primary-100">
+            It is on your digital card under Profile. You do not need a
+            separate ticket.
+          </p>
+        </div>
+      </div>
+      <p className="flex items-start gap-2.5 text-xs text-neutral-600 member-dark:text-neutral-300">
+        <Mail
           size={16}
           className="mt-0.5 shrink-0 text-neutral-500 member-dark:text-neutral-400"
           aria-hidden="true"
         />
         <span>
-          <strong className="font-semibold text-neutral-900 member-dark:text-neutral-100">
-            No email is sent
-          </strong>{" "}
-          for event registrations. This confirmation and your Participation
-          History on Profile are your record. You do not need a separate ticket.
+          We email a confirmation only if Email Notifications is turned on in
+          Settings. This confirmation and your Participation History on Profile
+          are your record.
         </span>
-      </li>
-    </ul>
+      </p>
+    </div>
   );
 }
 

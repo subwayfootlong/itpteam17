@@ -237,9 +237,10 @@ function RewardCard({
   onSelect: (partner: Partner) => void;
 }) {
   const discount = discountLabel(partner.offer);
-  const lockedLabel = partner.requiredTierLabels?.length
-    ? `Available to ${partner.requiredTierLabels.join(" / ")} members`
-    : "Tier-restricted reward";
+  const lockedAction =
+    partner.lockReason === "inactive_membership"
+      ? { href: "/member/payment", label: "Renew membership" }
+      : { href: "/member/tier-upgrade", label: "Request a tier upgrade" };
 
   return (
     <article className="mb-4 flex flex-col overflow-hidden rounded-2xl border border-neutral-200/80 member-dark:border-member-border/80 bg-white member-dark:bg-member-surface shadow-xs">
@@ -304,15 +305,28 @@ function RewardCard({
         <h2 className="mt-1 text-base font-semibold text-neutral-900 member-dark:text-neutral-100">
           {partner.offer}
         </h2>
-        <p className="mt-1 line-clamp-2 text-xs text-neutral-500 member-dark:text-neutral-400">
-          {partner.description}
-        </p>
+        {!partner.isLocked && (
+          <p className="mt-1 line-clamp-2 text-xs text-neutral-500 member-dark:text-neutral-400">
+            {partner.description}
+          </p>
+        )}
 
         {partner.isLocked ? (
-          <span className="mt-3 inline-flex items-center gap-1.5 self-start rounded-lg border border-neutral-200 member-dark:border-member-border bg-neutral-100 member-dark:bg-member-raised px-2.5 py-1 text-xs text-neutral-500 member-dark:text-neutral-400">
-            <Lock size={13} aria-hidden="true" />
-            {lockedLabel}
-          </span>
+          <div className="mt-3 rounded-xl border border-brand-accent/60 bg-brand-accent-soft member-dark:bg-member-raised p-3">
+            <p className="flex items-center gap-1.5 text-xs font-bold text-amber-900 member-dark:text-amber-300">
+              <Lock size={14} aria-hidden="true" />
+              Not available on your membership yet
+            </p>
+            <p className="mt-1 text-xs text-neutral-700 member-dark:text-neutral-300">
+              {partner.description}
+            </p>
+            <NavLink
+              href={lockedAction.href}
+              className="mt-2.5 flex min-h-11 w-full items-center justify-center rounded-xl border border-brand-primary-800 member-dark:border-brand-primary-700 bg-white member-dark:bg-member-surface px-4 py-2.5 text-sm font-semibold text-brand-primary-800 member-dark:text-brand-primary-200 transition-transform duration-100 hover:bg-brand-primary-50 member-dark:hover:bg-brand-primary-900 active:scale-[0.98]"
+            >
+              {lockedAction.label}
+            </NavLink>
+          </div>
         ) : (
           <button
             type="button"

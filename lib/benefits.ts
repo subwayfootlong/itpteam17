@@ -8,6 +8,7 @@ import {
   type MemberAccessContext,
   type TierAccessResult,
 } from "./tierAccess";
+import { formatTierLabel } from "./membershipTiers";
 
 type BenefitRow = {
   id: string | number;
@@ -54,10 +55,35 @@ function buildOffer(row: BenefitRow) {
   return description || amount || "Exclusive Pergas member reward";
 }
 
+// Locked rewards tell the member which tier they have, which tier the reward
+// needs, and what to do next. A lapsed membership is a renewal problem, not a
+// tier problem, so it gets its own wording.
+function lockedCopy(access: TierAccessResult) {
+  const requiredTiers = access.requiredTierLabels.length
+    ? access.requiredTierLabels.join(" or ")
+    : "eligible";
+
+  if (access.reason === "inactive_membership") {
+    return {
+      offer: "For active members only",
+      description:
+        "Your membership is not active right now. Renew it to use this reward.",
+      terms: "Renew your membership to use this reward.",
+    };
+  }
+
+  return {
+    offer: `For ${requiredTiers} members only`,
+    description: `Your membership tier is ${formatTierLabel(access.memberTier)}. This reward is for ${requiredTiers} members.`,
+    terms: `Upgrade to ${requiredTiers} membership to use this reward.`,
+  };
+}
+
 function mapBenefit(row: BenefitRow, access: TierAccessResult): Partner {
   const name = row.merchant_name?.trim() || "Pergas Partner";
   const address = row.address?.trim() || "Online or merchant-confirmed redemption";
   const online = isOnlineBenefit(row.address);
+  const locked = access.canAccess ? null : lockedCopy(access);
 
   return {
     id: String(row.id),
@@ -65,22 +91,22 @@ function mapBenefit(row: BenefitRow, access: TierAccessResult): Partner {
     initials: row.logo_initials?.trim() || initialsFromName(name),
     category: row.category?.trim() || "Other",
     region: online ? "Online" : "Singapore",
-    offer: access.canAccess
-      ? buildOffer(row)
-      : `Available to ${access.requiredTierLabels.join(" and ")} members`,
-    description: access.canAccess
-      ? row.description?.trim() ||
-        `${name} is an admin-listed Friends of Pergas benefit partner.`
-      : "This reward is reserved for eligible membership tiers.",
+    offer: locked ? locked.offer : buildOffer(row),
+    description: locked
+      ? locked.description
+      : row.description?.trim() ||
+        `${name} is an admin-listed Friends of Pergas benefit partner.`,
     address: access.canAccess ? address : "Restricted member reward",
     distance: online ? "Online benefit" : "Singapore location",
-    terms: access.canAccess
-      ? row.discount_description?.trim() ||
-        "Present an active Pergas membership when redeeming. Merchant terms and availability may apply."
-      : "Upgrade or renew your membership to access this reward.",
+    terms: locked
+      ? locked.terms
+      : row.discount_description?.trim() ||
+        "Present an active Pergas membership when redeeming. Merchant terms and availability may apply.",
     imageUrl: row.image_url?.trim() || undefined,
     logoUrl: row.logo_url?.trim() || undefined,
     isLocked: !access.canAccess,
+    lockReason:
+      access.reason === "allowed" ? undefined : access.reason,
     requiredTierLabels: access.requiredTierLabels,
   };
 }

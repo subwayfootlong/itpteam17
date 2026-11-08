@@ -12,5 +12,6 @@ export type Partner = {
   imageUrl?: string;
   logoUrl?: string;
   isLocked?: boolean;
+  lockReason?: "inactive_membership" | "tier_not_eligible";
   requiredTierLabels?: string[];
 };
