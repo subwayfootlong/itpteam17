@@ -26,6 +26,9 @@ open defect.
 **Final retest run:** [`evidence/runs/2026-11-08T14-20-36/`](evidence/runs/2026-11-08T14-20-36/), after fixing DEF-03
 (511 checks: 511 passed, 0 failed, 2 not run for SMTP). **All defects are closed.**
 
+**Final regression run:** [`evidence/runs/2026-11-08T14-46-23/`](evidence/runs/2026-11-08T14-46-23/), including TC-REG-02
+(admin and member save actions): 539 checks, 539 passed, 0 failed, 2 not run for SMTP.
+
 ## Summary
 
 | ID | Severity | Requirement (owner) | Defect | Status |

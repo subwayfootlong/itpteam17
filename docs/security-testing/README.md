@@ -19,6 +19,11 @@ npm run test:security:e2e:report   # opens Playwright's HTML report of the last 
 
 Run one test case: `npx playwright test tests/security/tc-sfr-01.spec.ts`
 
+The tests reuse any server already running on the port (3000 by default). If
+`npm run dev` is running there, the tests hit the dev server and the production-only
+checks fail (no `Secure` cookie flag, file paths in error pages). Use another port
+for the production build instead: `PORT=3100 npm run test:security:e2e`.
+
 The SFR-05 suites from the earlier work still run separately: `npm run test:sfr05`.
 `npm run test:security` is a separate set of unit tests for the session and
 Origin controls (`tests/security-controls.test.mjs`).

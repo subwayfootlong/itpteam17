@@ -29,7 +29,9 @@ Baseline run [`2026-10-29T13-16-06`](evidence/runs/2026-10-29T13-16-06/), 29 Oct
 
 Retest run [`2026-11-08T13-33-05`](evidence/runs/2026-11-08T13-33-05/), 8 Nov 2026, after merging `main` with nerocladiaus's session and CSRF fix (`29f5b43`): 509 checks, 479 passed, 30 failed, 2 not run (SMTP). DEF-02, DEF-04 and DEF-05 closed; DEF-03, DEF-06, DEF-07 and DEF-08 still open.
 
-Latest retest [`2026-11-08T13-49-21`](evidence/runs/2026-11-08T13-49-21/), after fixing DEF-07 and DEF-08: 509 checks, 506 passed, 3 failed (DEF-03, DEF-06), 2 not run (SMTP). Final retest [`2026-11-08T14-20-36`](evidence/runs/2026-11-08T14-20-36/), after fixing DEF-03: 511 checks, 511 passed, 0 failed, 2 not run (SMTP, handled separately). This is the "Latest retest" column below. All defects are closed.
+Latest retest [`2026-11-08T13-49-21`](evidence/runs/2026-11-08T13-49-21/), after fixing DEF-07 and DEF-08: 509 checks, 506 passed, 3 failed (DEF-03, DEF-06), 2 not run (SMTP). Final retest [`2026-11-08T14-20-36`](evidence/runs/2026-11-08T14-20-36/), after fixing DEF-03: 511 checks, 511 passed, 0 failed, 2 not run (SMTP, handled separately). All defects are closed.
+
+Final regression run [`2026-11-08T14-46-23`](evidence/runs/2026-11-08T14-46-23/), with TC-REG-02 added: 14 test cases, 539 checks, 539 passed, 0 failed, 2 not run (SMTP). This is the "Latest retest" column below.
 
 | ID | Requirement | Owner | Steps | Baseline (29 Oct) | Latest retest (8 Nov) |
 |---|---|---|---|---|---|
@@ -45,6 +47,7 @@ Latest retest [`2026-11-08T13-49-21`](evidence/runs/2026-11-08T13-49-21/), after
 | [TC-SNFR-02](#tc-snfr-02-personal-data-minimisation) | SNFR-02 Personal data minimisation (#55) | LiandoMaxin | 6 | PASS | PASS 23/23 |
 | [TC-SNFR-03](#tc-snfr-03-controlled-error-disclosure) | SNFR-03 Controlled error disclosure (#56) | — | 7 | **FAIL** | PASS 60/60 |
 | [TC-REG-01](#tc-reg-01-regression-existing-workflows-still-work) | SNFR-04/05 Regression: existing workflows still work (#57) | ooWise | 4 | PASS | PASS 21/21 |
+| [TC-REG-02](#tc-reg-02-regression-admin-and-member-save-actions-complete) | SNFR-04/05 Regression: admin and member save actions complete (#57) | ooWise | 8 | — (added 8 Nov) | PASS 28/28 |
 
 ---
 
@@ -369,6 +372,36 @@ at the end (steps 1–4).
 | 4 | Member and admin journeys in the browser: log in, view home, events, benefits, community, profile, digital card; admin dashboard, members, events | Every page loads and works; screenshots kept | Browser |
 
 **Status:** PASS (21/21 pages) · **Evidence:** [`TC-REG-01/`](evidence/runs/2026-10-29T13-16-06/TC-REG-01/) · **Defects:** —
+
+---
+
+## TC-REG-02 Regression: admin and member save actions complete
+
+**Requirement:** SNFR-04/05. Existing workflows are confirmed still working after
+remediation. TC-REG-01 only loads pages; this test case completes the saves that
+the defect fixes touched (DEF-08 changed every admin save path, DEF-03 changed
+sessions).
+
+**Preconditions:** `admin`, `memberA` and `memberB` log in; the published poll
+announcement "Jalsah Asatizah" exists.
+**Test data rule:** test benefits and payment methods are created inactive (an
+active benefit notifies every member; an active payment method switches off the
+real one), the event stays a draft (publishing notifies members), and every change
+to a real record (member details, tier, poll vote, password, settings) is restored.
+**Spec:** `tests/security/tc-reg-02.spec.ts`
+
+| # | Step | Expected result | Method |
+|---|---|---|---|
+| 1 | Admin creates, edits and deletes a benefit | 201, 200, 200; edit saved; row gone | Auto |
+| 2 | Admin creates, edits and deletes a payment method | 201, 200, 200; row gone; the real active payment method is untouched | Auto |
+| 3 | Admin creates a draft event, edits it and deletes it | 201, 200, 200; row gone | Auto |
+| 4 | Admin edits a member's record (`memberC`) | 200; change saved | Auto |
+| 5 | `memberB` requests a tier upgrade and the admin approves it | 201, 200; `memberB`'s tier changes | Auto |
+| 6 | `memberA` votes in the announcement poll | 200; vote saved | Auto |
+| 7 | `memberB` changes their password, signs in with the new one, then changes it back | 200; new password works, old one doesn't; original works again | Auto |
+| 8 | `memberB` saves notification settings and reads them back | 200; the change reads back | Auto |
+
+**Status:** PASS (28/28) · **Evidence:** [`TC-REG-02/`](evidence/runs/2026-11-08T14-46-23/TC-REG-02/) · **Defects:** —
 
 ---
 
