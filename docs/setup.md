@@ -97,6 +97,21 @@ npm run dev
 
 Then open http://localhost:3000 in your browser.
 
+## Sessions
+
+Signing in sets two cookies: `token` (the signed session JWT) and `last_activity`.
+
+| Setting | Value | Where |
+|---|---|---|
+| Session lifetime | 7 days: the JWT expires 7 days after sign-in, and both cookies have the same `Max-Age` | `lib/auth.ts` (`expiresIn: '7d'`), `lib/sessionPolicy.ts` (`SESSION_MAX_AGE_SECONDS`) |
+| Idle timeout | 15 minutes of inactivity signs the member out, in pages and in every API call | `lib/sessionPolicy.ts` (`SESSION_IDLE_TIMEOUT_MS`) |
+| Cookie flags | `HttpOnly`, `SameSite=Lax`, `Path=/`, and `Secure` in production | `lib/sessionPolicy.ts` (`getSessionCookieOptions`) |
+| Cross-site requests | State-changing API requests must come from the app's own origin (see `APP_URL` above) | `proxy.ts`, `lib/requestSecurity.ts` |
+
+`Secure` is only set when `NODE_ENV` is `production` (`npm run build` then
+`npm start`), so the cookies also work over plain `http://localhost` during
+`npm run dev`. Logging out clears both cookies in the browser.
+
 ## Other Useful Commands
 
 ```bash

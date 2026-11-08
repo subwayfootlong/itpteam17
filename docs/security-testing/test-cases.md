@@ -29,7 +29,7 @@ Baseline run [`2026-10-29T13-16-06`](evidence/runs/2026-10-29T13-16-06/), 29 Oct
 
 Retest run [`2026-11-08T13-33-05`](evidence/runs/2026-11-08T13-33-05/), 8 Nov 2026, after merging `main` with nerocladiaus's session and CSRF fix (`29f5b43`): 509 checks, 479 passed, 30 failed, 2 not run (SMTP). DEF-02, DEF-04 and DEF-05 closed; DEF-03, DEF-06, DEF-07 and DEF-08 still open.
 
-Latest retest [`2026-11-08T13-49-21`](evidence/runs/2026-11-08T13-49-21/), after fixing DEF-07 and DEF-08: 509 checks, 506 passed, 3 failed (DEF-03, DEF-06), 2 not run (SMTP). This is the "Latest retest" column below.
+Latest retest [`2026-11-08T13-49-21`](evidence/runs/2026-11-08T13-49-21/), after fixing DEF-07 and DEF-08: 509 checks, 506 passed, 3 failed (DEF-03, DEF-06), 2 not run (SMTP). This is the "Latest retest" column below, except TC-SNFR-01, retested on its own in [`2026-11-08T13-55-11`](evidence/runs/2026-11-08T13-55-11/) after DEF-06 was fixed (9/9 pass).
 
 | ID | Requirement | Owner | Steps | Baseline (29 Oct) | Latest retest (8 Nov) |
 |---|---|---|---|---|---|
@@ -41,7 +41,7 @@ Latest retest [`2026-11-08T13-49-21`](evidence/runs/2026-11-08T13-49-21/), after
 | [TC-SFR-06](#tc-sfr-06-secure-session-and-cross-site-request-handling) | SFR-06 Secure session and cross-site request handling (#52) | nerocladiaus | 9 | **FAIL** | **FAIL** 14/15 (DEF-03) |
 | [TC-SFR-07](#tc-sfr-07-secure-digital-membership-verification) | SFR-07 Secure digital membership verification (#53) | LiandoMaxin | 8 | PASS | PASS 16/16 |
 | [TC-SFR-08](#tc-sfr-08-secure-email-address-change) | SFR-08 Secure email address change (#39) | LiandoMaxin | 11 | PASS (2 not run) | PASS 19/19 (2 not run) |
-| [TC-SNFR-01](#tc-snfr-01-secure-session-configuration) | SNFR-01 Secure session configuration (#54) | — | 5 | **FAIL** | **FAIL** 7/9 (DEF-06) |
+| [TC-SNFR-01](#tc-snfr-01-secure-session-configuration) | SNFR-01 Secure session configuration (#54) | — | 5 | **FAIL** | PASS 9/9 (retested 13-55-11) |
 | [TC-SNFR-02](#tc-snfr-02-personal-data-minimisation) | SNFR-02 Personal data minimisation (#55) | LiandoMaxin | 6 | PASS | PASS 23/23 |
 | [TC-SNFR-03](#tc-snfr-03-controlled-error-disclosure) | SNFR-03 Controlled error disclosure (#56) | — | 7 | **FAIL** | PASS 60/60 |
 | [TC-REG-01](#tc-reg-01-regression-existing-workflows-still-work) | SNFR-04/05 Regression: existing workflows still work (#57) | ooWise | 4 | PASS | PASS 21/21 |

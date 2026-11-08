@@ -17,7 +17,11 @@ DEF-06, DEF-07 and DEF-08.
 
 **Retest run:** [`evidence/runs/2026-11-08T13-49-21/`](evidence/runs/2026-11-08T13-49-21/), after fixing DEF-07 and DEF-08
 on this branch (509 checks: 506 passed, 3 failed, 2 not run for SMTP). DEF-07 and
-DEF-08 are closed. The 3 remaining failures are DEF-03 and DEF-06 (nerocladiaus).
+DEF-08 are closed. The 3 remaining failures are DEF-03 (nerocladiaus) and DEF-06.
+
+**Retest run:** [`evidence/runs/2026-11-08T13-55-11/`](evidence/runs/2026-11-08T13-55-11/), TC-SNFR-01 only, after
+documenting sessions for DEF-06 (9/9 pass). DEF-06 is closed; DEF-03 is the only
+open defect.
 
 ## Summary
 
@@ -28,7 +32,7 @@ DEF-08 are closed. The 3 remaining failures are DEF-03 and DEF-06 (nerocladiaus)
 | [DEF-03](#def-03) | Medium | SFR-06 (nerocladiaus) | Session token still works after logout | Open (retest still fails) |
 | [DEF-04](#def-04) | Medium | SFR-06 (nerocladiaus) | No Origin check on state-changing API requests | Closed |
 | [DEF-05](#def-05) | Medium | SNFR-01 (unassigned), SFR-06 | Session cookies missing `Secure` and `SameSite` | Closed |
-| [DEF-06](#def-06) | Low | SNFR-01 (unassigned) | Session lifetime and idle timeout not documented | Open (retest still fails) |
+| [DEF-06](#def-06) | Low | SNFR-01 (unassigned) | Session lifetime and idle timeout not documented | Closed |
 | [DEF-07](#def-07) | Low | SNFR-03 (unassigned) | `X-Powered-By: Next.js` header reveals the framework | Closed |
 | [DEF-08](#def-08) | Low | SNFR-03 (unassigned) | 26 API routes return 5xx errors without logging them | Closed |
 
@@ -159,7 +163,7 @@ control the requirement asks for is missing, but another layer limits the impact
 
 ### DEF-06
 
-**Session lifetime and idle timeout not documented** · Low · Open (retest still fails)
+**Session lifetime and idle timeout not documented** · Low · Closed
 
 - **Found by:** TC-SNFR-01 step 5 (inspection).
 - **Evidence:** [`TC-SNFR-01/`](evidence/runs/2026-10-29T13-16-06/TC-SNFR-01/) checks 8–9.
@@ -170,7 +174,11 @@ control the requirement asks for is missing, but another layer limits the impact
 - **Retest after `29f5b43`:** [`TC-SNFR-01/`](evidence/runs/2026-11-08T13-33-05/TC-SNFR-01/) checks 8–9 still
   fail; `29f5b43` added a sentence on CSRF to `docs/setup.md` but nothing on session
   lifetime or the idle timeout.
-- **Fix:** — · **Retest evidence:** —
+- **Fix:** (ooWise, on this branch) a "Sessions" section in `docs/setup.md`: 7-day
+  session lifetime, 15-minute idle timeout, cookie flags, the same-origin rule for
+  state-changing requests, and where each is configured.
+- **Retest evidence:** [`TC-SNFR-01/`](evidence/runs/2026-11-08T13-55-11/TC-SNFR-01/) 9/9 pass; checks 8–9
+  find both in `docs/setup.md`.
 
 ### DEF-07
 
