@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken";
 
 // Builds session tokens for the session-handling tests (SFR-06, SNFR-01).
+// Test-made tokens carry no session ID (`jti`), so they can't be on a member's
+// revoked list and each one is valid apart from the single thing a test changes.
+// Revocation itself is tested with real tokens issued by /api/auth/login.
 // Uses the same JWT_SECRET as the server so "correctly signed but expired" and
 // "correctly signed with an extra claim" tokens can be made; forged tokens use
 // a different secret or no signature.
@@ -11,23 +14,27 @@ function secret() {
   return value;
 }
 
-export function signedSession(userId: string, email: string, extra: Record<string, unknown> = {}, expiresIn: number | string = "1h") {
-  return jwt.sign({ sub: userId, email, ...extra }, secret(), { expiresIn } as jwt.SignOptions);
+export type SessionUser = { id: string; email: string };
+
+const claims = (u: SessionUser) => ({ sub: u.id, email: u.email });
+
+export function signedSession(user: SessionUser, extra: Record<string, unknown> = {}, expiresIn: number | string = "1h") {
+  return jwt.sign({ ...claims(user), ...extra }, secret(), { expiresIn } as jwt.SignOptions);
 }
 
-export function expiredSession(userId: string, email: string) {
+export function expiredSession(user: SessionUser) {
   const now = Math.floor(Date.now() / 1000);
-  return jwt.sign({ sub: userId, email, iat: now - 7200, exp: now - 3600 }, secret());
+  return jwt.sign({ ...claims(user), iat: now - 7200, exp: now - 3600 }, secret());
 }
 
-export function wrongSecretSession(userId: string, email: string) {
-  return jwt.sign({ sub: userId, email }, "not-the-server-secret-" + "x".repeat(40), { expiresIn: "1h" });
+export function wrongSecretSession(user: SessionUser) {
+  return jwt.sign(claims(user), "not-the-server-secret-" + "x".repeat(40), { expiresIn: "1h" });
 }
 
-export function unsignedSession(userId: string, email: string) {
+export function unsignedSession(user: SessionUser) {
   const enc = (o: object) => Buffer.from(JSON.stringify(o)).toString("base64url");
   const now = Math.floor(Date.now() / 1000);
-  return `${enc({ alg: "none", typ: "JWT" })}.${enc({ sub: userId, email, iat: now, exp: now + 3600 })}.`;
+  return `${enc({ alg: "none", typ: "JWT" })}.${enc({ ...claims(user), iat: now, exp: now + 3600 })}.`;
 }
 
 /** Flip one character of the signature, keeping the header and payload intact. */

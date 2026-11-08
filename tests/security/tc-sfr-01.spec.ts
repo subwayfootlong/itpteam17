@@ -37,7 +37,7 @@ test("TC-SFR-01 API authorisation and role enforcement", async ({ evidence, anon
 
   // Step 6: a correctly signed token for memberA that also claims role "admin".
   const a = await userFor("memberA");
-  const forged = await apiWithCookie(sessionCookie(signedSession(a.id, a.email, { role: "admin" })));
+  const forged = await apiWithCookie(sessionCookie(signedSession(a, { role: "admin" })));
   await expectStatus("6 member token claiming admin -> admin", forged, ADMIN_ROUTES, 403);
 
   expect(ev.passed, "all TC-SFR-01 checks pass").toBe(true);

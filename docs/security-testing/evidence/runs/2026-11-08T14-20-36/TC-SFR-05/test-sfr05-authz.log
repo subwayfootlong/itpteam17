@@ -1,0 +1,92 @@
+
+> itpteam17@0.1.0 test:sfr05:authz
+> node --env-file=.env.local tests/test-server-authorization.mjs
+
+====================================================
+  SFR-05 Phase 1: Server-Side Authorization Tests  
+====================================================
+
+Server already running at http://localhost:3000
+
+--- SUITE 1: Unauthenticated Access Control (401 Expected) ---
+✅ PASS [Unauthenticated Guard] GET /api/admin/members -> Status: 401
+✅ PASS [Unauthenticated Guard] GET /api/admin/members/00000000-0000-0000-0000-000000000000 -> Status: 401
+✅ PASS [Unauthenticated Guard] PATCH /api/admin/members/00000000-0000-0000-0000-000000000000 -> Status: 401
+✅ PASS [Unauthenticated Guard] GET /api/admin/dashboard -> Status: 401
+✅ PASS [Unauthenticated Guard] GET /api/admin/analytics -> Status: 401
+✅ PASS [Unauthenticated Guard] GET /api/admin/payment-methods -> Status: 401
+✅ PASS [Unauthenticated Guard] POST /api/admin/payment-methods -> Status: 401
+✅ PASS [Unauthenticated Guard] GET /api/admin/payment-methods/00000000-0000-0000-0000-000000000000 -> Status: 401
+✅ PASS [Unauthenticated Guard] PATCH /api/admin/payment-methods/00000000-0000-0000-0000-000000000000 -> Status: 401
+✅ PASS [Unauthenticated Guard] DELETE /api/admin/payment-methods/00000000-0000-0000-0000-000000000000 -> Status: 401
+✅ PASS [Unauthenticated Guard] GET /api/admin/team -> Status: 401
+✅ PASS [Unauthenticated Guard] POST /api/admin/upload -> Status: 401
+✅ PASS [Unauthenticated Guard] GET /api/admin/events/00000000-0000-0000-0000-000000000000/registrations -> Status: 401
+✅ PASS [Unauthenticated Guard] DELETE /api/admin/events/00000000-0000-0000-0000-000000000000/registrations -> Status: 401
+✅ PASS [Unauthenticated Guard] GET /api/admin/events -> Status: 401
+✅ PASS [Unauthenticated Guard] POST /api/admin/events -> Status: 401
+✅ PASS [Unauthenticated Guard] GET /api/admin/announcements -> Status: 401
+✅ PASS [Unauthenticated Guard] POST /api/admin/announcements -> Status: 401
+✅ PASS [Unauthenticated Guard] GET /api/admin/tier-requests -> Status: 401
+✅ PASS [Unauthenticated Guard] PATCH /api/admin/comment-moderation -> Status: 401
+✅ PASS [Unauthenticated Guard] GET /api/admin/discussion-groups -> Status: 401
+✅ PASS [Unauthenticated Guard] GET /api/admin/engagement -> Status: 401
+
+--- SUITE 2: Member Privilege Escalation Prevention (403 Expected) ---
+Logging in member: member1@uat.pergas.org...
+✅ PASS [Member Login] Authenticate member1@uat.pergas.org
+✅ PASS [Member Role Isolation] Member blocked from GET /api/admin/members -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from GET /api/admin/members/00000000-0000-0000-0000-000000000000 -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from PATCH /api/admin/members/00000000-0000-0000-0000-000000000000 -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from GET /api/admin/dashboard -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from GET /api/admin/analytics -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from GET /api/admin/payment-methods -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from POST /api/admin/payment-methods -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from GET /api/admin/payment-methods/00000000-0000-0000-0000-000000000000 -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from PATCH /api/admin/payment-methods/00000000-0000-0000-0000-000000000000 -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from DELETE /api/admin/payment-methods/00000000-0000-0000-0000-000000000000 -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from GET /api/admin/team -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from POST /api/admin/upload -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from GET /api/admin/events/00000000-0000-0000-0000-000000000000/registrations -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from DELETE /api/admin/events/00000000-0000-0000-0000-000000000000/registrations -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from GET /api/admin/events -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from POST /api/admin/events -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from GET /api/admin/announcements -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from POST /api/admin/announcements -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from GET /api/admin/tier-requests -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from PATCH /api/admin/comment-moderation -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from GET /api/admin/discussion-groups -> Status: 403
+✅ PASS [Member Role Isolation] Member blocked from GET /api/admin/engagement -> Status: 403
+
+--- SUITE 3: Legitimate Admin Workflows (200 OK Expected) ---
+Logging in admin: admin2@uat.pergas.org...
+✅ PASS [Admin Login] Authenticate admin2@uat.pergas.org
+✅ PASS [Admin Workflow] Dashboard stats & feed -> 200 OK (Data validated)
+✅ PASS [Admin Workflow] Members directory -> 200 OK (Data validated)
+✅ PASS [Admin Workflow] Analytics metrics -> 200 OK (Data validated)
+✅ PASS [Admin Workflow] Events directory -> 200 OK (Data validated)
+✅ PASS [Admin Workflow] Announcements directory -> 200 OK (Data validated)
+✅ PASS [Admin Workflow] Tier requests queue -> 200 OK (Data validated)
+✅ PASS [Admin Workflow] Payment methods list -> 200 OK (Data validated)
+✅ PASS [Admin Workflow] Team members directory -> 200 OK (Data validated)
+✅ PASS [Admin Workflow] Discussion groups config -> 200 OK (Data validated)
+✅ PASS [Admin Workflow] Engagement benefits list -> 200 OK (Data validated)
+
+--- SUITE 4: Legitimate Member Workflows (200 OK Expected) ---
+✅ PASS [Member Workflow] Member Notifications API -> 200 OK (Data validated)
+✅ PASS [Member Workflow] Notification Preferences API -> 200 OK (Data validated)
+✅ PASS [Member Workflow] Tier Upgrade Info API -> 200 OK (Data validated)
+✅ PASS [Member Portal Navigation] Member Home Dashboard -> Status: 200
+✅ PASS [Member Portal Navigation] Member Events Page -> Status: 200
+✅ PASS [Member Portal Navigation] Member Benefits Page -> Status: 200
+✅ PASS [Member Portal Navigation] Member Community Page -> Status: 200
+✅ PASS [Member Portal Navigation] Member Profile Page -> Status: 200
+
+====================================================
+                 TEST SUMMARY                       
+====================================================
+Total Checks: 64
+Passed:       64
+Failed:       0
+
+🎉 All 64 tests passed! Phase 1 server-side authorization is fully verified.

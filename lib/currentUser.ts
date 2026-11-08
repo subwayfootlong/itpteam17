@@ -7,6 +7,7 @@ import {
   clearSessionCookies,
   getLastActivityTimestamp,
   isSessionIdleExpired,
+  isSessionRevoked,
   LAST_ACTIVITY_COOKIE,
   SESSION_COOKIE,
 } from "./session";
@@ -14,6 +15,7 @@ import {
 type TokenPayload = {
   sub?: string;
   email?: string;
+  jti?: unknown;
 };
 
 export type CurrentUser = {
@@ -50,13 +52,14 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     const { data } = await supabaseAdmin
       .from("users")
       .select(
-        "id, email, role, first_name, last_name, phone, organization, membership_tier, membership_status, expiry_date, profile_image_url",
+        "id, email, role, first_name, last_name, phone, organization, membership_tier, membership_status, expiry_date, profile_image_url, revoked_sessions",
       )
       .eq("id", payload.sub)
       .maybeSingle();
 
-    // Reject deleted users and JWTs issued before an email change.
+    // Reject deleted users, JWTs issued before an email change, and sessions ended by logout.
     if (!data || payload.email !== data.email) return null;
+    if (isSessionRevoked(payload, data.revoked_sessions)) return null;
 
     const firstName = data.first_name?.trim() ?? "";
     const lastName = data.last_name?.trim() ?? "";

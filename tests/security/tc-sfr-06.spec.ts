@@ -24,13 +24,13 @@ test("TC-SFR-06 secure session and cross-site request handling", async ({ eviden
   }
 
   try {
-    const valid = signedSession(a.id, a.email);
+    const valid = signedSession(a);
 
     // Steps 1-3: altered, forged, unsigned and expired tokens.
     await patchWith("1 token with altered signature", sessionCookie(tamperSignature(valid)), 401);
-    await patchWith("2 token signed with a different secret", sessionCookie(wrongSecretSession(a.id, a.email)), 401);
-    await patchWith("2 unsigned token (alg: none)", sessionCookie(unsignedSession(a.id, a.email)), 401);
-    await patchWith("3 correctly signed but expired token", sessionCookie(expiredSession(a.id, a.email)), 401);
+    await patchWith("2 token signed with a different secret", sessionCookie(wrongSecretSession(a)), 401);
+    await patchWith("2 unsigned token (alg: none)", sessionCookie(unsignedSession(a)), 401);
+    await patchWith("3 correctly signed but expired token", sessionCookie(expiredSession(a)), 401);
 
     // Step 4: valid token, but idle longer than the 15-minute timeout.
     const idle = await patchWith("4 valid token idle for 16 minutes", sessionCookie(valid, Date.now() - 16 * 60 * 1000), 401);
@@ -42,10 +42,14 @@ test("TC-SFR-06 secure session and cross-site request handling", async ({ eviden
     const session = await playwrightRequest.newContext({ baseURL, extraHTTPHeaders: sameOrigin(baseURL) });
     await session.post("/api/auth/login", { data: { email: ACCOUNTS.memberA, password: uatPassword() } });
     const token = (await session.storageState()).cookies.find((c) => c.name === "token")?.value ?? "";
+    await patchWith("5 the same token works before logout (control)", sessionCookie(token), 200);
     const logout = await session.post("/api/auth/logout");
     ev.check("5 logout succeeds", "200", String(logout.status()), logout.status() === 200);
     await session.dispose();
     await patchWith("5 token reused after logout", sessionCookie(token), 401);
+    // Logout ends only that session: memberA's other session (another device) stays signed in.
+    const other = await member.get(PREFS);
+    ev.check("5 memberA's other session stays signed in", "200", String(other.status()), other.status() === 200);
 
     // Step 6: valid session, request claims to come from another site.
     await patchWith("6 valid session with Origin: https://evil.example", sessionCookie(valid), 403, { Origin: "https://evil.example" });

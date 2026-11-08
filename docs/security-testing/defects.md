@@ -23,13 +23,16 @@ DEF-08 are closed. The 3 remaining failures are DEF-03 (nerocladiaus) and DEF-06
 documenting sessions for DEF-06 (9/9 pass). DEF-06 is closed; DEF-03 is the only
 open defect.
 
+**Final retest run:** [`evidence/runs/2026-11-08T14-20-36/`](evidence/runs/2026-11-08T14-20-36/), after fixing DEF-03
+(511 checks: 511 passed, 0 failed, 2 not run for SMTP). **All defects are closed.**
+
 ## Summary
 
 | ID | Severity | Requirement (owner) | Defect | Status |
 |---|---|---|---|---|
 | [DEF-01](#def-01) | Medium | SFR-05 (ooWise) | UAT account password hardcoded in public test files | Closed |
 | [DEF-02](#def-02) | Medium | SFR-06 (nerocladiaus) | APIs accept sessions past the 15-minute idle timeout | Closed |
-| [DEF-03](#def-03) | Medium | SFR-06 (nerocladiaus) | Session token still works after logout | Open (retest still fails) |
+| [DEF-03](#def-03) | Medium | SFR-06 (nerocladiaus) | Session token still works after logout | Closed |
 | [DEF-04](#def-04) | Medium | SFR-06 (nerocladiaus) | No Origin check on state-changing API requests | Closed |
 | [DEF-05](#def-05) | Medium | SNFR-01 (unassigned), SFR-06 | Session cookies missing `Secure` and `SameSite` | Closed |
 | [DEF-06](#def-06) | Low | SNFR-01 (unassigned) | Session lifetime and idle timeout not documented | Closed |
@@ -93,7 +96,7 @@ control the requirement asks for is missing, but another layer limits the impact
 
 ### DEF-03
 
-**Session token still works after logout** · Medium · Open (retest still fails)
+**Session token still works after logout** · Medium · Closed
 
 - **Found by:** TC-SFR-06 step 5.
 - **Evidence:** [`TC-SFR-06/`](evidence/runs/2026-10-29T13-16-06/TC-SFR-06/) check 8:
@@ -110,7 +113,22 @@ control the requirement asks for is missing, but another layer limits the impact
   `29f5b43` did not change logout. Because the new idle timeout trusts the
   unsigned `last_activity` cookie, server-side revocation is now also what stops a
   copied token from outliving the idle timeout.
-- **Fix:** — · **Retest evidence:** —
+- **Fix:** (ooWise, on this branch, with nerocladiaus's agreement) per-session
+  server-side logout. Every session token now has its own ID (`jti`, set in
+  `lib/auth.ts`). Logout adds "<id>:<expiry>" to a new `users.revoked_sessions`
+  column (`docs/supabase-session-revocation.sql`, applied to the UAT database
+  8 Nov 2026) and prunes expired entries. `getCurrentUser()`, the QR endpoint and
+  email change reject revoked sessions using the user row they already load, so
+  there is no extra query. Logging out on one device leaves the member's other
+  devices signed in. The suggested `session_version` design above was not used
+  because it would sign a member out everywhere; a sessions table was avoided to
+  keep the change small.
+- **Known limits:** a session can only be ended from the device that holds it
+  (there is no list of active devices to end one remotely). Tokens issued before
+  this change have no ID and simply expire within 7 days.
+- **Retest evidence:** [`TC-SFR-06/`](evidence/runs/2026-11-08T14-20-36/TC-SFR-06/) step 5 passes: the same
+  token gets 200 before logout and 401 after (sent with a fresh `last_activity`),
+  and the member's other session still gets 200.
 
 ### DEF-04
 

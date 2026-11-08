@@ -1,0 +1,112 @@
+{
+  "testCase": "TC-SFR-06",
+  "title": "Secure session and cross-site request handling",
+  "finishedAt": "2026-11-08T14:22:25.312Z",
+  "status": "PASS",
+  "checks": [
+    {
+      "step": "1 token with altered signature",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 token signed with a different secret",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 unsigned token (alg: none)",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "3 correctly signed but expired token",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "4 valid token idle for 16 minutes",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "4 idle session cookies cleared",
+      "expected": "token cookie cleared",
+      "actual": "cleared",
+      "pass": true
+    },
+    {
+      "step": "5 the same token works before logout (control)",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "5 logout succeeds",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "5 token reused after logout",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "5 memberA's other session stays signed in",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "6 valid session with Origin: https://evil.example",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 valid session with no Origin header",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "7 session cookie sets SameSite explicitly",
+      "expected": "SameSite=Lax or Strict",
+      "actual": "SameSite=lax",
+      "pass": true
+    },
+    {
+      "step": "8a cross-site fetch carried the session",
+      "expected": "no state change",
+      "actual": "no state change (opaque)",
+      "pass": true
+    },
+    {
+      "step": "8b cross-site form POST carried the session",
+      "expected": "no state change",
+      "actual": "no state change",
+      "pass": true
+    },
+    {
+      "step": "8c control: same form from the portal's own site",
+      "expected": "state changes (test can detect a successful request)",
+      "actual": "analytics row created",
+      "pass": true
+    },
+    {
+      "step": "9 valid session (control)",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    }
+  ],
+  "skipped": [],
+  "screenshots": []
+}

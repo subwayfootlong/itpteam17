@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 import { verifyAccessToken, verifyPassword } from "@/lib/auth";
-import { clearSessionCookies, getLastActivityTimestamp, isSessionIdleExpired, LAST_ACTIVITY_COOKIE } from "@/lib/session";
+import { clearSessionCookies, getLastActivityTimestamp, isSessionIdleExpired, isSessionRevoked, LAST_ACTIVITY_COOKIE } from "@/lib/session";
 import { sendEmail } from "@/lib/email";
 import { EmailChangeError, maskEmail, requestEmailChange, verifyEmailChange, type EmailChangeDependencies, type EmailChangeUser } from "@/lib/emailChange";
 
@@ -65,10 +65,10 @@ async function authenticatedMember(): Promise<EmailChangeUser | null> {
   let payload;
   try { payload = verifyAccessToken(token); } catch { return null; }
   if (typeof payload === "string" || typeof payload.sub !== "string" || !payload.sub || typeof payload.email !== "string") return null;
-  const { data, error } = await supabaseAdmin.from("users").select("id,email,password_hash,role")
+  const { data, error } = await supabaseAdmin.from("users").select("id,email,password_hash,role,revoked_sessions")
     .eq("id", payload.sub).maybeSingle();
   if (error) throw new Error("Unable to authenticate");
-  if (!data || data.email !== payload.email) return null;
+  if (!data || data.email !== payload.email || isSessionRevoked(payload, data.revoked_sessions)) return null;
   if (data.role !== "member") throw new EmailChangeError("Forbidden", 403);
   return data;
 }

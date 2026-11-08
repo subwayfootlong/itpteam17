@@ -57,7 +57,7 @@ test("TC-SFR-07 secure digital membership verification", async ({ evidence, apiA
   // Step 6: wrong secret, wrong purpose, and a session token presented as a QR.
   await expectInvalid("6 signed with a different secret", jwt.sign({ memberId: a.id, purpose: "membership-verification" }, "x".repeat(48), { algorithm: "HS256", expiresIn: 300 }), "invalid");
   await expectInvalid("6 wrong purpose", jwt.sign({ memberId: a.id, purpose: "password-reset" }, qrSecret, { algorithm: "HS256", expiresIn: 300 }), "invalid");
-  await expectInvalid("6 member's session token used as a QR", signedSession(a.id, a.email), "invalid");
+  await expectInvalid("6 member's session token used as a QR", signedSession(a), "invalid");
 
   // Step 7: response headers that keep the QR out of caches and referrers.
   for (const [label, res] of [["qr-token", issued], ["verify", ok]] as const) {

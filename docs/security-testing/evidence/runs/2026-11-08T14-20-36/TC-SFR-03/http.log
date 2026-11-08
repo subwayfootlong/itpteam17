@@ -1,0 +1,53 @@
+### 1 RSVP to E1 (basic)
+> POST /api/events/rsvp
+> body: {"eventId":"4343f733-5f04-4939-88d9-294ed9dd7b21"}
+< 200 OK
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    date: Sun, 08 Nov 2026 14:21:32 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"ok":true}
+### 2 RSVP to E2 (ordinary only)
+> POST /api/events/rsvp
+> body: {"eventId":"99483323-0817-49e8-bd95-97ff6e187dee"}
+< 403 Forbidden
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    date: Sun, 08 Nov 2026 14:21:32 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"error":"This event is not available for your membership tier."}
+### 3 GET RSVP link for E2
+> GET /api/events/rsvp?eventId=99483323-0817-49e8-bd95-97ff6e187dee
+< 404 Not Found
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: text/plain;charset=UTF-8
+    date: Sun, 08 Nov 2026 14:21:32 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: Event not found
+### 7 RSVP to E1 with expired membership
+> POST /api/events/rsvp
+> body: {"eventId":"4343f733-5f04-4939-88d9-294ed9dd7b21"}
+< 403 Forbidden
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    date: Sun, 08 Nov 2026 14:21:35 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"error":"This event is not available for your membership tier."}
+### 8 post to ordinary-only group
+> POST /api/community/threads
+< 404 Not Found
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    date: Sun, 08 Nov 2026 14:21:35 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"error":"Discussion group not found"}

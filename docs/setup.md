@@ -107,10 +107,12 @@ Signing in sets two cookies: `token` (the signed session JWT) and `last_activity
 | Idle timeout | 15 minutes of inactivity signs the member out, in pages and in every API call | `lib/sessionPolicy.ts` (`SESSION_IDLE_TIMEOUT_MS`) |
 | Cookie flags | `HttpOnly`, `SameSite=Lax`, `Path=/`, and `Secure` in production | `lib/sessionPolicy.ts` (`getSessionCookieOptions`) |
 | Cross-site requests | State-changing API requests must come from the app's own origin (see `APP_URL` above) | `proxy.ts`, `lib/requestSecurity.ts` |
+| Logout | Ends that session on the server too: its ID is added to `users.revoked_sessions`, so a copied token stops working. The member's other devices stay signed in | `app/api/auth/logout/route.ts`, `lib/sessionPolicy.ts` |
 
 `Secure` is only set when `NODE_ENV` is `production` (`npm run build` then
 `npm start`), so the cookies also work over plain `http://localhost` during
-`npm run dev`. Logging out clears both cookies in the browser.
+`npm run dev`. Server-side logout needs the `revoked_sessions` column from
+`docs/supabase-session-revocation.sql`; run it before deploying.
 
 ## Other Useful Commands
 
