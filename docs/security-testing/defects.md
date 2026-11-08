@@ -57,18 +57,17 @@ control the requirement asks for is missing, but another layer limits the impact
 - **Suggested fix:** read it from `UAT_PASSWORD` in `.env.local`, as
   `tests/security/` does, and change the UAT accounts' password, since the current
   one is already in the git history.
-- **Fix:** both files now read the password from `UAT_PASSWORD` and stop with a
-  clear message if it is missing; the `test:sfr05:authz` and
+- **Fix:** commit `d5d6954`. Both files now read the password from `UAT_PASSWORD`
+  and stop with a clear message if it is missing; the `test:sfr05:authz` and
   `test:sfr05:workflows` scripts load `.env.local`. TC-SFR-05 gained step 5, which
   fails if any committed file contains the UAT password (the same check run
-  against the previous commit, `1df41d1`, finds both files). Confirmed by the
-  owner (ooWise).
+  against the previous commit, `1df41d1`, finds both files).
 - **Retest evidence:** [`TC-SFR-05/`](evidence/runs/2026-10-29T15-28-54/TC-SFR-05/) (run 2026-10-29T15-28-54):
   15/15 pass, including step 5 (0 files contain the password) and all three SFR-05
   suites running with the password from `.env.local`.
 - **Closed 8 Nov 2026:** the code fix is retested (above). The old password is still
-  in the repository's git history; the team has agreed to change the UAT accounts'
-  password, after which everyone updates `UAT_PASSWORD` in their `.env.local`.
+  in the repository's git history, so the UAT accounts' password is to be changed,
+  after which `UAT_PASSWORD` is updated in each `.env.local`.
 
 ### DEF-02
 
@@ -113,8 +112,7 @@ control the requirement asks for is missing, but another layer limits the impact
   `29f5b43` did not change logout. Because the new idle timeout trusts the
   unsigned `last_activity` cookie, server-side revocation is now also what stops a
   copied token from outliving the idle timeout.
-- **Fix:** (ooWise, on this branch, with nerocladiaus's agreement) per-session
-  server-side logout. Every session token now has its own ID (`jti`, set in
+- **Fix:** commit `b26dbcb`. Per-session server-side logout. Every session token now has its own ID (`jti`, set in
   `lib/auth.ts`). Logout adds "<id>:<expiry>" to a new `users.revoked_sessions`
   column (`docs/supabase-session-revocation.sql`, applied to the UAT database
   8 Nov 2026) and prunes expired entries. `getCurrentUser()`, the QR endpoint and
@@ -192,7 +190,7 @@ control the requirement asks for is missing, but another layer limits the impact
 - **Retest after `29f5b43`:** [`TC-SNFR-01/`](evidence/runs/2026-11-08T13-33-05/TC-SNFR-01/) checks 8–9 still
   fail; `29f5b43` added a sentence on CSRF to `docs/setup.md` but nothing on session
   lifetime or the idle timeout.
-- **Fix:** (ooWise, on this branch) a "Sessions" section in `docs/setup.md`: 7-day
+- **Fix:** commit `ee63858`. A "Sessions" section in `docs/setup.md`: 7-day
   session lifetime, 15-minute idle timeout, cookie flags, the same-origin rule for
   state-changing requests, and where each is configured.
 - **Retest evidence:** [`TC-SNFR-01/`](evidence/runs/2026-11-08T13-55-11/TC-SNFR-01/) 9/9 pass; checks 8–9
@@ -207,8 +205,8 @@ control the requirement asks for is missing, but another layer limits the impact
   Sent on page responses and 404s (JSON API responses don't include it).
 - **Suggested fix:** `poweredByHeader: false` in `next.config.ts`.
 - **Retest after `29f5b43`:** still fails ([`TC-SNFR-03/`](evidence/runs/2026-11-08T13-33-05/TC-SNFR-03/) check 23).
-- **Fix:** `poweredByHeader: false` in `next.config.ts` (ooWise, on this branch;
-  the option is unchanged in Next.js 16.2.7, per its bundled docs).
+- **Fix:** commit `2a642ed`. `poweredByHeader: false` in `next.config.ts` (the
+  option is unchanged in Next.js 16.2.7, per its bundled docs).
 - **Retest evidence:** [`TC-SNFR-03/`](evidence/runs/2026-11-08T13-49-21/TC-SNFR-03/) check 23 passes: no
   `X-Powered-By` header on any of the 21 responses checked.
 
@@ -227,7 +225,7 @@ control the requirement asks for is missing, but another layer limits the impact
   logs the operation name and the database error code, without request bodies or
   personal data, called on each 5xx path.
 - **Retest after `29f5b43`:** still fails for the same 26 routes ([`TC-SNFR-03/`](evidence/runs/2026-11-08T13-33-05/TC-SNFR-03/)).
-- **Fix:** (ooWise, on this branch) new `lib/serverLog.ts` with
+- **Fix:** commit `2a642ed`. New `lib/serverLog.ts` with
   `logServerError(operation, error)`, called before each of the 58 unlogged 5xx
   responses in the 26 routes. It follows the email-change code's existing rule: log
   the operation and the Postgres/PostgREST code (or the error class name), never
