@@ -4,6 +4,7 @@ import { validateMemberFilters } from "@/lib/apiInputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
+import { logServerError } from "@/lib/serverLog";
 
 export async function GET(req: Request) {
   const { response: authResponse } = await requireAdmin();
@@ -32,6 +33,9 @@ export async function GET(req: Request) {
 
   const { data, error } = await query;
 
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  if (error) {
+    logServerError("admin/members GET", error);
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  }
   return NextResponse.json({ members: (data ?? []).map((row) => responseFields(row, MEMBER_DIRECTORY_FIELDS)) });
 }

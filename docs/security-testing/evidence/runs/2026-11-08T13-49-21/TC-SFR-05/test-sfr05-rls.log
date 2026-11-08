@@ -1,0 +1,36 @@
+
+> itpteam17@0.1.0 test:sfr05:rls
+> node --env-file=.env.local tests/test-sfr05-db-rls.mjs
+
+
+--- ANON ROLE ---
+✅ PASS anon cannot read users
+✅ PASS anon cannot read event_registrations
+✅ PASS anon cannot read announcement_comments
+✅ PASS anon cannot read announcement_poll_responses
+✅ PASS anon cannot read discussion_groups
+✅ PASS anon cannot read discussion
+✅ PASS anon cannot read discussion_comments
+✅ PASS anon cannot read notifications
+✅ PASS anon cannot read notification_preferences
+✅ PASS anon cannot read tier_upgrade_requests
+✅ PASS anon cannot read analytics_events
+✅ PASS anon cannot read payment_methods
+✅ PASS anon cannot read email_change_requests
+✅ PASS anon cannot read email_change_limits
+✅ PASS anon cannot read email_change_notifications
+✅ PASS anon cannot read email_outbox
+✅ PASS anon cannot read announcement_email_publications
+✅ PASS anon events: only published + audience_type=all
+✅ PASS anon announcements: only published + audience_type=all
+✅ PASS anon benefits: only active + audience_type=all
+✅ PASS anon cannot update users
+✅ PASS anon cannot insert analytics_events
+✅ PASS anon cannot insert events
+✅ PASS anon cannot insert announcement_comments
+
+--- AUTHENTICATED ROLE ---
+⚠️  SKIP authenticated-role tests -> SUPABASE_JWT_SECRET not set (Dashboard > Project Settings > API > JWT secret)
+
+SFR-05 DB-level RLS test: 24 passed, 0 failed, 1 skipped
+Skipped checks are NOT verified - resolve them before relying on this result.

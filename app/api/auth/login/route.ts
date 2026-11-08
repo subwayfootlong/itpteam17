@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { verifyPassword, createAccessToken } from '@/lib/auth';
 import { setSessionCookies } from '@/lib/session';
+import { logServerError } from '@/lib/serverLog';
 
 export async function POST(req: Request) {
   try {
@@ -20,6 +21,7 @@ export async function POST(req: Request) {
       .maybeSingle();
 
     if (error) {
+      logServerError("auth/login POST", error);
       return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
 
@@ -38,6 +40,7 @@ export async function POST(req: Request) {
     return res;
   } catch (err: unknown) {
     if (err instanceof InputValidationError) return invalidInput(err.message);
+    logServerError("auth/login POST", err);
     return NextResponse.json({ error: 'Login failed' }, { status: 500 });
   }
 }

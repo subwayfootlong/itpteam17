@@ -1,0 +1,94 @@
+{
+  "testCase": "TC-SFR-05",
+  "title": "Database access control",
+  "finishedAt": "2026-10-29T13:17:44.742Z",
+  "status": "PASS",
+  "checks": [
+    {
+      "step": "1 npm run test:sfr05:rls",
+      "expected": "exit 0, no failures",
+      "actual": "exit 0; SFR-05 DB-level RLS test: 24 passed, 0 failed, 1 skipped",
+      "pass": true
+    },
+    {
+      "step": "2 npm run test:sfr05:authz",
+      "expected": "exit 0, no failures",
+      "actual": "exit 0; Failed:       0",
+      "pass": true
+    },
+    {
+      "step": "2 npm run test:sfr05:workflows",
+      "expected": "exit 0, no failures",
+      "actual": "exit 0; Phase 2 Test Summary: 28/28 PASSED (0 failed)",
+      "pass": true
+    },
+    {
+      "step": "3 browser bundle (.next/static) scanned",
+      "expected": "57 files, 0 contain the key or supabaseAdmin",
+      "actual": "57 files, 0 contain it",
+      "pass": true
+    },
+    {
+      "step": "3 page HTML /",
+      "expected": "no service-role key",
+      "actual": "not found",
+      "pass": true
+    },
+    {
+      "step": "3 page HTML /member",
+      "expected": "no service-role key",
+      "actual": "not found",
+      "pass": true
+    },
+    {
+      "step": "3 page HTML /member/events",
+      "expected": "no service-role key",
+      "actual": "not found",
+      "pass": true
+    },
+    {
+      "step": "3 page HTML /member/benefit",
+      "expected": "no service-role key",
+      "actual": "not found",
+      "pass": true
+    },
+    {
+      "step": "3 page HTML /member/community",
+      "expected": "no service-role key",
+      "actual": "not found",
+      "pass": true
+    },
+    {
+      "step": "3 page HTML /member/profile",
+      "expected": "no service-role key",
+      "actual": "not found",
+      "pass": true
+    },
+    {
+      "step": "4 key read only in lib/supabaseServer.ts",
+      "expected": "lib/supabaseServer.ts",
+      "actual": "lib/supabaseServer.ts",
+      "pass": true
+    },
+    {
+      "step": "4 no NEXT_PUBLIC_ service-role variable",
+      "expected": "none",
+      "actual": "none",
+      "pass": true
+    },
+    {
+      "step": "4 lib/supabaseServer.ts refuses to load in a browser",
+      "expected": "throws when window is defined",
+      "actual": "guard present",
+      "pass": true
+    },
+    {
+      "step": "4 no component imports the server client",
+      "expected": "0 files",
+      "actual": "0 files",
+      "pass": true
+    }
+  ],
+  "skipped": [],
+  "screenshots": []
+}

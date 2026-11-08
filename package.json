@@ -7,13 +7,15 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:sfr05:authz": "node tests/test-server-authorization.mjs",
-    "test:sfr05:workflows": "node tests/test-workflow-regression.mjs",
+    "test:sfr05:authz": "node --env-file=.env.local tests/test-server-authorization.mjs",
+    "test:sfr05:workflows": "node --env-file=.env.local tests/test-workflow-regression.mjs",
     "test:sfr05:rls": "node --env-file=.env.local tests/test-sfr05-db-rls.mjs",
     "test:sfr05": "npm run test:sfr05:rls && npm run test:sfr05:authz && npm run test:sfr05:workflows",
     "test:security": "node --test tests/security-controls.test.mjs",
     "test:qr": "node --test tests/membershipQr.test.mjs",
-    "test:email": "node --test tests/emailChange.test.mjs"
+    "test:email": "node --test tests/emailChange.test.mjs",
+    "test:security:e2e": "playwright test",
+    "test:security:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.28.0",
@@ -32,6 +34,7 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",

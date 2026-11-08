@@ -1,0 +1,64 @@
+{
+  "testCase": "TC-SNFR-01",
+  "title": "Secure session configuration",
+  "finishedAt": "2026-10-29T13:18:02.924Z",
+  "status": "FAIL",
+  "checks": [
+    {
+      "step": "1 login: token cookie",
+      "expected": "HttpOnly; Secure; SameSite=Lax|Strict; Path=/; Max-Age",
+      "actual": "missing: Secure, SameSite",
+      "pass": false
+    },
+    {
+      "step": "2 login: last_activity cookie",
+      "expected": "HttpOnly; Secure; SameSite=Lax|Strict; Path=/; Max-Age",
+      "actual": "missing: Secure",
+      "pass": false
+    },
+    {
+      "step": "3 throwaway registration succeeds",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "3 register: token cookie",
+      "expected": "HttpOnly; Secure; SameSite=Lax|Strict; Path=/; Max-Age",
+      "actual": "missing: Secure, SameSite",
+      "pass": false
+    },
+    {
+      "step": "3 logout clears token with matching attributes",
+      "expected": "Max-Age=0; HttpOnly; Secure; SameSite",
+      "actual": "Max-Age=0; HttpOnly",
+      "pass": false
+    },
+    {
+      "step": "4 token has an expiry of 7 days",
+      "expected": "604800 s",
+      "actual": "604800 s",
+      "pass": true
+    },
+    {
+      "step": "4 cookie Max-Age matches token lifetime",
+      "expected": "604800 s",
+      "actual": "604800 s",
+      "pass": true
+    },
+    {
+      "step": "5 session lifetime (7 days) documented",
+      "expected": "documented",
+      "actual": "not found in README.md, docs\\setup.md, docs\\project-overview.md, docs\\workflow.md",
+      "pass": false
+    },
+    {
+      "step": "5 idle timeout (15 minutes) documented",
+      "expected": "documented",
+      "actual": "not found in README.md, docs\\setup.md, docs\\project-overview.md, docs\\workflow.md",
+      "pass": false
+    }
+  ],
+  "skipped": [],
+  "screenshots": []
+}

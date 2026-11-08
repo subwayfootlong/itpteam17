@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabaseServer";
 import { qrResponseHeaders, verifyMembershipQrToken } from "@/lib/membershipQr";
+import { logServerError } from "@/lib/serverLog";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,7 +15,10 @@ export async function GET(request: Request) {
     const { data, error } = await supabaseAdmin.from("users")
       .select("first_name, last_name, membership_tier, membership_status, expiry_date")
       .eq("id", result.memberId).maybeSingle();
-    if (error) return respond({ valid: false, code: "unavailable", error: "Unable to verify membership. Please try again." }, 503);
+    if (error) {
+      logServerError("verify/member GET", error);
+      return respond({ valid: false, code: "unavailable", error: "Unable to verify membership. Please try again." }, 503);
+    }
     if (!data) return respond({ valid: false, code: "invalid", error: "Invalid Membership QR" }, 404);
     const first = data.first_name?.trim().split(/\s+/)[0] || "Member";
     const initial = Array.from((data.last_name?.trim() || "") as string)[0];
@@ -24,7 +28,8 @@ export async function GET(request: Request) {
       membershipStatus: data.membership_status,
       expiryDate: data.expiry_date,
     } });
-  } catch {
+  } catch (err) {
+    logServerError("verify/member GET", err);
     return respond({ valid: false, code: "unavailable", error: "Unable to verify membership. Please try again." }, 503);
   }
 }

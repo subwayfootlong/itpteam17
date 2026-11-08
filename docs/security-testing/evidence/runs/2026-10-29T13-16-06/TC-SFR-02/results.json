@@ -1,0 +1,60 @@
+{
+  "testCase": "TC-SFR-02",
+  "title": "Resource-level access control",
+  "finishedAt": "2026-10-29T13:16:59.389Z",
+  "status": "PASS",
+  "checks": [
+    {
+      "step": "1 memberA's own profile updated",
+      "expected": "designation = \"[security-test] A\"",
+      "actual": "200, designation = \"[security-test] A\"",
+      "pass": true
+    },
+    {
+      "step": "1 memberB's profile unchanged",
+      "expected": "identical to before",
+      "actual": "identical",
+      "pass": true
+    },
+    {
+      "step": "2 memberB's notification still unread",
+      "expected": "is_read = false",
+      "actual": "200, is_read = false",
+      "pass": true
+    },
+    {
+      "step": "3 GET notifications counts only memberA's",
+      "expected": "unreadCount = 22 (memberA's own)",
+      "actual": "unreadCount = 22",
+      "pass": true
+    },
+    {
+      "step": "4 memberB's registration still exists",
+      "expected": "status = registered",
+      "actual": "400, status = registered",
+      "pass": true
+    },
+    {
+      "step": "5 memberB's pending thread hidden from memberA",
+      "expected": "not-found screen; thread content not in page source",
+      "actual": "not-found screen; content not in page source",
+      "pass": true
+    },
+    {
+      "step": "6 tier-upgrade GET excludes memberB's request",
+      "expected": "memberB's request not listed",
+      "actual": "200, 0 request(s), memberB's not listed",
+      "pass": true
+    },
+    {
+      "step": "7 QR token identifies memberA even when memberB's id is passed",
+      "expected": "memberId = memberA (f7081c04-31f7-4eb8-9d88-425f0d89dfb5)",
+      "actual": "memberId = memberA",
+      "pass": true
+    }
+  ],
+  "skipped": [],
+  "screenshots": [
+    "01-membera-opens-memberb-pending-thread.png"
+  ]
+}

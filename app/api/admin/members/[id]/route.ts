@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { isValidArsStatus, isValidSalutation } from '@/lib/memberProfileOptions';
+import { logServerError } from "@/lib/serverLog";
 import {
   formatStoredPhone,
   getPhoneValidationMessage,
@@ -46,7 +47,10 @@ export async function GET(
     .eq('id', id)
     .maybeSingle();
 
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  if (error) {
+    logServerError("admin/members/[id] GET", error);
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  }
   if (!data) return NextResponse.json({ error: 'Member not found' }, { status: 404 });
 
   const { data: registrations } = await supabaseAdmin
@@ -177,7 +181,10 @@ export async function PATCH(
     .select(MEMBER_SELECT)
     .maybeSingle();
 
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  if (error) {
+    logServerError("admin/members/[id] PATCH", error);
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  }
   if (!data) return NextResponse.json({ error: 'Member not found' }, { status: 404 });
 
   return NextResponse.json({ member: responseFields(data, MEMBER_DETAIL_FIELDS) });

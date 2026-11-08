@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/lib/supabaseServer";
 import { moderationStatus } from "@/lib/community";
 import { formatTierLabel } from "@/lib/membershipTiers";
 import { evaluateTierAccess, normalizeTierAudience } from "@/lib/tierAccess";
+import { logServerError } from "@/lib/serverLog";
 
 type ThreadRow = {
   id: string;
@@ -86,6 +87,7 @@ export async function POST(req: Request) {
       .single<ThreadRow>();
 
     if (error) {
+      logServerError("community/threads POST", error);
       return NextResponse.json({ error: "Unable to save community content" }, { status: 500 });
     }
 
@@ -106,6 +108,7 @@ export async function POST(req: Request) {
     });
   } catch (err: unknown) {
     if (err instanceof InputValidationError) return invalidInput(err.message);
+    logServerError("community/threads POST", err);
     return NextResponse.json(
       { error: "Unable to create discussion" },
       { status: 500 },

@@ -1,0 +1,42 @@
+
+> itpteam17@0.1.0 test:sfr05:workflows
+> node --env-file=.env.local tests/test-workflow-regression.mjs
+
+Server already running at http://localhost:3000
+
+--- SUITE 2: Portal Member & Admin Workflows Integrity ---
+✅ PASS [AUTH] Member 1 login succeeds & receives token
+✅ PASS [AUTH] Member 2 login succeeds & receives token
+✅ PASS [AUTH] Admin login succeeds & receives token
+✅ PASS [MEMBER-SSR] Member page /member loads cleanly -> status=200
+✅ PASS [MEMBER-SSR] Member page /member/events loads cleanly -> status=200
+✅ PASS [MEMBER-SSR] Member page /member/benefit loads cleanly -> status=200
+✅ PASS [MEMBER-SSR] Member page /member/community loads cleanly -> status=200
+✅ PASS [MEMBER-SSR] Member page /member/profile loads cleanly -> status=200
+✅ PASS [MEMBER-SSR] Member page /member/settings loads cleanly -> status=200
+✅ PASS [MEMBER-SSR] Member page /member/notifications loads cleanly -> status=200
+✅ PASS [MEMBER-API] Member gets notification count
+✅ PASS [MEMBER-API] Member queries tier upgrade info
+✅ PASS [MEMBER-API] Member updates own profile successfully -> status=200
+✅ PASS [ADMIN-API] Admin accesses Member Directory (/api/admin/members) -> status=200
+✅ PASS [ADMIN-API] Admin accesses Dashboard Overview (/api/admin/dashboard) -> status=200
+✅ PASS [ADMIN-API] Admin accesses Engagement Analytics (/api/admin/analytics) -> status=200
+✅ PASS [ADMIN-API] Admin accesses Tier Requests (/api/admin/tier-requests) -> status=200
+✅ PASS [ADMIN-API] Admin accesses Payment Methods (/api/admin/payment-methods) -> status=200
+✅ PASS [ADMIN-API] Admin accesses Admin Team (/api/admin/team) -> status=200
+
+--- SUITE 3: Security Boundary & Unauthorized Rejection ---
+✅ PASS [SECURITY] Unauthenticated denied on member profile update (401)
+✅ PASS [SECURITY] Unauthenticated denied on member notifications (401)
+✅ PASS [SECURITY] Unauthenticated denied on member tier upgrade (401)
+✅ PASS [SECURITY] Member strictly rejected from /api/admin/members (403) -> status=403
+✅ PASS [SECURITY] Member strictly rejected from /api/admin/dashboard (403) -> status=403
+✅ PASS [SECURITY] Member strictly rejected from /api/admin/analytics (403) -> status=403
+✅ PASS [SECURITY] Member strictly rejected from /api/admin/tier-requests (403) -> status=403
+✅ PASS [SECURITY] Member strictly rejected from /api/admin/payment-methods (403) -> status=403
+✅ PASS [SECURITY] Member strictly rejected from /api/admin/team (403) -> status=403
+
+======================================================
+Phase 2 Test Summary: 28/28 PASSED (0 failed)
+======================================================
+

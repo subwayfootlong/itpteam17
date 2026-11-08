@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { requireMember } from '@/lib/currentUser';
 import { evaluateTierAccess, normalizeTierAudience } from '@/lib/tierAccess';
+import { logServerError } from '@/lib/serverLog';
 
 export async function GET(req: Request) {
   const { user, response: authResponse } = await requireMember();
@@ -109,6 +110,7 @@ export async function POST(req: Request) {
       .eq('id', existingReg.id);
 
     if (updateError) {
+      logServerError("events/rsvp POST", updateError);
       return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
 
@@ -136,6 +138,7 @@ export async function POST(req: Request) {
       });
 
     if (insertError) {
+      logServerError("events/rsvp POST", insertError);
       return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
 
@@ -210,6 +213,7 @@ export async function DELETE(req: Request) {
     .eq('user_id', user.id);
 
   if (deleteError) {
+    logServerError("events/rsvp DELETE", deleteError);
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 

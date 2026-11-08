@@ -2,6 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { deliverEmailChangeNotification } from "@/lib/emailChangeServer";
 import { supabaseAdmin } from "@/lib/supabaseServer";
+import { logServerError } from "@/lib/serverLog";
 
 export async function POST(req: Request) {
   const secret = process.env.EMAIL_NOTIFICATION_CRON_SECRET;
@@ -12,7 +13,10 @@ export async function POST(req: Request) {
   }
   const { data, error } = await supabaseAdmin.from("email_change_notifications")
     .select("id").is("sent_at", null).order("created_at").limit(20);
-  if (error) return NextResponse.json({ error: "Unable to load notifications" }, { status: 503 });
+  if (error) {
+    logServerError("internal/email-change-notifications POST", error);
+    return NextResponse.json({ error: "Unable to load notifications" }, { status: 503 });
+  }
   const results = await Promise.allSettled((data ?? []).map(({ id }) => deliverEmailChangeNotification(id)));
   const failed = results.filter((result) => result.status === "rejected").length;
   return NextResponse.json({ sent: results.length - failed, failed }, { status: failed ? 503 : 200 });

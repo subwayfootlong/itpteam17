@@ -1,0 +1,123 @@
+### 1 no current password
+> POST /api/member/email-change/request
+> body: {"newEmail":"member5+security-test@uat.pergas.org"}
+< 401 Unauthorized
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    cache-control: no-store
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:17:56 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"error":"Invalid credentials."}
+### 1 wrong current password
+> POST /api/member/email-change/request
+< 401 Unauthorized
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    cache-control: no-store
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:17:56 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"error":"Invalid credentials."}
+### 2 invalid email format
+> POST /api/member/email-change/request
+< 400 Bad Request
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    cache-control: no-store
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:17:56 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"error":"Enter a valid new email address."}
+### 3 email already used by another account
+> POST /api/member/email-change/request
+< 409 Conflict
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    cache-control: no-store
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:17:57 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"error":"This email address is already registered."}
+### 5 no Origin header
+> POST /api/member/email-change/request
+< 403 Forbidden
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    cache-control: no-store
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:17:57 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"error":"Invalid request origin or content type."}
+### 5 foreign Origin
+> POST /api/member/email-change/request
+< 403 Forbidden
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    cache-control: no-store
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:17:57 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"error":"Invalid request origin or content type."}
+### 6 admin account
+> POST /api/member/email-change/request
+< 403 Forbidden
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    cache-control: no-store
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:17:57 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"error":"Forbidden"}
+### 7 wrong code
+> POST /api/member/email-change/verify
+< 400 Bad Request
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    cache-control: no-store
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:17:58 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"error":"Incorrect verification code."}
+### 8 correct code after 5 wrong attempts
+> POST /api/member/email-change/verify
+< 429 Too Many Requests
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    cache-control: no-store
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:17:59 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"error":"Too many incorrect attempts. Request a new code."}
+### 9 correct code after expiry
+> POST /api/member/email-change/verify
+< 400 Bad Request
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    cache-control: no-store
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:18:00 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"error":"Verification code expired. Request a new code."}
+### 10 correct code within the time limit
+> POST /api/member/email-change/verify
+< 200 OK
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    cache-control: no-store
+    content-type: application/json
+    set-cookie: token=[redacted]; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; HttpOnly | last_activity=[redacted]; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; HttpOnly
+    date: Thu, 29 Oct 2026 13:18:01 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"success":true,"message":"Email changed successfully. Please log in again.","notificationPending":true}

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { requireMember } from "@/lib/currentUser";
 import { getUnreadNotificationCount } from "@/lib/notifications";
 import { supabaseAdmin } from "@/lib/supabaseServer";
+import { logServerError } from "@/lib/serverLog";
 
 export async function GET() {
   const { user, response: authResponse } = await requireMember();
@@ -39,6 +40,7 @@ export async function PATCH(req: Request) {
       .eq("is_read", false);
 
     if (error) {
+      logServerError("member/notifications PATCH", error);
       return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
 
@@ -60,6 +62,7 @@ export async function PATCH(req: Request) {
     .eq("id", payload.id);
 
   if (error) {
+    logServerError("member/notifications PATCH", error);
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
@@ -78,6 +81,7 @@ export async function DELETE() {
     .eq("is_read", true);
 
   if (error) {
+    logServerError("member/notifications DELETE", error);
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 

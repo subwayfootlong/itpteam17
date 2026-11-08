@@ -1,0 +1,94 @@
+{
+  "testCase": "TC-SFR-06",
+  "title": "Secure session and cross-site request handling",
+  "finishedAt": "2026-10-29T13:17:51.510Z",
+  "status": "FAIL",
+  "checks": [
+    {
+      "step": "1 token with altered signature",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 token signed with a different secret",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 unsigned token (alg: none)",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "3 correctly signed but expired token",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "4 valid token idle for 16 minutes",
+      "expected": "401",
+      "actual": "200",
+      "pass": false
+    },
+    {
+      "step": "4 idle session cookies cleared",
+      "expected": "token cookie cleared",
+      "actual": "not cleared",
+      "pass": false
+    },
+    {
+      "step": "5 logout succeeds",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "5 token reused after logout",
+      "expected": "401",
+      "actual": "200",
+      "pass": false
+    },
+    {
+      "step": "6 valid session with Origin: https://evil.example",
+      "expected": "403",
+      "actual": "200",
+      "pass": false
+    },
+    {
+      "step": "7 session cookie sets SameSite explicitly",
+      "expected": "SameSite=Lax or Strict",
+      "actual": "no SameSite attribute",
+      "pass": false
+    },
+    {
+      "step": "8a cross-site fetch carried the session",
+      "expected": "no state change",
+      "actual": "no state change (opaque)",
+      "pass": true
+    },
+    {
+      "step": "8b cross-site form POST carried the session",
+      "expected": "no state change",
+      "actual": "no state change",
+      "pass": true
+    },
+    {
+      "step": "8c control: same form from the portal's own site",
+      "expected": "state changes (test can detect a successful request)",
+      "actual": "analytics row created",
+      "pass": true
+    },
+    {
+      "step": "9 valid session (control)",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    }
+  ],
+  "skipped": [],
+  "screenshots": []
+}

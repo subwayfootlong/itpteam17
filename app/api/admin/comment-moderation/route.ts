@@ -1,6 +1,7 @@
 import { readJsonObject, invalidInput, InputValidationError, isUuid } from "@/lib/inputValidation";
 import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from "next/server";
+import { logServerError } from "@/lib/serverLog";
 import {
   getModerationTable,
   type ModerationSource,
@@ -75,6 +76,7 @@ export async function PATCH(req: Request) {
   );
 
   if (error) {
+    logServerError("admin/comment-moderation PATCH", error);
     return NextResponse.json({ error: "Unable to update moderation status" }, { status: 500 });
   }
 

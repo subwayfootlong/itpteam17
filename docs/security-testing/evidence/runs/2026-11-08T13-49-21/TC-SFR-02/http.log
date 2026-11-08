@@ -1,0 +1,33 @@
+### 1 PATCH profile with memberB's id
+> PATCH /api/member/profile
+> body: {"id":"3b4b653a-e1f2-4043-9265-36eac2b78612","user_id":"3b4b653a-e1f2-4043-9265-36eac2b78612","salutation":"mr","first_name":"Member","last_name":"3","phone":"+65 8100 0003","organization":"Pergas Community Member","designation":"[security-test] A"}
+< 200 OK
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    date: Sun, 08 Nov 2026 13:50:10 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"ok":true}
+### 2 PATCH memberB's notification
+> PATCH /api/member/notifications
+> body: {"id":"f8b8a247-2b13-43cb-88f5-f1cb0d27126a","isRead":true}
+< 200 OK
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    date: Sun, 08 Nov 2026 13:50:11 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"ok":true}
+### 4 DELETE rsvp for memberB's event
+> DELETE /api/events/rsvp
+> body: {"eventId":"eb46fc7f-a341-47b1-98ab-e586ac8d3b8f"}
+< 400 Bad Request
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    date: Sun, 08 Nov 2026 13:50:12 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"error":"You are not registered for this event"}

@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { ADMIN_PAYMENT_METHOD_SELECT } from '@/lib/adminPaymentMethods';
 import { normalizePaymentUrl } from '@/lib/paymentUrl';
 import { supabaseAdmin } from '@/lib/supabaseServer';
+import { logServerError } from '@/lib/serverLog';
 
 function cleanText(value: unknown) {
   if (typeof value === 'string') return value.trim();
@@ -29,7 +30,10 @@ export async function GET(req: Request) {
   if (active === 'false') query = query.eq('is_active', false);
 
   const { data, error } = await query;
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  if (error) {
+    logServerError("admin/payment-methods GET", error);
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  }
   return NextResponse.json({ paymentMethods: data ?? [] });
 }
 
@@ -70,7 +74,10 @@ export async function POST(req: Request) {
       .from('payment_methods')
       .update({ is_active: false })
       .eq('is_active', true);
-    if (deactivateError) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    if (deactivateError) {
+      logServerError("admin/payment-methods POST", deactivateError);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    }
   }
 
   const { data, error } = await supabaseAdmin
@@ -85,6 +92,9 @@ export async function POST(req: Request) {
     .select(ADMIN_PAYMENT_METHOD_SELECT)
     .single();
 
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  if (error) {
+    logServerError("admin/payment-methods POST", error);
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  }
   return NextResponse.json({ paymentMethod: data, deactivatedOthers: isActive }, { status: 201 });
 }

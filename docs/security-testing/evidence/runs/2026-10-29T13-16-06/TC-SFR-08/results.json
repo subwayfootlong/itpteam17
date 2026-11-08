@@ -1,0 +1,133 @@
+{
+  "testCase": "TC-SFR-08",
+  "title": "Secure email address change",
+  "finishedAt": "2026-10-29T13:18:02.177Z",
+  "status": "PASS",
+  "checks": [
+    {
+      "step": "1 no current password",
+      "expected": "401",
+      "actual": "401 \"Invalid credentials.\"",
+      "pass": true
+    },
+    {
+      "step": "1 wrong current password",
+      "expected": "401",
+      "actual": "401 \"Invalid credentials.\"",
+      "pass": true
+    },
+    {
+      "step": "1 no request created after failed re-authentication",
+      "expected": "0 pending requests",
+      "actual": "0 pending request(s)",
+      "pass": true
+    },
+    {
+      "step": "2 invalid email format",
+      "expected": "400",
+      "actual": "400 \"Enter a valid new email address.\"",
+      "pass": true
+    },
+    {
+      "step": "3 email already used by another account",
+      "expected": "409",
+      "actual": "409 \"This email address is already registered.\"",
+      "pass": true
+    },
+    {
+      "step": "5 no Origin header",
+      "expected": "403",
+      "actual": "403 \"Invalid request origin or content type.\"",
+      "pass": true
+    },
+    {
+      "step": "5 foreign Origin",
+      "expected": "403",
+      "actual": "403 \"Invalid request origin or content type.\"",
+      "pass": true
+    },
+    {
+      "step": "6 admin account",
+      "expected": "403",
+      "actual": "403 \"Forbidden\"",
+      "pass": true
+    },
+    {
+      "step": "7 wrong code",
+      "expected": "400",
+      "actual": "400 \"Incorrect verification code.\"",
+      "pass": true
+    },
+    {
+      "step": "7 email not changed",
+      "expected": "member5@uat.pergas.org",
+      "actual": "member5@uat.pergas.org",
+      "pass": true
+    },
+    {
+      "step": "8 correct code after 5 wrong attempts",
+      "expected": "429",
+      "actual": "429 \"Too many incorrect attempts. Request a new code.\"",
+      "pass": true
+    },
+    {
+      "step": "8 email not changed",
+      "expected": "member5@uat.pergas.org",
+      "actual": "member5@uat.pergas.org",
+      "pass": true
+    },
+    {
+      "step": "9 correct code after expiry",
+      "expected": "400",
+      "actual": "400 \"Verification code expired. Request a new code.\"",
+      "pass": true
+    },
+    {
+      "step": "9 email not changed",
+      "expected": "member5@uat.pergas.org",
+      "actual": "member5@uat.pergas.org",
+      "pass": true
+    },
+    {
+      "step": "10 correct code within the time limit",
+      "expected": "200",
+      "actual": "200 \"Email changed successfully. Please log in again.\"",
+      "pass": true
+    },
+    {
+      "step": "10 email changed",
+      "expected": "member5+security-test@uat.pergas.org",
+      "actual": "member5+security-test@uat.pergas.org",
+      "pass": true
+    },
+    {
+      "step": "10 session ended",
+      "expected": "token cookie cleared",
+      "actual": "token cookie cleared",
+      "pass": true
+    },
+    {
+      "step": "10 old-email notice queued",
+      "expected": "to member5@uat.pergas.org",
+      "actual": "to member5@uat.pergas.org",
+      "pass": true
+    },
+    {
+      "step": "cleanup: memberC's email restored",
+      "expected": "member5@uat.pergas.org",
+      "actual": "member5@uat.pergas.org",
+      "pass": true
+    }
+  ],
+  "skipped": [
+    {
+      "step": "4 valid request sends the code to the new email",
+      "reason": "SMTP_PASSWORD not configured; the server cannot send email"
+    },
+    {
+      "step": "11 old email receives the change notice",
+      "reason": "SMTP_PASSWORD not configured; the notice is queued (step 10) but cannot be delivered"
+    }
+  ],
+  "screenshots": []
+}

@@ -1,0 +1,928 @@
+{
+  "testCase": "TC-SFR-01",
+  "title": "API authorisation and role enforcement",
+  "finishedAt": "2026-10-29T13:16:53.848Z",
+  "status": "PASS",
+  "checks": [
+    {
+      "step": "1 anonymous -> admin: GET /api/admin/analytics",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: GET /api/admin/announcements",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: POST /api/admin/announcements",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: GET /api/admin/announcements/00000000-0000-4000-8000-000000000000",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: PATCH /api/admin/announcements/00000000-0000-4000-8000-000000000000",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: DELETE /api/admin/announcements/00000000-0000-4000-8000-000000000000",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: GET /api/admin/announcements/00000000-0000-4000-8000-000000000000/poll-responses",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: POST /api/admin/batch-onboarding",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: PATCH /api/admin/comment-moderation",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: GET /api/admin/dashboard",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: GET /api/admin/discussion-groups",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: PATCH /api/admin/discussion-groups",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: GET /api/admin/engagement",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: POST /api/admin/engagement",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: GET /api/admin/engagement/00000000-0000-4000-8000-000000000000",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: PATCH /api/admin/engagement/00000000-0000-4000-8000-000000000000",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: DELETE /api/admin/engagement/00000000-0000-4000-8000-000000000000",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: GET /api/admin/events",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: POST /api/admin/events",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: GET /api/admin/events/00000000-0000-4000-8000-000000000000",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: PATCH /api/admin/events/00000000-0000-4000-8000-000000000000",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: DELETE /api/admin/events/00000000-0000-4000-8000-000000000000",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: GET /api/admin/events/00000000-0000-4000-8000-000000000000/registrations",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: DELETE /api/admin/events/00000000-0000-4000-8000-000000000000/registrations",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: GET /api/admin/members",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: GET /api/admin/members/00000000-0000-4000-8000-000000000000",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: PATCH /api/admin/members/00000000-0000-4000-8000-000000000000",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: GET /api/admin/payment-methods",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: POST /api/admin/payment-methods",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: GET /api/admin/payment-methods/00000000-0000-4000-8000-000000000000",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: PATCH /api/admin/payment-methods/00000000-0000-4000-8000-000000000000",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: DELETE /api/admin/payment-methods/00000000-0000-4000-8000-000000000000",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: GET /api/admin/team",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: GET /api/admin/tier-requests",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: PATCH /api/admin/tier-requests",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "1 anonymous -> admin: POST /api/admin/upload",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: POST /api/analytics/track",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: POST /api/community/announcement-comments",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: POST /api/community/announcement-poll",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: POST /api/community/thread-comments",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: POST /api/community/threads",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: GET /api/events/rsvp?eventId=00000000-0000-4000-8000-000000000000",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: POST /api/events/rsvp",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: DELETE /api/events/rsvp",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: PATCH /api/member/change-password",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: POST /api/member/email-change/request",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: POST /api/member/email-change/verify",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: GET /api/member/notification-preferences",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: PATCH /api/member/notification-preferences",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: GET /api/member/notifications",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: PATCH /api/member/notifications",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: DELETE /api/member/notifications",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: PATCH /api/member/profile",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: GET /api/member/qr-token",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: GET /api/member/tier-upgrade",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: POST /api/member/tier-upgrade",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "2 anonymous -> member: POST /api/auth/activity",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: GET /api/admin/analytics",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: GET /api/admin/announcements",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: POST /api/admin/announcements",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: GET /api/admin/announcements/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: PATCH /api/admin/announcements/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: DELETE /api/admin/announcements/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: GET /api/admin/announcements/00000000-0000-4000-8000-000000000000/poll-responses",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: POST /api/admin/batch-onboarding",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: PATCH /api/admin/comment-moderation",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: GET /api/admin/dashboard",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: GET /api/admin/discussion-groups",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: PATCH /api/admin/discussion-groups",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: GET /api/admin/engagement",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: POST /api/admin/engagement",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: GET /api/admin/engagement/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: PATCH /api/admin/engagement/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: DELETE /api/admin/engagement/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: GET /api/admin/events",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: POST /api/admin/events",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: GET /api/admin/events/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: PATCH /api/admin/events/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: DELETE /api/admin/events/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: GET /api/admin/events/00000000-0000-4000-8000-000000000000/registrations",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: DELETE /api/admin/events/00000000-0000-4000-8000-000000000000/registrations",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: GET /api/admin/members",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: GET /api/admin/members/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: PATCH /api/admin/members/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: GET /api/admin/payment-methods",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: POST /api/admin/payment-methods",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: GET /api/admin/payment-methods/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: PATCH /api/admin/payment-methods/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: DELETE /api/admin/payment-methods/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: GET /api/admin/team",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: GET /api/admin/tier-requests",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: PATCH /api/admin/tier-requests",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "3 member -> admin: POST /api/admin/upload",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "4 admin -> member: POST /api/analytics/track",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "4 admin -> member: POST /api/community/announcement-comments",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "4 admin -> member: POST /api/community/announcement-poll",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "4 admin -> member: POST /api/community/thread-comments",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "4 admin -> member: POST /api/community/threads",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "4 admin -> member: GET /api/events/rsvp?eventId=00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "4 admin -> member: POST /api/events/rsvp",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "4 admin -> member: DELETE /api/events/rsvp",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "4 admin -> member: PATCH /api/member/change-password",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "4 admin -> member: POST /api/member/email-change/request",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "4 admin -> member: POST /api/member/email-change/verify",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "4 admin -> member: GET /api/member/notification-preferences",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "4 admin -> member: PATCH /api/member/notification-preferences",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "4 admin -> member: GET /api/member/notifications",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "4 admin -> member: PATCH /api/member/notifications",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "4 admin -> member: DELETE /api/member/notifications",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "4 admin -> member: PATCH /api/member/profile",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "4 admin -> member: GET /api/member/qr-token",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "4 admin -> member: GET /api/member/tier-upgrade",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "4 admin -> member: POST /api/member/tier-upgrade",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "5 internal, no secret: POST /api/internal/email-change-notifications",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "5 internal, no secret: POST /api/internal/transactional-emails",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "5 internal, wrong secret: POST /api/internal/email-change-notifications",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "5 internal, wrong secret: POST /api/internal/transactional-emails",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: GET /api/admin/analytics",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: GET /api/admin/announcements",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: POST /api/admin/announcements",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: GET /api/admin/announcements/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: PATCH /api/admin/announcements/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: DELETE /api/admin/announcements/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: GET /api/admin/announcements/00000000-0000-4000-8000-000000000000/poll-responses",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: POST /api/admin/batch-onboarding",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: PATCH /api/admin/comment-moderation",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: GET /api/admin/dashboard",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: GET /api/admin/discussion-groups",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: PATCH /api/admin/discussion-groups",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: GET /api/admin/engagement",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: POST /api/admin/engagement",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: GET /api/admin/engagement/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: PATCH /api/admin/engagement/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: DELETE /api/admin/engagement/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: GET /api/admin/events",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: POST /api/admin/events",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: GET /api/admin/events/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: PATCH /api/admin/events/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: DELETE /api/admin/events/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: GET /api/admin/events/00000000-0000-4000-8000-000000000000/registrations",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: DELETE /api/admin/events/00000000-0000-4000-8000-000000000000/registrations",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: GET /api/admin/members",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: GET /api/admin/members/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: PATCH /api/admin/members/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: GET /api/admin/payment-methods",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: POST /api/admin/payment-methods",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: GET /api/admin/payment-methods/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: PATCH /api/admin/payment-methods/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: DELETE /api/admin/payment-methods/00000000-0000-4000-8000-000000000000",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: GET /api/admin/team",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: GET /api/admin/tier-requests",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: PATCH /api/admin/tier-requests",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    },
+    {
+      "step": "6 member token claiming admin -> admin: POST /api/admin/upload",
+      "expected": "403",
+      "actual": "403",
+      "pass": true
+    }
+  ],
+  "skipped": [],
+  "screenshots": []
+}

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { requireMember } from "@/lib/currentUser";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 import type { PollCounts, PollResponseValue } from "@/lib/data/announcements";
+import { logServerError } from "@/lib/serverLog";
 import {
   evaluateTierAccess,
   normalizeTierAudience,
@@ -44,6 +45,7 @@ export async function POST(req: Request) {
       >();
 
     if (announcementError) {
+      logServerError("community/announcement-poll POST", announcementError);
       return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
     if (!announcement || announcement.status !== "published" || !announcement.poll_enabled) {
@@ -78,6 +80,7 @@ export async function POST(req: Request) {
       );
 
     if (upsertError) {
+      logServerError("community/announcement-poll POST", upsertError);
       return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
 
@@ -87,6 +90,7 @@ export async function POST(req: Request) {
       .eq("announcement_id", id);
 
     if (tallyError) {
+      logServerError("community/announcement-poll POST", tallyError);
       return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
 
@@ -98,6 +102,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ response, counts });
   } catch (err: unknown) {
     if (err instanceof InputValidationError) return invalidInput(err.message);
+    logServerError("community/announcement-poll POST", err);
     return NextResponse.json(
       { error: "Unable to record your response" },
       { status: 500 },

@@ -1,0 +1,942 @@
+{
+  "testCase": "TC-SFR-04",
+  "title": "Server-side input validation and sanitisation",
+  "finishedAt": "2026-10-29T13:17:19.656Z",
+  "status": "PASS",
+  "checks": [
+    {
+      "step": "1 malformed JSON: POST /api/admin/announcements",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: POST /api/admin/announcements",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: POST /api/admin/announcements",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: PATCH /api/admin/announcements/00000000-0000-4000-8000-000000000000",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: PATCH /api/admin/announcements/00000000-0000-4000-8000-000000000000",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: PATCH /api/admin/announcements/00000000-0000-4000-8000-000000000000",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: POST /api/admin/batch-onboarding",
+      "expected": "400 with a message",
+      "actual": "400 \"The uploaded information could not be read. Please upload the CSV again.\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: POST /api/admin/batch-onboarding",
+      "expected": "400 with a message",
+      "actual": "400 \"The uploaded information could not be read. Please upload the CSV again.\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: POST /api/admin/batch-onboarding",
+      "expected": "400 with a message",
+      "actual": "400 \"The uploaded information could not be read. Please upload the CSV again.\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: PATCH /api/admin/comment-moderation",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: PATCH /api/admin/comment-moderation",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: PATCH /api/admin/comment-moderation",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: PATCH /api/admin/discussion-groups",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: PATCH /api/admin/discussion-groups",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: PATCH /api/admin/discussion-groups",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: POST /api/admin/engagement",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: POST /api/admin/engagement",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: POST /api/admin/engagement",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: PATCH /api/admin/engagement/00000000-0000-4000-8000-000000000000",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: PATCH /api/admin/engagement/00000000-0000-4000-8000-000000000000",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: PATCH /api/admin/engagement/00000000-0000-4000-8000-000000000000",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: POST /api/admin/events",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: POST /api/admin/events",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: POST /api/admin/events",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: PATCH /api/admin/events/00000000-0000-4000-8000-000000000000",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: PATCH /api/admin/events/00000000-0000-4000-8000-000000000000",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: PATCH /api/admin/events/00000000-0000-4000-8000-000000000000",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: PATCH /api/admin/members/00000000-0000-4000-8000-000000000000",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: PATCH /api/admin/members/00000000-0000-4000-8000-000000000000",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: PATCH /api/admin/members/00000000-0000-4000-8000-000000000000",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: POST /api/admin/payment-methods",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: POST /api/admin/payment-methods",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: POST /api/admin/payment-methods",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: PATCH /api/admin/payment-methods/00000000-0000-4000-8000-000000000000",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: PATCH /api/admin/payment-methods/00000000-0000-4000-8000-000000000000",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: PATCH /api/admin/payment-methods/00000000-0000-4000-8000-000000000000",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: PATCH /api/admin/tier-requests",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: PATCH /api/admin/tier-requests",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: PATCH /api/admin/tier-requests",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: POST /api/admin/upload",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid multipart form data\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: POST /api/admin/upload",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid multipart form data\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: POST /api/admin/upload",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid multipart form data\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: POST /api/analytics/track",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: POST /api/analytics/track",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: POST /api/analytics/track",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: POST /api/community/announcement-comments",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: POST /api/community/announcement-comments",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: POST /api/community/announcement-comments",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: POST /api/community/announcement-poll",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: POST /api/community/announcement-poll",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: POST /api/community/announcement-poll",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: POST /api/community/thread-comments",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: POST /api/community/thread-comments",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: POST /api/community/thread-comments",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: POST /api/community/threads",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: POST /api/community/threads",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: POST /api/community/threads",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: POST /api/events/rsvp",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: POST /api/events/rsvp",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: POST /api/events/rsvp",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: PATCH /api/member/change-password",
+      "expected": "400 with a message",
+      "actual": "400 \"Please complete all password fields and try again.\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: PATCH /api/member/change-password",
+      "expected": "400 with a message",
+      "actual": "400 \"Please complete all password fields and try again.\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: PATCH /api/member/change-password",
+      "expected": "400 with a message",
+      "actual": "400 \"Please complete all password fields and try again.\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: POST /api/member/email-change/request",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid request.\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: POST /api/member/email-change/request",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid request.\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: POST /api/member/email-change/request",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid request.\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: POST /api/member/email-change/verify",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid request.\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: POST /api/member/email-change/verify",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid request.\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: POST /api/member/email-change/verify",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid request.\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: PATCH /api/member/notification-preferences",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: PATCH /api/member/notification-preferences",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: PATCH /api/member/notification-preferences",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: PATCH /api/member/notifications",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: PATCH /api/member/notifications",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: PATCH /api/member/notifications",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: PATCH /api/member/profile",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: PATCH /api/member/profile",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: PATCH /api/member/profile",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: POST /api/member/tier-upgrade",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: POST /api/member/tier-upgrade",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: POST /api/member/tier-upgrade",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "1 malformed JSON: DELETE /api/events/rsvp",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 JSON array: DELETE /api/events/rsvp",
+      "expected": "400 with a message",
+      "actual": "400 \"Request body must be a JSON object\"",
+      "pass": true
+    },
+    {
+      "step": "1 empty body: DELETE /api/events/rsvp",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid JSON payload\"",
+      "pass": true
+    },
+    {
+      "step": "2 profile first_name is a number: PATCH /api/member/profile",
+      "expected": "400 with a message",
+      "actual": "400 \"first_name must be a string\"",
+      "pass": true
+    },
+    {
+      "step": "2 thread body is a number: POST /api/community/threads",
+      "expected": "400 with a message",
+      "actual": "400 \"Post must be a string\"",
+      "pass": true
+    },
+    {
+      "step": "2 comment threadId is an object: POST /api/community/thread-comments",
+      "expected": "400 with a message",
+      "actual": "400 \"Thread ID must be a UUID\"",
+      "pass": true
+    },
+    {
+      "step": "2 rsvp eventId is a number: POST /api/events/rsvp",
+      "expected": "400 with a message",
+      "actual": "400 \"eventId is required\"",
+      "pass": true
+    },
+    {
+      "step": "2 analytics eventType is a number: POST /api/analytics/track",
+      "expected": "400 with a message",
+      "actual": "400 \"Event type must be one of: event_view, event_rsvp_click, benefit_view, announcement_view, \"",
+      "pass": true
+    },
+    {
+      "step": "2 notification isRead is a string: PATCH /api/member/notifications",
+      "expected": "400 with a message",
+      "actual": "400 \"Notification id and read state are required\"",
+      "pass": true
+    },
+    {
+      "step": "2 event capacity is a string: POST /api/admin/events",
+      "expected": "400 with a message",
+      "actual": "400 \"Capacity must be an integer between 0 and 2147483647\"",
+      "pass": true
+    },
+    {
+      "step": "2 announcement poll_enabled is a string: POST /api/admin/announcements",
+      "expected": "400 with a message",
+      "actual": "400 \"poll_enabled must be true or false\"",
+      "pass": true
+    },
+    {
+      "step": "3 thread body 801 chars: POST /api/community/threads",
+      "expected": "400 with a message",
+      "actual": "400 \"Post cannot exceed 800 characters\"",
+      "pass": true
+    },
+    {
+      "step": "3 thread title 81 chars: POST /api/community/threads",
+      "expected": "400 with a message",
+      "actual": "400 \"Title cannot exceed 80 characters\"",
+      "pass": true
+    },
+    {
+      "step": "3 comment body 501 chars: POST /api/community/thread-comments",
+      "expected": "400 with a message",
+      "actual": "400 \"Comment cannot exceed 500 characters\"",
+      "pass": true
+    },
+    {
+      "step": "3 profile first_name 101 chars: PATCH /api/member/profile",
+      "expected": "400 with a message",
+      "actual": "400 \"first_name cannot exceed 100 characters\"",
+      "pass": true
+    },
+    {
+      "step": "3 tier-upgrade reason 1001 chars: POST /api/member/tier-upgrade",
+      "expected": "400 with a message",
+      "actual": "400 \"Reason must be 1,000 characters or fewer\"",
+      "pass": true
+    },
+    {
+      "step": "3 event title 201 chars: POST /api/admin/events",
+      "expected": "400 with a message",
+      "actual": "400 \"title cannot exceed 200 characters\"",
+      "pass": true
+    },
+    {
+      "step": "4 profile salutation 'king': PATCH /api/member/profile",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid salutation\"",
+      "pass": true
+    },
+    {
+      "step": "4 tier-upgrade tier 'platinum': POST /api/member/tier-upgrade",
+      "expected": "400 with a message",
+      "actual": "400 \"Select a valid membership tier\"",
+      "pass": true
+    },
+    {
+      "step": "4 notification action 'explode': PATCH /api/member/notifications",
+      "expected": "400 with a message",
+      "actual": "400 \"Invalid notification action\"",
+      "pass": true
+    },
+    {
+      "step": "4 poll response 'perhaps': POST /api/community/announcement-poll",
+      "expected": "400 with a message",
+      "actual": "400 \"Polls are only available on official announcements\"",
+      "pass": true
+    },
+    {
+      "step": "4 analytics category 'secret': POST /api/analytics/track",
+      "expected": "400 with a message",
+      "actual": "400 \"Category must be one of: event, benefit, announcement, system\"",
+      "pass": true
+    },
+    {
+      "step": "4 event status 'live': POST /api/admin/events",
+      "expected": "400 with a message",
+      "actual": "400 \"Status must be one of: draft, published, archived\"",
+      "pass": true
+    },
+    {
+      "step": "4 tier-request action 'escalate': PATCH /api/admin/tier-requests",
+      "expected": "400 with a message",
+      "actual": "400 \"Request id and a valid action are required\"",
+      "pass": true
+    },
+    {
+      "step": "4 member list tier 'gold': GET /api/admin/members?tier=gold",
+      "expected": "400 with a message",
+      "actual": "400 \"Tier must be one of: basic, student, associate, ordinary\"",
+      "pass": true
+    },
+    {
+      "step": "5 thread with <script>alert(1)</script>: POST /api/community/threads",
+      "expected": "400 with a message",
+      "actual": "400 \"Post must be plain text without HTML markup\"",
+      "pass": true
+    },
+    {
+      "step": "5 thread comment with <script>alert(1)</script>: POST /api/community/thread-comments",
+      "expected": "400 with a message",
+      "actual": "400 \"Comment must be plain text without HTML markup\"",
+      "pass": true
+    },
+    {
+      "step": "5 announcement comment with <script>alert(1)</script>: POST /api/community/announcement-comments",
+      "expected": "400 with a message",
+      "actual": "400 \"Comment must be plain text without HTML markup\"",
+      "pass": true
+    },
+    {
+      "step": "6 thread with <img src=x onerror=alert(1)>: POST /api/community/threads",
+      "expected": "400 with a message",
+      "actual": "400 \"Post must be plain text without HTML markup\"",
+      "pass": true
+    },
+    {
+      "step": "6 thread comment with <img src=x onerror=alert(1)>: POST /api/community/thread-comments",
+      "expected": "400 with a message",
+      "actual": "400 \"Comment must be plain text without HTML markup\"",
+      "pass": true
+    },
+    {
+      "step": "6 announcement comment with <img src=x onerror=alert(1)>: POST /api/community/announcement-comments",
+      "expected": "400 with a message",
+      "actual": "400 \"Comment must be plain text without HTML markup\"",
+      "pass": true
+    },
+    {
+      "step": "6 thread with <svg/onload=alert(1)>: POST /api/community/threads",
+      "expected": "400 with a message",
+      "actual": "400 \"Post must be plain text without HTML markup\"",
+      "pass": true
+    },
+    {
+      "step": "6 thread comment with <svg/onload=alert(1)>: POST /api/community/thread-comments",
+      "expected": "400 with a message",
+      "actual": "400 \"Comment must be plain text without HTML markup\"",
+      "pass": true
+    },
+    {
+      "step": "6 announcement comment with <svg/onload=alert(1)>: POST /api/community/announcement-comments",
+      "expected": "400 with a message",
+      "actual": "400 \"Comment must be plain text without HTML markup\"",
+      "pass": true
+    },
+    {
+      "step": "6 thread with <!--x-->: POST /api/community/threads",
+      "expected": "400 with a message",
+      "actual": "400 \"Post must be plain text without HTML markup\"",
+      "pass": true
+    },
+    {
+      "step": "6 thread comment with <!--x-->: POST /api/community/thread-comments",
+      "expected": "400 with a message",
+      "actual": "400 \"Comment must be plain text without HTML markup\"",
+      "pass": true
+    },
+    {
+      "step": "6 announcement comment with <!--x-->: POST /api/community/announcement-comments",
+      "expected": "400 with a message",
+      "actual": "400 \"Comment must be plain text without HTML markup\"",
+      "pass": true
+    },
+    {
+      "step": "5-6 no markup payload stored",
+      "expected": "0 rows",
+      "actual": "0 row(s)",
+      "pass": true
+    },
+    {
+      "step": "7 plain text with < > \" accepted",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "7 text shown literally, no script ran",
+      "expected": "text visible as typed; 0 dialogs",
+      "actual": "visible as typed; 0 dialog(s)",
+      "pass": true
+    },
+    {
+      "step": "8 event RSVP URL javascript:aler: POST /api/admin/events",
+      "expected": "400 with a message",
+      "actual": "400 \"external_rsvp_url must be an HTTP or HTTPS URL\"",
+      "pass": true
+    },
+    {
+      "step": "8 event RSVP URL data:text/html,: POST /api/admin/events",
+      "expected": "400 with a message",
+      "actual": "400 \"external_rsvp_url must be an HTTP or HTTPS URL\"",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/admin/analytics/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/admin/announcements/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/admin/announcements/[id]/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/admin/batch-onboarding/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/admin/comment-moderation/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/admin/discussion-groups/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/admin/engagement/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/admin/engagement/[id]/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/admin/events/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/admin/events/[id]/registrations/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/admin/events/[id]/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/admin/members/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/admin/members/[id]/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/admin/payment-methods/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/admin/payment-methods/[id]/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/admin/team/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/admin/tier-requests/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/admin/upload/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/analytics/track/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/auth/login/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/auth/register/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/community/announcement-comments/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/community/announcement-poll/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/community/thread-comments/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/community/threads/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/events/rsvp/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/member/change-password/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/member/notification-preferences/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/member/notifications/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/member/profile/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/member/tier-upgrade/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    },
+    {
+      "step": "9 app/api/verify/member/route.ts",
+      "expected": "reads input and validates it",
+      "actual": "validates",
+      "pass": true
+    }
+  ],
+  "skipped": [],
+  "screenshots": [
+    "01-plain-text-with-angle-brackets.png"
+  ]
+}

@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 import { tierAudienceToDatabase, validateTierAudience } from "@/lib/tierAccess";
+import { logServerError } from "@/lib/serverLog";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,7 @@ export async function GET() {
     .order("sort_order", { ascending: true });
 
   if (error) {
+    logServerError("admin/discussion-groups GET", error);
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
@@ -58,6 +60,7 @@ export async function PATCH(req: Request) {
     .maybeSingle();
 
   if (error) {
+    logServerError("admin/discussion-groups PATCH", error);
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   if (!data) {

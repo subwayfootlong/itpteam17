@@ -1,0 +1,33 @@
+### 1 login
+> POST /api/auth/login
+< 200 OK
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    set-cookie: token=[redacted]; Path=/; Expires=Thu, 05 Nov 2026 13:18:02 GMT; Max-Age=604800; HttpOnly | last_activity=[redacted]; Path=/; Expires=Thu, 05 Nov 2026 13:18:02 GMT; Max-Age=604800; HttpOnly; SameSite=lax
+    date: Thu, 29 Oct 2026 13:18:02 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"ok":true}
+### 3 register
+> POST /api/auth/register
+< 200 OK
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    set-cookie: token=[redacted]; Path=/; Expires=Thu, 05 Nov 2026 13:18:02 GMT; Max-Age=604800; HttpOnly | last_activity=[redacted]; Path=/; Expires=Thu, 05 Nov 2026 13:18:02 GMT; Max-Age=604800; HttpOnly; SameSite=lax
+    date: Thu, 29 Oct 2026 13:18:02 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"ok":true}
+### 3 logout
+> POST /api/auth/logout
+< 200 OK
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    set-cookie: token=[redacted]; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; HttpOnly | last_activity=[redacted]; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; HttpOnly
+    date: Thu, 29 Oct 2026 13:18:02 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"ok":true}

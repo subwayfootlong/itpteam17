@@ -1,0 +1,178 @@
+{
+  "testCase": "TC-REG-02",
+  "title": "Regression: admin and member save actions complete",
+  "finishedAt": "2026-11-08T14:47:04.959Z",
+  "status": "PASS",
+  "checks": [
+    {
+      "step": "1 admin creates a benefit",
+      "expected": "201",
+      "actual": "201",
+      "pass": true
+    },
+    {
+      "step": "1 admin edits the benefit",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "1 benefit edit saved",
+      "expected": "15% off",
+      "actual": "15% off",
+      "pass": true
+    },
+    {
+      "step": "1 admin deletes the benefit",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "1 benefit deleted",
+      "expected": "0 rows",
+      "actual": "0 rows",
+      "pass": true
+    },
+    {
+      "step": "2 admin creates a payment method",
+      "expected": "200 or 201",
+      "actual": "201",
+      "pass": true
+    },
+    {
+      "step": "2 admin edits the payment method",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "2 admin deletes the payment method",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "2 payment method deleted; real active method untouched",
+      "expected": "0 rows; 1 active",
+      "actual": "0 rows; 1 active",
+      "pass": true
+    },
+    {
+      "step": "3 admin creates a draft event",
+      "expected": "201",
+      "actual": "201",
+      "pass": true
+    },
+    {
+      "step": "3 admin edits the event",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "3 admin deletes the event",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "3 event deleted",
+      "expected": "0 rows",
+      "actual": "0 rows",
+      "pass": true
+    },
+    {
+      "step": "4 admin edits a member (memberC)",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "4 member edit saved",
+      "expected": "[security-test] REG",
+      "actual": "[security-test] REG",
+      "pass": true
+    },
+    {
+      "step": "5 member submits a tier-upgrade request",
+      "expected": "201",
+      "actual": "201",
+      "pass": true
+    },
+    {
+      "step": "5 admin approves it",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "5 member's tier updated",
+      "expected": "student",
+      "actual": "student",
+      "pass": true
+    },
+    {
+      "step": "6 member votes in the announcement poll",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "6 vote saved",
+      "expected": "yes",
+      "actual": "yes",
+      "pass": true
+    },
+    {
+      "step": "7 member changes their password",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "7 member signs in with the new password",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "7 old password no longer works",
+      "expected": "401",
+      "actual": "401",
+      "pass": true
+    },
+    {
+      "step": "7 member changes it back",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "7 original password works again",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "8 member saves notification settings",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    },
+    {
+      "step": "8 settings read back changed",
+      "expected": "event = false",
+      "actual": "event = false",
+      "pass": true
+    },
+    {
+      "step": "8 settings restored",
+      "expected": "200",
+      "actual": "200",
+      "pass": true
+    }
+  ],
+  "skipped": [],
+  "screenshots": []
+}

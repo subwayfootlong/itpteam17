@@ -1,4 +1,5 @@
 import { deliverNextEmail, expandNextAnnouncementEmail, emailWorkerAuthorized } from '@/lib/transactionalEmail';
+import { logServerError } from '@/lib/serverLog';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -11,7 +12,8 @@ export async function POST(request: Request) {
     const expansion = await expandNextAnnouncementEmail();
     if (expansion !== 'idle') return Response.json({ result: expansion }, { headers });
     return Response.json({ result: await deliverNextEmail() }, { headers });
-  } catch {
+  } catch (err) {
+    logServerError("internal/transactional-emails POST", err);
     return Response.json({ error: 'Email worker unavailable' }, { status: 503, headers });
   }
 }

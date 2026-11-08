@@ -1,0 +1,43 @@
+### 1 GET /api/member/notifications
+> GET /api/member/notifications
+< 200 OK
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:18:06 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"unreadCount":23}
+### 1 GET /api/member/notification-preferences
+> GET /api/member/notification-preferences
+< 200 OK
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:18:07 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"preferences":{"email":false,"benefit":true,"announcement":true,"event":true}}
+### 1 GET /api/member/tier-upgrade
+> GET /api/member/tier-upgrade
+< 200 OK
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:18:07 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"currentTier":"basic","availableTiers":[{"value":"student","label":"Student"},{"value":"associate","label":"Associate"},{"value":"ordinary","label":"Ordinary"}],"requests":[]}
+### 1 GET /api/member/qr-token
+> GET /api/member/qr-token
+< 200 OK
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    cache-control: private, no-store, max-age=0
+    content-type: application/json
+    referrer-policy: no-referrer
+    x-robots-tag: noindex, nofollow
+    date: Thu, 29 Oct 2026 13:18:07 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"verificationUrl":"http://localhost:3000/verify/member?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6ImY3MDgxYzA0LTMxZjctNGViOC05ZDg4LTQyNWYwZDg5ZGZiNSIsInB1cnBvc2UiOiJtZW1iZXJzaGlwLXZlcmlmaWNhdGlvbiIsImlhdCI6MTc5MzI3OTg4NywiZXhwIjoxNzkzMjgwMTg3fQ.[signature redacted]","expiresIn":300}

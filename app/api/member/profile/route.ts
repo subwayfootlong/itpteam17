@@ -9,6 +9,7 @@ import {
   isAcceptablePhoneNumber,
 } from "@/lib/phone";
 import { supabaseAdmin } from "@/lib/supabaseServer";
+import { logServerError } from "@/lib/serverLog";
 
 type ProfileUpdatePayload = {
   salutation?: string;
@@ -103,6 +104,7 @@ export async function PATCH(req: Request) {
       .maybeSingle();
 
     if (error) {
+      logServerError("member/profile PATCH", error);
       return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
 
@@ -113,6 +115,7 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ ok: true });
   } catch (err: unknown) {
     if (err instanceof InputValidationError) return invalidInput(err.message);
+    logServerError("member/profile PATCH", err);
     return NextResponse.json(
       { error: "Unable to update profile" },
       { status: 500 },

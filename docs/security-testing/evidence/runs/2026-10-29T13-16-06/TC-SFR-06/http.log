@@ -1,0 +1,88 @@
+### 1 token with altered signature
+> PATCH /api/member/notification-preferences
+> body: {"benefit":false}
+< 401 Unauthorized
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:17:45 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"error":"Unauthorized"}
+### 2 token signed with a different secret
+> PATCH /api/member/notification-preferences
+> body: {"benefit":false}
+< 401 Unauthorized
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:17:45 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"error":"Unauthorized"}
+### 2 unsigned token (alg: none)
+> PATCH /api/member/notification-preferences
+> body: {"benefit":false}
+< 401 Unauthorized
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:17:45 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"error":"Unauthorized"}
+### 3 correctly signed but expired token
+> PATCH /api/member/notification-preferences
+> body: {"benefit":false}
+< 401 Unauthorized
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:17:45 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"error":"Unauthorized"}
+### 4 valid token idle for 16 minutes
+> PATCH /api/member/notification-preferences
+> body: {"benefit":false}
+< 200 OK
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:17:45 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"preferences":{"email":false,"benefit":false,"announcement":true,"event":true}}
+### 5 token reused after logout
+> PATCH /api/member/notification-preferences
+> body: {"benefit":false}
+< 200 OK
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:17:46 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"preferences":{"email":false,"benefit":false,"announcement":true,"event":true}}
+### 6 valid session with Origin: https://evil.example
+> PATCH /api/member/notification-preferences
+> body: {"benefit":false}
+< 200 OK
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:17:46 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"preferences":{"email":false,"benefit":false,"announcement":true,"event":true}}
+### 9 valid session (control)
+> PATCH /api/member/notification-preferences
+> body: {"benefit":false}
+< 200 OK
+    vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+    content-type: application/json
+    date: Thu, 29 Oct 2026 13:17:50 GMT
+    connection: keep-alive
+    keep-alive: timeout=5
+    transfer-encoding: chunked
+< body: {"preferences":{"email":false,"benefit":false,"announcement":true,"event":true}}
