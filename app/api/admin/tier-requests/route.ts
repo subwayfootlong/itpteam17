@@ -7,6 +7,7 @@ import {
 } from "@/lib/membershipTiers";
 import { formatMemberName } from "@/lib/memberName";
 import { supabaseAdmin } from "@/lib/supabaseServer";
+import { logServerError } from "@/lib/serverLog";
 
 type TierRequestRow = {
   id: string;
@@ -38,6 +39,7 @@ export async function GET(req: Request) {
 
   const { data, error } = await query;
   if (error) {
+    logServerError("admin/tier-requests GET", error);
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
@@ -51,6 +53,7 @@ export async function GET(req: Request) {
     : { data: [], error: null };
 
   if (userError) {
+    logServerError("admin/tier-requests GET", userError);
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
@@ -161,6 +164,7 @@ export async function PATCH(req: Request) {
     .maybeSingle();
 
   if (claimError) {
+    logServerError("admin/tier-requests PATCH", claimError);
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
   if (!claimed) {
@@ -179,6 +183,7 @@ export async function PATCH(req: Request) {
         .update({ status: "pending", admin_note: null, reviewed_by: null, reviewed_at: null, updated_at: reviewedAt })
         .eq("id", request.id)
         .eq("status", "approved");
+      logServerError("admin/tier-requests PATCH", updateError);
       return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
   }

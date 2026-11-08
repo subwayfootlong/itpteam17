@@ -6,6 +6,7 @@ import { ADMIN_BENEFIT_SELECT } from '@/lib/adminBenefits';
 import { notifyBenefitAvailable } from '@/lib/notifications';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { tierAudienceToDatabase, validateTierAudience } from '@/lib/tierAccess';
+import { logServerError } from '@/lib/serverLog';
 
 function cleanText(value: unknown) {
   if (typeof value === 'string') return value.trim();
@@ -30,7 +31,10 @@ export async function GET(req: Request) {
   if (active === 'false') query = query.eq('is_active', false);
 
   const { data, error } = await query;
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  if (error) {
+    logServerError("admin/engagement GET", error);
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  }
   return NextResponse.json({ benefits: data ?? [] });
 }
 
@@ -80,7 +84,10 @@ export async function POST(req: Request) {
     .select(ADMIN_BENEFIT_SELECT)
     .single();
 
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  if (error) {
+    logServerError("admin/engagement POST", error);
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  }
   if (data?.is_active) {
     await notifyBenefitAvailable({
       id: String(data.id),

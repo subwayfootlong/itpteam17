@@ -78,11 +78,14 @@ test("TC-SNFR-03 controlled error disclosure", async ({ evidence, apiAs, anonApi
     const routes = walk(path.join(process.cwd(), "app", "api")).filter((f) => f.endsWith("route.ts"));
     const leakyReturn = routes.filter((f) => /json\(\s*\{[^}]*\b(?:error|err|e)\.(?:message|details|hint|stack)/.test(fs.readFileSync(f, "utf8")));
     ev.check("7 no handler returns a raw error message to the client", "0 files", leakyReturn.length ? leakyReturn.map(rel).join(", ") : "0 files", leakyReturn.length === 0);
+    // Every 5xx response must have a log call just before it, not merely somewhere in the file.
     for (const f of routes) {
-      const src = fs.readFileSync(f, "utf8");
-      if (!/status: 50\d|, 50\d\)/.test(src)) continue;
-      const logs = /console\.(error|warn)|logError|logger\./.test(src);
-      ev.check(`7 ${rel(f)} logs server-side when it returns 5xx`, "logs the error", logs ? "logs" : "returns 5xx WITHOUT logging", logs);
+      const sites = fiveXxSites(fs.readFileSync(f, "utf8"));
+      if (!sites.length) continue;
+      const unlogged = sites.filter((s) => !s.logged).map((s) => `line ${s.line}`);
+      ev.check(`7 ${rel(f)} logs server-side when it returns 5xx`, `all ${sites.length} 5xx paths log`,
+        unlogged.length ? `${unlogged.length} of ${sites.length} 5xx paths return WITHOUT logging (${unlogged.join(", ")})` : `all ${sites.length} log`,
+        unlogged.length === 0);
     }
   } finally {
     await db().from("discussion").delete().ilike("body", `%${FIXTURE_TAG}%`);
@@ -90,6 +93,26 @@ test("TC-SNFR-03 controlled error disclosure", async ({ evidence, apiAs, anonApi
 
   expect(ev.passed, "all TC-SNFR-03 checks pass").toBe(true);
 });
+
+/**
+ * Each `return` that sends a 5xx (`status: 500`, `cond ? 409 : 500`, or `respond(…, 503)`),
+ * and whether a log call appears within the few lines before it in the same block.
+ */
+function fiveXxSites(src: string) {
+  const lines = src.split(/\r?\n/);
+  const fiveXx = /status:\s*(?:[^,}]*\?\s*\d+\s*:\s*)?50\d\b|\},\s*50\d\)/;
+  const logCall = /console\.(?:error|warn)\(|logServerError\(/;
+  const sites: { line: number; logged: boolean }[] = [];
+  lines.forEach((line, i) => {
+    const isReturn = /^\s*return\b/.test(line) || /^\s*if \(.+\) return\b/.test(line);
+    if (!isReturn) return;
+    const statement = lines.slice(i, i + 6).join("\n").split(";")[0];
+    if (!fiveXx.test(statement)) return;
+    const before = lines.slice(Math.max(0, i - 4), i + 1).join("\n");
+    sites.push({ line: i + 1, logged: logCall.test(before) });
+  });
+  return sites;
+}
 
 function rel(f: string) {
   return path.relative(process.cwd(), f).replace(/\\/g, "/");

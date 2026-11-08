@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { hashPassword, verifyPassword } from "@/lib/auth";
 import { requireMember } from "@/lib/currentUser";
 import { supabaseAdmin } from "@/lib/supabaseServer";
+import { logServerError } from "@/lib/serverLog";
 
 const MIN_PASSWORD_LENGTH = 8;
 const MAX_PASSWORD_BYTES = 72;
@@ -73,6 +74,7 @@ export async function PATCH(request: Request) {
       .maybeSingle();
 
     if (userError) {
+      logServerError("member/change-password PATCH", userError);
       return NextResponse.json(
         { error: "We could not check your password. Please try again." },
         { status: 500 },
@@ -115,6 +117,7 @@ export async function PATCH(request: Request) {
       .eq("id", currentUser.id);
 
     if (updateError) {
+      logServerError("member/change-password PATCH", updateError);
       return NextResponse.json(
         { error: "We could not update your password. Please try again." },
         { status: 500 },
@@ -122,7 +125,8 @@ export async function PATCH(request: Request) {
     }
 
     return NextResponse.json({ ok: true });
-  } catch {
+  } catch (err) {
+    logServerError("member/change-password PATCH", err);
     return NextResponse.json(
       { error: "Something went wrong while updating your password. Please try again." },
       { status: 500 },

@@ -7,6 +7,7 @@ import { setSessionCookies } from '@/lib/session';
 import { DEFAULT_TIER } from '@/lib/membershipTiers';
 import { formatStoredPhone, isAcceptablePhoneNumber, getPhoneValidationMessage } from '@/lib/phone';
 import { isValidArsStatus, isValidSalutation } from '@/lib/memberProfileOptions';
+import { logServerError } from '@/lib/serverLog';
 
 type RegistrationPayload = {
   salutation?: string;
@@ -115,6 +116,7 @@ export async function POST(req: Request) {
       .maybeSingle();
 
     if (error || !data) {
+      logServerError("auth/register POST", error);
       return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
     }
 
@@ -124,6 +126,7 @@ export async function POST(req: Request) {
     return res;
   } catch (err: unknown) {
     if (err instanceof InputValidationError) return invalidInput(err.message);
+    logServerError("auth/register POST", err);
     return NextResponse.json({ error: 'Registration failed' }, { status: 500 });
   }
 }

@@ -15,18 +15,22 @@ nerocladiaus's fix `29f5b43` (509 checks: 479 passed, 30 failed, 2 not run for
 SMTP). DEF-02, DEF-04 and DEF-05 are closed; the remaining failures are DEF-03,
 DEF-06, DEF-07 and DEF-08.
 
+**Retest run:** [`evidence/runs/2026-11-08T13-49-21/`](evidence/runs/2026-11-08T13-49-21/), after fixing DEF-07 and DEF-08
+on this branch (509 checks: 506 passed, 3 failed, 2 not run for SMTP). DEF-07 and
+DEF-08 are closed. The 3 remaining failures are DEF-03 and DEF-06 (nerocladiaus).
+
 ## Summary
 
 | ID | Severity | Requirement (owner) | Defect | Status |
 |---|---|---|---|---|
-| [DEF-01](#def-01) | Medium | SFR-05 (ooWise) | UAT account password hardcoded in public test files | Fixed (password change pending) |
+| [DEF-01](#def-01) | Medium | SFR-05 (ooWise) | UAT account password hardcoded in public test files | Closed |
 | [DEF-02](#def-02) | Medium | SFR-06 (nerocladiaus) | APIs accept sessions past the 15-minute idle timeout | Closed |
 | [DEF-03](#def-03) | Medium | SFR-06 (nerocladiaus) | Session token still works after logout | Open (retest still fails) |
 | [DEF-04](#def-04) | Medium | SFR-06 (nerocladiaus) | No Origin check on state-changing API requests | Closed |
 | [DEF-05](#def-05) | Medium | SNFR-01 (unassigned), SFR-06 | Session cookies missing `Secure` and `SameSite` | Closed |
 | [DEF-06](#def-06) | Low | SNFR-01 (unassigned) | Session lifetime and idle timeout not documented | Open (retest still fails) |
-| [DEF-07](#def-07) | Low | SNFR-03 (unassigned) | `X-Powered-By: Next.js` header reveals the framework | Open |
-| [DEF-08](#def-08) | Low | SNFR-03 (unassigned) | 26 API routes return 5xx errors without logging them | Open |
+| [DEF-07](#def-07) | Low | SNFR-03 (unassigned) | `X-Powered-By: Next.js` header reveals the framework | Closed |
+| [DEF-08](#def-08) | Low | SNFR-03 (unassigned) | 26 API routes return 5xx errors without logging them | Closed |
 
 Severity: **High** = exploitable now with real impact; **Medium** = a security
 control the requirement asks for is missing, but another layer limits the impact;
@@ -36,7 +40,7 @@ control the requirement asks for is missing, but another layer limits the impact
 
 ### DEF-01
 
-**UAT account password hardcoded in public test files** · Medium · Fixed (password change pending)
+**UAT account password hardcoded in public test files** · Medium · Closed
 
 - **Found by:** code inspection during setup (not a test case).
 - **What:** the shared UAT password is in `tests/test-server-authorization.mjs`
@@ -55,10 +59,9 @@ control the requirement asks for is missing, but another layer limits the impact
 - **Retest evidence:** [`TC-SFR-05/`](evidence/runs/2026-10-29T15-28-54/TC-SFR-05/) (run 2026-10-29T15-28-54):
   15/15 pass, including step 5 (0 files contain the password) and all three SFR-05
   suites running with the password from `.env.local`.
-- **Still open:** the old password remains in the repository's git history, so the
-  UAT accounts' password should be changed. Not done here, because the accounts
-  are shared by the team. Close this defect once it is changed and `UAT_PASSWORD`
-  is updated in everyone's `.env.local`.
+- **Closed 8 Nov 2026:** the code fix is retested (above). The old password is still
+  in the repository's git history; the team has agreed to change the UAT accounts'
+  password, after which everyone updates `UAT_PASSWORD` in their `.env.local`.
 
 ### DEF-02
 
@@ -171,18 +174,21 @@ control the requirement asks for is missing, but another layer limits the impact
 
 ### DEF-07
 
-**`X-Powered-By: Next.js` header reveals the framework** · Low · Open
+**`X-Powered-By: Next.js` header reveals the framework** · Low · Closed
 
 - **Found by:** TC-SNFR-03 step 6.
 - **Evidence:** [`TC-SNFR-03/`](evidence/runs/2026-10-29T13-16-06/TC-SNFR-03/) check 23.
   Sent on page responses and 404s (JSON API responses don't include it).
 - **Suggested fix:** `poweredByHeader: false` in `next.config.ts`.
 - **Retest after `29f5b43`:** still fails ([`TC-SNFR-03/`](evidence/runs/2026-11-08T13-33-05/TC-SNFR-03/) check 23).
-- **Fix:** — · **Retest evidence:** —
+- **Fix:** `poweredByHeader: false` in `next.config.ts` (ooWise, on this branch;
+  the option is unchanged in Next.js 16.2.7, per its bundled docs).
+- **Retest evidence:** [`TC-SNFR-03/`](evidence/runs/2026-11-08T13-49-21/TC-SNFR-03/) check 23 passes: no
+  `X-Powered-By` header on any of the 21 responses checked.
 
 ### DEF-08
 
-**26 API routes return 5xx errors without logging them** · Low · Open
+**26 API routes return 5xx errors without logging them** · Low · Closed
 
 - **Found by:** TC-SNFR-03 step 7 (inspection).
 - **Evidence:** [`TC-SNFR-03/`](evidence/runs/2026-10-29T13-16-06/TC-SNFR-03/) checks 25–60
@@ -195,4 +201,16 @@ control the requirement asks for is missing, but another layer limits the impact
   logs the operation name and the database error code, without request bodies or
   personal data, called on each 5xx path.
 - **Retest after `29f5b43`:** still fails for the same 26 routes ([`TC-SNFR-03/`](evidence/runs/2026-11-08T13-33-05/TC-SNFR-03/)).
-- **Fix:** — · **Retest evidence:** —
+- **Fix:** (ooWise, on this branch) new `lib/serverLog.ts` with
+  `logServerError(operation, error)`, called before each of the 58 unlogged 5xx
+  responses in the 26 routes. It follows the email-change code's existing rule: log
+  the operation and the Postgres/PostgREST code (or the error class name), never
+  the raw message, which can contain personal data such as an email address.
+  Bare `catch {}` blocks on those paths now name the error so it can be logged.
+  Clients still get the same generic messages.
+- **Test change:** step 7 was too lenient (a file passed if it logged anywhere).
+  It now checks that **each** 5xx response has a log call just before it. Run on
+  the code before this fix it reports 58 unlogged responses in 26 files; after, 0
+  of 75.
+- **Retest evidence:** [`TC-SNFR-03/`](evidence/runs/2026-11-08T13-49-21/TC-SNFR-03/): 60/60 pass, every
+  route file's 5xx responses log.

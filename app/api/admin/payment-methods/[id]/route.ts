@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { ADMIN_PAYMENT_METHOD_SELECT } from '@/lib/adminPaymentMethods';
 import { normalizePaymentUrl } from '@/lib/paymentUrl';
 import { supabaseAdmin } from '@/lib/supabaseServer';
+import { logServerError } from '@/lib/serverLog';
 
 function cleanPatchValue(value: unknown) {
   if (typeof value === 'string') {
@@ -26,7 +27,10 @@ export async function GET(
   const { data, error } = await supabaseAdmin
     .from('payment_methods').select(ADMIN_PAYMENT_METHOD_SELECT).eq('id', id).maybeSingle();
 
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  if (error) {
+    logServerError("admin/payment-methods/[id] GET", error);
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  }
   if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json({ paymentMethod: data });
 }
@@ -76,13 +80,19 @@ export async function PATCH(
       .update({ is_active: false })
       .eq('is_active', true)
       .neq('id', id);
-    if (deactivateError) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    if (deactivateError) {
+      logServerError("admin/payment-methods/[id] PATCH", deactivateError);
+      return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+    }
   }
 
   const { data, error } = await supabaseAdmin
     .from('payment_methods').update(updates).eq('id', id).select(ADMIN_PAYMENT_METHOD_SELECT).maybeSingle();
 
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  if (error) {
+    logServerError("admin/payment-methods/[id] PATCH", error);
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  }
   if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json({ paymentMethod: data, deactivatedOthers: updates.is_active === true });
 }
@@ -97,6 +107,9 @@ export async function DELETE(
   const { id } = await params;
   if (!isUuid(id)) return invalidInput("ID must be a UUID");
   const { error } = await supabaseAdmin.from('payment_methods').delete().eq('id', id);
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  if (error) {
+    logServerError("admin/payment-methods/[id] DELETE", error);
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  }
   return NextResponse.json({ ok: true });
 }

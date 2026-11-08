@@ -6,6 +6,7 @@ import { ADMIN_BENEFIT_SELECT } from '@/lib/adminBenefits';
 import { notifyBenefitAvailable } from '@/lib/notifications';
 import { supabaseAdmin } from '@/lib/supabaseServer';
 import { tierAudienceToDatabase, validateTierAudience } from '@/lib/tierAccess';
+import { logServerError } from '@/lib/serverLog';
 
 function cleanPatchValue(value: unknown) {
   if (typeof value === 'string') {
@@ -27,7 +28,10 @@ export async function GET(
   const { data, error } = await supabaseAdmin
     .from('benefits').select(ADMIN_BENEFIT_SELECT).eq('id', id).maybeSingle();
 
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  if (error) {
+    logServerError("admin/engagement/[id] GET", error);
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  }
   if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json({ benefit: data });
 }
@@ -79,7 +83,10 @@ export async function PATCH(
   const { data, error } = await supabaseAdmin
     .from('benefits').update(updates).eq('id', id).select(ADMIN_BENEFIT_SELECT).maybeSingle();
 
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  if (error) {
+    logServerError("admin/engagement/[id] PATCH", error);
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  }
   if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   if (data.is_active && (!existing?.is_active || audienceChanged)) {
     await notifyBenefitAvailable({
@@ -107,6 +114,9 @@ export async function DELETE(
   const { id } = await params;
   if (!isUuid(id)) return invalidInput("ID must be a UUID");
   const { error } = await supabaseAdmin.from('benefits').delete().eq('id', id);
-  if (error) return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  if (error) {
+    logServerError("admin/engagement/[id] DELETE", error);
+    return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
+  }
   return NextResponse.json({ ok: true });
 }

@@ -1,6 +1,7 @@
 import { readJsonObject, invalidInput, InputValidationError } from "@/lib/inputValidation";
 import { NextResponse } from "next/server";
 import { requireMember } from "@/lib/currentUser";
+import { logServerError } from "@/lib/serverLog";
 import {
   getNotificationPreferences,
   updateNotificationPreferences,
@@ -52,8 +53,9 @@ export async function PATCH(req: Request) {
   try {
     const preferences = await updateNotificationPreferences(user.id, patch);
     return NextResponse.json({ preferences });
-  } catch {
+  } catch (err) {
     const message = "Unable to save preferences";
+    logServerError("member/notification-preferences PATCH", err);
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

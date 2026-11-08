@@ -3,6 +3,7 @@ import { verifyAccessToken } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabaseServer";
 import { generateMembershipQrToken, membershipVerificationUrl, MEMBERSHIP_QR_TTL, qrResponseHeaders } from "@/lib/membershipQr";
 import { getLastActivityTimestamp, isSessionIdleExpired, LAST_ACTIVITY_COOKIE } from "@/lib/session";
+import { logServerError } from "@/lib/serverLog";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -29,13 +30,17 @@ export async function GET(request: Request) {
       return respond({ error: "Unauthorized" }, 401);
     }
     const { data, error } = await supabaseAdmin.from("users").select("id,email,role").eq("id", userId).maybeSingle();
-    if (error) return respond({ error: "Unable to generate membership QR. Please try again." }, 503);
+    if (error) {
+      logServerError("member/qr-token GET", error);
+      return respond({ error: "Unable to generate membership QR. Please try again." }, 503);
+    }
     if (!data?.id || data.email !== email) return respond({ error: "Unauthorized" }, 401);
     if (data.role !== "member") return respond({ error: "Forbidden" }, 403);
     // member_id is optional and can contain a phone number. Use the stable record ID.
     const signed = generateMembershipQrToken(data.id);
     return respond({ verificationUrl: membershipVerificationUrl(signed, request.url), expiresIn: MEMBERSHIP_QR_TTL });
-  } catch {
+  } catch (err) {
+    logServerError("member/qr-token GET", err);
     return respond({ error: "Unable to generate membership QR. Please try again." }, 503);
   }
 }

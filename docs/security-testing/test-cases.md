@@ -29,7 +29,9 @@ Baseline run [`2026-10-29T13-16-06`](evidence/runs/2026-10-29T13-16-06/), 29 Oct
 
 Retest run [`2026-11-08T13-33-05`](evidence/runs/2026-11-08T13-33-05/), 8 Nov 2026, after merging `main` with nerocladiaus's session and CSRF fix (`29f5b43`): 509 checks, 479 passed, 30 failed, 2 not run (SMTP). DEF-02, DEF-04 and DEF-05 closed; DEF-03, DEF-06, DEF-07 and DEF-08 still open.
 
-| ID | Requirement | Owner | Steps | Baseline (29 Oct) | Retest (8 Nov) |
+Latest retest [`2026-11-08T13-49-21`](evidence/runs/2026-11-08T13-49-21/), after fixing DEF-07 and DEF-08: 509 checks, 506 passed, 3 failed (DEF-03, DEF-06), 2 not run (SMTP). This is the "Latest retest" column below.
+
+| ID | Requirement | Owner | Steps | Baseline (29 Oct) | Latest retest (8 Nov) |
 |---|---|---|---|---|---|
 | [TC-SFR-01](#tc-sfr-01-api-authorisation-and-role-enforcement) | SFR-01 API authorisation and role enforcement (#47) | LiandoMaxin | 6 | PASS | PASS 153/153 |
 | [TC-SFR-02](#tc-sfr-02-resource-level-access-control) | SFR-02 Resource-level access control (#48) | nerocladiaus | 7 | PASS | PASS 8/8 |
@@ -41,7 +43,7 @@ Retest run [`2026-11-08T13-33-05`](evidence/runs/2026-11-08T13-33-05/), 8 Nov 20
 | [TC-SFR-08](#tc-sfr-08-secure-email-address-change) | SFR-08 Secure email address change (#39) | LiandoMaxin | 11 | PASS (2 not run) | PASS 19/19 (2 not run) |
 | [TC-SNFR-01](#tc-snfr-01-secure-session-configuration) | SNFR-01 Secure session configuration (#54) | — | 5 | **FAIL** | **FAIL** 7/9 (DEF-06) |
 | [TC-SNFR-02](#tc-snfr-02-personal-data-minimisation) | SNFR-02 Personal data minimisation (#55) | LiandoMaxin | 6 | PASS | PASS 23/23 |
-| [TC-SNFR-03](#tc-snfr-03-controlled-error-disclosure) | SNFR-03 Controlled error disclosure (#56) | — | 7 | **FAIL** | **FAIL** 33/60 (DEF-07, DEF-08) |
+| [TC-SNFR-03](#tc-snfr-03-controlled-error-disclosure) | SNFR-03 Controlled error disclosure (#56) | — | 7 | **FAIL** | PASS 60/60 |
 | [TC-REG-01](#tc-reg-01-regression-existing-workflows-still-work) | SNFR-04/05 Regression: existing workflows still work (#57) | ooWise | 4 | PASS | PASS 21/21 |
 
 ---
@@ -346,7 +348,7 @@ values of secrets from `.env.local`.
 | 4 | Verify garbage QR tokens and call internal endpoints with bad secrets | Generic error; no leak patterns | a, c | Auto |
 | 5 | Open an unknown page and an unknown API path | Generic 404 page; no stack trace or framework detail | a, c | Browser |
 | 6 | Response headers across steps 1–5 | No `X-Powered-By`, no server version headers | a | Auto |
-| 7 | Review API error handling in every route file | No handler returns `error.message` or raw database errors to the client, and every route that can return a 5xx logs the error server-side | a, b | Inspection |
+| 7 | Review API error handling in every route file | No handler returns `error.message` or raw database errors to the client, and every 5xx response has a server-side log call just before it | a, b | Inspection |
 
 **Status:** FAIL (33/60; steps 6, 7 fail) · **Evidence:** [`TC-SNFR-03/`](evidence/runs/2026-10-29T13-16-06/TC-SNFR-03/) · **Defects:** [DEF-07](defects.md#def-07), [DEF-08](defects.md#def-08)
 

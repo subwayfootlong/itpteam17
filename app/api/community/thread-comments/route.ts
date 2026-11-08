@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/lib/supabaseServer";
 import { moderationStatus } from "@/lib/community";
 import { formatTierLabel } from "@/lib/membershipTiers";
 import { evaluateTierAccess, normalizeTierAudience } from "@/lib/tierAccess";
+import { logServerError } from "@/lib/serverLog";
 
 type CommentRow = {
   id: string;
@@ -119,6 +120,7 @@ export async function POST(req: Request) {
       .single<CommentRow>();
 
     if (error) {
+      logServerError("community/thread-comments POST", error);
       return NextResponse.json({ error: "Unable to save community content" }, { status: 500 });
     }
 
@@ -136,6 +138,7 @@ export async function POST(req: Request) {
     });
   } catch (err: unknown) {
     if (err instanceof InputValidationError) return invalidInput(err.message);
+    logServerError("community/thread-comments POST", err);
     return NextResponse.json(
       { error: "Unable to post comment" },
       { status: 500 },

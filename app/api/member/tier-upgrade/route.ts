@@ -7,6 +7,7 @@ import {
   isMembershipTier,
 } from "@/lib/membershipTiers";
 import { supabaseAdmin } from "@/lib/supabaseServer";
+import { logServerError } from "@/lib/serverLog";
 
 export async function GET() {
   const { user: currentUser, response: authResponse } = await requireMember();
@@ -29,6 +30,7 @@ export async function GET() {
     .order("created_at", { ascending: false });
 
   if (error) {
+    logServerError("member/tier-upgrade GET", error);
     return NextResponse.json({ error: "Unable to complete request" }, { status: 500 });
   }
 
@@ -118,6 +120,7 @@ export async function POST(req: Request) {
     const message = error.code === "23505"
       ? "You already have a pending tier upgrade request"
       : "Unable to submit tier upgrade request";
+    logServerError("member/tier-upgrade POST", error);
     return NextResponse.json({ error: message }, { status: error.code === "23505" ? 409 : 500 });
   }
 
