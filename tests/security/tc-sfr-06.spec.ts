@@ -1,5 +1,5 @@
 import { request as playwrightRequest } from "@playwright/test";
-import { test, expect } from "./support/fixtures";
+import { test, expect, sameOrigin } from "./support/fixtures";
 import { ACCOUNTS, uatPassword } from "./support/accounts";
 import { db, userFor } from "./support/db";
 import { signedSession, expiredSession, wrongSecretSession, unsignedSession, tamperSignature, sessionCookie } from "./support/tokens";
@@ -37,8 +37,9 @@ test("TC-SFR-06 secure session and cross-site request handling", async ({ eviden
     const cleared = (idle.headers()["set-cookie"] ?? "").includes("token=;");
     ev.check("4 idle session cookies cleared", "token cookie cleared", cleared ? "cleared" : "not cleared", cleared);
 
-    // Step 5: log out, then reuse the old token.
-    const session = await playwrightRequest.newContext({ baseURL });
+    // Step 5: log out, then reuse the old token. The reused request carries a fresh
+    // last_activity, as anyone holding a copied token can set that cookie themselves.
+    const session = await playwrightRequest.newContext({ baseURL, extraHTTPHeaders: sameOrigin(baseURL) });
     await session.post("/api/auth/login", { data: { email: ACCOUNTS.memberA, password: uatPassword() } });
     const token = (await session.storageState()).cookies.find((c) => c.name === "token")?.value ?? "";
     const logout = await session.post("/api/auth/logout");
@@ -48,9 +49,15 @@ test("TC-SFR-06 secure session and cross-site request handling", async ({ eviden
 
     // Step 6: valid session, request claims to come from another site.
     await patchWith("6 valid session with Origin: https://evil.example", sessionCookie(valid), 403, { Origin: "https://evil.example" });
+    // ...and with no Origin header at all (not sent by this client).
+    const noOrigin = await playwrightRequest.newContext({ baseURL, extraHTTPHeaders: { Cookie: sessionCookie(valid) } });
+    const r6b = await noOrigin.patch(PREFS, { data: body });
+    await ev.http("6 valid session with no Origin header", "PATCH", PREFS, r6b, body);
+    ev.check("6 valid session with no Origin header", "403", String(r6b.status()), r6b.status() === 403);
+    await noOrigin.dispose();
 
     // Step 7: SameSite on the session cookie.
-    const login = await (await playwrightRequest.newContext({ baseURL })).post("/api/auth/login", {
+    const login = await (await playwrightRequest.newContext({ baseURL, extraHTTPHeaders: sameOrigin(baseURL) })).post("/api/auth/login", {
       data: { email: ACCOUNTS.memberA, password: uatPassword() },
     });
     const tokenCookie = login.headersArray().filter((h) => h.name.toLowerCase() === "set-cookie").map((h) => h.value).find((v) => v.startsWith("token="));
@@ -61,7 +68,7 @@ test("TC-SFR-06 secure session and cross-site request handling", async ({ eviden
     const portal = new URL(baseURL!);
     const otherSite = `${portal.protocol}//127.0.0.1:${portal.port}`;
     const context = await browser.newContext();
-    await context.request.post(`${baseURL}/api/auth/login`, { data: { email: ACCOUNTS.memberA, password: uatPassword() } });
+    await context.request.post(`${baseURL}/api/auth/login`, { data: { email: ACCOUNTS.memberA, password: uatPassword() }, headers: sameOrigin(baseURL) });
     const page = await context.newPage();
     const start = new Date().toISOString();
     await page.goto(`${otherSite}/`);

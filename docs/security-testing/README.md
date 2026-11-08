@@ -13,13 +13,15 @@ Test cases, evidence and regression testing for every security requirement
 
 ```bash
 npm run build            # tests run against a production build
-npm run test:security    # starts the server if needed, runs all test cases
-npm run test:security:report   # opens Playwright's HTML report of the last run
+npm run test:security:e2e          # starts the server if needed, runs all test cases
+npm run test:security:e2e:report   # opens Playwright's HTML report of the last run
 ```
 
 Run one test case: `npx playwright test tests/security/tc-sfr-01.spec.ts`
 
 The SFR-05 suites from the earlier work still run separately: `npm run test:sfr05`.
+`npm run test:security` is a separate set of unit tests for the session and
+Origin controls (`tests/security-controls.test.mjs`).
 
 ### What `.env.local` needs
 
@@ -76,5 +78,5 @@ Not every run needs committing. Commit:
    with the reason).
 3. Fixes are made on this branch. Status `Fixed`, with the commit.
 4. The same test case is rerun and the retest evidence linked. Status `Closed`.
-5. After all fixes, a full regression run (`npm run test:security` and
+5. After all fixes, a full regression run (`npm run test:security:e2e` and
    `npm run test:sfr05`) confirms existing workflows still work.

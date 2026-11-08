@@ -1,4 +1,5 @@
 import { createHmac, randomUUID } from "node:crypto";
+import { request as playwrightRequest } from "@playwright/test";
 import { test, expect } from "./support/fixtures";
 import { uatPassword } from "./support/accounts";
 import { db, must, userFor } from "./support/db";
@@ -68,7 +69,10 @@ test("TC-SFR-08 secure email address change", async ({ evidence, apiAs, baseURL 
     ev.skip("4 valid request sends the code to the new email", "SMTP_PASSWORD not configured; the server cannot send email");
 
     // Step 5: Origin check.
-    await record("5 no Origin header", await req({ newEmail: NEW_EMAIL, currentPassword: uatPassword() }, {}), 403);
+    // memberC's session in a client that sends no Origin header (the default clients add one).
+    const bare = await playwrightRequest.newContext({ baseURL, storageState: await api.storageState() });
+    await record("5 no Origin header", await bare.post("/api/member/email-change/request", { data: { newEmail: NEW_EMAIL, currentPassword: uatPassword() } }), 403);
+    await bare.dispose();
     await record("5 foreign Origin", await req({ newEmail: NEW_EMAIL, currentPassword: uatPassword() }, { Origin: "https://evil.example" }), 403);
 
     // Step 6: members only.

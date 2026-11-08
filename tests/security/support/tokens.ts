@@ -49,7 +49,11 @@ export function decode(token: string) {
   return jwt.decode(token, { complete: true });
 }
 
-/** Cookie header for a request made with a given session token. */
-export function sessionCookie(token: string, lastActivity?: number) {
-  return lastActivity === undefined ? `token=${token}` : `token=${token}; last_activity=${lastActivity}`;
+/**
+ * Cookie header for a request made with a given session token. Includes a fresh
+ * `last_activity` by default: the portal rejects sessions without one, so leaving it
+ * out would make every token check fail for that reason instead of the one tested.
+ */
+export function sessionCookie(token: string, lastActivity: number = Date.now()) {
+  return `token=${token}; last_activity=${lastActivity}`;
 }

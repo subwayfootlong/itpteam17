@@ -27,20 +27,22 @@ change a test makes is restored.
 
 Baseline run [`2026-10-29T13-16-06`](evidence/runs/2026-10-29T13-16-06/), 29 Oct 2026, production build: 13 test cases (including the TC-00 harness check), 507 checks, 469 passed, 38 failed, 2 not run (SMTP). Failures are grouped into defects in [defects.md](defects.md).
 
-| ID | Requirement | Owner | Steps | Status |
-|---|---|---|---|---|
-| [TC-SFR-01](#tc-sfr-01-api-authorisation-and-role-enforcement) | SFR-01 API authorisation and role enforcement (#47) | LiandoMaxin | 6 | PASS |
-| [TC-SFR-02](#tc-sfr-02-resource-level-access-control) | SFR-02 Resource-level access control (#48) | nerocladiaus | 7 | PASS |
-| [TC-SFR-03](#tc-sfr-03-membership-tier-access-control) | SFR-03 Membership-tier access control (#49) | nerocladiaus | 8 | PASS |
-| [TC-SFR-04](#tc-sfr-04-server-side-input-validation-and-sanitisation) | SFR-04 Server-side input validation and sanitisation (#50) | LiandoMaxin | 9 | PASS |
-| [TC-SFR-05](#tc-sfr-05-database-access-control) | SFR-05 Database access control (#51) | ooWise | 5 | PASS |
-| [TC-SFR-06](#tc-sfr-06-secure-session-and-cross-site-request-handling) | SFR-06 Secure session and cross-site request handling (#52) | nerocladiaus | 9 | **FAIL** |
-| [TC-SFR-07](#tc-sfr-07-secure-digital-membership-verification) | SFR-07 Secure digital membership verification (#53) | LiandoMaxin | 8 | PASS |
-| [TC-SFR-08](#tc-sfr-08-secure-email-address-change) | SFR-08 Secure email address change (#39) | LiandoMaxin | 11 | PASS (2 not run) |
-| [TC-SNFR-01](#tc-snfr-01-secure-session-configuration) | SNFR-01 Secure session configuration (#54) | — | 5 | **FAIL** |
-| [TC-SNFR-02](#tc-snfr-02-personal-data-minimisation) | SNFR-02 Personal data minimisation (#55) | LiandoMaxin | 6 | PASS |
-| [TC-SNFR-03](#tc-snfr-03-controlled-error-disclosure) | SNFR-03 Controlled error disclosure (#56) | — | 7 | **FAIL** |
-| [TC-REG-01](#tc-reg-01-regression-existing-workflows-still-work) | SNFR-04/05 Regression: existing workflows still work (#57) | ooWise | 4 | PASS |
+Retest run [`2026-11-08T13-33-05`](evidence/runs/2026-11-08T13-33-05/), 8 Nov 2026, after merging `main` with nerocladiaus's session and CSRF fix (`29f5b43`): 509 checks, 479 passed, 30 failed, 2 not run (SMTP). DEF-02, DEF-04 and DEF-05 closed; DEF-03, DEF-06, DEF-07 and DEF-08 still open.
+
+| ID | Requirement | Owner | Steps | Baseline (29 Oct) | Retest (8 Nov) |
+|---|---|---|---|---|---|
+| [TC-SFR-01](#tc-sfr-01-api-authorisation-and-role-enforcement) | SFR-01 API authorisation and role enforcement (#47) | LiandoMaxin | 6 | PASS | PASS 153/153 |
+| [TC-SFR-02](#tc-sfr-02-resource-level-access-control) | SFR-02 Resource-level access control (#48) | nerocladiaus | 7 | PASS | PASS 8/8 |
+| [TC-SFR-03](#tc-sfr-03-membership-tier-access-control) | SFR-03 Membership-tier access control (#49) | nerocladiaus | 8 | PASS | PASS 8/8 |
+| [TC-SFR-04](#tc-sfr-04-server-side-input-validation-and-sanitisation) | SFR-04 Server-side input validation and sanitisation (#50) | LiandoMaxin | 9 | PASS | PASS 155/155 |
+| [TC-SFR-05](#tc-sfr-05-database-access-control) | SFR-05 Database access control (#51) | ooWise | 5 | PASS | PASS 15/15 |
+| [TC-SFR-06](#tc-sfr-06-secure-session-and-cross-site-request-handling) | SFR-06 Secure session and cross-site request handling (#52) | nerocladiaus | 9 | **FAIL** | **FAIL** 14/15 (DEF-03) |
+| [TC-SFR-07](#tc-sfr-07-secure-digital-membership-verification) | SFR-07 Secure digital membership verification (#53) | LiandoMaxin | 8 | PASS | PASS 16/16 |
+| [TC-SFR-08](#tc-sfr-08-secure-email-address-change) | SFR-08 Secure email address change (#39) | LiandoMaxin | 11 | PASS (2 not run) | PASS 19/19 (2 not run) |
+| [TC-SNFR-01](#tc-snfr-01-secure-session-configuration) | SNFR-01 Secure session configuration (#54) | — | 5 | **FAIL** | **FAIL** 7/9 (DEF-06) |
+| [TC-SNFR-02](#tc-snfr-02-personal-data-minimisation) | SNFR-02 Personal data minimisation (#55) | LiandoMaxin | 6 | PASS | PASS 23/23 |
+| [TC-SNFR-03](#tc-snfr-03-controlled-error-disclosure) | SNFR-03 Controlled error disclosure (#56) | — | 7 | **FAIL** | **FAIL** 33/60 (DEF-07, DEF-08) |
+| [TC-REG-01](#tc-reg-01-regression-existing-workflows-still-work) | SNFR-04/05 Regression: existing workflows still work (#57) | ooWise | 4 | PASS | PASS 21/21 |
 
 ---
 
@@ -204,8 +206,8 @@ can build expired and forged tokens.
 | 2 | Send it with a token signed with a different secret, and with an unsigned (`alg: none`) token | 401 for both | a, c | Auto |
 | 3 | Send it with a correctly signed token whose expiry has passed | 401 | a, c | Auto |
 | 4 | Send it with a valid token but `last_activity` older than the 15-minute idle timeout | 401 and session cookies cleared | a, c | Auto |
-| 5 | Log out, then reuse the old token | 401 | a, c | Auto |
-| 6 | Send it with a valid session and `Origin: https://evil.example` | 403 (cross-site request refused) | b | Auto |
+| 5 | Log out, then reuse the old token (with a fresh `last_activity`, which anyone holding the token can set) | 401 | a, c | Auto |
+| 6 | Send it with a valid session and `Origin: https://evil.example`, and with no `Origin` header | 403 for both (cross-site request refused) | b | Auto |
 | 7 | Inspect the session cookie's `SameSite` attribute | `SameSite=Lax` or `Strict` set explicitly | b | Auto |
 | 8 | From a page on another site (`127.0.0.1`), have the browser send a cross-site script request (8a) and submit a cross-site form (8b) to the portal (`localhost`) with credentials. Control 8c: the same form from the portal's own site | 8a, 8b: no state change. 8c: state changes, proving the test can detect a successful request | b | Browser |
 | 9 | Confirm a valid session still works for the same request (control) | 200 | a | Auto |
@@ -360,7 +362,7 @@ at the end (steps 1–4).
 | # | Step | Expected result | Method |
 |---|---|---|---|
 | 1 | Rerun the test case whose defect was fixed | The failing step now passes; the before and after evidence are both kept | Auto |
-| 2 | Run `npm run test:security` (all test cases) | No new failures | Auto |
+| 2 | Run `npm run test:security:e2e` (all test cases) | No new failures | Auto |
 | 3 | Run `npm run test:sfr05` (RLS, authorisation, member and admin workflows) | All pass | Auto |
 | 4 | Member and admin journeys in the browser: log in, view home, events, benefits, community, profile, digital card; admin dashboard, members, events | Every page loads and works; screenshots kept | Browser |
 

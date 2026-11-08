@@ -21,6 +21,16 @@ type EvidenceHandle = {
   current: () => Evidence;
 };
 
+/**
+ * Headers a browser sends on a same-site request. The portal rejects state-changing
+ * API requests whose Origin isn't its own (proxy.ts), so API clients send it by
+ * default, like a real browser on the portal would. Tests of the Origin rule
+ * override or omit it deliberately.
+ */
+export function sameOrigin(baseURL: string | undefined): Record<string, string> {
+  return { Origin: new URL(baseURL ?? "http://localhost:3000").origin };
+}
+
 // Fixture callbacks are named `provide` rather than Playwright's usual `use`,
 // so the React hooks lint rule doesn't mistake them for React's use().
 export const test = base.extend<SecurityFixtures>({
@@ -39,7 +49,7 @@ export const test = base.extend<SecurityFixtures>({
   },
 
   anonApi: async ({ baseURL }, provide) => {
-    const ctx = await playwrightRequest.newContext({ baseURL });
+    const ctx = await playwrightRequest.newContext({ baseURL, extraHTTPHeaders: sameOrigin(baseURL) });
     await provide(ctx);
     await ctx.dispose();
   },
@@ -47,7 +57,7 @@ export const test = base.extend<SecurityFixtures>({
   apiAs: async ({ baseURL }, provide) => {
     const contexts: APIRequestContext[] = [];
     await provide(async (role) => {
-      const ctx = await playwrightRequest.newContext({ baseURL });
+      const ctx = await playwrightRequest.newContext({ baseURL, extraHTTPHeaders: sameOrigin(baseURL) });
       await login(ctx, role);
       contexts.push(ctx);
       return ctx;
@@ -58,20 +68,20 @@ export const test = base.extend<SecurityFixtures>({
   apiWithCookie: async ({ baseURL }, provide) => {
     const contexts: APIRequestContext[] = [];
     await provide(async (cookie, extraHeaders = {}) => {
-      const ctx = await playwrightRequest.newContext({ baseURL, extraHTTPHeaders: { Cookie: cookie, ...extraHeaders } });
+      const ctx = await playwrightRequest.newContext({ baseURL, extraHTTPHeaders: { ...sameOrigin(baseURL), Cookie: cookie, ...extraHeaders } });
       contexts.push(ctx);
       return ctx;
     });
     await Promise.all(contexts.map((c) => c.dispose()));
   },
 
-  pageAs: async ({ browser }, provide) => {
+  pageAs: async ({ browser, baseURL }, provide) => {
     const contexts: Awaited<ReturnType<typeof browser.newContext>>[] = [];
     await provide(async (role) => {
       const context = await browser.newContext();
       // Logging in through the context's request client stores the session
       // cookie in the same cookie jar the page uses.
-      await login(context.request, role);
+      await login(context.request, role, sameOrigin(baseURL));
       contexts.push(context);
       return context.newPage();
     });
@@ -99,9 +109,10 @@ export function call(ctx: APIRequestContext, route: RouteCase, data: unknown = {
   });
 }
 
-async function login(ctx: APIRequestContext, role: AccountRole) {
+async function login(ctx: APIRequestContext, role: AccountRole, headers: Record<string, string> = {}) {
   const res = await ctx.post("/api/auth/login", {
     data: { email: ACCOUNTS[role], password: uatPassword() },
+    headers,
   });
   if (res.status() !== 200) {
     throw new Error(`Login as ${role} (${ACCOUNTS[role]}) failed with ${res.status()}: ${await res.text()}`);

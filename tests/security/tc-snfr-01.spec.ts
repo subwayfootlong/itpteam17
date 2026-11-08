@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { request as playwrightRequest, type APIResponse } from "@playwright/test";
-import { test, expect } from "./support/fixtures";
+import { test, expect, sameOrigin } from "./support/fixtures";
 import { ACCOUNTS, uatPassword } from "./support/accounts";
 import { db } from "./support/db";
 import { decode } from "./support/tokens";
@@ -27,7 +27,7 @@ function flags(cookie: string | undefined) {
 
 test("TC-SNFR-01 secure session configuration", async ({ evidence, baseURL }) => {
   const ev = evidence.start("TC-SNFR-01", "Secure session configuration");
-  const ctx = await playwrightRequest.newContext({ baseURL });
+  const ctx = await playwrightRequest.newContext({ baseURL, extraHTTPHeaders: sameOrigin(baseURL) });
   const throwawayEmail = `security-test-${Date.now()}@uat.pergas.org`;
 
   function checkCookie(step: string, cookie: string | undefined, needMaxAge: boolean) {
